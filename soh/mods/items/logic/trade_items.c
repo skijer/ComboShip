@@ -191,7 +191,7 @@ u8 TradeAdult_IsMmTradeUseItem(s32 item) {
     return (idx >= 11 && idx <= 18);
 }
 
-extern void* MmAssets_LoadResource(const char* path); // MM GI models (object_gi_*) from mm.o2r
+extern void* MmAssets_LoadResource(const char* path);  // MM GI models (object_gi_*) from mm.o2r
 extern void MmGi_SetupObjectSegments(PlayState* play); // shared with the rando GI draws (draw.cpp)
 
 // Presented item -> its MM GI display list(s) from mm.o2r. NULL = nothing in that render bucket. (Room

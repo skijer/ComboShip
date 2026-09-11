@@ -970,8 +970,8 @@ void DrawNetworkSharedPanel() {
 // matching the untagged placements SuffixCrossGameItems now writes for it.
 void PlandoBuildItems() {
     sPlando.items.clear();
-    const std::set<std::string> sharedNames = ComboRando::SharedPairNames(
-        ComboRando::ResolveSharedPairs(sSharedPairs ? sSharedPairs() : "", sPlando.mmDump));
+    const std::set<std::string> sharedNames =
+        ComboRando::SharedPairNames(ComboRando::ResolveSharedPairs(sSharedPairs ? sSharedPairs() : "", sPlando.mmDump));
     std::unordered_set<std::string> sharedListed;
     auto add = [&](const std::string& dump, ComboRando::GameId g, const char* suf) {
         try {

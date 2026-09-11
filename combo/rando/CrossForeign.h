@@ -309,8 +309,7 @@ struct CwSharedPair {
 // SOH_DumpSharedItemPairs speaks the FC table's RI_* tokens while MM's dump names its items with
 // GetItemDisplayName, so joining them needs the dump's own token->name map. Without it every pair
 // misses silently. A pair whose mm side is already a friendly name passes through unchanged.
-inline std::vector<CwSharedPair> ResolveSharedPairs(const std::string& sharedPairsJson,
-                                                    const std::string& mmDumpJson) {
+inline std::vector<CwSharedPair> ResolveSharedPairs(const std::string& sharedPairsJson, const std::string& mmDumpJson) {
     std::vector<CwSharedPair> pairs;
     if (sharedPairsJson.empty()) {
         return pairs;

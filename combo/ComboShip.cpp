@@ -1824,8 +1824,8 @@ static void RunComboFill(std::string inputSeed, ComboRando::ComboGenProgress* pr
         // ComboShip: suffix cross-game item-name collisions (e.g. "Mirror Shield") in the human-readable
         // placements so the consolidated file / plandomizer read unambiguously; each game strips its own
         // "(OOT)"/"(MM)" on apply. Foreign checks are skipped (carried by foreign[]).
-        const std::set<std::string> sharedNames = ComboRando::SharedPairNames(ComboRando::ResolveSharedPairs(
-            SOH_DumpSharedItemPairs ? SOH_DumpSharedItemPairs() : "", mmDump));
+        const std::set<std::string> sharedNames = ComboRando::SharedPairNames(
+            ComboRando::ResolveSharedPairs(SOH_DumpSharedItemPairs ? SOH_DumpSharedItemPairs() : "", mmDump));
         ComboRando::SuffixCrossGameItems(ootSpoiler, mmSpoiler, foreignArr, sohDump, mmDump, sharedNames);
 
         nlohmann::json consolidated;
@@ -2518,9 +2518,7 @@ static void Combo_RebuildMMSaveForSlot(int fileNum) try {
     }
 } catch (const std::exception& e) {
     std::cerr << "[ComboShip] ERROR: MM save rebuild threw for slot " << fileNum << ": " << e.what() << std::endl;
-} catch (...) {
-    std::cerr << "[ComboShip] ERROR: MM save rebuild threw for slot " << fileNum << std::endl;
-}
+} catch (...) { std::cerr << "[ComboShip] ERROR: MM save rebuild threw for slot " << fileNum << std::endl; }
 
 static void Combo_OnOOTSaveInit(int fileNum) {
     // A new file starts in OOT. Explicit because not every delete path clears the container

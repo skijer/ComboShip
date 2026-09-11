@@ -21,8 +21,17 @@ constexpr const char* kCvarEnabled = "gCombo.Sync.Enabled";
 
 enum SyncType { SYNC_INT, SYNC_FLOAT, SYNC_TEXT_SPEED };
 
-enum SyncGroup { GROUP_CONTROLS, GROUP_CAMERA, GROUP_CHEATS, GROUP_TIMESAVERS, GROUP_INTERFACE, GROUP_GAMEPLAY,
-                 GROUP_AUDIO, GROUP_RANDOMIZER, GROUP_COUNT };
+enum SyncGroup {
+    GROUP_CONTROLS,
+    GROUP_CAMERA,
+    GROUP_CHEATS,
+    GROUP_TIMESAVERS,
+    GROUP_INTERFACE,
+    GROUP_GAMEPLAY,
+    GROUP_AUDIO,
+    GROUP_RANDOMIZER,
+    GROUP_COUNT
+};
 
 struct GroupInfo {
     const char* cvar;
@@ -66,16 +75,20 @@ const SyncPair kPairs[] = {
     { "gEnhancements.Playback.CustomizeOcarinaControls", "gSettings.CustomOcarina.Enabled", SYNC_INT, GROUP_CONTROLS, 0,
       0 },
     { "gEnhancements.Playback.DpadOcarina", "gSettings.CustomOcarina.Dpad", SYNC_INT, GROUP_CONTROLS, 0, 0 },
-    { "gEnhancements.Playback.RightStickOcarina", "gSettings.CustomOcarina.RightStick", SYNC_INT, GROUP_CONTROLS, 0, 0 },
+    { "gEnhancements.Playback.RightStickOcarina", "gSettings.CustomOcarina.RightStick", SYNC_INT, GROUP_CONTROLS, 0,
+      0 },
     { "gEnhancements.Playback.NoDropOcarinaInput", "gEnhancements.DpadNoDropOcarinaInput", SYNC_INT, GROUP_CONTROLS, 0,
       0 },
     { "gEnhancements.Songs.FasterSongPlayback", "gEnhancements.FastOcarinaPlayback", SYNC_INT, GROUP_CONTROLS, 0, 0 },
     { "gEnhancements.PlayerActions.ArrowCycle", "gEnhancements.BowArrowCycle", SYNC_INT, GROUP_CONTROLS, 0, 0 },
     { "gEnhancements.PlayerActions.RemoteBombchu", "gEnhancements.RemoteBombchu", SYNC_INT, GROUP_CONTROLS, 0, 0 },
-    { "gEnhancements.Items.RemoveExplosiveLimit", "gEnhancements.RemoveExplosiveLimit", SYNC_INT, GROUP_CONTROLS, 0, 0 },
+    { "gEnhancements.Items.RemoveExplosiveLimit", "gEnhancements.RemoveExplosiveLimit", SYNC_INT, GROUP_CONTROLS, 0,
+      0 },
 
-    { "gEnhancements.Camera.FirstPerson.InvertX", "gSettings.Controls.InvertAimingXAxis", SYNC_INT, GROUP_CAMERA, 0, 0 },
-    { "gEnhancements.Camera.FirstPerson.InvertY", "gSettings.Controls.InvertAimingYAxis", SYNC_INT, GROUP_CAMERA, 0, 0 },
+    { "gEnhancements.Camera.FirstPerson.InvertX", "gSettings.Controls.InvertAimingXAxis", SYNC_INT, GROUP_CAMERA, 0,
+      0 },
+    { "gEnhancements.Camera.FirstPerson.InvertY", "gSettings.Controls.InvertAimingYAxis", SYNC_INT, GROUP_CAMERA, 0,
+      0 },
     { "gEnhancements.Camera.FirstPerson.RightStickEnabled", "gSettings.Controls.RightStickAim", SYNC_INT, GROUP_CAMERA,
       0, 0 },
     { "gEnhancements.Camera.FirstPerson.MoveInFirstPerson", "gSettings.MoveInFirstPerson", SYNC_INT, GROUP_CAMERA, 0,
@@ -122,7 +135,8 @@ const SyncPair kPairs[] = {
     { "gEnhancements.Timesavers.FasterRupeeAccumulator", "gEnhancements.FasterRupeeAccumulator", SYNC_INT,
       GROUP_TIMESAVERS, 0, 0 },
     { "gEnhancements.Playback.SkipScarecrowSong", "gEnhancements.InstantScarecrow", SYNC_INT, GROUP_TIMESAVERS, 0, 0 },
-    { "gEnhancements.Dialogue.SkipBottlePickupMessages", "gEnhancements.FastBottles", SYNC_INT, GROUP_TIMESAVERS, 0, 0 },
+    { "gEnhancements.Dialogue.SkipBottlePickupMessages", "gEnhancements.FastBottles", SYNC_INT, GROUP_TIMESAVERS, 0,
+      0 },
     { "gEnhancements.Dialogue.FastText", "gEnhancements.TextSpeed", SYNC_TEXT_SPEED, GROUP_TIMESAVERS, 0, 0 },
 
     { "gNotifications.Position", "gSettings.Notifications.Position", SYNC_INT, GROUP_INTERFACE, 0, 0 },
@@ -148,8 +162,8 @@ const SyncPair kPairs[] = {
 
     { "gAudioEditor.DisableTatlCallAudio", "gAudioEditor.DisableNaviCallAudio", SYNC_INT, GROUP_AUDIO, 0, 0 },
 
-    { "gEnhancements.DifficultyOptions.PermanentHeartLoss", "gEnhancements.PermanentHeartLoss", SYNC_INT, GROUP_GAMEPLAY,
-      0, 0 },
+    { "gEnhancements.DifficultyOptions.PermanentHeartLoss", "gEnhancements.PermanentHeartLoss", SYNC_INT,
+      GROUP_GAMEPLAY, 0, 0 },
     { "gEnhancements.DifficultyOptions.DeleteFileOnDeath", "gEnhancements.DeleteFileOnDeath", SYNC_INT, GROUP_GAMEPLAY,
       0, 0 },
     { "gEnhancements.DifficultyOptions.NoHeartDrops", "gEnhancements.NoHeartDrops", SYNC_INT, GROUP_GAMEPLAY, 0, 0 },
@@ -173,8 +187,8 @@ const SyncPair kPairs[] = {
     { "gRando.Options.RO_SHUFFLE_HIVE_DROPS", "gRandoSettings.ShuffleBeehives", SYNC_INT, GROUP_RANDOMIZER, 0, 0 },
     { "gRando.Options.RO_SHUFFLE_BUTTERFLIES", "gRandoSettings.ShuffleButterflyFairies", SYNC_INT, GROUP_RANDOMIZER, 0,
       0 },
-    { "gRando.Options.RO_SHUFFLE_OCARINA_BUTTONS", "gRandoSettings.ShuffleOcarinaButtons", SYNC_INT, GROUP_RANDOMIZER, 0,
-      0 },
+    { "gRando.Options.RO_SHUFFLE_OCARINA_BUTTONS", "gRandoSettings.ShuffleOcarinaButtons", SYNC_INT, GROUP_RANDOMIZER,
+      0, 0 },
     { "gRando.Options.RO_SHUFFLE_SWIM", "gRandoSettings.ShuffleSwim", SYNC_INT, GROUP_RANDOMIZER, 0, 0 },
     { "gRando.Options.RO_SHUFFLE_SKELETON_KEY", "gRandoSettings.SkeletonKey", SYNC_INT, GROUP_RANDOMIZER, 0, 0 },
     { "gRando.Options.RO_SHUFFLE_TYCOON_WALLET", "gRandoSettings.IncludeTycoonWallet", SYNC_INT, GROUP_RANDOMIZER, 0,
