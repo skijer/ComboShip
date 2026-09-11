@@ -603,7 +603,10 @@ void Sram_SaveEndOfCycle(PlayState* play) {
         gSaveContext.save.saveInfo.playerData.health = 0x30;
     }
 
-    if (GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) <= EQUIP_VALUE_SWORD_RAZOR) {
+    // NEI: a bare sword slot (ext sword taken off) must stay bare — the vanilla reset assumes Link
+    // always owns the Kokiri Sword and would hand one out here.
+    if ((GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) != EQUIP_VALUE_SWORD_NONE) &&
+        (GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) <= EQUIP_VALUE_SWORD_RAZOR)) {
         SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_KOKIRI);
 
         if (CUR_FORM == 0) {
@@ -650,7 +653,9 @@ void Sram_SaveEndOfCycle(PlayState* play) {
     SET_STOLEN_ITEM_1(STOLEN_ITEM_NONE);
     SET_STOLEN_ITEM_2(STOLEN_ITEM_NONE);
 
-    Inventory_DeleteItem(ITEM_OCARINA_FAIRY, SLOT_TRADE_DEED);
+    // NEI: the item argument only unbinds C buttons, and 0x05 is the combo's Fairy Ocarina now —
+    // naming it here wiped the ocarina off C on every cycle reset. The loop below clears the deeds.
+    Inventory_DeleteItem(ITEM_NONE, SLOT_TRADE_DEED);
     Inventory_DeleteItem(ITEM_SLINGSHOT, SLOT_TRADE_KEY_MAMA);
     Inventory_DeleteItem(ITEM_LONGSHOT, SLOT_TRADE_COUPLE);
 
@@ -745,6 +750,13 @@ void Sram_ResetSave(void) {
     memset(&gSaveContext.save.saveInfo, 0, sizeof(SaveInfo));
     // 2S2H
     memset(&gSaveContext.save.shipSaveInfo, 0, sizeof(ShipSaveInfo));
+    // Skijer's NEI: the zeroed NeiSaveData is NOT a valid empty state — custom slots / bottle slots /
+    // bottomlessContent use 0xFF as their "empty" sentinel (0x00 is a real item id). Without this a
+    // brand-new save starts with 4+4 phantom bottles (bottleSlots all 0x00) and 0x00-filled ownedItems.
+    {
+        extern void Nei_InitNewSave(void);
+        Nei_InitNewSave();
+    }
 }
 
 /**
@@ -1333,6 +1345,11 @@ void Sram_OpenSave(FileSelectState* fileSelect, SramContext* sramCtx) {
     s32 phi_t1;
     s32 pad1;
     s32 fileNum;
+
+    {
+        extern void ExtEquip_OnSaveOpened(void);
+        ExtEquip_OnSaveOpened(); // NEI: Player_Init re-reads the page-2 loadout for this file
+    }
 
     if (gSaveContext.flashSaveAvailable) {
         memset(sramCtx->saveBuf, 0, SAVE_BUFFER_SIZE);

@@ -88,6 +88,12 @@ class SaveManager {
     void LoadFile(int fileNum);
     bool SaveFile_Exist(int fileNum);
     void ThreadPoolWait();
+    // FleetSync (cross-game combo): full save state <-> in-memory JSON, NO disk IO. SaveToJsonObject
+    // builds a saveBlock-shaped json ({version, fileType, sections{...}}) from the LIVE gSaveContext
+    // synchronously (the anchor written into the combo temp file); LoadFromJsonObject applies one back
+    // through the registered section load handlers (the anchor restore). Same schema as the .sav files.
+    nlohmann::json SaveToJsonObject();
+    void LoadFromJsonObject(nlohmann::json& saveBlockJson);
 
     // Adds a function that is called when we are intializing a save, including when we are loading a save.
     void AddInitFunction(InitFunc func);

@@ -11,6 +11,7 @@
 #include "ComboNotesWindow.h"       // combo-owned cross-game Personal Notes window
 #include "ComboHintTracker.h"       // combo-owned unified Hint Tracker (#164)
 #include "ComboTimersWindow.h"      // combo-owned overlay timers (#173)
+#include "ComboSettingsSync.h"      // combo-owned cross-game settings sync
 #include "rando/ComboPlaythrough.h" // plando: ParseSpoilerPlacements + Suffix/BuildForeignArray + slot paths
 #include <imgui.h>
 #include <libultraship/libultraship.h>         // CVar bridge (CVarGet/Set* incl. color) + color.h (Color_RGBA8)
@@ -118,12 +119,15 @@ typedef const char* (*FnDump)(void);
 typedef int (*FnRequestReload)(const char*);
 FnDump sSohDump = nullptr;
 FnDump sMmDump = nullptr;
+FnDump sSharedPairs = nullptr;
 FnRequestReload sRequestReload = nullptr;
 void ResolvePlandoSyms() {
 #ifdef _WIN32
     if (HMODULE h = GetModuleHandleA("soh.dll")) {
         if (!sSohDump)
             sSohDump = (FnDump)GetProcAddress(h, "SOH_DumpRandoStaticData");
+        if (!sSharedPairs)
+            sSharedPairs = (FnDump)GetProcAddress(h, "SOH_DumpSharedItemPairs");
         if (!sRequestReload)
             sRequestReload = (FnRequestReload)GetProcAddress(h, "SOH_RequestComboReload");
     }
@@ -464,6 +468,7 @@ struct HubEntry {
         COMBO_CHECK_TRACKER,
         COMBO_HINT_TRACKER,
         COMBO_TIMERS,
+        COMBO_SYNC,
         COMBO_NETWORK
     } kind;
     const ComboRando::GameMenu* game = nullptr; // ENGINE/OOT_RANDO/MM_RANDO
@@ -960,9 +965,14 @@ void DrawNetworkSharedPanel() {
 }
 
 // Build the combined item picker list from both games' static-data dumps (items[] = full item table
-// with friendly name + advancement). Each game's items get its own "(OOT)"/"(MM)" display tag.
+// with friendly name + advancement). Each game's items get its own "(OOT)"/"(MM)" display tag, EXCEPT
+// a shared pair: that is one item in both worlds, so it is listed once, untagged, under OOT's name —
+// matching the untagged placements SuffixCrossGameItems now writes for it.
 void PlandoBuildItems() {
     sPlando.items.clear();
+    const std::set<std::string> sharedNames =
+        ComboRando::SharedPairNames(ComboRando::ResolveSharedPairs(sSharedPairs ? sSharedPairs() : "", sPlando.mmDump));
+    std::unordered_set<std::string> sharedListed;
     auto add = [&](const std::string& dump, ComboRando::GameId g, const char* suf) {
         try {
             auto d = nlohmann::json::parse(dump);
@@ -973,7 +983,10 @@ void PlandoBuildItems() {
                     continue;
                 if (g == ComboRando::GAME_OOT && n == "Triforce")
                     continue; // OOT's win item: placing it would roll credits outside the combo goal
-                sPlando.items.push_back({ n, g, it.value("advancement", true), n + suf });
+                const bool shared = sharedNames.count(n) != 0;
+                if (shared && !sharedListed.insert(n).second)
+                    continue;
+                sPlando.items.push_back({ n, g, it.value("advancement", true), shared ? n : n + suf });
             }
         } catch (...) {}
     };
@@ -1108,7 +1121,9 @@ void PlandoSavePlay() {
     }
     // Native cross-game name collisions get their own-game suffix; foreign checks are skipped (their
     // real item travels in foreign[]). Exactly the generator's write path.
-    ComboRando::SuffixCrossGameItems(ootPl, mmPl, foreignRaw, sPlando.sohDump, sPlando.mmDump);
+    ComboRando::SuffixCrossGameItems(ootPl, mmPl, foreignRaw, sPlando.sohDump, sPlando.mmDump,
+                                     ComboRando::SharedPairNames(ComboRando::ResolveSharedPairs(
+                                         sSharedPairs ? sSharedPairs() : "", sPlando.mmDump)));
     nlohmann::json foreign = ComboRando::BuildForeignArray(foreignRaw);
 
     j["oot"]["placements"] = ootPl;
@@ -1318,6 +1333,12 @@ void ComboMenu::DrawSharedPanel() {
         tmr.group = "Settings";
         tmr.kind = HubEntry::COMBO_TIMERS;
         e.push_back(std::move(tmr));
+        // Combo-owned settings sync: the options both games have under different CVar names.
+        HubEntry syn;
+        syn.label = "Sync";
+        syn.group = "Settings";
+        syn.kind = HubEntry::COMBO_SYNC;
+        e.push_back(std::move(syn));
         if (!e.empty())
             groups.push_back({ "Settings", std::move(e) });
         // Network group: the Anchor team-sync control (covers BOTH games) plus the Ship of Harkinian
@@ -1452,6 +1473,8 @@ void ComboMenu::DrawSharedPanel() {
         DrawHintTrackerSharedPanel();
     } else if (active->kind == HubEntry::COMBO_TIMERS) {
         DrawTimersSharedPanel();
+    } else if (active->kind == HubEntry::COMBO_SYNC) {
+        ComboSync::DrawSyncSharedPanel();
     } else if (active->kind == HubEntry::COMBO_NETWORK) {
         DrawNetworkSharedPanel();
     } else {
@@ -1834,4 +1857,6 @@ extern "C" void ComboUI_Register(void)
         if (auto win = gui->GetGuiWindow(name))
             win->Hide();
     }
+
+    ComboSync::RegisterSync();
 }

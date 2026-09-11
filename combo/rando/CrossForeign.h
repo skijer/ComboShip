@@ -22,6 +22,7 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <cstdint>
 #include <cstring>
 #include <iterator>
@@ -298,15 +299,73 @@ inline nlohmann::json BuildForeignArray(const nlohmann::json& foreignArray) {
     return out;
 }
 
+// A shared item exists once across both games: obtaining either half grants the other at runtime
+// (NEI's FleetSharedItems), so the fill keeps one copy and credits both logics when it is reached.
+struct CwSharedPair {
+    std::string ootName;
+    std::string mmName;
+};
+
+// SOH_DumpSharedItemPairs speaks the FC table's RI_* tokens while MM's dump names its items with
+// GetItemDisplayName, so joining them needs the dump's own token->name map. Without it every pair
+// misses silently. A pair whose mm side is already a friendly name passes through unchanged.
+inline std::vector<CwSharedPair> ResolveSharedPairs(const std::string& sharedPairsJson, const std::string& mmDumpJson) {
+    std::vector<CwSharedPair> pairs;
+    if (sharedPairsJson.empty()) {
+        return pairs;
+    }
+    std::unordered_map<std::string, std::string> tokenToName;
+    try {
+        auto d = nlohmann::json::parse(mmDumpJson);
+        for (const auto& it : d.value("items", nlohmann::json::array())) {
+            std::string token = it.value("token", std::string{});
+            std::string name = it.value("name", std::string{});
+            if (!token.empty() && !name.empty()) {
+                tokenToName.emplace(std::move(token), std::move(name));
+            }
+        }
+    } catch (...) {}
+    if (tokenToName.empty()) {
+        std::cerr << "[ComboShip] shared items: MM dump carries no item tokens; RI_*-keyed pairs cannot "
+                     "match - rebuild 2ship.dll\n";
+    }
+    try {
+        for (const auto& p : nlohmann::json::parse(sharedPairsJson)) {
+            std::string oot = p.value("oot", "");
+            std::string mm = p.value("mm", "");
+            if (oot.empty() || mm.empty()) {
+                continue;
+            }
+            auto named = tokenToName.find(mm);
+            pairs.push_back({ std::move(oot), named != tokenToName.end() ? named->second : std::move(mm) });
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "[ComboShip] shared items: pairs parse error, sharing off: " << e.what() << "\n";
+        pairs.clear();
+    }
+    return pairs;
+}
+
+// Names that mean the SAME item in both games, so nothing downstream may present them as two items.
+inline std::set<std::string> SharedPairNames(const std::vector<CwSharedPair>& pairs) {
+    std::set<std::string> names;
+    for (const auto& p : pairs) {
+        names.insert(p.ootName);
+        names.insert(p.mmName);
+    }
+    return names;
+}
+
 // Suffix cross-game ITEM-name collisions in the consolidated placements so a name like "Mirror Shield"
 // (in both games) reads unambiguously in the file / plandomizer. Only NATIVE placements are suffixed
 // (item's game == check's game), with that game's "(OOT)"/"(MM)" tag; each game strips its own suffix
 // on apply. Foreign checks are skipped (their real cross-game item is carried by the foreign[] array,
 // whose displayName already carries the tag). Check names are never suffixed: they live in per-game
 // objects (oot/mm) and a game DLL can't reproduce a cross-game-aware suffix at runtime.
+// sharedNames are exempt: a shared pair is ONE item, and tagging it would advertise two.
 inline void SuffixCrossGameItems(nlohmann::json& ootPlacements, nlohmann::json& mmPlacements,
                                  const nlohmann::json& foreignArray, const std::string& sohDump,
-                                 const std::string& mmDump) {
+                                 const std::string& mmDump, const std::set<std::string>& sharedNames = {}) {
     auto itemNames = [](const std::string& dump) {
         std::set<std::string> s;
         try {
@@ -325,7 +384,7 @@ inline void SuffixCrossGameItems(nlohmann::json& ootPlacements, nlohmann::json& 
     };
     std::set<std::string> ootSet = itemNames(sohDump), mmSet = itemNames(mmDump), shared;
     for (const auto& n : ootSet)
-        if (mmSet.count(n))
+        if (mmSet.count(n) && !sharedNames.count(n))
             shared.insert(n);
     if (shared.empty())
         return;

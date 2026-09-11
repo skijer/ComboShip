@@ -30,6 +30,10 @@ DEFINE_HOOK(OnSetDoAction, (uint16_t action));
 DEFINE_HOOK(OnPlayerSfx, (u16 sfxId));
 DEFINE_HOOK(OnOcarinaSongAction, ());
 DEFINE_HOOK(OnOcarinaNote, (uint8_t note, float modulator, int8_t bend));
+// The ocarina replaying a song BY ITSELF (AudioOcarina_PlaybackSong), not the player
+// pressing notes. Kept apart from OnOcarinaNote because that one means "the player played
+// this", which is what the song recogniser and the multiplayer note sync both act on.
+DEFINE_HOOK(OnOcarinaPlaybackNote, (uint8_t note, float modulator));
 DEFINE_HOOK(OnShopSlotChange, (uint8_t cursorIndex, int16_t price));
 DEFINE_HOOK(OnDungeonKeyUsed, (uint16_t mapIndex));
 DEFINE_HOOK(ShouldActorInit, (void* actor, bool* result));

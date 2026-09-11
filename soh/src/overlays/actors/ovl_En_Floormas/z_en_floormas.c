@@ -759,8 +759,8 @@ void EnFloormas_JumpAtLink(EnFloormas* this, PlayState* play) {
         this->actor.speedXZ = 0.0f;
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_FLOORMASTER_SM_LAND);
         EnFloormas_SetupLand(this);
-    } else if ((this->actor.yDistToPlayer < -10.0f) && (this->collider.base.ocFlags1 & OC1_HIT) &&
-               (&player->actor == this->collider.base.oc)) {
+    } else if (GameInteractor_Should(VB_ENEMY_GRAB_PLAYER, true, this) && (this->actor.yDistToPlayer < -10.0f) &&
+               (this->collider.base.ocFlags1 & OC1_HIT) && (&player->actor == this->collider.base.oc)) {
         play->grabPlayer(play, player);
         EnFloormas_SetupGrabLink(this, player);
     }

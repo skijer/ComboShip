@@ -12,6 +12,10 @@ extern "C" {
 extern PlayState* gPlayState;
 }
 
+// Rito: mid-air Roc's costs magic instead of being limited to one use.
+// Defined in mods/transformation_masks/rito_flight.inc.c.
+extern "C" uint8_t MmForm_RitoAirRocsAllowed(Player* player);
+
 #define MAX_ROCS_USES 1
 
 static uint8_t rocsUseCount = 0;
@@ -45,7 +49,11 @@ void RegisterRocsFeather() {
         if (usedItem == ITEM_ROCS_FEATHER) {
             *should = false;
 
-            if (rocsUseCount < MAX_ROCS_USES) {
+            // As a Rito, Roc's works in mid-air as often as you like — each use billed
+            // in magic instead of counted. MmForm_RitoAirRocsAllowed charges it and
+            // returns 0 for everyone else, so the vanilla one-use limit is untouched.
+            // Skijer's NEI
+            if ((rocsUseCount < MAX_ROCS_USES) || MmForm_RitoAirRocsAllowed(GET_PLAYER(gPlayState))) {
                 rocsUseCount++;
 
                 Player* player = GET_PLAYER(gPlayState);

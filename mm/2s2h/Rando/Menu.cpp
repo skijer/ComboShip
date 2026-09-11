@@ -1,5 +1,6 @@
 #include "Rando/Rando.h"
 #include <fast/Fast3dGui.h>
+#include "2s2h/ShipUtils.h"
 #include "Rando/Spoiler/Spoiler.h"
 #include "2s2h/BenGui/UIWidgets.hpp"
 #include <ship/window/gui/IconsFontAwesome4.h>
@@ -938,6 +939,56 @@ static bool ItemPoolCheckbox(const char* label, RandoOptionId optionId, const ch
     return changed;
 }
 
+struct NeiRandoOption {
+    RandoOptionId id;
+    int32_t on;
+};
+
+static const NeiRandoOption kNeiRandoOptions[] = {
+    { RO_SHUFFLE_NEI_ITEMS, 1 },
+    { RO_SHUFFLE_OOT_GEAR, 1 },
+    { RO_SHUFFLE_OOT_EQUIPMENT, 1 },
+    { RO_SHUFFLE_OOT_QUEST, 1 },
+    { RO_SHUFFLE_OOT_MASKS, 1 },
+    { RO_SHUFFLE_BOMB_ARROWS, RO_BOMB_ARROWS_SHUFFLED },
+    { RO_ELEMENTAL_WAND_SHUFFLE, RO_WAND_ELEMENTAL_SHUFFLE },
+    { RO_CROSSOVER_POKEBALL, 1 },
+    { RO_CROSSOVER_MARIO_MASK, 1 },
+};
+
+// Both Crossover items share ONE feature toggle, so this only ever turns it on: mirroring either
+// checkbox's value would let unchecking one switch the selector off while the other is shuffled.
+static void NeiRando_EnableCrossover() {
+    if (CVarGetInteger(Rando::StaticData::Options[RO_CROSSOVER_POKEBALL].cvar, RO_GENERIC_OFF) ||
+        CVarGetInteger(Rando::StaticData::Options[RO_CROSSOVER_MARIO_MASK].cvar, RO_GENERIC_OFF)) {
+        CVarSetInteger("gBrokenItems.Enabled", 1);
+    }
+    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+}
+
+static void NeiRando_SetAll(bool on) {
+    for (const auto& o : kNeiRandoOptions) {
+        CVarSetInteger(Rando::StaticData::Options[o.id].cvar, on ? o.on : 0);
+    }
+    NeiRando_EnableCrossover();
+    CVarSetInteger("gMods.BombArrows.Mode",
+                   CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_BOMB_ARROWS].cvar, RO_BOMB_ARROWS_OFF));
+    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+}
+
+static void NeiRando_DrawSetAllButtons() {
+    if (Button("Add all NEI content",
+               ButtonOptions().Tooltip("Turns on every option in this card at once: NEI custom items, OoT\n"
+                                       "gear, equipment, songs & quest items, masks, bomb arrows and the\n"
+                                       "elemental wand."))) {
+        NeiRando_SetAll(true);
+    }
+    ImGui::SameLine();
+    if (Button("Remove all", ButtonOptions().Tooltip("Turns every option in this card off."))) {
+        NeiRando_SetAll(false);
+    }
+}
+
 static void DrawItemPoolTab() {
     DrawSeedHealthStrip();
 
@@ -1213,6 +1264,94 @@ static void DrawItemPoolTab() {
     }
     UIWidgets::EndCard();
 
+    // ── Skijer's NEI custom items ────────────────────────────────────────────────────────────────
+    // 5.0.0 replaced the old DrawShufflesTab with the card-based check/item pool tabs, so these
+    // moved here (they add ITEMS to the pool, not checks). Until this gate exists NO RI_OOT_NEI_*
+    // item could be placed by the generator at all — they had give/draw plumbing but nothing ever
+    // pushed them into the pool.
+    UIWidgets::BeginCard("itemPoolNei");
+    ImGui::SeparatorText("NEI & Cross-Game");
+    NeiRando_DrawSetAllButtons();
+    CVarCheckbox(
+        "Shuffle NEI Custom Items", Rando::StaticData::Options[RO_SHUFFLE_NEI_ITEMS].cvar,
+        CheckboxOptions({ { .tooltip = "Adds Skijer's NEI custom items (the page-2 inventory) to the item pool:\n"
+                                       "Whip, Spinner, the three elemental Rods, Deku Leaf, Time Gate, Beetle,\n"
+                                       "Switch Hook, Mogma Mitts, Gust Jar, Ball and Chain, Dominion Rod, the six\n"
+                                       "Dual Cane skills, and more.\n\n"
+                                       "These are not considered by logic yet." } }));
+    // Cross-game categories: OoT items in a SOLO MM seed, no combo needed. In combo these come
+    // through the combo's own supply, so the checkboxes only affect solo seeds.
+    CVarCheckbox(
+        "Add OoT Items", Rando::StaticData::Options[RO_SHUFFLE_OOT_GEAR].cvar,
+        CheckboxOptions({ { .tooltip = "Adds OoT gear to a solo-MM pool: the Master Sword and Biggoron's Sword\n"
+                                       "chains, Stick/Nut Capacity, Open Chests, Progressive Strength and the\n"
+                                       "ship-vanilla Roc's Feather.\n\nNot considered by logic." } }));
+    CVarCheckbox(
+        "Add OoT Equipment", Rando::StaticData::Options[RO_SHUFFLE_OOT_EQUIPMENT].cvar,
+        CheckboxOptions({ { .tooltip = "Adds the extended-equipment page to a solo-MM pool: Cane of Byrna, Four\n"
+                                       "Sword, Trident, the three shields, the three tunics, the three boots,\n"
+                                       "the Magic Cape and the progressive Roc.\n\nNot considered by logic." } }));
+    CVarCheckbox(
+        "Add OoT Songs & Quest Items", Rando::StaticData::Options[RO_SHUFFLE_OOT_QUEST].cvar,
+        CheckboxOptions({ { .tooltip = "Adds OoT's songs, the six medallions, the three spiritual stones and the\n"
+                                       "Stone of Agony to a solo-MM pool.\n\nNot considered by logic." } }));
+    CVarCheckbox("Add OoT Masks", Rando::StaticData::Options[RO_SHUFFLE_OOT_MASKS].cvar,
+                 CheckboxOptions({ { .tooltip = "Adds the Skull, Spooky and Gerudo masks to a solo-MM pool.\n\n"
+                                                "Not considered by logic." } }));
+    // Crossover Items: no inventory cell, so they get their own gates rather than riding
+    // RO_SHUFFLE_NEI_ITEMS. Each one unlocks its form on the equipment page's Crossover sub-page.
+    if (CVarCheckbox(
+            "Include Pikachu Pokeball", Rando::StaticData::Options[RO_CROSSOVER_POKEBALL].cvar,
+            CheckboxOptions({ { .tooltip = "Adds the Pikachu Pokeball to the pool. Finding it unlocks PIKACHU\n"
+                                           "MODE on the equipment page's Crossover Items sub-page.\n"
+                                           "2Ship has no Pikachu transformation yet — the form selects but Link\n"
+                                           "does not change.\n\nNot considered by logic." } }))) {
+        NeiRando_EnableCrossover();
+    }
+    if (CVarCheckbox(
+            "Include Mario Mask", Rando::StaticData::Options[RO_CROSSOVER_MARIO_MASK].cvar,
+            CheckboxOptions({ { .tooltip = "Adds the Mario Mask to the pool. Finding it unlocks MARIO MODE on\n"
+                                           "the equipment page's Crossover Items sub-page.\n\n"
+                                           "Not considered by logic." } }))) {
+        NeiRando_EnableCrossover();
+    }
+    if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_NEI_ITEMS].cvar, RO_GENERIC_OFF)) {
+        // Bomb Arrows have no inventory slot any more — they are the last entry of the bow's
+        // element wheel, so this is purely about how you come by them. The seed-locked value mirrors
+        // into gMods.BombArrows.Mode because the in-game grant logic runs outside seeds too.
+        static std::unordered_map<int32_t, const char*> bombArrowModeOptions = {
+            { RO_BOMB_ARROWS_OFF, "Off" },
+            { RO_BOMB_ARROWS_BOMB_BAG, "Bomb Bag" },
+            { RO_BOMB_ARROWS_SHUFFLED, "Shuffled" },
+        };
+        UIWidgets::CVarCombobox("Shuffle Bomb Arrows", Rando::StaticData::Options[RO_SHUFFLE_BOMB_ARROWS].cvar,
+                                &bombArrowModeOptions,
+                                UIWidgets::ComboboxOptions().Tooltip(
+                                    "How Bomb Arrows are obtained. They sit at the end of the bow's element wheel,\n"
+                                    "next to the medallion arrows — they have no inventory slot of their own.\n\n"
+                                    "Off: never granted on their own (the Twilight Upgrade still unlocks them).\n"
+                                    "Bomb Bag: granted the moment you own any bomb bag.\n"
+                                    "Shuffled: a real randomizer item."));
+        CVarSetInteger("gMods.BombArrows.Mode",
+                       CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_BOMB_ARROWS].cvar, RO_BOMB_ARROWS_OFF));
+
+        static std::unordered_map<int32_t, const char*> wandModeOptions = {
+            { RO_WAND_MEDALLIONS, "Medallions" },
+            { RO_WAND_SINGLE_ITEM, "Single item" },
+            { RO_WAND_ELEMENTAL_SHUFFLE, "Elemental shuffle" },
+        };
+        UIWidgets::CVarCombobox(
+            "Elemental Wand", Rando::StaticData::Options[RO_ELEMENTAL_WAND_SHUFFLE].cvar, &wandModeOptions,
+            UIWidgets::ComboboxOptions().Tooltip(
+                "Six rods - Sand, Tornado, Water, Meteor, Storm and the Shadow Scepter - share ONE\n"
+                "inventory cell and one wheel (the cell Bomb Arrows vacated).\n\n"
+                "Medallions: one wand in the pool; a rod works once you own its OoT medallion.\n"
+                "Single item: one wand in the pool; finding it unlocks all six rods.\n"
+                "Elemental shuffle: the six rods are separate items; the first found also grants\n"
+                "the wand itself."));
+    }
+    UIWidgets::EndCard();
+
     UIWidgets::EndCardLayout();
 }
 
@@ -1275,9 +1414,7 @@ static void DrawStartingItemsTab() {
 
         Rando::StaticData::RandoStaticItem randoStaticItem = Rando::StaticData::Items[startingItem];
         const char* texturePath = Rando::StaticData::GetIconTexturePath(startingItem);
-        ImTextureID textureId =
-            std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                ->GetTextureByName(texturePath);
+        ImTextureID textureId = Ship_GetFast3dGui()->GetTextureByName(texturePath);
 
         ImVec4 tintColor =
             Ship_GetItemColorTint(startingItem == RI_PROGRESSIVE_LULLABY ? ITEM_SONG_LULLABY : randoStaticItem.itemId);
@@ -1342,9 +1479,7 @@ static void DrawStartingItemsTab() {
 
                     Rando::StaticData::RandoStaticItem randoStaticItem = Rando::StaticData::Items[item];
                     const char* texturePath = Rando::StaticData::GetIconTexturePath(item);
-                    ImTextureID textureId = std::dynamic_pointer_cast<Fast::Fast3dGui>(
-                                                Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                                                ->GetTextureByName(texturePath);
+                    ImTextureID textureId = Ship_GetFast3dGui()->GetTextureByName(texturePath);
 
                     // Force new row for Song of Time, first frog, and first time item
                     if (item == RI_SONG_TIME || item == RI_FROG_BLUE || item == RI_TIME_DAY_1) {
@@ -1710,6 +1845,12 @@ void Rando::RegisterMenu() {
     mBenMenu->AddSidebarEntry("Rando", "Hints", 1);
     path.sidebarName = "Hints";
     mBenMenu->AddWidget(path, "Hints", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) { DrawHintsTab(); });
+
+    mBenMenu->AddSidebarEntry("Rando", "Desired Items", 1);
+    path.sidebarName = "Desired Items";
+    mBenMenu->AddWidget(path, "Sheikah Sensor", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        BenGui::DrawSensorDesirePicker();
+    });
 
     mBenMenu->AddSidebarEntry("Rando", "Item Tracker", 1);
     path.sidebarName = "Item Tracker";

@@ -30,6 +30,10 @@ void UpdateMenuTricks();
 void UpdateMenuLocations();
 void MarkRandomizerMenusDirty();
 
+// The Sheikah Sensor rune's five wish slots. Drawn from both the NEI and the Randomizer menus, so
+// it lives on its own instead of being written twice. Skijer's NEI
+void DrawSensorDesirePicker();
+
 class SohMenu : public Ship::Menu {
   public:
     SohMenu(const std::string& consoleVariable, const std::string& name);

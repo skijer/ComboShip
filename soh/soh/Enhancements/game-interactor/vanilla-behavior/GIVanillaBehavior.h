@@ -2243,6 +2243,21 @@ typedef enum {
     // - `PlayState*` play
     VB_PLAYER_OVERRIDE_LIMB_DRAW_PAUSE,
 
+    // Fired from Player_OverrideLimbDrawGameplayDefault (gameplay, L_HAND). Lets a custom item
+    // request that Link's held-weapon DL be hidden because it draws its own model. Skijer's NEI
+    // #### `args`
+    // - `void*` player (Player*)
+    // #### `result`
+    // - default false; set true to hide the held-weapon DL
+    VB_PLAYER_SHOULD_HIDE_HELD_WEAPON,
+
+    // Fired from Player_HoldsTwoHandedWeapon. A custom item/form can mark the held item two-handed
+    // (disables shield, enables two-handed attack patterns). Skijer's NEI
+    // #### `args`
+    // - `void*` player (Player*)
+    // #### `result`
+    // - default = vanilla two-handed check (Biggoron..Hammer); set true to force two-handed
+    VB_PLAYER_HOLDS_TWO_HANDED_WEAPON,
     // #### `args`
     // - `*Player`
     // - `*PlayState`
@@ -3579,6 +3594,84 @@ typedef enum {
     // - None
     VB_TEMP_B_RESTORE_SWORDLESS,
 
+    // Skijer's NEI: first statement of Player_Draw; false skips the whole vanilla body (custom model).
+    // #### `result`
+    // ```c
+    // true   // run the vanilla Player_Draw body
+    // ```
+    // #### `args`
+    // - `*PlayState` (play)
+    // - `*Player`     (this)
+    VB_PLAYER_DRAW_BEGIN,
+
+    // Hook fired around `SkelAnime_DrawFlexLod` inside `Player_DrawImpl`.
+    // Subscribers may render their own visual in place of the vanilla Link
+    // skeleton (e.g. Harpoon's Prop Hunt hider disguise) by returning
+    // `false`. Returning `true` (default) keeps the vanilla draw.
+    //
+    // #### `result`
+    // ```c
+    // true   // draw vanilla Link
+    // ```
+    // #### `args`
+    // - `*PlayState` (play)
+    // - `*Player`     (this)
+    VB_PLAYER_DRAW,
+
+    // Skijer's NEI: positioned hook at each anim-override site; write *animOut to override (else vanilla plays).
+    // #### `result`
+    // ```c
+    // true   // play the vanilla animation already stored in *animOut
+    // ```
+    // #### `args`
+    // - `s32` siteId  (VBPlayerAnimOverrideSite)
+    // - `s32` siteArg (site-specific context; 0 when unused)
+    // - `LinkAnimationHeader**` animOut (in: vanilla anim; write to *animOut to override)
+    // - `*Player` (this)
+    VB_PLAYER_ANIM_OVERRIDE,
+
+    // Hook fired at the end of `Actor_Draw` for every actor. Subscribers
+    // can use it to overlay extra visuals on an actor (e.g. Harpoon's
+    // Triforce indicator above the carrier). Has no return value — always
+    // executes — but routed through OnVanillaBehavior so the existing
+    // GameInteractor plumbing handles it.
+    //
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*PlayState` (play)
+    // - `*Actor`     (actor)
+    VB_ACTOR_POST_DRAW,
+
+    // Skijer's NEI: SM64-Mario pre-pass, positioned in Player_Update inside the
+    // Player_UpdateNoclip() block. Fires BEFORE any IsActive/IsReady check (right
+    // after the input-filter setup of sp44). Mutates nothing by default; handler
+    // runs Sm64Mario_TickTransitionSuspend + Sm64MarioMask_ForceAndToggle.
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*PlayState` (play)
+    // - `*Player`    (this)
+    // - `*Input`     (&sp44)
+    VB_SM64_PLAYER_PRE_ACTION,
+
+    // Skijer's NEI: SM64-Mario pre-pass, positioned in Player_Update immediately
+    // BEFORE Player_UpdateCommon (the same frame UpdateCommon consumes the result).
+    // Handler runs Sm64Mario_InterceptDamage + Pikachu status read + the A<->B
+    // swap on the local sp44 that is passed straight into Player_UpdateCommon.
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*PlayState` (play)
+    // - `*Player`    (this)
+    // - `*Input`     (&sp44)
+    VB_SM64_PLAYER_PRE_UPDATE_COMMON,
     // #### `result`
     // ```c
     // true
@@ -3598,6 +3691,192 @@ typedef enum {
     // a textbox can be rendered instead. Pause screen only, Game Over version left
     // intact.
     VB_DRAW_SAVE_MENU,
+
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // Allows an enemy to transition into a player-grab state.
+    // #### `args`
+    // - `*Actor`
+    VB_ENEMY_GRAB_PLAYER,
+
+    // #### `result`
+    // ```c
+    // false
+    // ```
+    // Allows an aimable item to enter and remain in its aiming state while the player is airborne.
+    // #### `args`
+    // - `*Player`
+    VB_PLAYER_ALLOW_MIDAIR_AIM,
+
+    // Skijer's NEI: `Player_SetupRoll`, the choke point every roll entry passes through. A
+    // subscriber wanting a different move starts it itself, then returns false.
+    // #### `result`
+    // ```c
+    // true   // run the vanilla roll
+    // ```
+    // #### `args`
+    // - `*Player`    (this)
+    // - `*PlayState` (play)
+    VB_PLAYER_ROLL,
+
+    // Skijer's NEI: environmental heat — hot rooms, hot floors, lava floors. Asked through
+    // `Player_SuffersHeat`, which supplies the Goron Tunic / SuperTunic default.
+    // #### `result`
+    // ```c
+    // this->currentTunic != PLAYER_TUNIC_GORON && !SuperTunic
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_SUFFER_HEAT,
+
+    // Skijer's NEI: `func_8083821C`, the body catching fire. Distinct from VB_PLAYER_SUFFER_HEAT —
+    // a Fire Keese still ignites a heat-immune player.
+    // #### `result`
+    // ```c
+    // true   // catch fire
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_CATCH_FIRE,
+
+    // Skijer's NEI: child Link's two-handed Hylian stance — own model group, own defense anim, no
+    // shield in the right hand. Anything merely borrowing the Hylian slot must answer false.
+    // #### `result`
+    // ```c
+    // LINK_IS_CHILD && this->currentShield == PLAYER_SHIELD_HYLIAN
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_USE_CHILD_HYLIAN_STANCE,
+
+    // Skijer's NEI: does an elemental status stick — frozen solid, shocked. The damage itself
+    // lands either way.
+    // #### `result`
+    // ```c
+    // true   // the status applies
+    // ```
+    // #### `args`
+    // - `s32`     PLAYER_HIT_RESPONSE_FROZEN or PLAYER_HIT_RESPONSE_ELECTRIFIED
+    // - `*Player` (this)
+    VB_PLAYER_SUFFER_STATUS,
+
+    // Skijer's NEI: standing A with a weapon out — sheathe it.
+    // #### `result`
+    // ```c
+    // putAwayCooldownTimer == 0 && heldItemAction >= PLAYER_IA_SWORD_MASTER
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_PUTAWAY_HELD_ITEM,
+
+    // Skijer's NEI: standing A with nothing to sheathe. Asked only after
+    // VB_PLAYER_PUTAWAY_HELD_ITEM declines, so a mod owning the A press must refuse both.
+    // #### `result`
+    // ```c
+    // true   // toggle Navi
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_TOGGLE_NAVI,
+
+    // Skijer's NEI: what item a button reports. Mirrors 2Ship's flag of the same name — subscribers
+    // write through the pointer; the returned bool is unused.
+    // #### `result`
+    // ```c
+    // item
+    // ```
+    // #### `args`
+    // - `s32`        button index (0 = B, 1-3 = C, 4-7 = D-pad)
+    // - `*s32`       item, to overwrite
+    // - `*PlayState` (play)
+    VB_GET_ITEM_ON_BUTTON,
+
+    // Skijer's NEI: OOT's own two-step combo, where a third swing in a row bumps to the combo
+    // variant. A moveset that sequences its own row must refuse, or the bump walks off the end of
+    // that row into another clip.
+    // #### `result`
+    // ```c
+    // this->unk_845 >= 3
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_ADVANCE_COMBO,
+
+    // Skijer's NEI: the jump slash has just been given vanilla's launch for whichever route started
+    // it. Subscribers scale linearVelocity / velocity.y from there. Mutation only, result unused.
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    // - `s32`     PLAYER_MWA_* being started
+    VB_PLAYER_JUMP_SLASH_LAUNCH,
+
+    // Skijer's NEI: should Link's own voice answer for this grunt? A form, a voice pack or a mask
+    // that plays its own sound returns false.
+    // #### `result`
+    // ```c
+    // true   // play Link's voice
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    // - `u16`     sfxId, before the age offset
+    VB_PLAYER_VOICE_SFX,
+
+    // Skijer's NEI: can the player take hold of a ledge — the vault and the jump-grab both ask.
+    // #### `result`
+    // ```c
+    // true   // grabbing is allowed
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_GRAB_LEDGE,
+
+    // Skijer's NEI: vanilla's reaction to reaching an edge — the auto-hop down and the slip. A
+    // momentum move already carrying the player off must refuse, or vanilla steals the exit.
+    // #### `result`
+    // ```c
+    // true   // vanilla reacts
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_EDGE_REACTION,
+
+    // Skijer's NEI: something other than the Hover Boots is holding the player up, so the boots'
+    // physics, footstep sfx and ring effect all apply. Asked through `Player_IsHovering`.
+    // #### `result`
+    // ```c
+    // IvanCoopModeEnabled || gIvanPossessActive
+    // ```
+    // #### `args`
+    // - `*Player` (this)
+    VB_PLAYER_HOVERS_WITHOUT_BOOTS,
+
+    // Skijer's NEI: a guard that is an animation rather than a raised shield ate the hit. The
+    // shieldQuad never bounces for those, so VB_PLAYER_SHIELD_BLOCKED never fires for them either.
+    // #### `result`
+    // ```c
+    // false
+    // ```
+    // #### `args`
+    // - `*Player`    (this)
+    // - `*PlayState` (play)
+    VB_PLAYER_PARRY_HIT,
+
+    // Skijer's NEI: the shieldQuad just bounced an attack. Fired while AC_BOUNCED is still live —
+    // Player_UpdateShape clears it before any per-frame mod dispatch runs, so a subscriber that
+    // waits until then can no longer read the attacker. Mutation only, result unused.
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*Player`    (this)
+    // - `*PlayState` (play)
+    VB_PLAYER_SHIELD_BLOCKED,
 } GIVanillaBehavior;
 
 #endif

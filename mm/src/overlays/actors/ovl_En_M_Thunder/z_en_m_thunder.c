@@ -11,6 +11,7 @@
 
 #include "2s2h/BenGui/CosmeticEditor.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "mods/extended_equipment.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -131,9 +132,14 @@ void EnMThunder_Init(Actor* thisx, PlayState* play) {
     this->isCharging = false;
 
     if (player->stateFlags2 & PLAYER_STATE2_20000) {
-        if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired || (gSaveContext.magicState != MAGIC_STATE_IDLE) ||
-            ((ENMTHUNDER_GET_MAGIC_COST(&this->actor) != 0) &&
-             !Magic_Consume(play, ENMTHUNDER_GET_MAGIC_COST(&this->actor), MAGIC_CONSUME_NOW))) {
+        // Skijer's NEI: the free OoT Master Sword full-HP beam bypasses the magic-acquired /
+        // magic-state self-kill gate (it costs no magic and needs no magic meter). z_player.c sets
+        // gNeiMasterBeamFree true for exactly this spawn.
+        extern u8 gNeiMasterBeamFree;
+        if (!gNeiMasterBeamFree &&
+            (!gSaveContext.save.saveInfo.playerData.isMagicAcquired || (gSaveContext.magicState != MAGIC_STATE_IDLE) ||
+             ((ENMTHUNDER_GET_MAGIC_COST(&this->actor) != 0) &&
+              !Magic_Consume(play, ENMTHUNDER_GET_MAGIC_COST(&this->actor), MAGIC_CONSUME_NOW)))) {
             AudioSfx_PlaySfx(NA_SE_IT_ROLLING_CUT, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
                              &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
             AudioSfx_PlaySfx(NA_SE_IT_SWORD_SWING_HARD, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
@@ -547,7 +553,7 @@ void EnMThunder_Draw(Actor* thisx, PlayState* play2) {
 
     Matrix_Mult(&player->leftHandMf, MTXMODE_NEW);
 
-    if (GameInteractor_Should(VB_TRANSFORM_THUNDER_MATRIX, true, this)) {
+    if (!ExtEquip_TridentThunderTransform() && GameInteractor_Should(VB_TRANSFORM_THUNDER_MATRIX, true, this)) {
         if (this->type == ENMTHUNDER_TYPE_GILDED_SWORD) {
             Matrix_Translate(0.0f, 220.0f, 0.0f, MTXMODE_APPLY);
             Matrix_Scale(-1.2f, -0.8f, -0.6f, MTXMODE_APPLY);

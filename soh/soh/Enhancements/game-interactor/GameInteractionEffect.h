@@ -58,6 +58,11 @@ class ModifyHeartContainers : public GameInteractionEffectBase, public Parameter
     void _Apply() override;
 };
 
+class GiveItem : public GameInteractionEffectBase, public ParameterizedGameInteractionEffect {
+    GameInteractionEffectQueryResult CanBeApplied() override;
+    void _Apply() override;
+};
+
 class FillMagic : public GameInteractionEffectBase {
     GameInteractionEffectQueryResult CanBeApplied() override;
     void _Apply() override;
@@ -163,6 +168,12 @@ class ModifyMovementSpeedMultiplier : public RemovableGameInteractionEffect, pub
     void _Remove() override;
 };
 
+class ModifyRunSpeedModifier : public RemovableGameInteractionEffect, public ParameterizedGameInteractionEffect {
+    GameInteractionEffectQueryResult CanBeApplied() override;
+    void _Apply() override;
+    void _Remove() override;
+};
+
 class OneHitKO : public RemovableGameInteractionEffect {
     GameInteractionEffectQueryResult CanBeApplied() override;
     void _Apply() override;
@@ -199,6 +210,11 @@ class SetCollisionViewer : public RemovableGameInteractionEffect {
     GameInteractionEffectQueryResult CanBeApplied() override;
     void _Apply() override;
     void _Remove() override;
+};
+
+class SetCosmeticsColor : public GameInteractionEffectBase, public ParameterizedGameInteractionEffect {
+    GameInteractionEffectQueryResult CanBeApplied() override;
+    void _Apply() override;
 };
 
 class RandomizeCosmetics : public GameInteractionEffectBase {

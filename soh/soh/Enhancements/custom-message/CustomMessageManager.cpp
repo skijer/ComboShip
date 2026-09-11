@@ -771,6 +771,14 @@ void CustomMessage::InsertNames(std::vector<CustomMessage> toInsert) {
     }
 }
 
+void CustomMessage::ReplaceUnfilledNames(const std::string& fallback) {
+    // Altar/WOTH templates ask for up to ~16 slots; sweep with headroom. Replace is a no-op when the
+    // token is absent, so overshooting is free. Skijer's NEI
+    for (uint8_t a = 1; a <= 32; a++) {
+        Replace("[[" + std::to_string(a) + "]]", std::string(fallback));
+    }
+}
+
 std::string CustomMessage::MESSAGE_END() {
     return "\x02"s;
 }

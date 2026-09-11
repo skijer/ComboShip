@@ -96,3 +96,6 @@ x64/
 /vcpkg/
 # Superpowers brainstorming companion (local mockups)
 .superpowers/
+# scratch + backup dirs of the local NEI port tooling
+.nei-port-tmp/
+.nei-port-backup/

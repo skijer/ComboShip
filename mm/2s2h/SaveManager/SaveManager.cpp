@@ -8,6 +8,7 @@
 #include "BenPort.h"
 #include "2s2h/BenGui/Notification.h"
 #include <ship/window/Window.h>
+#include "2s2h/GameInteractor/GameInteractor.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 
 extern "C" {
@@ -197,9 +198,9 @@ int SaveManager_ReadSaveFile(const std::filesystem::path& fileName, nlohmann::js
 extern "C" int gComboOwlBlobSlot = -1;
 #endif
 
-void SaveManager_InitNewSaveForSlot(int mmFileNum, const unsigned char* ootName8) {
-    Sram_InitNewSave();
 #ifdef COMBO_BUILD
+void SaveManager_BuildComboBaseline(const unsigned char* ootName8) {
+    Sram_InitNewSave();
     // ComboShip: carry the OOT-entered file name over (same font codes in both games; anything
     // outside the shared 0x00-0x3F range, e.g. JP glyphs, becomes a space).
     if (ootName8 != nullptr) {
@@ -227,9 +228,17 @@ void SaveManager_InitNewSaveForSlot(int mmFileNum, const unsigned char* ootName8
     SET_WEEKEVENTREG(WEEKEVENTREG_ENTERED_WEST_CLOCK_TOWN);
     SET_WEEKEVENTREG(WEEKEVENTREG_ENTERED_NORTH_CLOCK_TOWN);
     // ComboShip: stamp RANDO before the write, not after. Every caller re-stamps it moments later, but
-    // this function PERSISTS, so leaving it VANILLA opened a window where the container briefly held a
-    // vanilla MM save, which silently disables every IS_RANDO hook. Combo has no vanilla mode.
+    // the caller below PERSISTS, so leaving it VANILLA opened a window where the container briefly held
+    // a vanilla MM save, which silently disables every IS_RANDO hook. Combo has no vanilla mode.
     gSaveContext.save.shipSaveInfo.saveType = SAVETYPE_RANDO;
+}
+#endif
+
+void SaveManager_InitNewSaveForSlot(int mmFileNum, const unsigned char* ootName8) {
+#ifdef COMBO_BUILD
+    SaveManager_BuildComboBaseline(ootName8);
+#else
+    Sram_InitNewSave();
 #endif
     nlohmann::json j;
     // Fresh json with no owlSave, and Combo_WriteGameSave replaces the whole mm section — that is what
@@ -704,6 +713,25 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
     std::string fileName = SaveManager_GetFileNameFromFlashSave(flashSave);
 
     bool isBackup = false;
+    // FleetSync: 0-based slot of the file being written (matches gSaveContext.fileNum), for the
+    // OnSaveFile hook fired after a successful full (non-backup) save write.
+    s16 hookFileNum = -1;
+    switch (flashSave) {
+        case FLASH_SAVE_FILE_1_NEW_CYCLE_SAVE:
+        case FLASH_SAVE_FILE_1_OWL_SAVE:
+            hookFileNum = 0;
+            break;
+        case FLASH_SAVE_FILE_2_NEW_CYCLE_SAVE:
+        case FLASH_SAVE_FILE_2_OWL_SAVE:
+            hookFileNum = 1;
+            break;
+        case FLASH_SAVE_FILE_3_NEW_CYCLE_SAVE:
+        case FLASH_SAVE_FILE_3_OWL_SAVE:
+            hookFileNum = 2;
+            break;
+        default:
+            break;
+    }
 
     if (flashSave == FLASH_SAVE_UNAVAILABLE) {
         return;
@@ -771,6 +799,9 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
                 j["type"] = "2S2H_SAVE";
 
                 SaveManager_WriteSaveFile(fileName, j);
+                if (hookFileNum >= 0) {
+                    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnSaveFile>(hookFileNum);
+                }
             } else {
                 // If IS_VALID_FILE fails, we should delete the save file, even if there is an owl save in it, because
                 // they just deleted the new cycle save
@@ -823,6 +854,9 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
                 gComboOwlBlobSlot = (int)gSaveContext.fileNum + 1; // #182: gSaveContext now matches the blob
 #endif
                 SaveManager_WriteSaveFile(fileName, j);
+                if (hookFileNum >= 0) {
+                    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnSaveFile>(hookFileNum);
+                }
             } else {
 #ifdef COMBO_BUILD
                 gComboOwlBlobSlot = -1; // #182: func_80147314 is deleting the blob

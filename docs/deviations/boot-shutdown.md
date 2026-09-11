@@ -568,7 +568,8 @@ slot whose owl blob `gSaveContext` descends from.
   Presence of the key is the discriminator; `save.isOwlSave` is **not** reliable, every owl writer
   restores it in RAM afterwards. Stays a pure read — the dormant tracker peek shares this function.
   Its owl branches return the load-failure codes like every other page: a slot with neither key, or an
-  unparseable `owlSave` and no `newCycleSave`, is `-4` (fail-closed sentinel; entry still proceeds).
+  unparseable `owlSave` and no `newCycleSave`, is `-4` (fail-closed sentinel; entry still proceeds, via
+  the rebuild in `Combo_RepairMMSaveForSlot` — see `deviations/rando.md`).
 - `SaveManager_SaveCurrentForCombo` read-modify-writes: it **refreshes** the blob when the flag matches,
   otherwise **erases** it. Never leaves it untouched — blanket preservation would let a dormant grant
   write a newer `newCycleSave` behind a stale blob, and the granted item would vanish. The refresh
@@ -679,6 +680,29 @@ the launcher boundary, where `ComboIsValidSlot` already is one. No assert was ad
 candidate — checking in `Sram_StartWriteToFlashDefault` that `curPage` matches `gSaveContext.fileNum` —
 would false-fire, because file-select copy/erase/nameset legitimately call it for `copyDestFileIndex`,
 `selectedFileIndex` and the SRAM header. The dead kaleido branches were left in place rather than
-removed, matching the quit-to-title seams above. Also noticed but not touched: the comment at
+removed, matching the quit-to-title seams above. Also noticed but not touched at the time: the comment at
 `BenPort.cpp`'s `Combo_LoadMMSaveFile` claims the caller rebuilds on a negative code — `title_setup.c`
-discards the return and rebuilds nothing. Not sent upstream.
+discarded the return and rebuilt nothing (resolved below, 2026-09-07). Not sent upstream.
+
+## MM entry on a failed load, and why nobody saw it (2026-09-07)
+
+Two independent defects, one report ("starting my rando in MM puts me in as Fierce Deity with a lot of
+Ocarinas of Time").
+
+**The symptom is the fingerprint of a save that never loaded.** `title_setup.c` called
+`Combo_LoadMMSaveFile` and ignored the code, so a refused slot entered `Play_Init` on what
+`SaveContext_Init` left: all zeros. In MM `PLAYER_FORM_FIERCE_DEITY` is `0` and `ITEM_OCARINA_OF_TIME`
+is `0x00`, so the zeroed save *is* Fierce Deity with an ocarina in every inventory slot — playable
+garbage rather than the harmless blank the fail-closed sentinel assumed. Entry now goes through
+`Combo_RepairMMSaveForSlot`, which rebuilds the half from the slot's own baked seed; the policy and the
+no-baked-seed fallback are in `deviations/rando.md`.
+
+**Client-DLL `SPDLOG_*` output never reached the log file.** spdlog's default-logger registry is per
+module. `Context::InitLogging` builds the file-backed logger *inside libultraship.dll* and sets it as the
+default **there**, so `SPDLOG_INFO`/`SPDLOG_ERROR` compiled into `2ship.dll` (and `soh.dll`) went to each
+module's own stock logger and vanished — including `SaveManager_LoadSaveFile`'s "read result" line, the
+one that would have named the failure code here. Only libultraship's own logs and the exported
+`LUSLOG_*` C entry points were ever visible, which is why `title_setup.c:21` (soh, `LUSLOG_INFO`) shows
+up in `logs/Fleet of Harkinian.log` and `BenPort.cpp`'s "Starting 2 Ship 2 Harkinian version" does not.
+`OTRGlobals::Initialize` now adopts the shared logger (`spdlog::set_default_logger(ctx->GetLogger())`)
+right after `InitLogging`. Done for `2ship.dll` only; `soh.dll` has the same one-line gap.

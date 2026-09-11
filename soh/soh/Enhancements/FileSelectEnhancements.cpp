@@ -79,6 +79,24 @@ const char* SohFileSelect_GetSettingText(uint8_t optionIndex, uint8_t language) 
     return RandomizerSettingsMenuText[optionIndex][language].c_str();
 }
 
+// Combo-worded variant of the sub-screen options (QUEST_OOTXMM), indexed by CBO_*. English text is
+// used for every language (the combo is niche); translate later if wanted.
+std::array<std::string, LANGUAGE_MAX> ComboSettingsMenuText[CBO_MAX] = {
+    { "Start Combo (create OoT + MM save)", "Start Combo (create OoT + MM save)",
+      "Start Combo (create OoT + MM save)" },
+    { "Generate New Combo Seed", "Generate New Combo Seed", "Generate New Combo Seed" },
+    { "Load Combo Seed (.fleet)", "Load Combo Seed (.fleet)", "Load Combo Seed (.fleet)" },
+    { "Open Combo Settings", "Open Combo Settings", "Open Combo Settings" },
+    { "Generating combo...", "Generating combo...", "Generating combo..." },
+    { "No combo seed yet.\nGenerate one, or Load Combo Seed (.fleet).",
+      "No combo seed yet.\nGenerate one, or Load Combo Seed (.fleet).",
+      "No combo seed yet.\nGenerate one, or Load Combo Seed (.fleet)." },
+};
+
+const char* SohFileSelect_GetComboSettingText(uint8_t optionIndex, uint8_t language) {
+    return ComboSettingsMenuText[optionIndex][language].c_str();
+}
+
 void SohFileSelect_ShowPresetMenu() {
     SohGui::ShowEscMenu();
     CVarSetString(CVAR_SETTING("Menu.ActiveHeader"), "Settings");

@@ -389,6 +389,12 @@ void EnBom_Draw(Actor* thisx, PlayState* play) {
     s32 pad;
     EnBom* this = (EnBom*)thisx;
 
+    // NEI: when this bomb is a dropped Power Keg, draw the real MM keg barrel instead of the OOT bomb.
+    extern u8 PowerKeg_DrawKegModel(Actor * thisx, PlayState * play);
+    if (PowerKeg_DrawKegModel(thisx, play)) {
+        return;
+    }
+
     OPEN_DISPS(play->state.gfxCtx);
 
     if (thisx->params == BOMB_BODY) {

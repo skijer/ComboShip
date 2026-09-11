@@ -1,5 +1,15 @@
 #include "z64collision_check.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include <libultraship/bridge/consolevariablebridge.h>
+
+// Skijer's NEI shared time control (mods/items/helpers/timestop_helper.c): caches which AC
+// colliders each actor registers so frozen actors can stay hittable during a time stop.
+void TimeCtl_NoteAcCollider(Collider* collider);
+// Skijer's NEI Champion's Tunic (mods/equipment/behaviors/equip_champion.c): snapshots
+// where every hostile attack collider is, so Flurry Rush can tell that a damage collider
+// is sweeping past Link. It has to be taken HERE because ClearContext wipes the AT list
+// before Actor_UpdateAll, so this is the only point in the frame where the list is whole.
+void Champion_NoteIncomingAttacks(PlayState* play);
 
 #include "stdbool.h"
 
@@ -57,6 +67,17 @@ f32 CollisionCheck_GetDamageAndEffectOnElementAC(Collider* atCol, ColliderElemen
     u32 dmgFlags;
     s32 i;
     f32 damage;
+    u8 tridentFierceDamage = 0;
+
+    // A damage table normally replaces the attacker's numeric damage with its own
+    // entry (Sword Beam is 2 on Odolwa/Twinmold and 0 on Gyorg). The six Trident
+    // boss projectiles deliberately carry a 12-damage FD payload: retain attack
+    // index 0x19 for the boss-specific Fierce Deity effect, but do not let that
+    // table erase the explicitly requested quantity.
+    if ((atCol != NULL) && (atCol->actor != NULL)) {
+        extern u8 TridentChargeBall_GetFierceDamage(Actor * projectile);
+        tridentFierceDamage = TridentChargeBall_GetFierceDamage(atCol->actor);
+    }
 
     *effect = 0;
     damage = CollisionCheck_GetElementATDamage(atCol, atElem, acCol, acElem);
@@ -77,11 +98,35 @@ f32 CollisionCheck_GetDamageAndEffectOnElementAC(Collider* atCol, ColliderElemen
             damage *= sDamageMultipliers[acCol->actor->colChkInfo.damageTable->attack[i] & 0xF];
         }
 
+        // SoH z_collision_check.c:3660-3675 — when an Ivan-style entity is
+        // the active "player" (Ivan companion, possess mode, or SM64 Mario),
+        // scale damage by Player.ivanDamageMultiplier. EnPartner (in SoH)
+        // sets the multiplier per attack; MM has no EnPartner so the field
+        // initializes to 1 in Player_Init and the multiply is a no-op
+        // unless something explicitly drops it. Preserves the SoH path
+        // verbatim so Mario punch/kick/dive damage routes through the same
+        // hook in both ports.
+        {
+            extern u8 gIvanPossessActive;
+            extern u8 Sm64Mario_IsReady(void);
+            // MM doesn't define CVAR_ENHANCEMENT() as a macro (SoH-only
+            // convention). Use the literal CVar name — equivalent expansion.
+            if (CVarGetInteger("gEnhancements.IvanCoopModeEnabled", 0) || gIvanPossessActive || Sm64Mario_IsReady()) {
+                // CollisionCheck_GetDamageAndEffectOnElementAC takes no
+                // PlayState* — use the global gPlayState (variables.h:298)
+                // to reach the active Player.
+                damage *= GET_PLAYER(gPlayState)->ivanDamageMultiplier;
+            }
+        }
+
         if ((GameInteractor_Should(VB_DAMAGE_EFFECT, true, i, acCol->actor->colChkInfo.damageTable, effect,
                                    acCol->actor))) {
             *effect = (acCol->actor->colChkInfo.damageTable->attack[i] >> 4) & 0xF;
         }
         // #endregion
+    }
+    if (tridentFierceDamage != 0) {
+        damage = tridentFierceDamage;
     }
     return damage;
 }
@@ -1249,6 +1294,11 @@ s32 CollisionCheck_SetAC(struct PlayState* play, CollisionCheckContext* colChkCt
     }
     index = colChkCtx->colACCount;
     colChkCtx->colAC[colChkCtx->colACCount++] = col;
+    // Skijer's NEI time stop: remember who registered what. A frozen actor never runs
+    // its update, so it never gets here again and would drop out of the AC list —
+    // Link's sword and arrows would pass straight through a stopped enemy. The freeze
+    // pass re-registers these on the actor's behalf. No-op when nothing is frozen.
+    TimeCtl_NoteAcCollider(col);
 
     return index;
 }
@@ -2996,6 +3046,8 @@ void CollisionCheck_AC(struct PlayState* play, CollisionCheckContext* colChkCtx,
 void CollisionCheck_AT(struct PlayState* play, CollisionCheckContext* colChkCtx) {
     Collider** acColP;
 
+    Champion_NoteIncomingAttacks(play);
+
     if ((colChkCtx->colATCount == 0) || (colChkCtx->colACCount == 0)) {
         return;
     }
@@ -3532,6 +3584,21 @@ void CollisionCheck_ApplyDamage(struct PlayState* play, CollisionCheckContext* c
         if (!(col->acFlags & AC_HARD) || ((col->acFlags & AC_HARD) && (atElem->atDmgInfo.dmgFlags == 0x20000000))) {
             if (col->actor->colChkInfo.damage < finalDamage) {
                 col->actor->colChkInfo.damage = finalDamage;
+            }
+        }
+
+        // SoH z_collision_check.c:3037-3044 — apply Ivan/Mario damage scale
+        // to the final assigned damage (mirror of the multiplier hook in
+        // CollisionCheck_GetDamageAndEffectOnElementAC above). Same gate
+        // and same field; this path covers ApplyDamage callers that flow
+        // through finalDamage assignment instead of the +=.
+        {
+            extern u8 gIvanPossessActive;
+            extern u8 Sm64Mario_IsReady(void);
+            // MM doesn't define CVAR_ENHANCEMENT() as a macro (SoH-only
+            // convention). Use the literal CVar name — equivalent expansion.
+            if (CVarGetInteger("gEnhancements.IvanCoopModeEnabled", 0) || gIvanPossessActive || Sm64Mario_IsReady()) {
+                col->actor->colChkInfo.damage *= GET_PLAYER(play)->ivanDamageMultiplier;
             }
         }
     }

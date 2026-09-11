@@ -1,4 +1,5 @@
 #include "z64.h"
+#include <libultraship/log/luslog.h> // 2S2H [Port] LUSLOG_ERROR (transition guard)
 #include "regs.h"
 #include "functions.h"
 #include "z64vismono.h"
@@ -42,6 +43,7 @@ u8 sMotionBlurStatus;
 #include "debug.h"
 #include "BenPort.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "2s2h/FleetShipCombo/FleetShipCombo.h"
 #include "2s2h/Enhancements/FrameInterpolation/FrameInterpolation.h"
 #include "2s2h/Enhancements/Graphics/Graphics.h"
 #include "2s2h/DeveloperTools/CollisionViewer.h"
@@ -618,7 +620,28 @@ void Play_UpdateTransition(PlayState* this) {
     }
 
     switch (this->transitionMode) {
-        case TRANS_MODE_SETUP:
+        case TRANS_MODE_SETUP: {
+            // 2S2H [Port] Fleet Ship Combo: a STALE/GARBAGE nextEntrance (e.g. a hole-fall warp
+            // that completed while this game was combo-frozen) walks Entrance_GetTableEntry's
+            // unbounded pointers below and crashes (0xc0000005). Validate scene + spawn against
+            // the real table and CANCEL the transition instead, logging the value.
+            extern s32 gSceneEntranceTableCount;
+            extern SceneEntranceTableEntry sSceneEntranceTable[];
+            s16 guardLayer = 0;
+            if (gSaveContext.nextCutsceneIndex >= 0xFFF0) {
+                guardLayer = (gSaveContext.nextCutsceneIndex & 0xF) + 1;
+            }
+            u16 guardEntrance = (u16)(this->nextEntrance + guardLayer);
+            u32 guardScene = (u32)guardEntrance >> 9;
+            if ((s32)guardScene >= gSceneEntranceTableCount || sSceneEntranceTable[guardScene].table == NULL ||
+                ((guardEntrance >> 4) & 0x1F) >= sSceneEntranceTable[guardScene].tableCount) {
+                LUSLOG_ERROR("Play_UpdateTransition: INVALID nextEntrance 0x%04X (layer %d) — cancelled",
+                             this->nextEntrance, guardLayer);
+                this->transitionTrigger = TRANS_TRIGGER_OFF;
+                this->transitionMode = TRANS_MODE_OFF;
+                break;
+            }
+        }
             if (this->transitionTrigger != TRANS_TRIGGER_END) {
                 s16 sceneLayer = 0;
 
@@ -974,6 +997,13 @@ const char D_801DFA34[][4] = {
     "h",   "i",  "f",  "fa", "fb", "fc", "fd", "fe",  "ff",  "fg", "fh", "fi", "fj", "fk",
 };
 
+// Generic hold-button box selector (Sheikah Slate runes, ...). Declared locally rather than via a
+// header: mods/*.h is globbed with CONFIGURE_DEPENDS, so a new header there forces a full CMake
+// regeneration. Definitions live in mods/items/helpers/box_menu.c. Skijer's NEI
+u8 BoxMenu_IsOpen(void);
+void BoxMenu_Update(PlayState* play);
+void BoxMenu_Draw(PlayState* play);
+
 void Play_UpdateMain(PlayState* this) {
     s32 pad;
     Input* input = this->state.input;
@@ -1075,7 +1105,13 @@ void Play_UpdateMain(PlayState* this) {
             Skybox_Update(&this->skyboxCtx);
 
             if (IS_PAUSED(&this->pauseCtx)) {
-                KaleidoScopeCall_Update(this);
+                // Generic hold-button box selector (Sheikah Slate runes, ...) borrows the pause
+                // state the same way, so it must win over the kaleido here. Skijer's NEI
+                if (BoxMenu_IsOpen()) {
+                    BoxMenu_Update(this);
+                } else {
+                    KaleidoScopeCall_Update(this);
+                }
             } else if (this->gameOverCtx.state != GAMEOVER_INACTIVE) {
                 GameOver_Update(this);
             }
@@ -1149,13 +1185,16 @@ void Play_Update(PlayState* this) {
 }
 
 void Play_PostWorldDraw(PlayState* this) {
-    if (IS_PAUSED(&this->pauseCtx)) {
+    if (IS_PAUSED(&this->pauseCtx) && !BoxMenu_IsOpen()) {
         KaleidoScopeCall_Draw(this);
     }
 
     if (gSaveContext.gameMode == GAMEMODE_NORMAL) {
         Interface_Draw(this);
     }
+
+    // Generic box selector — drawn after the HUD so it sits on top. Skijer's NEI
+    BoxMenu_Draw(this);
 
     if (!IS_PAUSED(&this->pauseCtx) || (this->msgCtx.currentTextId != 0xFF)) {
         Message_Draw(this);
@@ -2102,6 +2141,10 @@ s32 Play_CamIsNotFixed(PlayState* this) {
 }
 
 s32 FrameAdvance_IsEnabled(PlayState* this) {
+    // NOTE (Fleet Ship Combo): do NOT force this true for the inactive game. The freeze is
+    // done in FrameAdvance_Update (returns false -> whole play update is skipped). Forcing
+    // IsEnabled true here also gates Effect_Add (z_effect.c), so the player's melee weapon
+    // blur effect wouldn't be allocated during Player_Init -> null deref crash.
     return this->frameAdvCtx.enabled != false;
 }
 

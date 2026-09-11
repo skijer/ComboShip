@@ -39,6 +39,13 @@ Gfx* Gfx_DrawTexRectIA8_DropShadowOffsetOverride(Gfx* pkt, TexturePtr texture, s
 Color_RGBA8 CosmeticEditor_GetChangedColorEx(u8 r, u8 g, u8 b, u8 a, const char* cosmeticId, u8 mode, f32 modifier);
 Color_RGBA8 CosmeticEditor_GetChangedColor(u8 r, u8 g, u8 b, u8 a, const char* cosmeticId);
 
+// Per-player tunic tint. While it is on, the tunic display lists no longer carry their own prim
+// color: they jump through segment 0x07, so whoever is about to be drawn binds their own color
+// first. Every Player_DrawImpl call site MUST bind, unconditionally — the tint can turn on after
+// the frame's display list is already built, and an unbound segment 0x07 crashes Fast3D.
+void PlayerTunic_BindLocalColor(struct PlayState* play);
+void PlayerTunic_BindColor(struct PlayState* play, u8 r, u8 g, u8 b);
+
 typedef enum {
     COSMETIC_COLOR_MODE_DEFAULT,
     COSMETIC_COLOR_MODE_MULTIPLY,
@@ -150,6 +157,13 @@ bool IsCustomDekuModelActive();
 bool IsCustomGoronModelActive();
 bool IsCustomZoraModelActive();
 bool IsCustomKafeiModelActive();
+
+// Hands the tunic over to the per-player tint (Harpoon rooms) and back. While handed over, the
+// cosmetic editor and the NEI equipment tunic stop writing the tunic patch; giving it back restores
+// whatever they wanted.
+void PlayerTunic_SetPerPlayerTint(bool enabled);
+// Color the local player's tunic falls back to when Harpoon has no color of its own.
+Color_RGBA8 PlayerTunic_ResolveLocalColor();
 #endif //__cplusplus
 
 #endif

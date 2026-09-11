@@ -29,6 +29,12 @@ void ApplyToSaveContext(nlohmann::json spoiler) {
     auto priorityItems = Rando::GetSariaPriorityItemsFromSpoiler(spoiler);
     Rando::SetSariaPriorityItemsInSave(gSaveContext.save.shipSaveInfo.rando, priorityItems);
 
+    // OoT+MM combo: persist the OoT areas in a sidecar so hints can name the real place of an item
+    // that stayed on the OoT side. Absent in non-combo seeds. Skijer's NEI
+    if (spoiler.contains("ootItemAreas")) {
+        Rando::Spoiler::SaveOotItemAreas(gSaveContext.save.shipSaveInfo.rando.finalSeed, spoiler["ootItemAreas"]);
+    }
+
     for (auto& [randoCheckId, randoStaticCheck] : Rando::StaticData::Checks) {
         if (randoStaticCheck.randoCheckId == RC_UNKNOWN) {
             continue;
@@ -72,6 +78,13 @@ void ApplyToSaveContext(nlohmann::json spoiler) {
             if (spoiler["checks"][randoStaticCheck.name].contains("price")) {
                 RANDO_SAVE_CHECKS[randoCheckId].price =
                     spoiler["checks"][randoStaticCheck.name]["price"].get<uint16_t>();
+            }
+            // Excluded check carried by a spoiler (OoT+MM combo writes {"randoItemId":"RI_JUNK","skipped":true}
+            // for the checks GeneratePools turned into skipped junk): keep it skipped, not a live junk check.
+            // Skijer's NEI
+            if (spoiler["checks"][randoStaticCheck.name].contains("skipped")) {
+                RANDO_SAVE_CHECKS[randoCheckId].skipped =
+                    spoiler["checks"][randoStaticCheck.name]["skipped"].get<bool>();
             }
         } else {
             std::string itemName = spoiler["checks"][randoStaticCheck.name].get<std::string>();

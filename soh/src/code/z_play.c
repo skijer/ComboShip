@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "soh/Enhancements/gameconsole.h"
+#include "soh/FleetShipCombo/FleetShipCombo.h"
 #include "soh/frame_interpolation.h"
 #include <overlays/actors/ovl_En_Niw/z_en_niw.h>
 #include <overlays/misc/ovl_kaleido_scope/z_kaleido_scope.h>
@@ -13,9 +14,20 @@
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/SaveManager.h"
 #include "soh/framebuffer_effects.h"
+#include "mods/items/custom_items.h"
+#include "mods/items/helpers/minish_kaleido.h"
+#include "mods/items/helpers/postman_kaleido.h"
+#include "mods/items/logic/item_postman_hat.h"
+#include "mods/transformation_masks/mm_mask_wear.h"
+#include <libultraship/libultraship.h>
 
 #include <time.h>
 #include <assert.h>
+
+// SM64 Mario: snapshot actor OC colliders into libsm64's surface set. Defined in
+// expansions/sm64/sm64_mario_surfaces.c (#included into z_player.c), so it has
+// external linkage and is callable here. Must run AFTER Actor_UpdateAll.
+extern void Sm64Surfaces_RefreshActorColliders(PlayState* play);
 
 TransitionUnk sTrnsnUnk;
 s32 gTrnsnUnkState;
@@ -33,6 +45,9 @@ Input* D_8012D1F8 = NULL;
 
 PlayState* gPlayState;
 s16 firstInit = 0;
+// Actor id assigned to EnPartner (Ivan) when ActorDB registers it at boot; read by IvanCoop and
+// Hylia's Grace to spawn/find him. Lost in the upstream merge, which rewrote this globals block.
+s16 gEnPartnerId;
 
 void Play_SpawnScene(PlayState* play, s32 sceneId, s32 spawn);
 
@@ -228,6 +243,10 @@ void Play_Destroy(GameState* thisx) {
 
     if (gSaveContext.linkAge != play->linkAgeOnLoad) {
         Inventory_SwapAgeEquipment();
+        {
+            extern void ExtEquip_ValidateForAge(void);
+            ExtEquip_ValidateForAge(); // NEI: age-restricted page-2 pieces come off with the swap
+        }
         Player_SetEquipmentData(play, player);
     }
 
@@ -668,6 +687,13 @@ void Play_Init(GameState* thisx) {
     // nextEntranceIndex was not initialized, so the previous value was carried over during soft resets.
     gPlayState->nextEntranceIndex = gSaveContext.entranceIndex;
 }
+
+// Generic hold-button box selector (Sheikah Slate runes, ...). Declared locally rather than via a
+// header: mods/*.h is globbed with CONFIGURE_DEPENDS, so a new header there forces a full CMake
+// regeneration. Definitions live in mods/items/helpers/box_menu.c. Skijer's NEI
+u8 BoxMenu_IsOpen(void);
+void BoxMenu_Update(PlayState* play);
+void BoxMenu_Draw(PlayState* play);
 
 void Play_Update(PlayState* play) {
     Input* input = play->state.input;
@@ -1190,8 +1216,32 @@ void Play_Update(PlayState* play) {
 
                     PLAY_LOG(3637);
 
+                    // PICTOGRAPH BOX (Skijer's NEI): the lens/photo state machine. It runs HERE, and
+                    // specifically BEFORE Actor_UpdateAll, for two reasons:
+                    //   1. The shutter halts every actor exactly like MM (z_parameter.c sets
+                    //      play->haltAllActors at PICTO_BOX_STATE_SETUP_PHOTO). A player-driven tick
+                    //      would freeze with the world and nobody could answer the keep/discard prompt.
+                    //   2. While the lens is up the pictograph OWNS A and B, and it takes them out of
+                    //      the input before Link ever reads them — otherwise his own A handling drops
+                    //      him out of first-person on the very frame we fire, and the picture comes out
+                    //      in third person.
+                    // MM runs its picto logic from the interface update for the same reasons.
+                    {
+                        extern void Picto_Update(PlayState * play);
+                        Picto_Update(play);
+                    }
+
                     if (!play->haltAllActors) {
                         Actor_UpdateAll(play, &play->actorCtx);
+                    }
+
+                    // SM64 Mario: now that Actor_UpdateAll has run, the OC
+                    // collider list is fully populated (props/doors register
+                    // after the player). Snapshot it so Mario stops phasing
+                    // through signs/torches/gates. (libsm64 only knows static +
+                    // dynapoly collision otherwise.)
+                    if (CVarGetInteger("gSm64Mario", 0)) {
+                        Sm64Surfaces_RefreshActorColliders(play);
                     }
 
                     PLAY_LOG(3643);
@@ -1248,7 +1298,18 @@ void Play_Update(PlayState* play) {
 
             if ((play->pauseCtx.state != 0) || (play->pauseCtx.debugState != 0)) {
                 PLAY_LOG(3721);
-                KaleidoScopeCall_Update(play);
+                if (BoxMenu_IsOpen()) {
+                    // Generic hold-button box selector (Sheikah Slate runes, ...). Skijer's NEI
+                    BoxMenu_Update(play);
+                } else if (gCustomItemState.minishCapWarpMode) {
+                    MinishKaleido_Update(play);
+                } else if (gCustomItemState.postmanHatWarpMode) {
+                    PostmanKaleido_Update(play);
+                } else if (MmMaskWear_IsGreatFairyWarpActive()) {
+                    MmMaskWear_GreatFairyWarpUpdate(play);
+                } else {
+                    KaleidoScopeCall_Update(play);
+                }
             } else if (play->gameOverCtx.state != GAMEOVER_INACTIVE) {
                 PLAY_LOG(3727);
                 GameOver_Update(play);
@@ -1311,7 +1372,10 @@ skip:
 
 void Play_DrawOverlayElements(PlayState* play) {
     if ((play->pauseCtx.state != 0) || (play->pauseCtx.debugState != 0)) {
-        KaleidoScopeCall_Draw(play);
+        if (!BoxMenu_IsOpen() && !gCustomItemState.minishCapWarpMode && !gCustomItemState.postmanHatWarpMode &&
+            !MmMaskWear_IsGreatFairyWarpActive()) {
+            KaleidoScopeCall_Draw(play);
+        }
     }
 
     if (gSaveContext.gameMode == GAMEMODE_NORMAL) {
@@ -1323,6 +1387,19 @@ void Play_DrawOverlayElements(PlayState* play) {
     if (play->gameOverCtx.state != GAMEOVER_INACTIVE) {
         GameOver_FadeInLights(play);
     }
+
+    // Great Fairy Mask teleport menu overlay
+    MmMaskWear_DrawOverlay(play);
+
+    // Minish Cap warp overlay — drawn last on OVERLAY_DISP so it covers HUD
+    if (gCustomItemState.minishCapWarpMode) {
+        MinishKaleido_Draw(play);
+    } else if (gCustomItemState.postmanHatWarpMode) {
+        PostmanKaleido_Draw(play);
+    }
+
+    // Generic box selector — drawn after everything else so it sits on top. Skijer's NEI
+    BoxMenu_Draw(play);
 }
 
 void Play_Draw(PlayState* play) {
@@ -2146,6 +2223,9 @@ s32 Play_CamIsNotFixed(PlayState* play) {
 }
 
 s32 FrameAdvance_IsEnabled(PlayState* play) {
+    // NOTE (Fleet Ship Combo): do NOT force this true for the inactive game. The freeze is
+    // done in FrameAdvance_Update (returns false -> whole play update is skipped). Forcing
+    // IsEnabled true here also gates Effect_Add, breaking player init (null weapon-effect).
     return !!play->frameAdvCtx.enabled;
 }
 

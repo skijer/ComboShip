@@ -10,11 +10,18 @@
 #define RANDO_SAVE_OPTIONS gSaveContext.save.shipSaveInfo.rando.randoSaveOptions
 #define RANDO_EVENTS gSaveContext.save.shipSaveInfo.rando.randoEvents
 
+// Sheikah Sensor rune: the five wished-for items, consulted in slot order. Each CVar holds a
+// RandoItemId outright, so the menu writes exactly what the rune reads.
+#define SENSOR_DESIRE_SLOTS 5
+#define CVAR_SENSOR_DESIRE_PREFIX "gNei.SensorDesire"
+
 namespace Rando {
 
 void Init();
 void DrawItem(RandoItemId randoItemId, RandoCheckId randoCheckId = RC_UNKNOWN, Actor* actor = nullptr);
-void GiveItem(RandoItemId randoItemId);
+// randoCheckId is only for naming: junk, traps and (in combo) foreign items resolve their display
+// name from the CHECK, so a give that omits it toasts the sentinel's name instead of the real one.
+void GiveItem(RandoItemId randoItemId, RandoCheckId randoCheckId = RC_UNKNOWN);
 // ComboShip: a small key lives in TWO counters — inventory.dungeonKeys and the rando mirror that
 // logic's KEY_COUNT reads — and both are -1 when fresh. Normalize each sentinel independently before
 // bumping, so a pre-existing desync heals instead of leaving the mirror permanently one behind.
@@ -51,6 +58,10 @@ RandoCheckId FindItemPlacement(RandoItemId randoItemId);
 // Like GetLocationNameForHint(FindItemPlacement(id)); on ComboShip builds, falls back to the combo
 // foreign map when the item was cross-placed into OOT instead of an MM check.
 std::string GetItemLocationHintName(RandoItemId randoItemId, bool exact);
+
+// Same answer when the caller already knows the check. Use this in EVERY hint that shows a place,
+// rather than calling StaticData::GetLocationNameForHint directly.
+std::string GetHintLocationText(RandoItemId randoItemId, RandoCheckId randoCheckId, bool exact = false);
 void RegisterMenu();
 
 std::vector<RandoItemId> GetComputedStartingItems(RandoSaveInfo& randoSaveInfo);

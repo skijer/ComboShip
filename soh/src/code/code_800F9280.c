@@ -18,6 +18,13 @@ ActiveSequence gActiveSeqs[4];
 
 u8 sSeqCmdWrPos = 0;
 u8 sSeqCmdRdPos = 0;
+// One-shot per-player flag: MmBgm_Play* sets this via Audio_PrimeMmSideChannel
+// to tell Audio_QueueSeqCmd "the next cmd on this player already has
+// seqToPlay primed with a 16-bit MM seq id — skip AudioEditor lookup so we
+// don't overwrite it." Consumed (cleared) on the next QueueSeqCmd for that
+// player, so it can never leak into a later cmd and shadow the
+// custom/music/* randomizer (which also writes seqReplaced/seqToPlay).
+static u8 sMmSideChannelPrimed[4] = { 0 };
 u8 D_80133408 = 0;
 u8 D_8013340C = 1;
 u8 D_80133410[] = { 0, 1, 2, 3 };
@@ -380,8 +387,30 @@ void Audio_ProcessSeqCmd(u32 cmd) {
     }
 }
 
+extern f32 D_80130F24;
+extern f32 sRelativeOcarinaVolume;
+
+void Audio_PrimeMmSideChannel(u8 playerIdx, u16 fullSeqId) {
+    if (playerIdx >= 4)
+        return;
+    gAudioContext.seqToPlay[playerIdx] = fullSeqId;
+    gAudioContext.seqReplaced[playerIdx] = 1;
+    sMmSideChannelPrimed[playerIdx] = 1;
+}
+
 void Audio_QueueSeqCmd(u32 cmd) {
-    // Replacement is resolved per-command in Audio_StartSequence().
+    // NEI: consume the MM side-channel prime flag so it doesn't latch on. The primed
+    // seqToPlay/seqReplaced set by Audio_PrimeMmSideChannel is read per-command in
+    // func_800F9280(), which now packs the full 16-bit MM seqId into the play command.
+    u8 op = cmd >> 28;
+    if (op == 0 || op == 2 || op == 12) {
+        u8 playerIdx = GET_PLAYER_IDX(cmd);
+        if (sMmSideChannelPrimed[playerIdx]) {
+            sMmSideChannelPrimed[playerIdx] = 0;
+        }
+    }
+
+    // Replacement is resolved per-command in func_800F9280().
     sAudioSeqCmds[sSeqCmdWrPos++] = cmd;
 }
 

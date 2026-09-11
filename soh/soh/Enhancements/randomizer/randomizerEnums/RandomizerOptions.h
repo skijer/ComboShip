@@ -528,6 +528,22 @@ RANDO_ENUM_ITEM(RO_MQ_SET_MQ)
 RANDO_ENUM_ITEM(RO_MQ_SET_RANDOM)
 RANDO_ENUM_END(RandoOptionMQSet)
 
+// Bomb Arrows treatment (Skijer's NEI). Bomb Arrows is the 7th value of the bow's element flag and
+// has no inventory cell; this is only about how you come by it.
+RANDO_ENUM_BEGIN(RandoOptionBombArrows)
+RANDO_ENUM_ITEM(RO_BOMB_ARROWS_OFF)      // never granted on its own (Twilight Upgrade still works)
+RANDO_ENUM_ITEM(RO_BOMB_ARROWS_BOMB_BAG) // auto-granted with any bomb bag (the old AutoGrantOnBag)
+RANDO_ENUM_ITEM(RO_BOMB_ARROWS_SHUFFLED) // a real randomizer item
+RANDO_ENUM_END(RandoOptionBombArrows)
+
+// Elemental Wand treatment (Skijer's NEI). All three grant the SAME page-2 slot; they differ only in
+// what unlocks an individual rod and therefore in how many items the pool carries.
+RANDO_ENUM_BEGIN(RandoOptionElementalWand)
+RANDO_ENUM_ITEM(RO_WAND_MEDALLIONS)        // 1 pool item; rod N works iff you own medallion N
+RANDO_ENUM_ITEM(RO_WAND_SINGLE_ITEM)       // 1 pool item; finding it unlocks all six rods
+RANDO_ENUM_ITEM(RO_WAND_ELEMENTAL_SHUFFLE) // 6 pool items, one per rod
+RANDO_ENUM_END(RandoOptionElementalWand)
+
 #ifdef RANDO_ENUM_BEGIN_CLEANUP
 #undef RANDO_ENUM_BEGIN
 #undef RANDO_ENUM_BEGIN_CLEANUP

@@ -1,6 +1,12 @@
 #include "Rando/Rando.h"
 #include "Rando/ActorBehavior/Souls.h"
 #include "Rando/MiscBehavior/ClockShuffle.h"
+#include "mods/nei_save.h" // ootHookshotLevel (FC 3-level hookshot chain obtainability)
+// Needed by the OoT progressive chains below: they resolve to their concrete tier and degrade to
+// junk at the top, reading the SAME state their gives write. Skijer's NEI
+#include "2s2h/FleetShipCombo/FleetComboIds.h" // FC_OOT_SWORD_MASTER / FC_OOT_SWORD_BIGGORON
+#include "mods/extended_inventory.h"           // SLOT_ROCS
+#include "mods/items/logic/weapon_upgrades.h"  // WeaponUpgrade_Has* (hammer / master / BGS tops)
 #include "2s2h/ShipUtils.h"
 #include "2s2h/ShipInit.hpp"
 #include <cassert>
@@ -223,6 +229,45 @@ bool Rando::IsItemObtainable(RandoItemId randoItemId, RandoCheckId randoCheckId)
     switch (randoItemId) {
         case RI_UNKNOWN:
             return false;
+        // Stone of Agony is a 2-level progressive: 1st copy = the stone (quest
+        // bit), 2nd = the Quartz of Motion. A third copy has nothing left to
+        // give, so it degrades to junk like every other maxed progressive.
+        case RI_OOT_STONE_OF_AGONY:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !(Nei_Save()->quartzOwned);
+        // The other OoT chains, same rule as every MM progressive: once the top tier is owned there
+        // is nothing left to give, so the check degrades to junk. Each reads the SAME state its
+        // give writes, so obtainability and the give can never disagree. Skijer's NEI
+        case RI_OOT_PROGRESSIVE_HAMMER:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !WeaponUpgrade_HasHammerAxe();
+        case RI_OOT_PROGRESSIVE_MASTER_SWORD:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !WeaponUpgrade_HasTrueMaster();
+        case RI_OOT_PROGRESSIVE_BGS:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !WeaponUpgrade_HasGreatFairy();
+        case RI_OOT_PROGRESSIVE_STRENGTH: {
+            if (hasObtainedCheck) {
+                return false;
+            }
+            u8 lvl = Nei_StrengthLevel();
+            u8 native = (u8)CUR_UPG_VALUE(UPG_STRENGTH);
+            return ((native > lvl) ? native : lvl) < NEI_STRENGTH_MAX;
+        }
+        case RI_OOT_PROGRESSIVE_ROC:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return Nei_GetOwnedItem(SLOT_ROCS) != ITEM_ROCS_CAPE;
         case RI_PROGRESSIVE_WALLET:
             if (hasObtainedCheck) {
                 return false;
@@ -392,6 +437,17 @@ bool Rando::IsItemObtainable(RandoItemId randoItemId, RandoCheckId randoCheckId)
                 return false;
             }
             break;
+        case RI_HOOKSHOT: {
+            // FC 3-level chain (FCI_HOOKSHOT, count 3): copies stay obtainable until Ultrashot
+            // (ootHookshotLevel 3). Without this, the vanilla GIFIELD_20 dedupe below junks every
+            // copy after the first (the native hookshot item exists from copy 1 on) and the
+            // Longshot/Ultrashot tiers would be unreachable in MM.
+            int hookLvl = Nei_Save()->ootHookshotLevel;
+            if (hookLvl == 0 && INV_CONTENT(ITEM_HOOKSHOT) == ITEM_HOOKSHOT) {
+                hookLvl = 1; // pre-chain native hookshot with no level recorded
+            }
+            return hookLvl < 3;
+        }
         case RI_SHIELD_HERO:
             if (GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_NONE) {
                 return false;
@@ -714,6 +770,30 @@ RandoItemId Rando::ConvertItem(RandoItemId randoItemId, RandoCheckId randoCheckI
                 // Shouldn't happen, just in case
                 assert(false);
                 return RI_JUNK;
+            // OoT chains -> their concrete tier, so the NAME, textbox and model are the tier's and
+            // the give freezes it in CUSTOM_ITEM_PARAM (no more guessing from live state at draw
+            // time). Mirrors RI_PROGRESSIVE_BOW right below. Skijer's NEI
+            case RI_OOT_PROGRESSIVE_HAMMER:
+                return Nei_Save()->ootHammerOwned ? RI_OOT_IRON_KNUCKLE_AXE : RI_OOT_HAMMER;
+            case RI_OOT_PROGRESSIVE_MASTER_SWORD:
+                return (Nei_Save()->comboObtained[FC_OOT_SWORD_MASTER] != 0) ? RI_OOT_TRUE_MASTER_SWORD
+                                                                             : RI_OOT_MASTER_SWORD;
+            case RI_OOT_PROGRESSIVE_BGS:
+                return (Nei_Save()->comboObtained[FC_OOT_SWORD_BIGGORON] != 0) ? RI_GREAT_FAIRY_SWORD
+                                                                               : RI_OOT_BIGGORON_SWORD;
+            case RI_OOT_STONE_OF_AGONY:
+                return Nei_Save()->quartzOwned ? RI_OOT_QUARTZ_OF_MOTION : RI_OOT_STONE_OF_AGONY;
+            case RI_OOT_PROGRESSIVE_ROC:
+                return (Nei_GetOwnedItem(SLOT_ROCS) == ITEM_NONE) ? RI_OOT_NEI_ROCS_FEATHER : RI_OOT_NEI_ROCS_CAPE;
+            case RI_OOT_PROGRESSIVE_STRENGTH: {
+                u8 lvl = Nei_StrengthLevel();
+                u8 native = (u8)CUR_UPG_VALUE(UPG_STRENGTH);
+                if (native > lvl) {
+                    lvl = native;
+                }
+                return (lvl == 0) ? RI_OOT_GORONS_BRACELET
+                                  : ((lvl == 1) ? RI_OOT_SILVER_GAUNTLETS : RI_OOT_GOLDEN_GAUNTLETS);
+            }
             case RI_PROGRESSIVE_BOW:
                 if (CUR_UPG_VALUE(UPG_QUIVER) == 0) {
                     return RI_BOW;

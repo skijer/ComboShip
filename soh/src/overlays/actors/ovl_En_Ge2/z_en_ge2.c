@@ -11,6 +11,7 @@
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include <assert.h>
 #include "soh/ResourceManagerHelpers.h"
+#include "mods/transformation_masks/gerudo_form.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -155,8 +156,14 @@ void EnGe2_Init(Actor* thisx, PlayState* play) {
             break;
         case GE2_TYPE_GERUDO_CARD_GIVER:
             EnGe2_ChangeAction(this, GE2_ACTION_WAITLOOKATPLAYER);
-            this->actor.update = EnGe2_UpdateAfterTalk;
-            this->actionFunc = EnGe2_ForceTalk;
+            // Gerudo Mask cheat: wearing the mask makes Card-Giver Gerudos act like
+            // friendly Gerudos — no forced card-giving cutscene.
+            if (GerudoForm_IsActive()) {
+                this->actor.update = EnGe2_UpdateFriendly;
+            } else {
+                this->actor.update = EnGe2_UpdateAfterTalk;
+                this->actionFunc = EnGe2_ForceTalk;
+            }
             this->actor.targetMode = 6;
             break;
         default:
@@ -494,6 +501,16 @@ void EnGe2_ForceTalk(EnGe2* this, PlayState* play) {
 }
 
 void EnGe2_SetupCapturePlayer(EnGe2* this, PlayState* play) {
+    // Never start a capture while the guards should be friendly. The friendly
+    // re-check at the bottom of EnGe2_Update only flips this->actor.update on
+    // the NEXT frame, so a detection on the same frame the player becomes a
+    // Gerudo (Gerudo Mask transform) would still capture without this gate.
+    if (GameInteractor_Should(VB_GERUDOS_BE_FRIENDLY, EnGe2_CheckCarpentersFreed())) {
+        this->actor.update = EnGe2_UpdateFriendly;
+        this->actor.targetMode = 6;
+        return;
+    }
+
     this->stateFlags |= GE2_STATE_CAPTURING;
     this->actor.speedXZ = 0.0f;
     EnGe2_ChangeAction(this, GE2_ACTION_CAPTURETURN);

@@ -11,6 +11,9 @@ extern void Inventory_ChangeEquipment(s16, u16);
 extern void Player_SetEquipmentData(PlayState*, Player*);
 extern void func_808328EC(Player*, u16);
 extern PlayState* gPlayState;
+// NEI page-2 equipment: a vanilla shield/tunic/boots equipped in-game takes the ext piece of that
+// type off first (mods/extended_equipment.h).
+void ExtEquip_Unequip(s16 equipType);
 }
 
 static u16 sItemButtons[] = { BTN_B, BTN_CLEFT, BTN_CDOWN, BTN_CRIGHT, BTN_DUP, BTN_DDOWN, BTN_DLEFT, BTN_DRIGHT };
@@ -34,6 +37,7 @@ static void UseTunicBoots(Player* player, PlayState* play, Input* input) {
     if (item >= ITEM_SHIELD_DEKU && item <= ITEM_BOOTS_HOVER) {
         if (item >= ITEM_BOOTS_KOKIRI) {
             u16 bootsValue = item - ITEM_BOOTS_KOKIRI + 1;
+            ExtEquip_Unequip(EQUIP_TYPE_BOOTS);
             if (CUR_EQUIP_VALUE(EQUIP_TYPE_BOOTS) == bootsValue) {
                 Inventory_ChangeEquipment(EQUIP_TYPE_BOOTS, EQUIP_VALUE_BOOTS_KOKIRI);
             } else {
@@ -44,6 +48,7 @@ static void UseTunicBoots(Player* player, PlayState* play, Input* input) {
                                                                                               : NA_SE_PL_CHANGE_ARMS);
         } else if (item >= ITEM_TUNIC_KOKIRI) {
             u16 tunicValue = item - ITEM_TUNIC_KOKIRI + 1;
+            ExtEquip_Unequip(EQUIP_TYPE_TUNIC);
             if (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) == tunicValue) {
                 Inventory_ChangeEquipment(EQUIP_TYPE_TUNIC, EQUIP_VALUE_TUNIC_KOKIRI);
             } else {
@@ -54,6 +59,7 @@ static void UseTunicBoots(Player* player, PlayState* play, Input* input) {
         } else {
             u16 shieldValue = item - ITEM_SHIELD_DEKU + 1;
             if (CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != shieldValue) {
+                ExtEquip_Unequip(EQUIP_TYPE_SHIELD);
                 Inventory_ChangeEquipment(EQUIP_TYPE_SHIELD, shieldValue);
                 Player_SetEquipmentData(play, player);
                 func_808328EC(player, NA_SE_PL_CHANGE_ARMS);

@@ -1470,7 +1470,29 @@ void Settings::CreateOptions() {
     // TODO: Compasses show rewards/woth, maps show dungeon mode
     OPT_BOOL(RSK_BLUE_FIRE_ARROWS, "Blue Fire Arrows", CVAR_RANDOMIZER_SETTING("BlueFireArrows"), mOptionDescriptions[RSK_BLUE_FIRE_ARROWS]);
     OPT_BOOL(RSK_SUNLIGHT_ARROWS, "Sunlight Arrows", CVAR_RANDOMIZER_SETTING("SunlightArrows"), mOptionDescriptions[RSK_SUNLIGHT_ARROWS]);
+    OPT_BOOL(RSK_SW97_SPELLS, "Sage Spells", CVAR_RANDOMIZER_SETTING("SW97Spells"), mOptionDescriptions[RSK_SW97_SPELLS]);
     OPT_BOOL(RSK_ROCS_FEATHER, "Roc's Feather", CVAR_RANDOMIZER_SETTING("RocsFeather"), mOptionDescriptions[RSK_ROCS_FEATHER]);
+    OPT_BOOL(RSK_SKIJER_CUSTOM_ITEMS, "Skijer's Custom Items", CVAR_RANDOMIZER_SETTING("SkijerCustomItems"), mOptionDescriptions[RSK_SKIJER_CUSTOM_ITEMS], IMFLAG_NONE, WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON);
+    OPT_BOOL(RSK_MM_MASKS_ALL, "Add All MM Masks to Rando", CVAR_RANDOMIZER_SETTING("MmMasksAll"), mOptionDescriptions[RSK_MM_MASKS_ALL]);
+    OPT_BOOL(RSK_MM_SONGS, "Add MM Songs to Rando", CVAR_RANDOMIZER_SETTING("MmSongs"), mOptionDescriptions[RSK_MM_SONGS]);
+    OPT_BOOL(RSK_MM_MASKS_TRANSFORM, "Add Transformation Masks to Rando", CVAR_RANDOMIZER_SETTING("MmMasksTransform"), mOptionDescriptions[RSK_MM_MASKS_TRANSFORM]);
+    OPT_BOOL(RSK_EXT_EQUIPMENT, "Extended Equipment", CVAR_RANDOMIZER_SETTING("ExtEquipment"), mOptionDescriptions[RSK_EXT_EQUIPMENT]);
+    OPT_BOOL(RSK_NEI_WEAPON_UPGRADES, "NEI Weapon Upgrades", CVAR_RANDOMIZER_SETTING("NeiWeaponUpgrades"), mOptionDescriptions[RSK_NEI_WEAPON_UPGRADES]);
+    OPT_BOOL(RSK_CROSSOVER_POKEBALL, "Include Pikachu Pokeball", CVAR_RANDOMIZER_SETTING("CrossoverPokeball"), mOptionDescriptions[RSK_CROSSOVER_POKEBALL]);
+    OPT_BOOL(RSK_CROSSOVER_MARIO_MASK, "Include Mario Mask", CVAR_RANDOMIZER_SETTING("CrossoverMarioMask"), mOptionDescriptions[RSK_CROSSOVER_MARIO_MASK]);
+    // Bomb Arrows are no longer an inventory item — they are the 7th value of the bow's element
+    // wheel. This decides how you come by them. "Bomb Bag" is what the old
+    // gMods.BombArrows.AutoGrantOnBag checkbox did; that checkbox is gone, subsumed here.
+    OPT_U8(RSK_SHUFFLE_BOMB_ARROWS, "Shuffle Bomb Arrows", { "Off", "Bomb Bag", "Shuffled" }, OptionCategory::Setting,
+           CVAR_RANDOMIZER_SETTING("ShuffleBombArrows"), mOptionDescriptions[RSK_SHUFFLE_BOMB_ARROWS],
+           WIDGET_CVAR_COMBOBOX, RO_BOMB_ARROWS_OFF);
+    // Elemental Wand — six rods, one page-2 cell, one slot flag. Only the unlock differs:
+    //   Medallions       one wand in the pool; a rod works if you own its OoT medallion
+    //   Single item      one wand in the pool; finding it unlocks all six rods
+    //   Elemental shuffle six separate rods in the pool; the first found also grants the slot
+    OPT_U8(RSK_ELEMENTAL_WAND_SHUFFLE, "Elemental Wand", { "Medallions", "Single item", "Elemental shuffle" },
+           OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ElementalWandShuffle"),
+           mOptionDescriptions[RSK_ELEMENTAL_WAND_SHUFFLE], WIDGET_CVAR_COMBOBOX, RO_WAND_MEDALLIONS);
     OPT_U8(RSK_INFINITE_UPGRADES, "Infinite Upgrades", {"Off", "Progressive", "Condensed Progressive"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("InfiniteUpgrades"), mOptionDescriptions[RSK_INFINITE_UPGRADES]);
     OPT_BOOL(RSK_SKELETON_KEY, "Skeleton Key", CVAR_RANDOMIZER_SETTING("SkeletonKey"), mOptionDescriptions[RSK_SKELETON_KEY]);
     OPT_BOOL(RSK_SLINGBOW_BREAK_BEEHIVES, "Slingshot/Bow Can Break Beehives", CVAR_RANDOMIZER_SETTING("SlingBowBeehives"), mOptionDescriptions[RSK_SLINGBOW_BREAK_BEEHIVES]);
@@ -1943,6 +1965,7 @@ void Settings::CreateOptions() {
                                                                       &mOptions[RSK_BIG_POE_COUNT],
                                                                       &mOptions[RSK_BLUE_FIRE_ARROWS],
                                                                       &mOptions[RSK_SUNLIGHT_ARROWS],
+                                                                      &mOptions[RSK_SW97_SPELLS],
                                                                       &mOptions[RSK_FULL_WALLETS],
                                                                       &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],
                                                                       &mOptions[RSK_SWORDLESS_EPONA_ITEMS],
@@ -2527,6 +2550,7 @@ void Settings::CreateOptions() {
                                               &mOptions[RSK_DAMAGE_MULTIPLIER],
                                               &mOptions[RSK_BLUE_FIRE_ARROWS],
                                               &mOptions[RSK_SUNLIGHT_ARROWS],
+                                              &mOptions[RSK_SW97_SPELLS],
                                               &mOptions[RSK_INFINITE_UPGRADES],
                                               &mOptions[RSK_SKELETON_KEY],
                                               &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],

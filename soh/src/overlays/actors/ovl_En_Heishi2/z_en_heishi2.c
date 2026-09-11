@@ -15,6 +15,11 @@
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
+// MM mask ownership check (mods/extended_inventory.c) — Keaton Mask with an MM
+// counterpart is permanent: selling it grants the reward without losing the mask.
+extern int32_t ExtInv_HasMmMask(uint16_t itemId);
+extern void ExtInv_KeepMmMaskOrSell(PlayState* play, uint16_t maskItem);
+
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY)
 
 void EnHeishi2_Init(Actor* thisx, PlayState* play);
@@ -559,10 +564,11 @@ void func_80A540C0(EnHeishi2* this, PlayState* play) {
             case 0:
                 this->actor.textId = 0x2020;
                 Message_ContinueTextbox(play, this->actor.textId);
-                Player_UnsetMask(play);
                 Flags_SetInfTable(INFTABLE_GATE_GUARD_PUT_ON_KEATON_MASK);
                 Flags_SetItemGetInf(ITEMGETINF_38);
-                Item_Give(play, ITEM_SOLD_OUT);
+                // MM Keaton Mask owners keep the mask: the guard pays for it (reward flags
+                // above stay set) but the permanent MM mask is not taken away.
+                ExtInv_KeepMmMaskOrSell(play, ITEM_MM_MASK_KEATON);
                 if (this->unk_30A != 0) {
                     this->unk_30A = 2;
                     this->unk_30E = 1;

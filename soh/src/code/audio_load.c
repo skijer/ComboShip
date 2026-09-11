@@ -91,6 +91,27 @@ u8 seqCachePolicyMap[MAX_AUTHENTIC_SEQID];
 size_t fontMapSize;
 char** fontMap;
 
+// Number of SoundFont struct slots allocated in gAudioContext.soundFonts at
+// boot. AudioLoad_PopulateMmFontMeta uses this to OOB-check before writing.
+// Set inside AudioLoad_Init right after the soundFonts alloc.
+static size_t sSoundFontsCapacity = 0;
+
+// Allocated capacity (NOT logical size) of the sequenceMap/seqLoadStatus and
+// fontMap/fontLoadStatus backing arrays. These are pre-sized at boot with
+// headroom so the MM BGM loader (mm_bgm_loader.cpp, game thread) can register
+// MM sequences/fonts by writing into the pre-allocated slack and only bumping
+// the logical *MapSize — WITHOUT reallocating (which would move+free the buffer
+// under the audio thread that reads sequenceMap[]/fontMap[]/*LoadStatus[] every
+// callback, a use-after-free). The grow helpers fall back to realloc only if a
+// request ever exceeds this capacity (should not happen in normal play).
+//   *_CAP_HEADROOM mirrors the MM_FONT_HEADROOM pattern used for soundFonts.
+// sequenceMapCapacity counts the +0xF slack band too (matching the acceptance
+// guard's sequenceMapSize + 0xF), so reads in that band stay in-bounds.
+static size_t sSequenceMapCapacity = 0; // # of char* slots allocated in sequenceMap (and bytes in seqLoadStatus)
+static size_t sFontMapCapacity = 0;     // # of char* slots allocated in fontMap (and bytes in fontLoadStatus)
+#define MM_SEQ_CAP_HEADROOM 256
+#define MM_FONT_CAP_HEADROOM 256
+
 uintptr_t fontStart;
 uint32_t fontOffsets[8192];
 
@@ -601,7 +622,10 @@ s32 AudioLoad_SyncInitSeqPlayerInternal(s32 playerIdx, s32 seqId, s32 arg2) {
     SequenceData seqData2 = ResourceMgr_LoadSeqByName(sequenceMap[seqId]);
 
     for (int i = 0; i < seqData2.numFonts; i++) {
-        fontId = seqData2.fonts[i];
+        // resolvedFont (>= 0) carries the un-truncated font index for streamed custom
+        // songs, lifting the 256-soundfont cap that the u8 fonts[] imposes. For every
+        // other sequence resolvedFont is -1 and we use the per-entry fonts[i].
+        fontId = (seqData2.resolvedFont >= 0) ? seqData2.resolvedFont : seqData2.fonts[i];
         AudioLoad_SyncLoadFont(fontId); // NOTE: If this is commented out, then enemies will play child link sounds...
         // numFonts--;
     }
@@ -1347,12 +1371,21 @@ void AudioLoad_Init(void* heap, size_t heapSize) {
     char** seqList = ResourceMgr_ListFiles("audio/sequences*", &seqListSize);
     char** customSeqList = ResourceMgr_ListFiles("custom/music/*", &customSeqListSize);
     sequenceMapSize = (size_t)(seqListSize + customSeqListSize);
+    // Pre-size with headroom (see sSequenceMapCapacity note) so the MM BGM loader
+    // never reallocs sequenceMap/seqLoadStatus during playback. Capacity includes
+    // the +0xF slack band that the acceptance guard permits.
+    sSequenceMapCapacity = sequenceMapSize + 0xF + MM_SEQ_CAP_HEADROOM;
     // calloc: unassigned slots stay NULL for the guard in AudioLoad_SyncInitSeqPlayerInternal().
-    sequenceMap = calloc(sequenceMapSize + 0xF, sizeof(char*));
+    sequenceMap = calloc(sSequenceMapCapacity, sizeof(char*));
 
-    // SOH [Bugfix] Size to match sequenceMap (+ 0xF); custom ids can exceed sequenceMapSize.
-    gAudioContext.seqLoadStatus = malloc(sequenceMapSize + 0xF);
-    memset(gAudioContext.seqLoadStatus, 5, sequenceMapSize + 0xF);
+    // seqLoadStatus MUST cover the same index range the acceptance guard allows
+    // (AudioLoad_SyncInitSeqPlayerInternal permits seqId < sequenceMapSize + 0xF,
+    // and sequenceMap is sized +0xF). Sizing it to only sequenceMapSize let a
+    // valid-per-guard seqId in the +0xF slack band read up to 15 bytes OOB in
+    // AudioLoad_IsSeqLoadComplete / AudioLoad_SetSeqLoadStatus. Allocate the full
+    // capacity and fill with the 5 sentinel (LOAD_STATUS_PERMANENTLY_LOADED).
+    gAudioContext.seqLoadStatus = malloc(sSequenceMapCapacity);
+    memset(gAudioContext.seqLoadStatus, 5, sSequenceMapCapacity);
     for (size_t i = 0; i < seqListSize; i++) {
         SequenceData sDat = ResourceMgr_LoadSeqByName(seqList[i]);
         sequenceMap[sDat.seqNumber] = strdup(seqList[i]);
@@ -1371,9 +1404,14 @@ void AudioLoad_Init(void* heap, size_t heapSize) {
     char** fntList = ResourceMgr_ListFiles("audio/fonts*", &fntListSize);
     char** customFntList = ResourceMgr_ListFiles("custom/fonts/*", &customFntListSize);
 
-    gAudioContext.fontLoadStatus = calloc(customFntListSize + fntListSize, sizeof(u8));
-    fontMap = calloc(customFntListSize + fntListSize, sizeof(char*));
     fontMapSize = customFntListSize + fntListSize;
+    // Pre-size with headroom (see sFontMapCapacity note) so the MM BGM loader
+    // never reallocs fontMap/fontLoadStatus during playback. MM registers ~41
+    // fonts starting at fontMapSize, well within this headroom; the soundFonts
+    // array has its own MM_FONT_HEADROOM and PopulateMmFontMeta guards that side.
+    sFontMapCapacity = fontMapSize + MM_FONT_CAP_HEADROOM;
+    gAudioContext.fontLoadStatus = calloc(sFontMapCapacity, sizeof(u8));
+    fontMap = calloc(sFontMapCapacity, sizeof(char*));
     for (int i = 0; i < fntListSize; i++) {
         SoundFont* sf = ResourceMgr_LoadAudioSoundFontByName(fntList[i]);
         fontMap[sf->fntIndex] = strdup(fntList[i]);
@@ -1432,7 +1470,11 @@ void AudioLoad_Init(void* heap, size_t heapSize) {
             }
             SoundFont* sf = ResourceMgr_LoadAudioSoundFontByName(res);
             memset(&sDat->fonts[0], 0, sizeof(sDat->fonts));
-            sDat->fonts[0] = sf->fntIndex;
+            sDat->fonts[0] = (u8)sf->fntIndex; // low byte kept for the fanfare reload-compare path
+            // Full-width index used at playback. Without this, streamed packs with
+            // >256 songs (each ships its own soundfont) truncate the font index in
+            // the u8 fonts[] and song #256+ plays the wrong/corrupt soundfont.
+            sDat->resolvedFont = sf->fntIndex;
             sDat->numFonts = 1;
         }
 
@@ -1464,8 +1506,23 @@ void AudioLoad_Init(void* heap, size_t heapSize) {
 
     numFonts = fntListSize;
 
-    // #end region
-    gAudioContext.soundFonts = AudioHeap_Alloc(&gAudioContext.audioInitPool, numFonts * sizeof(SoundFont));
+// #end region
+// MM_FONT_HEADROOM: extra SoundFont slots beyond OOT's boot count, so the
+// MM BGM loader (soh/mods/sound_translator/mm_bgm_loader.cpp) can register
+// MM soundfonts at SoH-side indices past `numFonts` without OOB on the
+// audio thread. Verified crash 0xc0000005 at mixer.c:103 (aLoadBufferImpl)
+// when an MM seq referenced font idx 134 and gAudioContext.soundFonts was
+// only sized for 38 OOT fonts. MM has 41 fonts; OOT has ~38; combined
+// worst-case (no aliasing) ≈ 79 slots. 256 is generous safety margin.
+#define MM_FONT_HEADROOM 256
+    gAudioContext.soundFonts =
+        AudioHeap_Alloc(&gAudioContext.audioInitPool, (numFonts + MM_FONT_HEADROOM) * sizeof(SoundFont));
+    // Zero the headroom so an OOB-into-headroom read returns 0 fields (and any
+    // pointer-deref following bad metadata bails cleanly) instead of garbage.
+    if (gAudioContext.soundFonts != NULL) {
+        memset(&gAudioContext.soundFonts[numFonts], 0, MM_FONT_HEADROOM * sizeof(SoundFont));
+    }
+    sSoundFontsCapacity = (size_t)(numFonts + MM_FONT_HEADROOM);
 
     if (addr = AudioHeap_Alloc(&gAudioContext.audioInitPool, D_8014A6C4.permanentPoolSize), addr == NULL) {
         // cast away const from D_8014A6C4
@@ -1475,6 +1532,152 @@ void AudioLoad_Init(void* heap, size_t heapSize) {
     AudioHeap_AllocPoolInit(&gAudioContext.permanentPool, addr, D_8014A6C4.permanentPoolSize);
     gAudioContextInitalized = true;
     osSendMesg(gAudioContext.taskStartQueueP, OS_MESG_32(gAudioContext.totalTaskCnt), OS_MESG_NOBLOCK);
+}
+
+// -----------------------------------------------------------------------------
+// MM BGM custom-seq registration helpers
+// -----------------------------------------------------------------------------
+// Allow a separate translation unit (mm_bgm_loader.cpp) to install MM .seq
+// resources from mm.o2r into sequenceMap / AudioCollection at runtime, mirroring
+// the boot-time custom/music/* loop above (lines ~1402-1442). MM seqs that
+// reference fonts by CRC must also have their fonts inserted into fontMap.
+// These helpers grow the malloc'd maps as needed. Safe to call only from the
+// main thread before any MM BGM play call.
+
+// Returns the next free seq number not yet in AudioCollection, starting from
+// sequenceMapSize. Caller passes back the same value to AudioLoad_RegisterMmSequence.
+s32 AudioLoad_FindNextFreeSeqId(void) {
+    int seqNum = (int)sequenceMapSize;
+    while (AudioCollection_HasSequenceNum((u16)seqNum)) {
+        seqNum++;
+    }
+    return seqNum;
+}
+
+// Grow sequenceMap to fit seqNum (if needed), strdup path into the slot, and add
+// it to AudioCollection. Returns 1 on success, 0 on alloc failure.
+s32 AudioLoad_RegisterMmSequence(const char* path, u16 seqNum) {
+    if (path == NULL) {
+        return 0;
+    }
+    if ((size_t)seqNum >= sequenceMapSize) {
+        size_t newSize = (size_t)seqNum + 16;
+        // Fast path: the slot (and its +0xF slack band) already lives inside the
+        // capacity pre-allocated at boot. Just publish the larger logical size —
+        // NO realloc, so the audio thread (reading sequenceMap[]/seqLoadStatus[]
+        // under audio.mutex) never sees a moved/freed buffer. The pre-allocated
+        // slack is already NULL (sequenceMap, calloc) and 5 (seqLoadStatus, memset).
+        if (newSize + 0xF <= sSequenceMapCapacity) {
+            sequenceMapSize = newSize;
+        } else {
+            // Fallback (should not happen in normal play — headroom exhausted):
+            // grow the backing arrays. This realloc is the unsafe-under-reader
+            // case the pre-size avoids; it can only run if MM registered more
+            // sequences than MM_SEQ_CAP_HEADROOM reserved. Grow generously so it
+            // happens at most once.
+            size_t newCap = newSize + 0xF + MM_SEQ_CAP_HEADROOM;
+            char** grown = realloc(sequenceMap, newCap * sizeof(char*));
+            if (grown == NULL) {
+                return 0;
+            }
+            for (size_t i = sSequenceMapCapacity; i < newCap; i++) {
+                grown[i] = NULL;
+            }
+            u8* growStatus = realloc(gAudioContext.seqLoadStatus, newCap);
+            if (growStatus == NULL) {
+                sequenceMap = grown;
+                return 0;
+            }
+            for (size_t i = sSequenceMapCapacity; i < newCap; i++) {
+                growStatus[i] = 5; // LOAD_STATUS_PERMANENTLY_LOADED sentinel like boot
+            }
+            sequenceMap = grown;
+            gAudioContext.seqLoadStatus = growStatus;
+            sSequenceMapCapacity = newCap;
+            sequenceMapSize = newSize;
+        }
+    }
+    if (sequenceMap[seqNum] != NULL) {
+        free(sequenceMap[seqNum]);
+    }
+    sequenceMap[seqNum] = strdup(path);
+    AudioCollection_AddToCollection((char*)path, seqNum);
+    return 1;
+}
+
+// Grow fontMap to fit fontIndex (if needed), strdup path into the slot.
+// Returns the assigned index (== fontIndex) or -1 on failure.
+s32 AudioLoad_RegisterMmFont(const char* path, s32 fontIndex) {
+    if (path == NULL || fontIndex < 0) {
+        return -1;
+    }
+    if ((size_t)fontIndex >= fontMapSize) {
+        // Grow by exactly one slot (was previously +16 — that bloated fontMapSize
+        // by 16 per call, pushing MM font indices into the 600+ range and OOB
+        // past gAudioContext.soundFonts' boot allocation).
+        size_t newSize = (size_t)fontIndex + 1;
+        // Fast path: slot already inside the boot pre-allocated capacity. Publish
+        // the larger logical size only — NO realloc, so the audio thread reading
+        // fontMap[]/fontLoadStatus[] under audio.mutex never sees a moved buffer.
+        // Pre-allocated slack is already NULL (fontMap) and 0 (fontLoadStatus).
+        if (newSize <= sFontMapCapacity) {
+            fontMapSize = newSize;
+        } else {
+            // Fallback (headroom exhausted — should not happen in normal play):
+            // grow the backing arrays. Unsafe-under-reader realloc; only reachable
+            // if MM registered more fonts than MM_FONT_CAP_HEADROOM reserved.
+            size_t newCap = newSize + MM_FONT_CAP_HEADROOM;
+            char** grown = realloc(fontMap, newCap * sizeof(char*));
+            if (grown == NULL) {
+                return -1;
+            }
+            for (size_t i = sFontMapCapacity; i < newCap; i++) {
+                grown[i] = NULL;
+            }
+            u8* growStatus = realloc(gAudioContext.fontLoadStatus, newCap);
+            if (growStatus == NULL) {
+                fontMap = grown;
+                return -1;
+            }
+            for (size_t i = sFontMapCapacity; i < newCap; i++) {
+                growStatus[i] = 0;
+            }
+            fontMap = grown;
+            gAudioContext.fontLoadStatus = growStatus;
+            sFontMapCapacity = newCap;
+            fontMapSize = newSize;
+        }
+    }
+    if (fontMap[fontIndex] != NULL) {
+        free(fontMap[fontIndex]);
+    }
+    fontMap[fontIndex] = strdup(path);
+    return fontIndex;
+}
+
+// Populate gAudioContext.soundFonts[fontIndex] with the metadata from a loaded
+// SoundFont resource. Without this, the audio synth thread reads zeroed (or
+// garbage, pre-fix) bytes from the boot-allocated soundFonts array and faults
+// when dereferencing a bogus instruments/drums/sampleAddr pointer.
+//
+// The SoundFont struct is shallow-copied — its pointer fields (instruments,
+// drums, soundEffects) keep pointing into the cached resource's memory, which
+// stays alive while the resource manager holds it.
+void AudioLoad_PopulateMmFontMeta(s32 fontIndex, SoundFont* sf) {
+    if (sf == NULL || fontIndex < 0) {
+        return;
+    }
+    if ((size_t)fontIndex >= sSoundFontsCapacity) {
+        return; // OOB past the headroom — caller asked for more than we reserved
+    }
+    gAudioContext.soundFonts[fontIndex] = *sf;
+    // SoH-side fontIndex (not the MM ROM value); makes any code that checks
+    // sf->fntIndex consistent with the bookkeeping in fontMap[].
+    gAudioContext.soundFonts[fontIndex].fntIndex = fontIndex;
+}
+
+s32 AudioLoad_FindNextFreeFontIndex(void) {
+    return (s32)fontMapSize;
 }
 
 void AudioLoad_InitSlowLoads(void) {

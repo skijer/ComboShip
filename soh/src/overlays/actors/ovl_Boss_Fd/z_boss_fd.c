@@ -16,6 +16,7 @@
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/transformation_masks/boss_super_damage.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -1292,6 +1293,42 @@ void BossFd_CollisionCheck(BossFd* this, PlayState* play) {
     ColliderJntSphElement* headCollider = &this->collider.elements[0];
     ColliderInfo* hurtbox;
 
+    // FD / Pika Gigantamax: full damage to the flying head and CAN kill it in the air
+    // (vanilla clamps health to a min of 2, forcing you to finish it in the hole phase
+    // — user wants it killable while flying). Triggered by an accepted AC hit on the
+    // head (Pika electric / FD beam land on the wide 0xFFCDFFFE bumper) OR the geometric
+    // FD-sword-blade / touch reach detector (lets FD reach the high serpent even when
+    // not at full health, where the ranged beam isn't available). Gated on IsFormActive
+    // so normal play / the boomerang regression is untouched. Mash to death.
+    if (BossSuperDamage_IsFormActive(play) &&
+        ((headCollider->info.bumperFlags & BUMP_HIT) ||
+         BossSuperDamage_FormAttackReaches(play, &this->headPos, BossSuperDamage_FormAttackRange(play) + 60.0f))) {
+        headCollider->info.bumperFlags &= ~BUMP_HIT;
+        if ((s8)this->actor.colChkInfo.health <= 0) {
+            return; // already dying — ignore further hits while the death plays out
+        }
+        BossSuperDamage_StartElectricSparks(&this->actor, 90);
+        this->actor.colChkInfo.health -= BossSuperDamage_FormDamage(play);
+        if ((s8)this->actor.colChkInfo.health <= 0) {
+            this->actor.colChkInfo.health = 0;
+            // Route the air kill through Boss_Fd2's death sequence so the FULL death
+            // cutscene plays and ALL defeat triggers fire (subcamera, blue warp, room
+            // clear, finishing blow). Boss_Fd2 owns the death subcamera — killing
+            // Boss_Fd directly (forcing BOSSFD_DEATH_START) burns the body but never
+            // creates the camera, so no cutscene. Park Boss_Fd in Wait so it receives
+            // the FD2_SIGNAL_DEATH handoff Boss_Fd2 sends mid-sequence (→ emerge → body
+            // burn). Looks odd (serpent vanishes, dies at a hole) but fires everything —
+            // user's explicit choice.
+            this->actionFunc = BossFd_Wait;
+            this->handoffSignal = FD2_SIGNAL_AIRKILL;
+        }
+        this->work[BFD_DAMAGE_FLASH_TIMER] = 10;
+        this->work[BFD_INVINC_TIMER] = 12; // short cooldown so mashing lands fast
+        Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_DAMAGE1, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        return;
+    }
+
     if (headCollider->info.bumperFlags & BUMP_HIT) {
         headCollider->info.bumperFlags &= ~BUMP_HIT;
         hurtbox = headCollider->info.acHitInfo;
@@ -1666,6 +1703,9 @@ void BossFd_Draw(Actor* thisx, PlayState* play) {
     osSyncPrintf("FD DRAW END\n");
     BossFd_DrawEffects(this->effects, play);
     osSyncPrintf("FD DRAW END2\n");
+
+    // Skijer's NEI: FD/Pika electric glow
+    BossSuperDamage_DrawGlowFromSpheres(&this->actor, play, &this->collider, 19, 1.5f);
 }
 
 s32 BossFd_OverrideRightArmDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* thisx) {

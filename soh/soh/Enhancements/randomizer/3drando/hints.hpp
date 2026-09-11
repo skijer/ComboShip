@@ -80,4 +80,8 @@ void CreateChildAltarHint();
 void CreateAdultAltarHint();
 // ComboShip: resolved (settings-applied) always-hint check list, for the combo hint dump.
 std::vector<RandomizerCheck> GetAlwaysHintCandidates();
+// ComboShip: the combo payload's item -> area map ({"<item name>":"<area>"}), spanning BOTH games.
+// Static NPC hints search only OOT's own locations, so this is the only way one can name an area for
+// an item the combo fill placed in Termina.
+void Combo_SetHintItemAreas(const std::string& json);
 #endif

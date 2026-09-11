@@ -85,6 +85,19 @@ static bool UpdateToDAccess(Entrance* entrance, Region* connection) {
     bool ageTimePropagated = false;
     Region* parent = entrance->GetParentRegion();
 
+    // BOTH ends can be missing. An entrance whose parent or destination is RR_NONE leads nowhere, and
+    // every branch below dereferences both pointers on the same line — guarding only the destination
+    // just moved the crash. Nothing propagates across an edge with a missing end, so returning false
+    // is the correct answer as well as the safe one.
+    //
+    // The fill never hits this because it walks the graph while it is fully wired; the combo's
+    // cross-game playthrough verifier walks it after generation has finished, and finds the loose
+    // ends. Skijer's NEI
+    if (connection == nullptr || parent == nullptr) {
+        StopPerformanceTimer(PT_TOD_ACCESS);
+        return false;
+    }
+
     if (!connection->childDay && parent->childDay && entrance->CheckConditionAtAgeTime(logic->IsChild, logic->AtDay)) {
         connection->childDay = true;
         ageTimePropagated = true;
@@ -185,6 +198,15 @@ void ProcessExits(Region* region, GetAccessibleLocationsStruct& gals, Randomizer
         }
 
         Region* exitRegion = exit.GetConnectedRegion();
+        // An exit can point at no region at all — RR_NONE is the placeholder every unassigned exit
+        // carries, and Root alone has dozens of them. UpdateToDAccess dereferences this immediately,
+        // so walking the graph outside the fill's own lifetime (the combo's cross-game playthrough
+        // verifier does exactly that, after generation has finished) crashed on the first one.
+        // Nothing can propagate through an exit that leads nowhere, so skipping is also the correct
+        // answer, not just the safe one. Skijer's NEI
+        if (exitRegion == nullptr) {
+            continue;
+        }
         // Update Time of Day Access for the exit
         if (UpdateToDAccess(&exit, exitRegion)) {
             gals.logicUpdated = true;
@@ -866,12 +888,17 @@ static void AssumedFill(const std::vector<RandomizerGet>& items, const std::vect
     }
 
     // keep retrying to place everything until it works or takes too long
-    int retries = 10;
+    int retries = 25;
     bool unsuccessfulPlacement = false;
     std::vector<RandomizerCheck> attemptedLocations;
     do {
         retries--;
         if (retries <= 0) {
+            // This was silent: exhausting the retries here aborts the whole attempt without a word, so
+            // a generation that never converges leaves no trace of why. Skijer's NEI
+            SPDLOG_ERROR("AssumedFill: exhausted 25 retries with {} items and {} allowed locations - "
+                         "could not place everything reachably",
+                         items.size(), allowedLocations.size());
             placementFailure = true;
             return;
         }
@@ -996,8 +1023,19 @@ static std::vector<RandomizerGet> GetMedallionsInPool(std::vector<RandomizerGet>
 // This function will specifically randomize dungeon rewards for the End of Dungeons
 // setting, or randomize one dungeon reward to Link's Pocket if that setting is on
 // RANDOTODO this function assumes only 1 of each reward can exist, fix it when starting items are refactored
+bool FleetCombo_RestrictedDungeonRewards();
+
 static void RandomizeDungeonRewards() {
     auto ctx = Rando::Context::GetInstance();
+
+    // Fleet Ship Combo: with the shared Dungeon Rewards option on "Reward Spots" the combo deals all
+    // 13 rewards (OoT's 9 + MM's 4 remains) across the 13 boss spots of BOTH games in its own stage,
+    // so this one must stand down. Otherwise it claims OoT's 9 locations here — and hands one to
+    // Link's Pocket — before the combo hook runs, and the shared pool loses most of its spots.
+    // Link's Pocket then just takes an ordinary item like any other location. Skijer's NEI
+    if (FleetCombo_RestrictedDungeonRewards()) {
+        return;
+    }
 
     std::vector<RandomizerGet> rewards = FilterFromPool(itemPool, [](const auto i) {
         return Rando::StaticData::RetrieveItem(i).GetItemType() == ITEMTYPE_DUNGEONREWARD;
@@ -1094,8 +1132,12 @@ static void RandomizeOwnDungeon(const Rando::DungeonInfo* dungeon) {
     });
 
     // filter out locations that may be required to have songs placed at them
+    // Fleet Ship Combo: the shared "Song Spots" mode needs the same reservation, whatever OoT's own
+    // song option says — the combo is the one that will fill those spots. (Declared here too; the
+    // definition lives in FleetComboRando.cpp.)
+    extern int FleetCombo_SharedSongsMode();
     dungeonLocations = FilterFromPool(dungeonLocations, [ctx](const auto loc) {
-        if (ctx->GetOption(RSK_SHUFFLE_SONGS).Is(RO_SONG_SHUFFLE_SONG_LOCATIONS) ||
+        if (FleetCombo_SharedSongsMode() == 1 || ctx->GetOption(RSK_SHUFFLE_SONGS).Is(RO_SONG_SHUFFLE_SONG_LOCATIONS) ||
             ctx->GetOption(RSK_SHUFFLE_SONGS).Is(RO_SONG_SHUFFLE_OFF)) {
             return !(Rando::StaticData::GetLocation(loc)->GetRCType() == RCTYPE_SONG_LOCATION);
         }
@@ -1105,6 +1147,10 @@ static void RandomizeOwnDungeon(const Rando::DungeonInfo* dungeon) {
         }
         return true;
     });
+    // Fleet Ship Combo: no reward reservation here on purpose. The shared restricted stages run
+    // before this one now, so their spots are already occupied and AssumedFill skips them by itself.
+    // A per-stage reservation was the wrong layer — one existed for songs, none for rewards, and the
+    // next category would have needed a third. Skijer's NEI
 
     // Add specific items that need be randomized within this dungeon
     if (ctx->GetOption(RSK_KEYSANITY).Is(RO_DUNGEON_ITEM_LOC_OWN_DUNGEON) && dungeon->GetSmallKey() != RG_NONE) {
@@ -1114,7 +1160,10 @@ static void RandomizeOwnDungeon(const Rando::DungeonInfo* dungeon) {
             });
         SohUtils::AppendVector(dungeonItems, dungeonSmallKeys);
     }
-    if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_REWARDS).Is(RO_DUNGEON_REWARDS_OWN_DUNGEON) &&
+    // Fleet Ship Combo: on "Reward Spots" the rewards belong to the combo's shared stage, so they
+    // must not be pinned to their own dungeon here either. Skijer's NEI
+    if (!FleetCombo_RestrictedDungeonRewards() &&
+        ctx->GetOption(RSK_SHUFFLE_DUNGEON_REWARDS).Is(RO_DUNGEON_REWARDS_OWN_DUNGEON) &&
         dungeon->GetReward() != RG_NONE) {
         std::vector<RandomizerGet> dungeonReward =
             FilterAndEraseFromPool(itemPool, [dungeon](const RandomizerGet i) { return (i == dungeon->GetReward()); });
@@ -1217,7 +1266,12 @@ static void RandomizeDungeonItems() {
         SohUtils::AppendVector(overworldItems, gerudoKeys);
     }
 
-    if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_REWARDS).Is(RO_DUNGEON_REWARDS_ANY_DUNGEON)) {
+    // Fleet Ship Combo: same stand-down as RandomizeDungeonRewards. On "Reward Spots" the rewards
+    // belong to the combo's own stage, so they must not be siphoned into the any-dungeon or overworld
+    // pools here — they would be placed inside OoT before the combo ever sees them. Skijer's NEI
+    if (FleetCombo_RestrictedDungeonRewards()) {
+        // nothing: the rewards stay in itemPool for the combo stage to claim
+    } else if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_REWARDS).Is(RO_DUNGEON_REWARDS_ANY_DUNGEON)) {
         auto rewards = FilterAndEraseFromPool(itemPool, [](const auto i) {
             return Rando::StaticData::RetrieveItem(i).GetItemType() == ITEMTYPE_DUNGEONREWARD;
         });
@@ -1341,11 +1395,21 @@ void VanillaFill() {
 void ClearProgress() {
 }
 
+// Fleet Ship Combo (FleetComboRando.cpp): pre-colocación cross-game de la seed combinada.
+// No-op (returns true) salvo que haya una generación combo activa. false = reintentar el fill.
+bool FleetCombo_PrePlacementHook();
+// Shared restricted categories (Songs / Dungeon Rewards on their spots mode). Runs BEFORE every
+// native placement stage so its spots are taken and the native stages skip them on their own.
+bool FleetCombo_RestrictedStageHook();
+// 0 = Own Game Logic (combo does not touch songs), 1 = Song Spots, 2 = Anywhere. Always 0 outside a
+// combo generation, so the vanilla song stage below behaves exactly as before.
+int FleetCombo_SharedSongsMode();
+
 int Fill() {
     auto ctx = Rando::Context::GetInstance();
     int retries = 0;
     SPDLOG_INFO("Starting seed generation...");
-    while (retries < 5) {
+    while (retries < 30) {
         SPDLOG_INFO("Attempt {}...", retries + 1);
         placementFailure = false;
         // showItemProgress = false;
@@ -1469,6 +1533,31 @@ int Fill() {
         }
         StopPerformanceTimer(PT_SHOPSANITY);
 
+        // Fleet Ship Combo: the shared restricted categories (Songs / Dungeon Rewards on their spots
+        // mode) place FIRST — before every stage that could take one of their spots: dungeon rewards,
+        // own-dungeon items and Link's Pocket, all below. Those stages only ever fill EMPTY locations,
+        // so once these spots hold an item they skip them on their own and nothing has to reserve
+        // them one by one — which is what kept failing: the song reservation existed, the reward one
+        // did not, and any stage added later would have needed a third.
+        //
+        // Three things fix its position, and all three were learned the hard way:
+        //   - AFTER the entrance shuffle: the stage judges spots by reachability, and the shuffled
+        //     graph is the real one.
+        //   - AFTER FillExcludedLocations: a location the player excluded stays junk, so a category
+        //     with more items than remaining spots is a genuine conflict, reported instead of
+        //     silently overridden.
+        //   - AFTER shopsanity: shop items are erased from itemPool before this point, so they are
+        //     only assumed once they are PLACED (the search applies placed items as it walks). Run
+        //     any earlier and the assumed inventory silently loses every shop item — which is why
+        //     SoH itself lends the pool GetMinVanillaShopItems(8) during entrance validation, and
+        //     why its own comment below notes a bought shield gates access to Gohma.
+        // Shops can never hold a song or a boss reward, so placing them first costs no spots.
+        if (!FleetCombo_RestrictedStageHook()) {
+            retries++;
+            ClearProgress();
+            continue;
+        }
+
         StartPerformanceTimer(PT_OWN_DUNGEON);
         // Place dungeon rewards
         SPDLOG_INFO("Shuffling and Placing Dungeon Items...");
@@ -1492,6 +1581,25 @@ int Fill() {
         RandomizeLinksPocket();
         StopPerformanceTimer(PT_LIMITED_CHECKS);
 
+        // Fleet Ship Combo: cross-game placement runs HERE, after OoT's restricted stages (shops,
+        // own-dungeon keys/maps/compasses, dungeon rewards, Link's Pocket) and before the general
+        // advancement fill.
+        //
+        // It used to run before all of them, which starved those stages: the combo ate the reachable
+        // slots inside each dungeon and RandomizeOwnDungeon was then left with locations that were
+        // allowed but neither empty nor reachable, failing with "25 retries exhausted with 1 items
+        // and 28 allowed locations" and retrying the whole fill forever.
+        //
+        // This is the ordering every multiworld randomizer uses (Archipelago runs each world's
+        // pre_fill on its untouched locations first, then fills shared items over the remainder):
+        // each game claims what its own options restrict, and only what is left is up for grabs
+        // across games. Skijer's NEI
+        if (!FleetCombo_PrePlacementHook()) {
+            retries++;
+            ClearProgress();
+            continue;
+        }
+
         StartPerformanceTimer(PT_ADVANCEMENT_ITEMS);
         SPDLOG_INFO("Shuffling Advancement Items");
         // Then place the rest of the advancement items
@@ -1509,6 +1617,96 @@ int Fill() {
         StartPerformanceTimer(PT_PLAYTHROUGH_GENERATION);
         GeneratePlaythrough();
         StopPerformanceTimer(PT_PLAYTHROUGH_GENERATION);
+        // Distinguishes the TWO retry causes, which were indistinguishable in the log until now:
+        // unbeatable seed vs. placement failure. Skijer's NEI
+        if (!ctx->playthroughBeatable || placementFailure) {
+            // WHY IT FAILED, without naming a single item.
+            //
+            // Every hand-written probe here (hasLullaby, hasOcarina, the medallion counters) answered
+            // exactly one question and went stale the moment the next option landed. The general form
+            // is the one that matters: after GeneratePlaythrough, IsAddedToPool marks every location
+            // the walk reached, so an ADVANCEMENT item sitting in a location it never reached is, by
+            // definition, an item this seed cannot hand you. That list IS the failure.
+            //
+            // It needs no knowledge of songs, rewards, bridges or trials, and it says the same thing
+            // for whatever gets added next: these are the items you cannot get, and where each one is
+            // stuck. Items the combo placed in MM never appear here - they reach OoT's logic by
+            // announcement - so anything listed is genuinely OoT-side. Skijer's NEI
+            size_t reached = 0;
+            std::string missed, stuck;
+            int missedCount = 0, stuckCount = 0;
+            for (RandomizerCheck rc : ctx->allLocations) {
+                Rando::ItemLocation* loc = ctx->GetItemLocation(rc);
+                if (loc->IsAddedToPool()) {
+                    reached++;
+                    continue;
+                }
+                missedCount++;
+                if (missedCount <= 25) {
+                    missed += missed.empty() ? "" : ", ";
+                    missed += Rando::StaticData::GetLocation(rc)->GetName();
+                }
+                RandomizerGet rg = loc->GetPlacedRandomizerGet();
+                if (rg == RG_NONE || !Rando::StaticData::RetrieveItem(rg).IsAdvancement()) {
+                    continue;
+                }
+                stuckCount++;
+                if (stuckCount <= 25) {
+                    stuck += stuck.empty() ? "" : ", ";
+                    stuck += Rando::StaticData::RetrieveItem(rg).GetName().GetEnglish();
+                    stuck += " @ ";
+                    stuck += Rando::StaticData::GetLocation(rc)->GetName();
+                }
+            }
+            // AND THE DOOR THAT DID NOT OPEN. When no progression item is stuck anywhere, nothing
+            // is MISSING - a region gate is what failed, and locations are the wrong granularity to
+            // see it.
+            //
+            // But "every unreached region" is useless on its own: it came back with 417, nearly all
+            // of them the MQ half of dungeons that are vanilla in this seed (or the reverse), which
+            // are unreachable by design. The gate is the FRONTIER - a region the walk never entered
+            // in any age or time, sitting on the far side of an exit from a region it DID enter.
+            // Everything deeper is a consequence of that one door. Names the exit too, so the failing
+            // condition can be looked up directly. Skijer's NEI
+            std::string regions;
+            int regionCount = 0;
+            for (int r = RR_NONE + 1; r < RR_MAX; r++) {
+                Region* from = RegionTable((RandomizerRegion)r);
+                if (from == nullptr) {
+                    continue;
+                }
+                if (!from->childDay && !from->childNight && !from->adultDay && !from->adultNight) {
+                    continue; // not reached itself, so its exits say nothing
+                }
+                for (const Rando::Entrance& exit : from->exits) {
+                    // RR_NONE is the placeholder every unassigned exit points at, and Root alone has
+                    // dozens of them - they drowned the real doors 20 times over.
+                    if (exit.GetConnectedRegionKey() == RR_NONE) {
+                        continue;
+                    }
+                    Region* to = RegionTable(exit.GetConnectedRegionKey());
+                    if (to == nullptr || to->regionName.empty() || to->regionName == "Invalid Region") {
+                        continue;
+                    }
+                    if (to->childDay || to->childNight || to->adultDay || to->adultNight) {
+                        continue;
+                    }
+                    regionCount++;
+                    if (regionCount <= 30) {
+                        regions += regions.empty() ? "" : ", ";
+                        regions += from->regionName;
+                        regions += " -X-> ";
+                        regions += to->regionName;
+                    }
+                }
+            }
+            SPDLOG_ERROR("Fill attempt failed: playthroughBeatable={} placementFailure={}; playthrough "
+                         "reached {} of {} locations\n  UNOBTAINABLE progression ({}): {}\n"
+                         "  BLOCKED DOORS ({}): {}\n  UNREACHED locations ({}): {}",
+                         ctx->playthroughBeatable, placementFailure, reached, ctx->allLocations.size(), stuckCount,
+                         stuck.empty() ? "none - nothing is missing, a region gate is what failed" : stuck, regionCount,
+                         regions, missedCount, missed);
+        }
         // Successful placement, produced beatable result
         if (ctx->playthroughBeatable && !placementFailure) {
             SPDLOG_INFO("Calculating Playthrough...");
@@ -1538,7 +1736,7 @@ int Fill() {
             return 1;
         }
         // Unsuccessful placement
-        if (retries < 4) {
+        if (retries < 29) {
             SPDLOG_DEBUG("Failed to generate a beatable seed. Retrying...");
             Regions::ResetAllLocations();
             logic->Reset();

@@ -1139,6 +1139,17 @@ s32 Player_HoldsBow(Player* player);
 s32 Player_HoldsSlingshot(Player* player);
 s32 func_8008F128(Player* player);
 s32 Player_ActionToMeleeWeapon(s32 itemAction);
+// Skijer's NEI: Fierce Deity skin active AND a real sword (Master/Kokiri/Biggoron) in
+// hand — the gate for FD's always-two-handed Deity sword. See z_player_lib.c.
+s32 Player_IsFDHoldingSword(Player* player);
+// Skijer's NEI: exposed to environmental heat. Shared so z_player.c and z_player_lib.c
+// cannot drift apart on it again. See z_player_lib.c.
+s32 Player_SuffersHeat(Player* player);
+s32 Player_IsZoraBoomerangActive(void);
+s32 Player_IsDekuBubbleActive(void);
+Input* Player_GetControlInput(void);
+f32 Player_GetControlStickMagnitude(void);
+s32 Player_GetFloorType(void);
 s32 Player_GetMeleeWeaponHeld(Player* player);
 s32 Player_HoldsTwoHandedWeapon(Player* player);
 s32 Player_HoldsBrokenKnife(Player* player);
@@ -1648,7 +1659,7 @@ void GameState_Destroy(GameState* gameState);
 GameStateFunc GameState_GetInit(GameState* gameState);
 u32 GameState_IsRunning(GameState* gameState);
 void* GameState_Alloc(GameState* gameState, size_t size, char* file, s32 line);
-void func_800C55D0(GameAlloc* this);
+void GameAlloc_Cleanup(GameAlloc* this);
 void* GameAlloc_MallocDebug(GameAlloc* this, size_t size, const char* file, s32 line);
 void* GameAlloc_Malloc(GameAlloc* this, size_t size);
 void GameAlloc_Free(GameAlloc* this, void* data);
@@ -2055,7 +2066,9 @@ void AudioSeq_SkipForwardSequence(SequencePlayer* seqPlayer);
 void AudioSeq_ResetSequencePlayer(SequencePlayer* seqPlayer);
 void AudioSeq_InitSequencePlayerChannels(s32 playerIdx);
 void AudioSeq_InitSequencePlayers(void);
-void AudioOcarina_Start(u16);
+// Skijer's NEI: widened to u32 (MM/custom song bits 16-25). Upstream renamed this from
+// AudioOcarina_Start to AudioOcarina_Start; the wider parameter is ours and has to survive the rename.
+void AudioOcarina_Start(u32);
 void AudioOcarina_SetInstrument(u8);
 void AudioOcarina_SetPlaybackSong(s8 songIdxPlusOne, s8 playbackState);
 void AudioOcarina_SetRecordingState(u8);
@@ -2159,7 +2172,7 @@ void func_800F8F88(void);
 u8 Audio_IsSfxPlaying(u32 sfxId);
 void Audio_ResetSounds(void);
 void func_800F9474(u8, u16);
-void func_800F94FC(u32);
+void Audio_ProcessSeqCmd(u32);
 void Audio_ProcessSeqCmd(u32);
 void Audio_ProcessSeqCmds(void);
 u16 func_800FA0B4(u8 a0);

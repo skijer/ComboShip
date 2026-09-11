@@ -143,6 +143,9 @@ int main(int argc, char** argv) {
     auto MM_InitRandoHeadless = Sym<FnVoidV>(mm, "MM_InitRandoHeadless");
     auto SOH_Dump = Sym<FnDump>(soh, "SOH_DumpRandoStaticData");
     auto MM_Dump = Sym<FnDump>(mm, "MM_DumpRandoStaticData");
+    // Without this the headless pool keeps every duplicated MM copy and diverges from the in-game
+    // layout for the same seed, which is the parity the validator exists to prove.
+    auto SOH_DumpSharedPairs = Sym<FnDump>(soh, "SOH_DumpSharedItemPairs");
     auto SOH_DumpSettings = Sym<FnDump>(soh, "SOH_DumpRandoSettings");
     auto MM_DumpSettings = Sym<FnDump>(mm, "MM_DumpRandoSettings");
     auto SOH_RestoreSettings = Sym<FnTakeStr>(soh, "SOH_RestoreRandoSettings");
@@ -546,7 +549,8 @@ int main(int argc, char** argv) {
             }
             ComboRando::OotAccess ootAccess = ComboRando::OotAccessFromDump(sohDump);
             r = ComboRando::CrossWorldCombinedFill(sohDump, mmDump, masterSeed, oot, mmO, nullptr, forced, ootAccess,
-                                                   goal, mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT);
+                                                   goal, mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT,
+                                                   SOH_DumpSharedPairs ? SOH_DumpSharedPairs() : "");
             if (r.success) {
                 resolvedMmStart = mmStart;
                 // Cross-hint data (Phase 2/3 mirror of RunComboFill, incl. the same area maps so the
@@ -622,7 +626,9 @@ int main(int argc, char** argv) {
                     nlohmann::json ootPl = fillSpoiler.value("oot", nlohmann::json::object());
                     nlohmann::json mmPl = fillSpoiler.value("mm", nlohmann::json::object());
                     ComboRando::SuffixCrossGameItems(ootPl, mmPl, fillSpoiler.value("foreign", nlohmann::json::array()),
-                                                     sohDump, mmDump);
+                                                     sohDump, mmDump,
+                                                     ComboRando::SharedPairNames(ComboRando::ResolveSharedPairs(
+                                                         SOH_DumpSharedPairs ? SOH_DumpSharedPairs() : "", mmDump)));
                     consolidated["oot"] = { { "settings", nlohmann::json::parse(SOH_DumpSettings()) },
                                             { "enabledTricks", SOH_DumpEnabledTricks
                                                                    ? nlohmann::json::parse(SOH_DumpEnabledTricks())

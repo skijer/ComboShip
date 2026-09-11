@@ -827,6 +827,9 @@ void SohMenu::AddMenuRandomizer() {
     path.sidebarName = "Starting Items";
     AddSidebarEntry("Randomizer", path.sidebarName, 1);
     AddWidget(path, "Starting Items", WIDGET_CUSTOM).CustomFunction(DrawStartingItemsMenu);
+    path.sidebarName = "Desired Items";
+    AddSidebarEntry("Randomizer", path.sidebarName, 1);
+    AddWidget(path, "Sheikah Sensor", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) { DrawSensorDesirePicker(); });
     path.sidebarName = "Locations";
     AddSidebarEntry("Randomizer", path.sidebarName, 1);
     AddWidget(path, "Excluded Locations", WIDGET_CUSTOM).CustomFunction(DrawLocationsMenu);

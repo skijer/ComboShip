@@ -9,6 +9,9 @@
 #include <libultraship/bridge/crashhandlerbridge.h>
 #include <soh/Enhancements/bootcommands.h>
 #include "soh/OTRGlobals.h"
+#include "soh/FleetShipCombo/FleetShipCombo.h"
+
+#include <libultraship/bridge.h>
 #include "soh/CrashHandlerExt.h"
 
 s32 gScreenWidth = SCREEN_WIDTH;
@@ -103,6 +106,10 @@ int main(int argc, char* argv[]) {
     // TODO: Was moved to below InitOTR because it requires window to be setup. But will be late to catch crashes.
     CrashHandlerRegisterCallback(CrashHandler_PrintSohData);
     BootCommands_Init();
+
+    // Fleet Ship Combo (Frente A): Ship is the host. If launched with --boot=mm or the
+    // player was last in 2ship, bring up the 2ship child (2ship.exe --fleet-child).
+    FleetShipCombo_HostBootstrap(argc, argv);
 
     Heaps_Alloc();
     Main(0);

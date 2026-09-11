@@ -7,6 +7,7 @@
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "mods/transformation_masks/boss_super_damage.h"
 #include <libultraship/bridge/resourcebridge.h>
 
 #include <stdlib.h> // malloc
@@ -1261,7 +1262,11 @@ void BossDodongo_Update(Actor* thisx, PlayState* play2) {
 
     for (i = 6; i < 19; i++) {
         if (i != 12) {
-            this->collider.elements[i].dim.scale = (this->actionFunc == BossDodongo_Roll) ? 0.0f : 1.0f;
+            // Vanilla disables the body spheres while rolling (you can't hurt the
+            // ball). FD / Pika keep them active so the rolling ball stays hittable
+            // and can be stunned mid-roll.
+            u8 disableForRoll = (this->actionFunc == BossDodongo_Roll) && !BossSuperDamage_IsActive(play);
+            this->collider.elements[i].dim.scale = disableForRoll ? 0.0f : 1.0f;
         }
     }
 
@@ -1392,6 +1397,9 @@ void BossDodongo_Draw(Actor* thisx, PlayState* play) {
     CLOSE_DISPS(play->state.gfxCtx);
 
     BossDodongo_DrawEffects(play);
+
+    // Skijer's NEI: FD/Pika electric glow
+    BossSuperDamage_DrawGlowFromSpheres(&this->actor, play, &this->collider, 19, 1.3f);
 }
 
 f32 func_808C4F6C(BossDodongo* this, PlayState* play) {
@@ -1488,6 +1496,40 @@ void BossDodongo_UpdateDamage(BossDodongo* this, PlayState* play) {
     }
 
     if (this->unk_1C0 == 0) {
+        // FD / Pika Gigantamax super-attack: paralyze-or-damage on a hit to ANY
+        // collider sphere, in ANY state. Runs before (and overrides) the vanilla
+        // bomb-feed + sword logic. Scanning every element — not just element 0 —
+        // is what makes him stunnable while ROLLING, where only a subset of his
+        // spheres are active. Standing/rolling → first hit forces a collapse
+        // (paralysis); once down, each hit damages and refreshes the down timer
+        // so mashing kills him fast. VFX = electric light-orb glow.
+        if (BossSuperDamage_IsActive(play)) {
+            s32 sdHit = 0;
+            for (i = 0; i < 19; i++) {
+                if (this->collider.elements[i].info.bumperFlags & 2) {
+                    this->collider.elements[i].info.bumperFlags &= ~2;
+                    sdHit = 1;
+                }
+            }
+            if (sdHit) {
+                u8 isDown = (this->actionFunc == BossDodongo_Vulnerable) || (this->actionFunc == BossDodongo_LayDown);
+                BossSuperDamage_StartElectricSparks(&this->actor, 90);
+                this->unk_1C0 = 5;
+                if (isDown) {
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_K_DAMAGE);
+                    Actor_RequestQuakeAndRumble(&this->actor, play, 4, 10);
+                    this->health -= BossSuperDamage_FormDamage(play);
+                    this->unk_1DA = 100; // keep him down (don't let Vulnerable time out)
+                } else {
+                    Animation_Change(&this->skelAnime, &object_kingdodongo_Anim_004E0C, 1.0f, 0.0f,
+                                     Animation_GetLastFrame(&object_kingdodongo_Anim_004E0C), ANIMMODE_ONCE, -5.0f);
+                    this->actionFunc = BossDodongo_LayDown;
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_K_DAMAGE);
+                }
+                return;
+            }
+        }
+
         if (this->actionFunc == BossDodongo_Inhale) {
             for (i = 0; i < 19; i++) {
                 if (this->collider.elements[i].info.bumperFlags & 2) {
@@ -1508,7 +1550,9 @@ void BossDodongo_UpdateDamage(BossDodongo* this, PlayState* play) {
         if (this->collider.elements->info.bumperFlags & 2) {
             this->collider.elements->info.bumperFlags &= ~2;
             item1 = this->collider.elements[0].info.acHitInfo;
+
             if ((this->actionFunc == BossDodongo_Vulnerable) || (this->actionFunc == BossDodongo_LayDown)) {
+                // Vanilla: only damageable while collapsed after eating a bomb.
                 swordDamage = damage = CollisionCheck_GetSwordDamage(item1->toucher.dmgFlags, play);
 
                 if (damage != 0) {

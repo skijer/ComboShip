@@ -80,12 +80,29 @@ Hint::Hint(RandomizerHint ownKey_, nlohmann::json json_) {
         itemNamesChosen.push_back(json_["itemNameChosen"].get<uint8_t>());
     }
 
+    // Areas come back as NAMES, and a name that belongs to the other game (combo rando) has no
+    // RandomizerArea enum here — areaNameToEnum answers 0, which is RA_NONE, which prints as "an
+    // Isolated Place". That is why a seed whose spoiler correctly said "Odolwa's Lair" still said
+    // "an Isolated Place" on the altar: the string survived the write and died on the read.
+    //
+    // So an unrecognised name is kept verbatim as a foreign area, exactly as generation produced it.
+    // GetAreaName already prefers foreignAreas when present, so nothing downstream changes.
+    auto loadArea = [this](const std::string& name) {
+        auto it = Rando::StaticData::areaNameToEnum.find(name);
+        if (it != Rando::StaticData::areaNameToEnum.end() && it->second != RA_NONE) {
+            areas.push_back((RandomizerArea)it->second);
+            foreignAreas.push_back("");
+            return;
+        }
+        areas.push_back(RA_NONE);
+        foreignAreas.push_back(name); // the other game's zone: it only exists as text
+    };
     if (json_.contains("areas")) {
         for (auto area : json_["areas"]) {
-            areas.push_back((RandomizerArea)Rando::StaticData::areaNameToEnum[area]);
+            loadArea(area.get<std::string>());
         }
     } else if (json_.contains("area")) {
-        areas.push_back((RandomizerArea)Rando::StaticData::areaNameToEnum[json_["area"]]);
+        loadArea(json_["area"].get<std::string>());
     }
 
     if (json_.contains("areaNamesChosen")) {
@@ -364,6 +381,10 @@ const CustomMessage Hint::GetHintMessage(MessageFormat format, size_t id) const 
     }
 
     hintText.InsertNames(toInsert);
+    // Safety net: if the template asks for more slots than the list covers (which happens in the
+    // combo when the hinted item lives in the other game and its area did not resolve), the leftover
+    // [[N]] tokens would be printed raw on screen. Skijer's NEI
+    hintText.ReplaceUnfilledNames("an unknown place");
     hintText.SetSingularPlural();
 
     if (num != 0) {
@@ -442,17 +463,23 @@ oJson Hint::toJSON() {
                 log["itemNamesChosen"] = nameNums;
             }
         }
+        // Area name for the spoiler: when the slot points at the other game (combo) the enum is
+        // useless, so we log MM's real string, keeping the .fleet auditable. Skijer's NEI
+        auto areaStringForSlot = [this](size_t c) -> std::string {
+            if (foreignAreas.size() > c && !foreignAreas[c].empty()) {
+                return foreignAreas[c];
+            }
+            return StaticData::hintTextTable[StaticData::areaNames[areas[c]]].GetClear().GetForCurrentLanguage(
+                MF_CLEAN);
+        };
         if (areas.size() == 1) {
-            log["area"] =
-                StaticData::hintTextTable[StaticData::areaNames[areas[0]]].GetClear().GetForCurrentLanguage(MF_CLEAN);
+            log["area"] = areaStringForSlot(0);
         } else if (areas.size() > 0 && !(StaticData::staticHintInfoMap.contains(ownKey) &&
                                          StaticData::staticHintInfoMap[ownKey].targetChecks.size() > 0)) {
             // If we got locations from defaults, areas are derived from them and don't need logging
             std::vector<std::string> areaStrings = {};
             for (size_t c = 0; c < areas.size(); c++) {
-                areaStrings.push_back(
-                    StaticData::hintTextTable[StaticData::areaNames[areas[c]]].GetClear().GetForCurrentLanguage(
-                        MF_CLEAN));
+                areaStrings.push_back(areaStringForSlot(c));
             }
             log["areas"] = areaStrings;
         }
@@ -564,11 +591,24 @@ const CustomMessage Hint::GetItemName(uint8_t slot, bool mysterious) const {
 }
 
 const CustomMessage Hint::GetAreaName(uint8_t slot) const {
+    // Other game's area (combo): there is no RandomizerArea enum for MM's zones, so the name travels
+    // as a string and is returned verbatim. Skijer's NEI
+    if (foreignAreas.size() > slot && !foreignAreas[slot].empty()) {
+        return CustomMessage(foreignAreas[slot]);
+    }
     uint8_t nameNum = 0;
     if (areaNamesChosen.size() > slot) {
         nameNum = areaNamesChosen[slot];
     }
     return GetAreaHintText(slot).GetHintMessage(nameNum);
+}
+
+void Hint::SetForeignAreas(std::vector<std::string> foreignAreas_) {
+    foreignAreas = std::move(foreignAreas_);
+}
+
+const std::vector<std::string>& Hint::GetForeignAreas() const {
+    return foreignAreas;
 }
 
 CustomMessage Hint::GetBridgeReqsText() {

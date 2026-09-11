@@ -1150,9 +1150,9 @@ ComboShip could reach that state two ways, both now closed:
   a soft-locked slot) but keeps `SAVETYPE_RANDO` and now returns nonzero; the launcher logs loudly. Same
   for the empty-placement early return.
 
-Tripwire: `Combo_LoadMMSaveFile` logs an error whenever a loaded MM save isn't `SAVETYPE_RANDO`.
-Already-broken saves are not repaired — re-create the file. The legacy population from before this was
-caught is retired by the 0.3.0 container gate (see below).
+Tripwire: `Combo_LoadMMSaveFile` logs an error whenever a loaded MM save isn't `SAVETYPE_RANDO`, and
+refuses it (`-6`) so entry rebuilds the half from the slot's baked seed (see "Entry is never blocked"
+below). The legacy population from before this was caught is retired by the 0.3.0 container gate.
 
 ### Residual key-loss gaps closed (2026-08-22)
 
@@ -1176,13 +1176,23 @@ fail-closed: it never rebuilds, it just goes blank.
 pre-read failed, which nothing could ever load again; under `COMBO_BUILD` it now seeds `newCycleSave` from
 the owl snapshot (resuming a little late beats a dead slot).
 
-**No rebuild, no repair, no blocked entry.** ComboShip never blocks MM entry *and* never repairs a save.
-There is deliberately nothing between those two: a missing or unloadable `mm` section means either the
-file was created with **no seed bound** — which `Combo_OnOOTSaveInit` already refuses loudly, writing no
-`mm` section at all — or the file is damaged. In both cases the load logs an error, the fail-closed
-sentinel above keeps stray writes and tracker draws off the slot, play proceeds, and the remedy is
-re-creating the file. `title_setup.c` therefore just calls `Combo_LoadMMSaveFile` and ignores the code;
-the return value's only consumers are that log and the dormant peek's success check.
+**Entry is never blocked, and never runs on the zeros (2026-09-07).** The 2026-08-23 design had
+`title_setup.c` ignore the load code and enter Play regardless, on the theory that the fail-closed
+sentinel made a failed load harmless. It is not harmless: what Play then runs on is `SaveContext_Init`'s
+zeroed save, and in MM `playerForm == 0` is **Fierce Deity** while item id `0x00` is the **Ocarina of
+Time**, so the player lands as Fierce Deity with an ocarina in every inventory slot (NEI's page 2
+included) — the exact bug report this replaced. A failed load now goes to `Combo_RepairMMSaveForSlot`
+first.
+
+Repair is not invention: each container is self-contained and carries the slot's own baked `combo.rando`,
+so `Combo_RebuildMMSaveForSlot` (launcher side, registered through `MM_SetRebuildSaveCallback`) rebuilds
+the half through `Combo_WriteMMSaveForSlot` — the same call file creation makes, so the result is the save
+creation would have written. A present-but-unloadable section is parked under `mmUnreadable` in the
+container before the rebuild's write, so a damaged half is never the only casualty of reading it wrong.
+Only when the slot has **no baked seed** (created with none — which `Combo_OnOOTSaveInit` already refuses
+loudly) does entry fall back to a throwaway `SaveManager_BuildComboBaseline`, kept unpersistable by the
+`0xFF` sentinel and cleared `saveType`, plus an on-screen notification: the remedy is still re-creating
+the file, but the player is told instead of being handed a Fierce Deity.
 
 **Legacy broken saves are retired by the `0.3.0` container gate, not by runtime repair.**
 `LoadOrCreateContainer` backs up any container whose `comboRelease` differs in `major.minor` and starts
@@ -1731,3 +1741,74 @@ which retries until `2ship.dll` is loaded.
 - A hand-edited seed file with no `masterSeed` key falls back to 0 consistently on every path (latch,
   `SOH_SetComboRandoSeed`, the rolls), so all such seeds share one palette and one audio shuffle — the
   pre-existing behavior of `SOH_SetComboRandoSeed(0)`, not a new deviation.
+
+## Shared-item dedup never fired, and neither did the OoT->MM half-grant (2026-09-08)
+
+**Why:** `SOH_DumpSharedItemPairs` emits the FC table's `mm` column as the stringified `RI_*` token
+(`FleetComboItemsGlue.cpp`, `sFcPeerName[]`), and its comment still claims "the names are exactly what
+each game's static-data dump emits". That stopped being true when `MM_DumpRandoStaticData` moved to
+friendly names (`GetItemDisplayName`): the dump says `"Progressive Master Sword"`, the pair says
+`"RI_OOT_PROGRESSIVE_MASTER_SWORD"`. So `mmHasCopies` was false for essentially all 391 pairs and
+`CrossWorldCombinedFill` removed **zero** copies on every seed — the reported "both Progressive Master
+Swords in the pool". The identical token mismatch broke the RUNTIME half: soh's
+`FleetShared_OnNativeObtained` sends the token to `MM_GrantSharedItem`, which resolves through
+`Combo_MM_SpoilerNameToItemId()` (friendly-keyed) and logged `unknown MM item 'RI_...'`. Keeping one
+copy is only correct if that grant works, so both halves had to be fixed together.
+
+**Vendored (`COMBO_BUILD` paths only):**
+- `mm/2s2h/BenPort.cpp` — `MM_DumpRandoStaticData`'s `items[]` entries carry a new `"token"` field
+  (the `RI_*` spoilerName) so the launcher can join tokens to friendly names.
+- `mm/2s2h/BenPort.cpp` — `Combo_MM_SpoilerNameToItemId()` also keys every item by its `RI_*` token.
+  `emplace` keeps the friendly key when a token collides with another item's name.
+
+**Combo-owned:**
+- `combo/rando/CrossForeign.h` — `CwSharedPair` moved here from `CrossWorldRando.h` (the display layer
+  needs the same pairs), plus `ResolveSharedPairs` (token -> friendly via the dump's own map; a pair
+  already carrying a friendly name passes through) and `SharedPairNames`.
+- `combo/rando/CrossWorldRando.h` — the merge rule is now `max(ootCount, mmCount)`, not "drop every MM
+  copy". **This matters:** with the dedup actually firing, the old rule deleted all 52 MM Pieces of
+  Heart against OOT's 39 and the balancer padded 52 MM checks with cloned junk.
+- `combo/rando/CrossForeign.h` (`SuffixCrossGameItems`) and `combo/gui/ComboMenu.cpp`
+  (`PlandoBuildItems`) — a shared pair is ONE item: no `(OOT)`/`(MM)` tag on its placements, and one
+  untagged row in the plandomizer picker instead of two.
+- `combo/ComboRandoHeadless.cpp` — resolves and passes `SOH_DumpSharedItemPairs`; without it the
+  headless validator built a different pool than the game for the same seed.
+
+**Known, NOT fixed here (they need a table decision, not a code fix):** the Dual Cane is one FC row
+against six distinct MM ids so five duplicate; `FCI_DESIRE_SENSOR`'s `ootName` is "Desire Sensor"
+while soh's itemTable says "Rune: Sheikah Sensor", so that pair is dead; with `NeiWeaponUpgrades` off
+(the default) OOT pools the NON-progressive Kokiri/Master/Biggoron/Hammer, which have no FC rows at
+all, so the Kokiri Sword duplicates out of the box.
+
+## Static NPC hints could not name an item that crossed into Termina (2026-09-08)
+
+**Why:** `ForeignAreaForItem` (`3drando/hints.cpp`) forwards to `FleetCombo_GetMmAreaForOotItem`, which
+opens with `if (sMmCheckAreas.empty() || sComboFc.empty()) return "";`. Those containers are filled
+only by `GenerateCombo`, reached only from `FleetCombo_StartGeneration` — and under `COMBO_BUILD` the
+file-select generate branch calls `SOH_TriggerComboGenerate` instead. So the whole NEI rescue was dead
+code in a ComboShip build and every area-type NPC hint (Greg, Sheik, the six boss keys, Dampé, Saria,
+Mido, Fishing Pole) rendered `RA_NONE` -> "an Isolated Place" whenever its item was placed in MM.
+`FleetCombo_ChainForItem` is gated the same way, so the Master Sword -> Progressive Master Sword
+translation never happened either.
+
+**Combo-owned:** `combo/rando/CrossHints.h` emits `hints.ootItemAreas` — every OOT-namespace item ->
+the area it landed in, in EITHER game (the same resolution `itemAreaText` does, RNG-free so the
+seeded stream is untouched). Its `itemAreaText` also retries under `"Progressive " + name`: the
+Ganondorf hint was being dropped WHOLE (not just its sword clause) because the exact-name lookup for
+"Master Sword" missed while the pool held the progressive.
+
+**Vendored (`COMBO_BUILD`-guarded):**
+- `3drando/hints.hpp` / `hints.cpp` — `Combo_SetHintItemAreas(json)` stores the map; `ForeignAreaForItem`
+  consults it first (with a `FleetCombo_ChainAliasFor` retry — that function has no `sComboFc` gate)
+  and only then falls back to the old FleetCombo path.
+- `3drando/hints.cpp` — new `FindItemsForHint`, used by `CreateAltarHint`, `CreateStaticHintFromData`
+  and `CreateStaticItemHint`: re-searches every `RC_UNKNOWN_CHECK` under the item's chain id.
+  `CreateStaticHintFromData` never attempted that translation at all.
+- `soh/soh/OTRGlobals.cpp` — `SOH_ApplyComboHints` pushes `ootItemAreas` **before** `CreateStaticHints()`.
+- `mm/2s2h/Rando/ActorBehavior/EnGs.cpp` — the gossip-stone draw reads `Rando::GetItemTypeForCheck`
+  instead of the raw item type. `RI_COMBO_FOREIGN` is declared `RITYPE_JUNK`, so every MM check holding
+  an OoT item was dropped before weighting and MM's own stones could never hint one.
+
+**On future merges:** if upstream reshapes `FindItemsAndMarkHinted` or `StaticHintInfo`, re-check
+`FindItemsForHint`; if `GetItemDisplayName`/`RetrieveItem().GetName()` change, the `ootItemAreas` keys
+are the join and must move with them.

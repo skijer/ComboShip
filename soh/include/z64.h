@@ -351,7 +351,8 @@ typedef struct {
     /* 0x0001 */ char   unk_01[0x01];
     /* 0x0002 */ u8     unk_02;
     /* 0x0003 */ u8     lensActive;
-    /* 0x0004 */ char   unk_04[0x04];
+    /*        */ u8     lensFromLantern; // Skijer's NEI
+    /* 0x0004 */ char   unk_04[0x03];
     /* 0x0008 */ u8     total; // total number of actors loaded
     /* 0x000C */ ActorListEntry actorLists[ACTORCAT_MAX];
     /* 0x006C */ TargetContext targetCtx;
@@ -454,9 +455,27 @@ typedef enum OcarinaSongId {
     /* 11 */ OCARINA_SONG_STORMS,
     /* 12 */ OCARINA_SONG_SCARECROW_SPAWN,
     /* 13 */ OCARINA_SONG_MEMORY_GAME,
-    /* 14 */ OCARINA_SONG_MAX,
-    /* 14 */ OCARINA_SONG_SCARECROW_LONG = OCARINA_SONG_MAX // anything larger than 13 is considered the long scarecrow's song
+    // Skijer's NEI: MM-unique songs + 3 custom brought to OoT's quest page (mirror of the OoT songs
+    // ported into MM). OoT's song-flag bitmask has bits 14-29 free (mode flags at 30/31), so these
+    // slots recognize/play natively — no side-recognition needed (unlike the 2ship side).
+    /* 14 */ OCARINA_SONG_MM_SONATA,
+    /* 15 */ OCARINA_SONG_MM_GORON_LULLABY,
+    /* 16 */ OCARINA_SONG_MM_NEW_WAVE,
+    /* 17 */ OCARINA_SONG_MM_ELEGY,
+    /* 18 */ OCARINA_SONG_MM_OATH,
+    /* 19 */ OCARINA_SONG_MM_SOARING,
+    /* 20 */ OCARINA_SONG_MM_HEALING,
+    /* 21 */ OCARINA_SONG_NEI_FUGUE_OF_HOME,
+    /* 22 */ OCARINA_SONG_NEI_COMMAND_MELODY,
+    /* 23 */ OCARINA_SONG_NEI_BALLAD_OF_HERO,
+    /* 24 */ OCARINA_SONG_MAX,
+    /* 24 */ OCARINA_SONG_SCARECROW_LONG = OCARINA_SONG_MAX // anything larger than MAX is the long scarecrow's song
 } OcarinaSongId;
+
+#define OCARINA_SONG_MM_FIRST OCARINA_SONG_MM_SONATA
+#define OCARINA_SONG_MM_LAST OCARINA_SONG_MM_HEALING
+#define OCARINA_SONG_NEI_CUSTOM_FIRST OCARINA_SONG_NEI_FUGUE_OF_HOME
+#define OCARINA_SONG_NEI_CUSTOM_LAST OCARINA_SONG_NEI_BALLAD_OF_HERO
 
 typedef enum {
     /* 0x00 */ OCARINA_ACTION_UNK_0, // acts like free play but never set

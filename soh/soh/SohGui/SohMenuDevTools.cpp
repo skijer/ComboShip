@@ -256,6 +256,16 @@ void SohMenu::AddMenuDevTools() {
     });
 #endif
 
+    // Animation Viewer
+    path.sidebarName = "Anim Viewer";
+    AddSidebarEntry("Dev Tools", path.sidebarName, 1);
+    AddWidget(path, "Popout Animation Viewer", WIDGET_WINDOW_BUTTON)
+        .CVar(CVAR_WINDOW("AnimationViewer"))
+        .WindowName("Animation Viewer")
+        .HideInSearch(true)
+        .Options(WindowButtonOptions().Tooltip("Enables the separate Animation Viewer Window. "
+                                               "Preview any of Link's animations on the live player."));
+
     // Display List Viewer
     path.sidebarName = "DList Viewer";
     AddSidebarEntry("Dev Tools", path.sidebarName, 2);

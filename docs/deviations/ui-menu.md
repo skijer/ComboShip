@@ -390,3 +390,49 @@ save's whole state — not just play time — is discarded on a combo resume. No
 deliberately preserves `owlSave`, so a read-priority fix alone would let a stale owl save shadow a
 newer cycle save; the delete-on-continue half is required too.
 
+
+## Cross-game settings sync (2026-09-08)
+
+**Why:** the two DLLs share one `ConsoleVariables` store, so ~110 settings are already literally one
+CVar. The rest are the same player-facing option under two names — `gCheats.InfiniteRupees` vs
+`gCheats.InfiniteMoney`, `gEnhancements.Camera.FreeLook.*` vs `gSettings.FreeLook.*`,
+`gNotifications.*` vs `gSettings.Notifications.*`, and the shuffle options both randomizers read the
+same way. The combo overlay rendered both games' sections side by side, so each of those was two
+visible controls for one concept.
+
+**Combo-owned, no game-source change:** `combo/gui/ComboSettingsSync.{h,cpp}` — an 80-row table in 8
+categories (`gCombo.Sync.*`, all default on), reconciled from a logic-only `GuiWindow` registered in
+`ComboUI_Register`. Panel at Settings -> Sync. Wired the same five ways as the Timers entry
+(`HubEntry::Kind`, the entry push, the dispatch branch, the include, `COMBOUI_SOURCES`).
+
+**A poll, not a hook.** libultraship exposes no CVar change notification of any kind (there is an
+`EventSystem`, but nothing in `ship/config` fires into it), and settings also move outside the combo
+overlay's `ComboWidgetRender` funnel — popout editors, both games' Presets, the console. One per-frame
+reconcile is one dispatch point; hooking every write site is not.
+
+**Change-driven, never a reconcile.** Each pair records the last value it saw on each side and is
+*armed* on its first tick without writing anything. Only a side that MOVED away from its recorded
+value is propagated. **This is deliberate:** an at-boot "make them agree" pass would overwrite the
+config of anyone who starts with the two games set differently. Turning a category off disarms its
+pairs, so re-enabling it does not replay everything that changed meanwhile. MM wins a same-frame tie.
+
+**Rows are only in the table when the value spaces match**, verified against each game's widget
+declaration. Deliberately absent, with the reason at the site: `ClimbSpeed` (MM multiplies 1-5, OOT
+adds 0-12), `DamageMultiplier` and `MirroredWorld` (enum lists overlap only in part), `CrouchStab`
+(inverted polarity, 1:2), `SkipToFileSelect` (bool vs the `BootSequence` enum), `SkipGetItemCutscenes`
+(4 values vs 3), `SkipEnemyCutscenes` (1 MM bool vs 2 OOT bools), `AlternateAssets` (per-game
+archives, split on purpose). On the rando side every OOT `OPT_U8` against a plain MM bool is out —
+pots, crates, grass, freestanding, wonder items, boss souls, tokens, shopsanity, item pool, ice traps —
+as are the Triforce/win-condition keys (the launcher owns them and overwrites both games) and the
+"add the OTHER game's content" options, which are mirrors rather than equals. Only two non-boolean
+rows are in: `ShuffleBombArrows` and `ElementalWandShuffle`, whose three-value enums are identical in
+both trees. `FastText` <-> `TextSpeed` carries an explicit bool <-> 1-6 translation, and the
+first-person sensitivity rows clamp on the way into MM (OOT's slider reaches 5x, MM's stops at 2x).
+
+**Not covered:** the five audio volume sliders keep their existing one-way `ComboAudioBridge`
+(OOT -> MM, different value spaces); a second mechanism writing those keys would fight it. The input
+viewer's renamed `LeftAnalogAngles` subtree is left out — niche, and its colour CVars need a different
+accessor.
+
+**On future merges:** the table is CVar strings, so a rename on either side silently stops syncing that
+row rather than breaking anything. Re-check it when either menu is reworked.

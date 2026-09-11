@@ -132,7 +132,15 @@ source_group("include" FILES ${Header_Files__include})
 # }}}
 
 # soh (root)
-file(GLOB_RECURSE soh__ RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "soh/*.c" "soh/*.cpp" "soh/*.h" "soh/*.hpp")
+file(GLOB_RECURSE soh__ CONFIGURE_DEPENDS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "soh/*.c" "soh/*.cpp" "soh/*.h" "soh/*.hpp")
+
+# mods (only .cpp files - .c files are included via #include pattern)
+file(GLOB_RECURSE mods__ RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "mods/*.cpp" "mods/*.h" "mods/*.hpp")
+list(APPEND soh__ ${mods__})
+
+# expansions (only .cpp files - .c files are included via #include pattern)
+file(GLOB_RECURSE expansions__ RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "expansions/*.cpp" "expansions/*.h" "expansions/*.hpp")
+list(APPEND soh__ ${expansions__})
 
 # Add specific files that don't match the pattern
 list(APPEND soh__ ${CMAKE_CURRENT_SOURCE_DIR}/soh/Enhancements/speechsynthesizer/DarwinSpeechSynthesizer.mm)
@@ -231,6 +239,14 @@ set(ALL_FILES
 add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE SOH_BUILD_DLL)
 
+# NEI sits on an older Shipwright base, so its mods/ and expansions/ still call decomp symbols that
+# upstream has since renamed. Aliasing them here keeps those files byte-identical to the NEI branch,
+# which is what lets scripts/nei-port/nei_port.py re-copy them untouched on every port. Same idiom as
+# NEI's own expansions/sw97/sw97_compat.h. Drop an entry once NEI's base carries the new name.
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    func_80041DB8=SurfaceType_GetWallFlags
+)
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 endif()
@@ -325,6 +341,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE assets
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    ${CMAKE_CURRENT_SOURCE_DIR}/mods/
     ${CMAKE_CURRENT_SOURCE_DIR}/../libultraship/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../ZAPDTR/ZAPD/resource/type
     ${SDL2-INCLUDE}
@@ -427,11 +444,14 @@ if(MSVC)
                 /Gy;
             >
             /W3;
-            /WX;
+            # /WX (upstream) is deliberately off here: upstream's tree is warning-clean, this fork
+            # carries hundreds of extra files that are not, and turning every warning into an error
+            # buries the real build breaks under noise from unrelated code.
             /bigobj;
             /sdl-;
             /permissive-;
             /MP;
+            /guard:cf;
             ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
             ${DEFAULT_CXX_EXCEPTION_HANDLING}
         )
@@ -450,7 +470,7 @@ if(MSVC)
             /MP;
             /sdl-;
             /W3;
-            /WX;
+            /guard:cf;
             ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
             ${DEFAULT_CXX_EXCEPTION_HANDLING}
         )
@@ -468,7 +488,8 @@ if(MSVC)
             >
             /MANIFEST:NO;
             /DEBUG;
-            /SUBSYSTEM:WINDOWS
+            /SUBSYSTEM:WINDOWS;
+            /GUARD:CF
         )
     elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Win32")
         target_link_options(${PROJECT_NAME} PRIVATE
@@ -483,7 +504,8 @@ if(MSVC)
             >
             /MANIFEST:NO;
             /DEBUG;
-            /SUBSYSTEM:WINDOWS
+            /SUBSYSTEM:WINDOWS;
+            /GUARD:CF
         )
     endif()
 endif()

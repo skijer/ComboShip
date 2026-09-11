@@ -44,6 +44,10 @@ class ActorDB {
 
     ActorDB();
 
+    // Registers this fork's own actors (EnPartner/Ivan and the SW97 set). Defined in ActorDB.cpp;
+    // the declaration lives here because the upstream merge brought its own copy of this header.
+    void AddBuiltInCustomActors();
+
     // Wrapper around ActorDBEntry so we get C++isms for the entries
     struct Entry {
         Entry();

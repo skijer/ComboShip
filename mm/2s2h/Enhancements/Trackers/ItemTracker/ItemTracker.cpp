@@ -152,9 +152,7 @@ TrackerImageObject GetImageObject(TrackerItemType itemType, u32 itemId) {
             trackerImageObject.textureColor = Ship_GetRandoItemColorTint(randoItemId);
             const char* texturePath = Rando::StaticData::GetIconTexturePath(randoItemId);
             if (texturePath != nullptr) {
-                trackerImageObject.textureId =
-                    std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                        ->GetTextureByName(texturePath);
+                trackerImageObject.textureId = Ship_GetFast3dGui()->GetTextureByName(texturePath);
             }
             if (randoItemId >= RI_OWL_CLOCK_TOWN_SOUTH && randoItemId <= RI_OWL_ZORA_CAPE) {
                 trackerImageObject.textureDimensions.y = 24.0f;
@@ -171,8 +169,7 @@ TrackerImageObject GetImageObject(TrackerItemType itemType, u32 itemId) {
             }
 
             trackerImageObject.textureId =
-                std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                    ->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
+                Ship_GetFast3dGui()->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
         } break;
         case TRACKER_ITEM_SWORD: {
             if (GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) > EQUIP_VALUE_SWORD_NONE) {
@@ -184,8 +181,7 @@ TrackerImageObject GetImageObject(TrackerItemType itemType, u32 itemId) {
             }
 
             trackerImageObject.textureId =
-                std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                    ->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
+                Ship_GetFast3dGui()->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
         } break;
         case TRACKER_ITEM_SHIELD: {
             if (GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) > EQUIP_VALUE_SHIELD_NONE) {
@@ -197,8 +193,7 @@ TrackerImageObject GetImageObject(TrackerItemType itemType, u32 itemId) {
             }
 
             trackerImageObject.textureId =
-                std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                    ->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
+                Ship_GetFast3dGui()->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
         } break;
         case TRACKER_ITEM_WALLET: {
             if (CUR_UPG_VALUE(UPG_WALLET) >= 1) {
@@ -210,8 +205,7 @@ TrackerImageObject GetImageObject(TrackerItemType itemType, u32 itemId) {
             }
 
             trackerImageObject.textureId =
-                std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                    ->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
+                Ship_GetFast3dGui()->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
         } break;
         case TRACKER_ITEM_MAGIC: {
             if (gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
@@ -223,8 +217,7 @@ TrackerImageObject GetImageObject(TrackerItemType itemType, u32 itemId) {
             }
 
             trackerImageObject.textureId =
-                std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                    ->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
+                Ship_GetFast3dGui()->GetTextureByName((const char*)gItemIcons[vanillaItemId]);
         } break;
         default:
             break;
@@ -436,9 +429,7 @@ bool DrawItemTrackerSlot(TrackerItemType itemType, u32 itemId, float scale, bool
         if (itemId == RI_GS_TOKEN_OCEAN) {
             tintColor = ImVec4(0.0f, 209.0f / 256.0f, 231.0f / 256.0f, imageObject.textureColor.w); // Ocean tint
         }
-        auto textureId =
-            std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                ->GetTextureByName(gMagicArrowEquipEffectTex);
+        auto textureId = Ship_GetFast3dGui()->GetTextureByName(gMagicArrowEquipEffectTex);
 
         // Draw texture behind the actual item icon
         ImGui::GetWindowDrawList()->AddImage(textureId, p0 + offset - ImVec2(8.0f, 8.0f),
@@ -449,9 +440,7 @@ bool DrawItemTrackerSlot(TrackerItemType itemType, u32 itemId, float scale, bool
     if (itemType == TRACKER_ITEM_RANDO && itemId >= RI_SOUL_BOSS_GOHT && itemId <= RI_SOUL_BOSS_TWINMOLD) {
         ImVec4 tintColor =
             ImVec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, imageObject.textureColor.w); // Swamp tint
-        auto textureId =
-            std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                ->GetTextureByName(gMagicArrowEquipEffectTex);
+        auto textureId = Ship_GetFast3dGui()->GetTextureByName(gMagicArrowEquipEffectTex);
 
         // Draw texture behind the actual item icon
         ImGui::GetWindowDrawList()->AddImage(textureId, p0 + offset - ImVec2(8.0f, 8.0f),

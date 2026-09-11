@@ -109,9 +109,11 @@ RandoCheckId GetRandomCheck(bool repeatableOnlyObtained = false, std::string* ou
 
     for (auto& [randoCheckId, _] : Rando::StaticData::Checks) {
         RandoSaveCheck saveCheck = RANDO_SAVE_CHECKS[randoCheckId];
-        auto& item = Rando::StaticData::Items[saveCheck.randoItemId];
-        if (!saveCheck.shuffled || item.randoItemType == RITYPE_JUNK ||
-            (repeatableOnlyObtained && saveCheck.obtained)) {
+        // ComboShip: a check holding an OoT item stores the RI_COMBO_FOREIGN sentinel, which is
+        // hard-typed RITYPE_JUNK — reading the raw type dropped every cross-game check from the draw,
+        // so MM's stones could never hint an OoT item. Skijer's NEI
+        RandoItemType itemType = Rando::GetItemTypeForCheck(saveCheck.randoItemId, randoCheckId);
+        if (!saveCheck.shuffled || itemType == RITYPE_JUNK || (repeatableOnlyObtained && saveCheck.obtained)) {
             continue;
         }
 
@@ -120,8 +122,8 @@ RandoCheckId GetRandomCheck(bool repeatableOnlyObtained = false, std::string* ou
             baseWeight = rcToWeight[randoCheckId];
         } else if (riToWeight.contains(saveCheck.randoItemId)) {
             baseWeight = riToWeight[saveCheck.randoItemId];
-        } else if (itemTypeToWeight.contains(item.randoItemType)) {
-            baseWeight = itemTypeToWeight[item.randoItemType];
+        } else if (itemTypeToWeight.contains(itemType)) {
+            baseWeight = itemTypeToWeight[itemType];
         }
 
         u32 effectiveWeight = 100 + (baseWeight - 1) * strength;
@@ -304,7 +306,7 @@ void Rando::ActorBehavior::InitEnGsBehavior() {
                     CustomMessage::Replace(&entry.msg, "{{item}}",
                                            Rando::StaticData::GetItemName(saveCheck.randoItemId, true, randoCheckId));
                     CustomMessage::Replace(&entry.msg, "{{location}}",
-                                           Rando::StaticData::GetLocationNameForHint(randoCheckId, true));
+                                           Rando::GetHintLocationText(saveCheck.randoItemId, randoCheckId, true));
 
                     gSaveContext.rupeeAccumulator -= cost;
                     cost *= 2;

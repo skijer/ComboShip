@@ -32,6 +32,19 @@
 #include "2s2h/ObjectExtension/ActorListIndex.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 
+// Skijer's NEI shared time control (mods/items/helpers/timestop_helper.c).
+// gChampionSlowFactor: 1.0f = normal, 0.0f = fully stopped, in between = slow motion.
+// It is defined in mods/extended_equipment.c and arbitrated by timestop_helper so
+// Champion's Tunic, Zonai Permafrost and the Phantom Hourglass cannot fight over it.
+extern f32 gChampionSlowFactor;
+extern s32 TimeCtl_IsActorExempt(Actor* actor);
+
+// Skijer's NEI — Poe-fire lantern lens (mods/items/logic/item_lantern.c). It is a
+// second, independent lens source: no magic, no mask, and it never touches
+// actorCtx.lensActive so the Lens of Truth keeps working normally alongside it.
+extern u8 gLanternLensActive;
+extern s32 TimeCtl_GetStutterFrames(void);
+
 // bss
 // FaultClient sActorFaultClient; // 2 funcs
 
@@ -1315,6 +1328,16 @@ void Actor_SetMovementScale(s32 scale) {
  */
 void Actor_UpdatePos(Actor* actor) {
     f32 speedRate = sActorMovementScale;
+
+    // Skijer's NEI time control. Only a FULL stop zeroes motion here. A PARTIAL
+    // slowdown deliberately does NOT scale speedRate: the slow is expressed by letting
+    // the actor tick 1 frame in N (see the freeze in Actor_UpdateAll), and scaling its
+    // motion on top of that MULTIPLIES the two — which is why a nominal 0.15 read as a
+    // dead stop instead of slow motion. Exemptions (Link, native projectiles, Link's
+    // children) are centralized in TimeCtl_IsActorExempt.
+    if ((gChampionSlowFactor <= 0.0f) && !TimeCtl_IsActorExempt(actor)) {
+        speedRate = 0.0f;
+    }
 
     actor->world.pos.x += (actor->velocity.x * speedRate) + actor->colChkInfo.displacement.x;
     actor->world.pos.y += (actor->velocity.y * speedRate) + actor->colChkInfo.displacement.y;
@@ -2603,6 +2626,230 @@ void Actor_InitHalfDaysBit(ActorContext* actorCtx) {
     actorCtx->halfDaysBit = HALFDAYBIT_DAY0_DAWN >> halfDayCount;
 }
 
+// ─── Skijer's NEI: OoT Farore's Wind warp-point pillar ───────────────────────────────────────
+// 1:1 port of soh z_actor.c func_8002FA60 (scene-load init), Actor_DrawFaroresWindPointer
+// (per-frame state machine + draw) and func_80030488 (light cleanup), backed by NeiSaveData's
+// fw* fields — MM's SaveContext has no `fw` and MM clobbers respawn[RESPAWN_MODE_TOP] on every
+// spawn, so the pillar keeps its own state here. State variable (OoT respawn[TOP].data):
+//   0        no pillar
+//   <40      grow ramp (|data| scales up; negative = dispel shrink-back, same math as OoT)
+//   40       at rest at the warp point
+//   >40      fade-out pulled into the camera (arrival consumed the point / natural end)
+#include "mods/nei_save.h"
+#include "objects/gameplay_keep/gameplay_keep.h"
+
+s32 Entrance_GetSceneIdAbsolute(u16 entrance);
+
+static LightInfo sOotFwLightInfo;
+static LightNode* sOotFwLightNode = NULL;
+static s32 sOotFwLightInserted = false;
+static s32 sOotFwData = 0;           // OoT gSaveContext.respawn[RESPAWN_MODE_TOP].data
+static Vec3f sOotFwCurPos;           // OoT gSaveContext.respawn[RESPAWN_MODE_TOP].pos
+static s32 sOotFwFlyTimer = 0;       // OoT D_8015BC14
+static f32 sOotFwFlyProgress = 0.0f; // OoT D_8015BC18
+static s32 sOotFwSceneMatch = false; // OoT entranceIndex match (MM: same absolute scene)
+static u8 sOotFwRoomIndex = 0;
+
+// OoT func_8002FA60 — called from Actor_InitContext on every scene load.
+void OotFw_OnSceneInit(PlayState* play) {
+    NeiSaveData* nei = Nei_Save();
+
+    if (nei->fwSet) {
+        sOotFwData = 40; // OoT loads the point at rest (data = 0x28)
+        sOotFwCurPos.x = nei->fwPosX;
+        sOotFwCurPos.y = nei->fwPosY;
+        sOotFwCurPos.z = nei->fwPosZ;
+        sOotFwSceneMatch =
+            (Entrance_GetSceneIdAbsolute(nei->fwEntrance) == Entrance_GetSceneIdAbsolute(gSaveContext.save.entrance));
+        sOotFwRoomIndex = nei->fwRoomIndex;
+    } else {
+        sOotFwData = 0;
+        sOotFwCurPos.x = sOotFwCurPos.y = sOotFwCurPos.z = 0.0f;
+        sOotFwSceneMatch = false;
+    }
+    sOotFwFlyTimer = 0;
+    sOotFwFlyProgress = 0.0f;
+
+    Lights_PointNoGlowSetInfo(&sOotFwLightInfo, sOotFwCurPos.x, sOotFwCurPos.y + 60.0f, sOotFwCurPos.z, 255, 255, 255,
+                              -1);
+    sOotFwLightNode = LightContext_InsertLight(play, &play->lightCtx, &sOotFwLightInfo);
+    sOotFwLightInserted = true;
+}
+
+// Called by item_oot_spells.c the moment the warp point is written (OoT: respawn[TOP].data = 1 +
+// Play_SetupRespawnPoint(TOP) right before the fw copy) — starts the grow-in at Link's cast spot
+// and the sparkle "fly" toward the stored point.
+void OotFw_NotifyPointSet(PlayState* play) {
+    Player* player = (Player*)play->actorCtx.actorLists[ACTORCAT_PLAYER].first;
+
+    sOotFwData = 1;
+    sOotFwCurPos = player->actor.world.pos;
+    sOotFwSceneMatch = true;
+    sOotFwRoomIndex = Nei_Save()->fwRoomIndex;
+}
+
+// OoT dispel: data = -data — the grow-leg math then shrinks |data| back to 0.
+void OotFw_NotifyDispelled(void) {
+    if (sOotFwData > 0) {
+        sOotFwData = -sOotFwData;
+    }
+}
+
+// Warp-in arrival consumed the point (OoT Player_Action_8085076C bumps data past 40 → the
+// pointer fades into the camera and clears fw.set when fully transparent).
+void OotFw_NotifyArrived(void) {
+    sOotFwData = 41;
+}
+
+// OoT Actor_DrawFaroresWindPointer — called from Actor_DrawAll after the effect passes.
+void OotFw_DrawPointer(PlayState* play) {
+    s32 lightRadius = -1;
+    s32 params;
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    params = sOotFwData;
+
+    if (params) {
+        f32 yOffset = 60.0f; // MM human Link == OoT child height
+        f32 ratio = 1.0f;
+        s32 alpha = 255;
+        s32 temp = params - 40;
+
+        if (temp < 0) {
+            sOotFwData = ++params;
+            ratio = ABS_ALT(params) * 0.025f;
+            sOotFwFlyTimer = 60;
+            sOotFwFlyProgress = 1.0f;
+        } else if (sOotFwFlyTimer != 0) {
+            sOotFwFlyTimer--;
+        } else if (sOotFwFlyProgress > 0.0f) {
+            static Vec3f sFwEffectVel = { 0.0f, -0.05f, 0.0f };
+            static Vec3f sFwEffectAccel = { 0.0f, -0.025f, 0.0f };
+            static Color_RGBA8 sFwEffectPrimCol = { 255, 255, 255, 0 };
+            static Color_RGBA8 sFwEffectEnvCol = { 100, 200, 0, 0 };
+            NeiSaveData* nei = Nei_Save();
+            Vec3f* curPos = &sOotFwCurPos;
+            Vec3f nextPos;
+            f32 prevNum = sOotFwFlyProgress;
+            Vec3f dist;
+            f32 diff;
+            Vec3f effectPos;
+            f32 factor;
+            f32 length;
+            f32 dx;
+            f32 speed;
+
+            nextPos.x = nei->fwPosX;
+            nextPos.y = nei->fwPosY;
+            nextPos.z = nei->fwPosZ;
+            diff = Math_Vec3f_DistXYZAndStoreDiff(&nextPos, curPos, &dist);
+
+            if (diff < 20.0f) {
+                sOotFwFlyProgress = 0.0f;
+                Math_Vec3f_Copy(curPos, &nextPos);
+            } else {
+                length = diff * (1.0f / sOotFwFlyProgress);
+                speed = 20.0f / length;
+                speed = CLAMP_MIN(speed, 0.05f);
+                Math_StepToF(&sOotFwFlyProgress, 0.0f, speed);
+                factor = (diff * (sOotFwFlyProgress / prevNum)) / diff;
+                curPos->x = nextPos.x + (dist.x * factor);
+                curPos->y = nextPos.y + (dist.y * factor);
+                curPos->z = nextPos.z + (dist.z * factor);
+                length *= 0.5f;
+                dx = diff - length;
+                yOffset += sqrtf(SQ(length) - SQ(dx)) * 0.2f;
+            }
+
+            effectPos.x = curPos->x + Rand_CenteredFloat(6.0f);
+            effectPos.y = curPos->y + 80.0f + (6.0f * Rand_ZeroOne());
+            effectPos.z = curPos->z + Rand_CenteredFloat(6.0f);
+
+            EffectSsKirakira_SpawnDispersed(play, &effectPos, &sFwEffectVel, &sFwEffectAccel, &sFwEffectPrimCol,
+                                            &sFwEffectEnvCol, 1000, 16);
+
+            if (sOotFwFlyProgress == 0.0f) {
+                sOotFwData = 40; // OoT: respawn[TOP] = respawn[DOWN], data = 40 — landed at the point
+            }
+        } else if (temp > 0) {
+            Vec3f* curPos = &sOotFwCurPos;
+            f32 nextRatio = 1.0f - temp * 0.1f;
+            f32 curRatio = 1.0f - (f32)(temp - 1) * 0.1f;
+            Vec3f eye;
+            Vec3f dist;
+            f32 diff;
+
+            if (nextRatio > 0.0f) {
+                eye.x = play->view.eye.x;
+                eye.y = play->view.eye.y - yOffset;
+                eye.z = play->view.eye.z;
+                diff = Math_Vec3f_DistXYZAndStoreDiff(&eye, curPos, &dist);
+                diff = (diff * (nextRatio / curRatio)) / diff;
+                curPos->x = eye.x + (dist.x * diff);
+                curPos->y = eye.y + (dist.y * diff);
+                curPos->z = eye.z + (dist.z * diff);
+            }
+
+            alpha = 255 - (temp * 30);
+
+            if (alpha < 0) {
+                Nei_Save()->fwSet = 0; // OoT gSaveContext.fw.set = 0
+                sOotFwData = 0;
+                alpha = 0;
+            } else {
+                sOotFwData = ++params;
+            }
+
+            ratio = 1.0f + ((f32)temp * 0.2f); // required to match (OoT comment)
+        }
+
+        lightRadius = 500.0f * ratio;
+
+        if ((play->csCtx.state == CS_STATE_IDLE) && sOotFwSceneMatch &&
+            (sOotFwRoomIndex == play->roomCtx.curRoom.num)) {
+            f32 scale = 0.025f * ratio;
+
+            POLY_XLU_DISP = Gfx_SetupDL(POLY_XLU_DISP, SETUPDL_25);
+
+            Matrix_Translate(sOotFwCurPos.x, sOotFwCurPos.y + yOffset, sOotFwCurPos.z, MTXMODE_NEW);
+            Matrix_Scale(scale, scale, scale, MTXMODE_APPLY);
+            Matrix_Mult(&play->billboardMtxF, MTXMODE_APPLY);
+            Matrix_Push();
+
+            gDPPipeSync(POLY_XLU_DISP++);
+            gDPSetPrimColor(POLY_XLU_DISP++, 128, 128, 255, 255, 200, alpha);
+            gDPSetEnvColor(POLY_XLU_DISP++, 100, 200, 0, 255);
+
+            Matrix_RotateZF(((play->gameplayFrames * 1500) & 0xFFFF) * (M_PIf / 32768.0f), MTXMODE_APPLY);
+            MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
+            gSPDisplayList(POLY_XLU_DISP++, gEffFlash1DL);
+
+            Matrix_Pop();
+            Matrix_RotateZF((f32)(u16)(~((play->gameplayFrames * 1200) & 0xFFFF)) * (M_PIf / 32768.0f), MTXMODE_APPLY);
+
+            MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
+            gSPDisplayList(POLY_XLU_DISP++, gEffFlash1DL);
+        }
+
+        if (sOotFwLightInserted) {
+            Lights_PointNoGlowSetInfo(&sOotFwLightInfo, sOotFwCurPos.x, sOotFwCurPos.y + yOffset, sOotFwCurPos.z, 255,
+                                      255, 255, lightRadius);
+        }
+    }
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+// OoT func_80030488 — remove the pillar's point light on scene teardown.
+void OotFw_OnCleanup(PlayState* play) {
+    if (sOotFwLightInserted) {
+        LightContext_RemoveLight(play, &play->lightCtx, sOotFwLightNode);
+        sOotFwLightNode = NULL;
+        sOotFwLightInserted = false;
+    }
+}
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
 void Actor_InitContext(PlayState* play, ActorContext* actorCtx, ActorEntry* actorEntry) {
     ActorOverlay* overlayEntry;
     CycleSceneFlags* cycleFlags;
@@ -2642,6 +2889,7 @@ void Actor_InitContext(PlayState* play, ActorContext* actorCtx, ActorEntry* acto
     Actor_InitHalfDaysBit(actorCtx);
     // Fault_AddClient(&sActorFaultClient, (void*)Actor_PrintLists, actorCtx, NULL);
     Player_SpawnHorse(play, (Player*)actorCtx->actorLists[ACTORCAT_PLAYER].first);
+    OotFw_OnSceneInit(play); // Skijer's NEI: Farore's Wind pillar (OoT func_8002FA60 call site)
 }
 
 /**
@@ -2771,6 +3019,15 @@ Actor* Actor_UpdateActor(UpdateActor_Params* params) {
                     GameInteractor_ExecuteOnActorUpdate(actor);
                 }
                 DynaPoly_UnsetAllInteractFlags(play, &play->colCtx.dyna, actor);
+
+                // Skijer's NEI partial slowdown: re-freeze for TimeCtl_GetStutterFrames()
+                // after each update, so the actor ticks 1 frame in N and its animations and
+                // AI timers slow with it. The interval is derived from the requested factor,
+                // so 0.33 really is a third of normal speed. A FULL stop is not handled here
+                // — timestop_helper drives that directly so newly spawned actors are caught.
+                if ((gChampionSlowFactor > 0.0f) && (gChampionSlowFactor < 1.0f) && !TimeCtl_IsActorExempt(actor)) {
+                    actor->freezeTimer = TimeCtl_GetStutterFrames();
+                }
             }
 
             CollisionCheck_ResetDamage(&actor->colChkInfo);
@@ -2984,7 +3241,19 @@ void Actor_Draw(PlayState* play, Actor* actor) {
     }
 
     if (GameInteractor_ShouldActorDraw(actor)) {
+        // Phantom Hourglass: the recall drains everything but Link and its target to grey. Skijer's NEI
+        extern u8 Hourglass_ShouldDrawGray(Actor * actor);
+        extern void Hourglass_PushGray(PlayState * play);
+        extern void Hourglass_PopGray(PlayState * play);
+        u8 recallGray = Hourglass_ShouldDrawGray(actor);
+
+        if (recallGray) {
+            Hourglass_PushGray(play);
+        }
         actor->draw(actor, play);
+        if (recallGray) {
+            Hourglass_PopGray(play);
+        }
         GameInteractor_ExecuteOnActorDraw(actor);
     }
 
@@ -3165,22 +3434,28 @@ void Actor_DrawLensActors(PlayState* play, s32 numLensActors, Actor** lensActors
         POLY_XLU_DISP = gfx;
     }
 
-    gfx = OVERLAY_DISP;
+    // Skijer's NEI — the Poe lantern's shadow fire is a lens with NO circle: it reveals and
+    // hides over the whole screen. Skip the overlay when the lens is the lantern's own
+    // (the Lens of Truth item parks magicState in CONSUME_LENS; the lantern never does, so
+    // that is what tells the two apart when both are on).
+    if (!gLanternLensActive || (gSaveContext.magicState == MAGIC_STATE_CONSUME_LENS)) {
+        gfx = OVERLAY_DISP;
 
-    gDPPipeSync(gfx++);
+        gDPPipeSync(gfx++);
 
-    gDPSetOtherMode(gfx++,
-                    G_AD_DISABLE | G_CD_MAGICSQ | G_CK_NONE | G_TC_FILT | G_TF_BILERP | G_TT_NONE | G_TL_TILE |
-                        G_TD_CLAMP | G_TP_NONE | G_CYC_1CYCLE | G_PM_NPRIMITIVE,
-                    G_AC_THRESHOLD | G_ZS_PRIM | G_RM_CLD_SURF | G_RM_CLD_SURF2);
+        gDPSetOtherMode(gfx++,
+                        G_AD_DISABLE | G_CD_MAGICSQ | G_CK_NONE | G_TC_FILT | G_TF_BILERP | G_TT_NONE | G_TL_TILE |
+                            G_TD_CLAMP | G_TP_NONE | G_CYC_1CYCLE | G_PM_NPRIMITIVE,
+                        G_AC_THRESHOLD | G_ZS_PRIM | G_RM_CLD_SURF | G_RM_CLD_SURF2);
 
-    gDPSetCombineLERP(gfx++, 1, TEXEL0, PRIMITIVE, 0, 1, TEXEL0, PRIMITIVE, 0, 1, TEXEL0, PRIMITIVE, 0, 1, TEXEL0,
-                      PRIMITIVE, 0);
-    gDPSetPrimColor(gfx++, 0, 0, 74, 0, 0, 74);
+        gDPSetCombineLERP(gfx++, 1, TEXEL0, PRIMITIVE, 0, 1, TEXEL0, PRIMITIVE, 0, 1, TEXEL0, PRIMITIVE, 0, 1, TEXEL0,
+                          PRIMITIVE, 0);
+        gDPSetPrimColor(gfx++, 0, 0, 74, 0, 0, 74);
 
-    gfxTemp = gfx;
-    Actor_DrawLensOverlay(&gfxTemp, play->actorCtx.lensMaskSize);
-    OVERLAY_DISP = gfxTemp;
+        gfxTemp = gfx;
+        Actor_DrawLensOverlay(&gfxTemp, play->actorCtx.lensMaskSize);
+        OVERLAY_DISP = gfxTemp;
+    }
 
     CLOSE_DISPS(gfxCtx);
 }
@@ -3429,9 +3704,13 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
             actor->isDrawn = false;
             if ((actor->init == NULL) && (actor->draw != NULL) && (shipActorFlagsCopy & drawActorFlagsMask)) {
                 // #endregion
+                // gLanternLensActive counts as a fully-open lens here: without it, actors
+                // in LENS_MODE_HIDE_ACTORS rooms (fake walls/floors) were only collected
+                // once lensMaskSize reached its active size, which the lantern never
+                // drives — so illusions stayed on screen while hidden actors appeared.
                 if ((actor->flags & ACTOR_FLAG_REACT_TO_LENS) &&
                     ((play->roomCtx.curRoom.lensMode == LENS_MODE_SHOW_ACTORS) ||
-                     (play->actorCtx.lensMaskSize == LENS_MASK_ACTIVE_SIZE) ||
+                     (play->actorCtx.lensMaskSize == LENS_MASK_ACTIVE_SIZE) || gLanternLensActive ||
                      (actor->room != play->roomCtx.curRoom.num))) {
                     if (Actor_AddToLensActors(play, actor)) {}
                 } else {
@@ -3447,6 +3726,8 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
     EffectSs_DrawAll(play);
     EffFootmark_Draw(play);
 
+    OotFw_DrawPointer(play); // Skijer's NEI: Farore's Wind pillar (OoT func_800315AC call site)
+
     ref2 = POLY_XLU_DISP;
     gSPDisplayList(sp58, &ref2[1]);
     POLY_XLU_DISP = &ref2[1];
@@ -3460,7 +3741,7 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
         Math_StepToC(&play->actorCtx.lensMaskSize, 0, 10);
     }
 
-    if (play->actorCtx.lensMaskSize != 0) {
+    if ((play->actorCtx.lensMaskSize != 0) || gLanternLensActive) {
         play->actorCtx.lensActorsDrawn = true;
         Actor_DrawLensActors(play, play->actorCtx.numLensActors, play->actorCtx.lensActors);
     }
@@ -3566,6 +3847,8 @@ void Actor_CleanupContext(ActorContext* actorCtx, PlayState* play) {
     s32 category;
 
     // Fault_RemoveClient(&sActorFaultClient);
+
+    OotFw_OnCleanup(play); // Skijer's NEI: Farore's Wind pillar light (OoT func_80030488 call site)
 
     for (category = 0; category < ACTORCAT_MAX; category++) {
         if (category != ACTORCAT_PLAYER) {
@@ -4291,9 +4574,29 @@ u32 sArrowDmgFlags[] = {
     DMG_FIRE_ARROW,   // ARROW_TYPE_FIRE
     DMG_ICE_ARROW,    // ARROW_TYPE_ICE
     DMG_LIGHT_ARROW,  // ARROW_TYPE_LIGHT
-    DMG_DEKU_NUT,     // ARROW_TYPE_SLINGSHOT
-    DMG_DEKU_BUBBLE,  // ARROW_TYPE_DEKU_BUBBLE
-    DMG_DEKU_NUT,     // ARROW_TYPE_DEKU_NUT
+    // Skijer's NEI: the OoT Fairy Slingshot seed hits with the Deku-bubble damage bit (user
+    // decision — MM has no DMG_SLINGSHOT; the bubble is MM's closest "small magical pellet"
+    // and every enemy damage table has an entry for it). Was DMG_DEKU_NUT (vestigial).
+    DMG_DEKU_BUBBLE, // ARROW_TYPE_SLINGSHOT
+    DMG_DEKU_BUBBLE, // ARROW_TYPE_DEKU_BUBBLE
+    DMG_DEKU_NUT,    // ARROW_TYPE_DEKU_NUT
+    // Skijer's NEI: SW97 elemental seeds — fire/ice/light carry the real elemental arrow bits
+    // (fork parity: soh z_en_arrow.c seedElemDmg[]); dark/soul/wind have no MM damage bit, so
+    // they hit like the plain seed (glow/VFX still elemental).
+    DMG_FIRE_ARROW,  // ARROW_TYPE_SEED_FIRE
+    DMG_ICE_ARROW,   // ARROW_TYPE_SEED_ICE
+    DMG_LIGHT_ARROW, // ARROW_TYPE_SEED_LIGHT
+    DMG_DEKU_BUBBLE, // ARROW_TYPE_SEED_DARK
+    DMG_DEKU_BUBBLE, // ARROW_TYPE_SEED_SOUL
+    DMG_DEKU_BUBBLE, // ARROW_TYPE_SEED_WIND
+    // Skijer's NEI: SW97 medallion bow arrows — fire/ice/light real elemental bits (fork
+    // sw97DmgFlags[]); dark/soul/wind hit like a normal arrow (no MM bit for them).
+    DMG_FIRE_ARROW,   // ARROW_TYPE_SW97_FIRE
+    DMG_ICE_ARROW,    // ARROW_TYPE_SW97_ICE
+    DMG_LIGHT_ARROW,  // ARROW_TYPE_SW97_LIGHT
+    DMG_NORMAL_ARROW, // ARROW_TYPE_SW97_DARK
+    DMG_NORMAL_ARROW, // ARROW_TYPE_SW97_SOUL
+    DMG_NORMAL_ARROW, // ARROW_TYPE_SW97_WIND
 };
 
 u32 Actor_GetArrowDmgFlags(s32 params) {

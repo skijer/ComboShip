@@ -4,15 +4,53 @@
 #include "objects/object_link_child/object_link_child.h"
 #include "objects/object_custom_equip/object_custom_equip.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
+#include "soh/Enhancements/game-interactor/vanilla-behavior/PlayerAnimOverride.h"
 #include "soh/ShipInit.hpp"
 #include "soh/ResourceManagerHelpers.h"
+// Skijer's NEI: needed so OPEN_DISPS/CLOSE_DISPS in the draw handler get C linkage (else LNK2001)
+#include "soh/frame_interpolation.h"
 
 extern "C" {
 #include "z64.h"
 #include "macros.h"
 #include "functions.h"
 #include "variables.h"
+#include "mods/transformation_masks/transformation_masks.h"
+// Skijer's NEI: draw-fork subsystems
+#include "mods/pak_loader/pak_loader.h" // PakLoader_FrameBegin
+#include "expansions/sm64/sm64_mario.h" // Sm64Mario_HasMesh/Draw/ShouldHideLink
+#include "mods/items/custom_items.h"    // CustomItems_OverrideDraw
+#include "mods/extended_equipment.h"    // ExtEquip_DrawBehavior
 extern SaveContext gSaveContext;
+
+// Harpoon Prop Hunt local-prop draw intercept. Forward-declared (matching the
+// inline `extern` z_player.c previously used) to avoid pulling the Harpoon C++
+// headers into this TU. Returns 1 when it rendered a prop (suppress Link), else 0.
+s32 HarpoonPropHunt_TryDrawLocalProp(Actor* thisx, PlayState* play);
+
+// Skijer's NEI: Pikachu status intercept (mm_player_form.cpp / pikachu_form.cpp).
+// Forward-declared to match the inline `extern` z_player.c previously used.
+u8 MmForm_IsPikachuActive(void);
+void PikachuForm_InterceptStatus(PlayState* play, Player* player);
+
+// SW97 Cucco mode draw — Soul-arrow + cucco transformation. When active,
+// replaces Link's body with the cucco model while still walking Link's
+// skeleton (null limbs) so shadow + Navi keep tracking.
+s32 Sw97_IsCuccoModeActive(void);
+void Sw97_DrawCuccoForm(PlayState* play, Player* player);
+
+// Cucco-egg projectile hooks: while cucco is active, any bow/slingshot
+// arrow Link fires gets tagged so its draw becomes the pocket-egg model
+// and its horizontal speed is clamped to CUCCO_EGG_SPEED_MAX.
+void Sw97_TagCuccoEgg(Actor* arrow);
+void Sw97_TickCuccoEggClamp(Actor* arrow);
+
+// Cucco shield / aim state, needed by the input strip and the VB guards below.
+s32 Sw97_CuccoShieldIsUp(void);
+s32 Sw97_CuccoEggAimActive(void);
+// 0 = soul-arrow form (30s, no items), 1 = CVar form (persistent, items OK).
+extern s32 gSw97CuccoModeSource;
+void Sw97_EndCuccoMode(void);
 }
 
 static const char* ResolveCustomChain(std::initializer_list<const char*> paths) {
@@ -114,6 +152,34 @@ static const char* GetShieldOnBackDL(s32 shield) {
             return gCustomMirrorShieldOnBackDL;
     }
     return nullptr;
+}
+
+// Hand/held shield model DL for the given shield value (Deku/Hylian/Mirror).
+static const char* GetCustomShieldDL(s32 shield) {
+    switch (shield) {
+        case PLAYER_SHIELD_DEKU:
+            return gCustomDekuShieldDL;
+        case PLAYER_SHIELD_HYLIAN:
+            return gCustomHylianShieldDL;
+        case PLAYER_SHIELD_MIRROR:
+            return gCustomMirrorShieldDL;
+    }
+    return nullptr;
+}
+
+// Allocates a small gfx buffer, emits up to two display lists (skipping null
+// ones), terminates it, and stores it in *dList. Callers guard with
+// "if (a || b)" so at least one is non-null. Mirrors the open-coded
+// Graph_Alloc + gSPDisplayList + gSPEndDisplayList sequence used throughout.
+static void EmitDLBuffer(PlayState* play, Gfx** dList, Gfx* a, Gfx* b) {
+    Gfx* buf = (Gfx*)Graph_Alloc(play->state.gfxCtx, 3 * sizeof(Gfx));
+    Gfx* p = buf;
+    if (a)
+        gSPDisplayList(p++, a);
+    if (b)
+        gSPDisplayList(p++, b);
+    gSPEndDisplayList(p);
+    *dList = buf;
 }
 
 static const char* GetSwordInSheathDLForPlayer(Player* player, PlayState* play) {
@@ -228,6 +294,13 @@ static void RegisterCustomEquipment() {
         Player* player = (Player*)va_arg(args, void*);
         PlayState* play = va_arg(args, PlayState*);
 
+        // NEI: while transformed (MM mask form) the form draws its own skeleton,
+        // so Link's custom-equipment limb override must not run.
+        if (TransformMasks_IsTransformedAny()) {
+            va_end(args);
+            return;
+        }
+
         const bool isAdult = gSaveContext.linkAge == LINK_AGE_ADULT;
         const char* customDL = nullptr;
 
@@ -241,11 +314,7 @@ static void RegisterCustomEquipment() {
                 if (isOcarina) {
                     Gfx* resolvedHand = LoadGfxByName(isAdult ? gLinkAdultLeftHandNearDL : gLinkChildLeftHandNearDL);
                     if (resolvedHand) {
-                        Gfx* buf = (Gfx*)Graph_Alloc(play->state.gfxCtx, 2 * sizeof(Gfx));
-                        Gfx* p = buf;
-                        gSPDisplayList(p++, resolvedHand);
-                        gSPEndDisplayList(p);
-                        *dList = buf;
+                        EmitDLBuffer(play, dList, resolvedHand, nullptr);
                     }
                     break;
                 }
@@ -330,15 +399,8 @@ static void RegisterCustomEquipment() {
 
                     Gfx* resolvedFpsWeapon = LoadCustomGfx(fpsWeapon);
                     Gfx* resolvedFpsHand = LoadCustomGfx(fpsHand);
-                    if (resolvedFpsWeapon) {
-                        Gfx* buf = (Gfx*)Graph_Alloc(play->state.gfxCtx, 3 * sizeof(Gfx));
-                        Gfx* p = buf;
-                        if (resolvedFpsWeapon)
-                            gSPDisplayList(p++, resolvedFpsWeapon);
-                        if (resolvedFpsHand)
-                            gSPDisplayList(p++, resolvedFpsHand);
-                        gSPEndDisplayList(p);
-                        *dList = buf;
+                    if (resolvedFpsWeapon || resolvedFpsHand) {
+                        EmitDLBuffer(play, dList, resolvedFpsWeapon, resolvedFpsHand);
                     }
                 } else {
                     bool useOpenHand = false;
@@ -355,17 +417,7 @@ static void RegisterCustomEquipment() {
                                            player->modelGroup == PLAYER_MODELGROUP_OCARINA ||
                                            player->modelGroup == PLAYER_MODELGROUP_OOT;
                     if (isShielding) {
-                        switch (player->currentShield) {
-                            case PLAYER_SHIELD_DEKU:
-                                customDL = gCustomDekuShieldDL;
-                                break;
-                            case PLAYER_SHIELD_HYLIAN:
-                                customDL = gCustomHylianShieldDL;
-                                break;
-                            case PLAYER_SHIELD_MIRROR:
-                                customDL = gCustomMirrorShieldDL;
-                                break;
-                        }
+                        customDL = GetCustomShieldDL(player->currentShield);
                     } else if (isOcarina) {
                         const bool isOoT = player->heldItemAction == PLAYER_IA_OCARINA_OF_TIME ||
                                            player->itemAction == PLAYER_IA_OCARINA_OF_TIME ||
@@ -376,17 +428,7 @@ static void RegisterCustomEquipment() {
                     } else {
                         switch ((u8)player->rightHandType) {
                             case PLAYER_MODELTYPE_RH_SHIELD:
-                                switch (player->currentShield) {
-                                    case PLAYER_SHIELD_DEKU:
-                                        customDL = gCustomDekuShieldDL;
-                                        break;
-                                    case PLAYER_SHIELD_HYLIAN:
-                                        customDL = gCustomHylianShieldDL;
-                                        break;
-                                    case PLAYER_SHIELD_MIRROR:
-                                        customDL = gCustomMirrorShieldDL;
-                                        break;
-                                }
+                                customDL = GetCustomShieldDL(player->currentShield);
                                 break;
                             case PLAYER_MODELTYPE_RH_BOW_SLINGSHOT:
                             case PLAYER_MODELTYPE_RH_BOW_SLINGSHOT_2:
@@ -467,14 +509,7 @@ static void RegisterCustomEquipment() {
                 Gfx* resolvedSword = LoadCustomGfx(swordPath);
                 Gfx* resolvedShield = LoadCustomGfx(shieldPath);
                 if (resolvedSword || resolvedShield) {
-                    Gfx* buf = (Gfx*)Graph_Alloc(play->state.gfxCtx, 3 * sizeof(Gfx));
-                    Gfx* p = buf;
-                    if (resolvedSword)
-                        gSPDisplayList(p++, resolvedSword);
-                    if (resolvedShield)
-                        gSPDisplayList(p++, resolvedShield);
-                    gSPEndDisplayList(p);
-                    *dList = buf;
+                    EmitDLBuffer(play, dList, resolvedSword, resolvedShield);
                 }
                 break;
             }
@@ -490,6 +525,12 @@ static void RegisterCustomEquipment() {
         Gfx** dList = va_arg(args, Gfx**);
         Player* player = (Player*)va_arg(args, void*);
         PlayState* play = va_arg(args, PlayState*);
+
+        // NEI: skip custom-equipment limb override while transformed.
+        if (TransformMasks_IsTransformedAny()) {
+            va_end(args);
+            return;
+        }
 
         const bool isAdult = gSaveContext.linkAge == LINK_AGE_ADULT;
         const char* customDL = nullptr;
@@ -521,12 +562,7 @@ static void RegisterCustomEquipment() {
                     Gfx* resolvedHand =
                         LoadGfxByName(isAdult ? gLinkAdultLeftHandClosedNearDL : gLinkChildLeftFistNearDL);
                     if (resolvedHand) {
-                        Gfx* buf = (Gfx*)Graph_Alloc(play->state.gfxCtx, 3 * sizeof(Gfx));
-                        Gfx* p = buf;
-                        gSPDisplayList(p++, resolvedHand);
-                        gSPDisplayList(p++, resolvedCustom);
-                        gSPEndDisplayList(p);
-                        *dList = buf;
+                        EmitDLBuffer(play, dList, resolvedHand, resolvedCustom);
                     }
                 }
                 break;
@@ -534,29 +570,14 @@ static void RegisterCustomEquipment() {
 
             case PLAYER_LIMB_R_HAND: {
                 if (PauseGetLimbType(PLAYER_LIMB_R_HAND) == PLAYER_MODELTYPE_RH_SHIELD) {
-                    switch (CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD)) {
-                        case PLAYER_SHIELD_DEKU:
-                            customDL = gCustomDekuShieldDL;
-                            break;
-                        case PLAYER_SHIELD_HYLIAN:
-                            customDL = gCustomHylianShieldDL;
-                            break;
-                        case PLAYER_SHIELD_MIRROR:
-                            customDL = gCustomMirrorShieldDL;
-                            break;
-                    }
+                    customDL = GetCustomShieldDL(CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD));
                 }
                 Gfx* resolvedCustom = LoadCustomGfx(customDL);
                 if (resolvedCustom) {
                     Gfx* resolvedHand =
                         LoadGfxByName(isAdult ? gLinkAdultRightHandClosedNearDL : gLinkChildRightHandClosedNearDL);
                     if (resolvedHand) {
-                        Gfx* buf = (Gfx*)Graph_Alloc(play->state.gfxCtx, 3 * sizeof(Gfx));
-                        Gfx* p = buf;
-                        gSPDisplayList(p++, resolvedHand);
-                        gSPDisplayList(p++, resolvedCustom);
-                        gSPEndDisplayList(p);
-                        *dList = buf;
+                        EmitDLBuffer(play, dList, resolvedHand, resolvedCustom);
                     }
                 }
                 break;
@@ -579,14 +600,7 @@ static void RegisterCustomEquipment() {
                 Gfx* resolvedSword = LoadCustomGfx(swordPath);
                 Gfx* resolvedShield = LoadCustomGfx(shieldPath);
                 if (resolvedSword || resolvedShield) {
-                    Gfx* buf = (Gfx*)Graph_Alloc(play->state.gfxCtx, 3 * sizeof(Gfx));
-                    Gfx* p = buf;
-                    if (resolvedSword)
-                        gSPDisplayList(p++, resolvedSword);
-                    if (resolvedShield)
-                        gSPDisplayList(p++, resolvedShield);
-                    gSPEndDisplayList(p);
-                    *dList = buf;
+                    EmitDLBuffer(play, dList, resolvedSword, resolvedShield);
                 }
                 break;
             }
@@ -599,6 +613,12 @@ static void RegisterCustomEquipment() {
     COND_VB_SHOULD(VB_DRAW_HOOKSHOT_TIP, CVarGetInteger(CVAR_SETTING("AltAssets"), 1), {
         Player* player = va_arg(args, Player*);
         PlayState* play = va_arg(args, PlayState*);
+
+        // NEI: skip custom hookshot tip DL while transformed.
+        if (TransformMasks_IsTransformedAny()) {
+            va_end(args);
+            return;
+        }
         const char* tipPath = (player->heldItemAction == PLAYER_IA_LONGSHOT)
                                   ? ResolveCustomChain({ gCustomLongshotTipDL, gCustomHookshotTipDL, nullptr })
                                   : gCustomHookshotTipDL;
@@ -612,6 +632,12 @@ static void RegisterCustomEquipment() {
     COND_VB_SHOULD(VB_DRAW_HOOKSHOT_CHAIN, CVarGetInteger(CVAR_SETTING("AltAssets"), 1), {
         Player* player = va_arg(args, Player*);
         PlayState* play = va_arg(args, PlayState*);
+
+        // NEI: skip custom hookshot chain DL while transformed.
+        if (TransformMasks_IsTransformedAny()) {
+            va_end(args);
+            return;
+        }
         const char* chainPath = (player->heldItemAction == PLAYER_IA_LONGSHOT)
                                     ? ResolveCustomChain({ gCustomLongshotChainDL, gCustomHookshotChainDL, nullptr })
                                     : gCustomHookshotChainDL;
@@ -658,3 +684,390 @@ static void RegisterCustomEquipment() {
 }
 
 static RegisterShipInitFunc initFunc(RegisterCustomEquipment, { CVAR_SETTING("AltAssets") });
+
+// Skijer's NEI: player-draw fork (VB_PLAYER_DRAW_BEGIN). Fires first in Player_Draw;
+// *should=false suppresses the vanilla draw. Pak/O2r skeleton swap stays inline in z_player.c.
+// Registered unconditionally (each block self-guards), NOT gated on AltAssets.
+static void RegisterPlayerDrawForkNEI() {
+    // Skijer's NEI: hide Link's held-weapon DL when a custom item draws its own model
+    // (Byrna / IK Axe via ExtEquip_ShouldHideSwordDL, or the Fire/Ice/Light rods).
+    REGISTER_VB_SHOULD(VB_PLAYER_SHOULD_HIDE_HELD_WEAPON, {
+        Player* player = (Player*)va_arg(args, void*);
+        if (ExtEquip_ShouldHideSwordDL() || player->itemAction == PLAYER_IA_ROD_FIRE ||
+            player->itemAction == PLAYER_IA_ROD_ICE || player->itemAction == PLAYER_IA_ROD_LIGHT) {
+            *should = true;
+        }
+    });
+
+    // Skijer's NEI: held item is two-handed for the FD-skin sword + custom Fire/Ice/Light rods (BGS-style)
+    REGISTER_VB_SHOULD(VB_PLAYER_HOLDS_TWO_HANDED_WEAPON, {
+        Player* player = (Player*)va_arg(args, void*);
+        // FD wields the Deity sword two-handed no matter which sword is equipped, and
+        // nothing at all when no sword is in hand — Player_IsFDHoldingSword is that gate
+        // (swords only: a Deku Stick / Hammer in FD's hands keeps its own identity).
+        // The Cane of Byrna is the Insect Glaive: a pole weapon, so it wields
+        // two-handed and carries no shield, exactly like the Biggoron's Sword.
+        if (Player_IsFDHoldingSword(player) || ExtEquip_ByrnaIsTwoHanded(player) ||
+            player->heldItemAction == PLAYER_IA_ROD_FIRE || player->heldItemAction == PLAYER_IA_ROD_ICE ||
+            player->heldItemAction == PLAYER_IA_ROD_LIGHT) {
+            *should = true;
+        }
+    });
+
+    REGISTER_VB_SHOULD(VB_PLAYER_DRAW_BEGIN, {
+        PlayState* play = va_arg(args, PlayState*);
+        Player* player = va_arg(args, Player*);
+        u8 isLocalPlayer = (player == GET_PLAYER(play));
+
+        // PAK Loader: free previous frame's combined DLs (main player only)
+        if (isLocalPlayer) {
+            PakLoader_FrameBegin();
+        }
+
+        // Harpoon Prop Hunt prop-draw intercept (local only); returns 1 when it drew a prop
+        if (isLocalPlayer) {
+            if (HarpoonPropHunt_TryDrawLocalProp(&player->actor, play)) {
+                *should = false;
+                va_end(args);
+                return;
+            }
+        }
+
+        // SM64 Mario: draw Mario instead of Link (HasMesh stricter than IsReady)
+        if (isLocalPlayer) {
+            if (Sm64Mario_HasMesh()) {
+                Sm64Mario_Draw(play, player);
+                *should = false;
+                va_end(args);
+                return;
+            }
+            // CVAR on but Mario not drawable yet (detransform / Lens held): hide Link
+            if (Sm64Mario_ShouldHideLink()) {
+                *should = false;
+                va_end(args);
+                return;
+            }
+        }
+
+        // SW97 Cucco mode: draw cucco model instead of Link, but walk Link's
+        // skeleton with null limbs so shadow + Navi follow (same pattern as
+        // GaroForm_DrawNullBody / MmForm_Draw).
+        if (isLocalPlayer && Sw97_IsCuccoModeActive()) {
+            Sw97_DrawCuccoForm(play, player);
+            OPEN_DISPS(play->state.gfxCtx);
+            if (!(player->stateFlags2 & PLAYER_STATE2_DISABLE_DRAW)) {
+                if (player->unk_862 > 0) {
+                    Player_DrawGetItem(play, player);
+                }
+                CustomItems_OverrideDraw(player, play);
+                ExtEquip_DrawBehavior(player, play);
+            }
+            CLOSE_DISPS(play->state.gfxCtx);
+            *should = false;
+            va_end(args);
+            return;
+        }
+
+        // Transformation Masks: draw MM form instead of Link; Dragon Scale swim draws barrier only
+        if (isLocalPlayer && TransformMasks_IsZoraSwimEnabled()) {
+            TransformMasks_Draw(play, player); // barrier only (INACTIVE + zoraSwimEnabled)
+        }
+
+        if (isLocalPlayer && (TransformMasks_IsTransformed() || TransformMasks_IsFDSkinMode())) {
+            if (TransformMasks_HasSkeleton()) {
+                {
+                    TransformMasks_Draw(play, player);
+
+                    // Refresh hookshot anchor (unk_3C8): PostLimbDrawGameplay won't run, else pull never ends
+                    if ((player->heldItemAction == PLAYER_IA_HOOKSHOT) ||
+                        (player->heldItemAction == PLAYER_IA_LONGSHOT)) {
+                        player->unk_3C8.x = player->actor.world.pos.x;
+                        player->unk_3C8.y = player->actor.world.pos.y + 40.0f; // approx hand height
+                        player->unk_3C8.z = player->actor.world.pos.z;
+                    }
+
+                    // Still draw get-item + custom items on MM forms
+                    OPEN_DISPS(play->state.gfxCtx);
+                    if (!(player->stateFlags2 & PLAYER_STATE2_DISABLE_DRAW)) {
+                        if (player->unk_862 > 0) {
+                            Player_DrawGetItem(play, player);
+                        }
+                        CustomItems_OverrideDraw(player, play);
+                        ExtEquip_DrawBehavior(player, play);
+                    }
+                    CLOSE_DISPS(play->state.gfxCtx);
+                    *should = false;
+                    va_end(args);
+                    return;
+                }
+                // First-person aim (unk_6AD != 0): fall through; limbs hidden but skeleton still processes
+            } else {
+                // Skeleton not loaded: flash overlay only, fall through to Link draw
+                TransformMasks_Draw(play, player);
+            }
+        }
+    });
+}
+
+static RegisterShipInitFunc initFuncPlayerDrawFork(RegisterPlayerDrawForkNEI, {});
+
+// Skijer's NEI: SW97 cucco egg hooks. While cucco mode is active, tag
+// EnArrow at Init (swap draw → pocket-egg DL) and clamp its speedXZ each
+// Update tick. Vanilla aim + release flow unchanged — only visuals + speed
+// are affected once the arrow is airborne.
+static void RegisterCuccoArrowEggHooks() {
+    COND_ID_HOOK(OnActorInit, ACTOR_EN_ARROW, true, [](void* actorPtr) {
+        if (Sw97_IsCuccoModeActive()) {
+            Sw97_TagCuccoEgg((Actor*)actorPtr);
+        }
+    });
+    COND_ID_HOOK(OnActorUpdate, ACTOR_EN_ARROW, true, [](void* actorPtr) { Sw97_TickCuccoEggClamp((Actor*)actorPtr); });
+
+    // The cucco shield forces player->currentShield to Deku so vanilla
+    // projectiles will reflect off it (EnNutsball / EnOkuta both gate on that
+    // field). The side effect to shut down is fire: a burning block would run
+    // Inventory_DeleteEquipment and destroy a shield the player does not own.
+    REGISTER_VB_SHOULD(VB_BURN_SHIELD, {
+        if (Sw97_CuccoShieldIsUp()) {
+            *should = false;
+        }
+    });
+
+    // Cucco eggs are free. Without this, fire and light eggs would bill the
+    // player for magic they never spent on a bow.
+    REGISTER_VB_SHOULD(VB_EN_ARROW_MAGIC_CONSUMPTION, {
+        if (Sw97_IsCuccoModeActive()) {
+            *should = false;
+        }
+    });
+
+    // Soul-arrow cucco is a movement-only form: reaching for any item drops
+    // the transformation instead of using it. The CVar form keeps its items.
+    REGISTER_VB_SHOULD(VB_CHANGE_HELD_ITEM_AND_USE_ITEM, {
+        if (Sw97_IsCuccoModeActive() && gSw97CuccoModeSource == 0) {
+            Sw97_EndCuccoMode();
+            *should = false;
+        }
+    });
+}
+static RegisterShipInitFunc initFuncCuccoArrowEggHooks(RegisterCuccoArrowEggHooks, {});
+
+static void RegisterSagesTunicHooks() {
+    REGISTER_VB_SHOULD(VB_RECIEVE_FALL_DAMAGE, {
+        if (ExtEquip_HasSagesResistance(SAGES_RESIST_FALL)) {
+            ExtEquip_SagesFlash(SAGES_RESIST_FALL);
+            *should = false;
+        }
+    });
+    REGISTER_VB_SHOULD(VB_LIKE_LIKE_GRAB_PLAYER, {
+        if (ExtEquip_HasSagesResistance(SAGES_RESIST_STUN)) {
+            ExtEquip_SagesFlash(SAGES_RESIST_STUN);
+            *should = false;
+        }
+    });
+    REGISTER_VB_SHOULD(VB_REDEAD_GIBDO_FREEZE_LINK, {
+        if (ExtEquip_HasSagesResistance(SAGES_RESIST_STUN)) {
+            ExtEquip_SagesFlash(SAGES_RESIST_STUN);
+            *should = false;
+        }
+    });
+    REGISTER_VB_SHOULD(VB_ENEMY_GRAB_PLAYER, {
+        if (ExtEquip_HasSagesResistance(SAGES_RESIST_STUN)) {
+            ExtEquip_SagesFlash(SAGES_RESIST_STUN);
+            *should = false;
+        }
+    });
+}
+
+static RegisterShipInitFunc initFuncSagesTunicHooks(RegisterSagesTunicHooks, {});
+
+extern "C" u8 Champion_AllowsMidairAim(Player* player);
+
+static void RegisterChampionHooks() {
+    REGISTER_VB_SHOULD(VB_PLAYER_ALLOW_MIDAIR_AIM, {
+        Player* player = va_arg(args, Player*);
+        if (Champion_AllowsMidairAim(player)) {
+            *should = true;
+        }
+        // A flying cucco needs to be able to aim its eggs. Without this,
+        // Player_ActionHandler_13 refuses midair and the mirilla dies on the
+        // frame it opens.
+        if (Sw97_CuccoEggAimActive()) {
+            *should = true;
+        }
+    });
+}
+
+static RegisterShipInitFunc initFuncChampionHooks(RegisterChampionHooks, {});
+
+// Skijer's NEI: SM64 pre-UpdateCommon pre-pass (z_player pieces 1-2,5-7; 3-4 stay inline)
+#define SM64_SWAP_AB(b) (((b) & ~(BTN_A | BTN_B)) | (((b)&BTN_A) ? BTN_B : 0) | (((b)&BTN_B) ? BTN_A : 0))
+static void RegisterSm64PreUpdateCommonNEI() {
+    // Pieces 1-2: tick transition-suspend (before any IsActive/IsReady check),
+    // then the (now no-op) Mario-mask C-Down force/toggle.
+    REGISTER_VB_SHOULD(VB_SM64_PLAYER_PRE_ACTION, {
+        PlayState* play = va_arg(args, PlayState*);
+        Player* player = va_arg(args, Player*);
+        (void)va_arg(args, Input*); // &sp44 (unused by pieces 1-2)
+        Sm64Mario_TickTransitionSuspend(play, player);
+        Sm64MarioMask_ForceAndToggle(play, player);
+    });
+
+    // Pieces 5-7: steal damage, read Pikachu status, then swap A<->B on the exact
+    // sp44 that is passed straight into Player_UpdateCommon (OOT's contextual A).
+    REGISTER_VB_SHOULD(VB_SM64_PLAYER_PRE_UPDATE_COMMON, {
+        PlayState* play = va_arg(args, PlayState*);
+        Player* player = va_arg(args, Player*);
+        Input* in = va_arg(args, Input*);
+        Sm64Mario_InterceptDamage(play, player);
+        if (MmForm_IsPikachuActive()) {
+            PikachuForm_InterceptStatus(play, player);
+        }
+        // SW97 cucco mode: strip the buttons the cucco moveset owns from
+        // Link's input, so his actionFunc doesn't roll, jump-slash or raise a
+        // shield a cucco isn't carrying. Sw97_TickCuccoMode reads the raw
+        // presses from play->state.input[0] (unaffected by this) instead.
+        //
+        // A and B are always ours (flap/glide, Wing Whack/spin, egg fire).
+        // R is conditional: with a real shield equipped AND on the ground it
+        // is left alone so Link's own shield AI takes over — that fallback is
+        // the whole reason this isn't a flat strip. Airborne R stays ours so
+        // the ground pound survives regardless of equipment.
+        //
+        // Stripping A/B/R also keeps the first-person aim alive: the vanilla
+        // aim state bails on any A/B/R press (z_player.c:14753), and it reads
+        // this same stripped copy.
+        if (Sw97_IsCuccoModeActive()) {
+            u16 strip = BTN_A | BTN_B;
+            // Read the EQUIPMENT, never player->currentShield — the cucco
+            // shield overwrites that field to Deku while it is up.
+            bool hasShield = SHIELD_EQUIP_TO_PLAYER(CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD)) != PLAYER_SHIELD_NONE;
+            bool grounded = (player->actor.bgCheckFlags & BGCHECKFLAG_GROUND) != 0;
+            if (!(hasShield && grounded)) {
+                strip |= BTN_R;
+            }
+            in->cur.button &= ~strip;
+            in->press.button &= ~strip;
+            in->rel.button &= ~strip;
+        }
+        if (Sm64Mario_IsReady()) {
+            in->cur.button = SM64_SWAP_AB(in->cur.button);
+            in->press.button = SM64_SWAP_AB(in->press.button);
+            in->rel.button = SM64_SWAP_AB(in->rel.button);
+        }
+    });
+}
+
+static RegisterShipInitFunc initFuncSm64PreUpdateCommon(RegisterSm64PreUpdateCommonNEI, {});
+#undef SM64_SWAP_AB
+
+// Skijer's NEI: player anim-override fork (VB_PLAYER_ANIM_OVERRIDE). Each site stores the
+// vanilla anim in *animOut; a getter overwrites it only when non-NULL (else vanilla unchanged).
+// Registered unconditionally (each block self-guards).
+// Left inline in z_player.c (they re-play on top, not single-play): func_808358F0 boomerang
+// throw, func_80831F00 melee start.
+extern "C" {
+LinkAnimationHeader* MmForm_GetJumpSlashAnim(s32 phase);
+LinkAnimationHeader* MmForm_GetZoraBoomerangAnim(s32 phase);
+}
+
+static void RegisterPlayerAnimOverrideNEI() {
+    REGISTER_VB_SHOULD(VB_PLAYER_ANIM_OVERRIDE, {
+        s32 siteId = va_arg(args, s32);
+        s32 siteArg = va_arg(args, s32);
+        LinkAnimationHeader** animOut = va_arg(args, LinkAnimationHeader**);
+        Player* player = va_arg(args, Player*);
+
+        switch (siteId) {
+            case VB_PLAYER_ANIM_SITE_DODGE_HOP: {
+                // Gerudo's sidehops and backflip. siteArg is the direction; the clip
+                // is resampled to the vanilla one's length inside the getter, so the
+                // hop keeps exactly OOT's timing and travel.
+                LinkAnimationHeader* gerudoHop = GerudoMhr_GetHopAnim(siteArg);
+                if (gerudoHop != nullptr) {
+                    *animOut = gerudoHop;
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_SHIELD_RAISE: {
+                // Gerudo blade guard: the raise slice (1-20 of the flourish, x2).
+                // The Trident does NOT override this: its guard is vanilla's shield
+                // stance now, and R+B is a guard dash instead of a crouch stab.
+                LinkAnimationHeader* gerudoRaise = GerudoMhr_GetGuardAnim(player, 0);
+                if (gerudoRaise != nullptr) {
+                    *animOut = gerudoRaise;
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_SHIELD_LOOP: {
+                LinkAnimationHeader* gerudoLoop = GerudoMhr_GetGuardAnim(player, 1);
+                if (gerudoLoop != nullptr) {
+                    *animOut = gerudoLoop;
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_MELEE_SWING: {
+                // Forms fight with their body, so their aerial slashes are kicks and fin swipes,
+                // not Link's sword clips.
+                if (TransformMasks_IsTransformed() && (siteArg >= PLAYER_MWA_FLIPSLASH_START) &&
+                    (siteArg <= PLAYER_MWA_JUMPSLASH_FINISH)) {
+                    LinkAnimationHeader* formAnim = MmForm_GetJumpSlashAnim(siteArg);
+                    if (formAnim != nullptr) {
+                        *animOut = formAnim;
+                    }
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_FALL_WAIT: {
+                // Gerudo falls with the blades out.
+                LinkAnimationHeader* gerudoFall = GerudoMhr_GetFallAnim(player);
+                if (gerudoFall != nullptr) {
+                    *animOut = gerudoFall;
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_ZORA_BOOMERANG_WAIT: {
+                // Zora boomerang phase 0, transformed only
+                LinkAnimationHeader* formAnim =
+                    TransformMasks_IsTransformed() ? MmForm_GetZoraBoomerangAnim(0) : nullptr;
+                if (formAnim != nullptr) {
+                    *animOut = formAnim;
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_ZORA_BOOMERANG_CATCH: {
+                // Zora boomerang phase 2, transformed only
+                LinkAnimationHeader* zoraCatch =
+                    TransformMasks_IsTransformed() ? MmForm_GetZoraBoomerangAnim(2) : nullptr;
+                if (zoraCatch != nullptr) {
+                    *animOut = zoraCatch;
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_ROLL: {
+                // Gerudo rolls with a dual-blades tumble. OOT's roll action is
+                // untouched — this only changes which clip it plays.
+                LinkAnimationHeader* gerudoRoll = GerudoMhr_GetRollAnim();
+                if (gerudoRoll != nullptr) {
+                    *animOut = gerudoRoll;
+                }
+                break;
+            }
+            case VB_PLAYER_ANIM_SITE_JUMPSLASH_RECOVERY: {
+                // Jump-slash recovery: transformed + mwa in [FLIPSLASH_FINISH, JUMPSLASH_FINISH]
+                if (TransformMasks_IsTransformed() && (player->meleeWeaponAnimation >= PLAYER_MWA_FLIPSLASH_FINISH) &&
+                    (player->meleeWeaponAnimation <= PLAYER_MWA_JUMPSLASH_FINISH)) {
+                    LinkAnimationHeader* formAnim = MmForm_GetJumpSlashAnim(player->meleeWeaponAnimation);
+                    if (formAnim != nullptr) {
+                        *animOut = formAnim;
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    });
+}
+
+static RegisterShipInitFunc initFuncPlayerAnimOverride(RegisterPlayerAnimOverrideNEI, {});

@@ -116,6 +116,20 @@ AnimatedMaterial* ResourceMgr_LoadAnimatedMatByName(const char* path);
 char* ResourceMgr_LoadTexOrDListByName(const char* filePath);
 char* ResourceMgr_LoadIfDListByName(const char* filePath);
 char* ResourceMgr_LoadPlayerAnimByName(const char* animPath);
+// Wraps a raw SOH_PlayerAnimation payload in a real header (cached). Skijer's NEI
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeader(const char* animPath);
+// Same, REWRITTEN: root frozen (stripY also pins Y), optionally cut to an inclusive
+// sub-range, optionally resampled to an exact length. The imported movesets need all
+// three — a clip carrying its own root would teleport the player, one packed clip
+// serves several engine rows, and the locomotion rows are SAMPLED so their length is
+// not free. firstFrame/lastFrame -1 = the whole clip; targetFrames 0 = keep length.
+// Cached by path AND parameters. Skijer's NEI
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeaderInPlaceRange(const char* animPath, uint8_t stripY,
+                                                                      int16_t firstFrame, int16_t lastFrame,
+                                                                      int16_t targetFrames);
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeaderInPlaceResampled(const char* animPath, uint8_t stripY,
+                                                                          int16_t targetFrames);
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeaderInPlace(const char* animPath, uint8_t stripY);
 AnimationHeaderCommon* ResourceMgr_LoadAnimByName(const char* path);
 char* ResourceMgr_GetNameByCRC(uint64_t crc, char* alloc);
 Gfx* ResourceMgr_LoadGfxByCRC(uint64_t crc);
@@ -190,6 +204,9 @@ void Combo_RequestOwlSaveQuit(void);
 // Load an existing MM save from disk into gSaveContext (C-callable wrapper). 0 = ok; negative = nothing
 // usable was loaded (logged; the load leaves the fail-closed sentinel behind and play still proceeds).
 int Combo_LoadMMSaveFile(int mmFileNum);
+// Recover from that failure: rebuild the slot's MM half from its baked seed, else leave a throwaway
+// baseline that cannot persist. Never let Play start on the zeroed SaveContext.
+void Combo_RepairMMSaveForSlot(int fileNum);
 // ComboShip (#182): 1-based MM file whose owlSave blob is what gSaveContext descends from (-1 = none).
 extern int gComboOwlBlobSlot;
 // ComboShip (#182): mirrors Sram_OpenSave's owl branch; resolveEntrance = 0 keeps combo's arrival point.
@@ -224,6 +241,10 @@ __declspec(dllexport)
     void MM_ResumeGame(int fileNum);
 #endif
 void CrashHandler_PrintExt(char* buffer, size_t* pos);
+
+// The NEI asset folder for THIS game ("nei", or "nei/2ship" in ComboShip, where both games share one
+// Ship directory and their packs collide by name). Build every nei/ path from this, never a literal.
+const char* Nei_AssetDir(void);
 #ifdef __cplusplus
 };
 #endif

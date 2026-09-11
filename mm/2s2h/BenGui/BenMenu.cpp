@@ -1,6 +1,7 @@
 #include "BenMenu.h"
 #include <fast/Fast3dWindow.h>
 #include <fast/Fast3dGui.h>
+#include "2s2h/ShipUtils.h"
 #include "BenGui.hpp"
 #include "UIWidgets.hpp"
 #include "BenPort.h"
@@ -10,10 +11,23 @@
 #include "2s2h/Enhancements/Enhancements.h"
 #include "2s2h/Enhancements/GfxPatcher/AuthenticGfxPatches.h"
 #include "2s2h/PresetManager/PresetManager.h"
+#include "2s2h/Network/Harpoon/Harpoon.h"
+#include "2s2h/Network/Harpoon/HarpoonSkinSync.h"
+#include "2s2h/FleetShipCombo/FleetShipCombo.h"
 #include "HudEditor.h"
 #include "Notification.h"
 #include "2s2h/Enhancements/Trackers/DisplayOverlay.h"
+#include <algorithm>
+#include <string>
 #include <variant>
+#include <vector>
+#ifdef __APPLE__
+#include <SDL_scancode.h>
+#include <SDL_gamecontroller.h>
+#else
+#include <SDL2/SDL_scancode.h>
+#include <SDL2/SDL_gamecontroller.h>
+#endif
 #include <ship/utils/StringHelper.h>
 #include <spdlog/fmt/fmt.h>
 #include "variables.h"
@@ -84,6 +98,10 @@ static std::unordered_map<int32_t, const char*> imguiScaleOptions = {
     { 1, "Normal" },
     { 2, "Large" },
     { 3, "X-Large" },
+};
+
+static const std::unordered_map<int32_t, const char*> customFormOptions = {
+    { 0, "None" }, { 1, "Kafei" }, { 2, "Keaton" }, { 3, "Gerudo" }, { 4, "Garo" },
 };
 
 static const std::unordered_map<int32_t, const char*> menuThemeOptions = {
@@ -485,9 +503,7 @@ void BenMenu::AddSettings() {
         ImGui::SeparatorText("Thank You");
         ImGui::PopStyleColor();
         ImGui::SameLine();
-        ImTextureID heartTextureId =
-            std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                ->GetTextureByName((const char*)gQuestIconHeartContainer2Tex);
+        ImTextureID heartTextureId = Ship_GetFast3dGui()->GetTextureByName((const char*)gQuestIconHeartContainer2Tex);
         ImGui::Image(heartTextureId, ImVec2(25.0f, 25.0f));
         ImGui::TextWrapped("Special thanks to our contributors, playtesters, artists, moderators, helpers, and "
                            "everyone in the larger decomp & N64 communities who make this project possible.\n\n");
@@ -1160,8 +1176,9 @@ void BenMenu::AddEnhancements() {
             "Enables magic spin attacks for the Fierce Deity Sword and Great Fairy's Sword."));
     AddWidget(path, "Better Picto Message", WIDGET_CVAR_CHECKBOX)
         .CVar("gEnhancements.Equipment.BetterPictoMessage")
-        .Options(
-            CheckboxOptions().Tooltip("Inform the player what target if any is being captured in the pictograph."));
+        .Options(CheckboxOptions()
+                     .Tooltip("Inform the player what target if any is being captured in the pictograph.")
+                     .DefaultValue(true));
     AddWidget(path, "Picto Box on C-Up", WIDGET_CVAR_CHECKBOX)
         .CVar("gEnhancements.Items.PictoBoxOnCUp")
         .Options(CheckboxOptions().Tooltip(
@@ -1213,6 +1230,30 @@ void BenMenu::AddEnhancements() {
         .CVar("gModes.MirroredWorld.StoneTowerTempleFix")
         .Options(CheckboxOptions().Tooltip(
             "Mirrors (or unmirrors) the inverted Stone Tower Temple to make its layout consistent."));
+    AddWidget(path, "SM64 Mario Mode", WIDGET_CVAR_CHECKBOX)
+        .CVar("gSm64Mario")
+        .Options(CheckboxOptions().Tooltip(
+            "Replaces Link with Mario from Super Mario 64, driven by libsm64. Mario keeps SM64 "
+            "physics and animations.\n\n"
+            "Requires sm64.dll next to 2ship.exe (shipped automatically) and a valid SM64 US "
+            "Z64 ROM (sm64.z64) placed next to 2ship.exe or pointed to via the gSm64RomPath CVar.\n\n"
+            "C-Left = Cappy, C-Right = Roll; these override equipped MM items in those slots.\n"
+            "C-Down keeps its equipped item. D-pad controls Wing, Metal, Vanish, and Fire caps."));
+    AddWidget(path, "Mario Mask C-Down Toggle", WIDGET_CVAR_CHECKBOX)
+        .CVar("gSm64MarioMaskForce")
+        .Options(CheckboxOptions().Tooltip(
+            "When enabled, the Mario Mask icon appears in the C-Down slot and pressing C-Down "
+            "toggles Mario Mode on/off. The press is consumed so the equipped C-Down item "
+            "doesn't fire on the same frame.\n\n"
+            "Useful for transforming back to Link without opening the menu."));
+    AddWidget(path, "Mario Master Volume", WIDGET_CVAR_SLIDER_FLOAT)
+        .CVar("gSm64MasterVolume")
+        .Options(FloatSliderOptions().Min(0.0f).Max(1.0f).DefaultValue(0.8f).Step(0.05f).Format("%.2f").Tooltip(
+            "Volume multiplier for Mario voice samples and SFX (jumps, "
+            "punches, coin pickups, death sounds). 0 mutes Mario; 1 is full "
+            "volume. Default 0.8 to blend with MM's BGM.\n\n"
+            "Place your SM64 US Z64 ROM as `sm64.z64` next to 2ship.exe to "
+            "enable Mario Mode."));
     AddWidget(path, "Other", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Milk Run Reward Options", WIDGET_CVAR_COMBOBOX)
         .CVar("gEnhancements.Minigames.CremiaHugs")
@@ -1479,6 +1520,32 @@ void BenMenu::AddEnhancements() {
 
     path = { "Enhancements", "Items/Songs", SECTION_COLUMN_1 };
     AddSidebarEntry("Enhancements", "Items/Songs", 3);
+    AddWidget(path, "Custom Forms (NEI)", WIDGET_SEPARATOR_TEXT);
+    AddWidget(path, "Kafei Mask Transforms", WIDGET_CVAR_CHECKBOX)
+        .CVar("gForms.Kafei")
+        .Options(CheckboxOptions()
+                     .Tooltip("Wearing Kafei's Mask transforms you into Kafei (child or adult with the Time Gate).")
+                     .DefaultValue(true));
+    AddWidget(path, "Keaton Mask Transforms", WIDGET_CVAR_CHECKBOX)
+        .CVar("gForms.Keaton")
+        .Options(CheckboxOptions().Tooltip("Wearing the Keaton Mask transforms you into a Keaton.").DefaultValue(true));
+    AddWidget(path, "Garo Mask Transforms", WIDGET_CVAR_CHECKBOX)
+        .CVar("gForms.Garo")
+        .Options(CheckboxOptions().Tooltip("Wearing the Garo Mask transforms you into a Garo.").DefaultValue(true));
+    AddWidget(path, "Gerudo Form (MHR dual blades)", WIDGET_CVAR_CHECKBOX)
+        .CVar("gForms.Gerudo")
+        .Options(CheckboxOptions()
+                     .Tooltip("Enables the Gerudo form: dual scimitars, sprint on A, forward slash, aerial slash "
+                              "and Urbosa's Fury on R+B once the rage bar has charge.")
+                     .DefaultValue(true));
+    AddWidget(path, "Force Form", WIDGET_CVAR_COMBOBOX)
+        .CVar("gForms.ForceForm")
+        .Options(ComboboxOptions()
+                     .Tooltip("Force a custom form regardless of the worn mask. Gerudo has no MM mask, so this "
+                              "is also its switch.")
+                     .ComboMap(&customFormOptions)
+                     .DefaultIndex(0));
+
     // Mask Enhancements
     AddWidget(path, "Masks", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Equippable While Swimming", WIDGET_CVAR_CHECKBOX)
@@ -2317,6 +2384,922 @@ void BenMenu::AddDevTools() {
 #endif
 }
 
+// -----------------------------------------------------------------------------
+// Network — Harpoon multiplayer. Ported 1:1 from SoH's HarpoonMenu.cpp
+// (single raw-ImGui panel) instead of the project's widget system, so the
+// layout matches Shipwright. The geoguessr/display toggles at the bottom are
+// the 2ship-specific additions the user asked for.
+// -----------------------------------------------------------------------------
+static const char* HARPOON_OFFICIAL_HOST = "54.209.53.9";
+static const int HARPOON_OFFICIAL_PORT = 8765;
+
+static void HarpoonMainMenu() {
+    auto* harpoon = Harpoon::Instance();
+
+    bool isConnected = harpoon->IsConnected();
+    bool isConnecting = harpoon->IsConnecting();
+    bool isReady = harpoon->IsReady();
+    bool inputLocked = isConnected || isConnecting;
+    bool inRoom = harpoon->State() == HarpoonConnState::InRoom;
+
+    ImGui::Text("Harpoon - Multiplayer");
+    ImGui::Separator();
+
+    static char hostBuf[128];
+    static char nameBuf[64];
+    static bool initialized = false;
+    static bool useOfficial = false;
+    if (!initialized) {
+        std::string h = CVarGetString("gNetwork.Harpoon.Host", "54.209.53.9");
+        std::string n = CVarGetString("gNetwork.Harpoon.Name", "Player");
+        snprintf(hostBuf, sizeof(hostBuf), "%s", h.c_str());
+        snprintf(nameBuf, sizeof(nameBuf), "%s", n.c_str());
+        initialized = true;
+    }
+
+    ImGui::BeginDisabled(inputLocked || useOfficial);
+    ImGui::Text("Host:");
+    ImGui::SameLine();
+    if (ImGui::InputText("##HarpoonHost", hostBuf, sizeof(hostBuf))) {
+        CVarSetString("gNetwork.Harpoon.Host", hostBuf);
+    }
+    int port = CVarGetInteger("gNetwork.Harpoon.Port", 8765);
+    ImGui::Text("Port:");
+    ImGui::SameLine();
+    if (ImGui::InputInt("##HarpoonPort", &port)) {
+        CVarSetInteger("gNetwork.Harpoon.Port", port);
+    }
+    ImGui::EndDisabled();
+
+    ImGui::BeginDisabled(inputLocked);
+    if (ImGui::Button(useOfficial ? "Custom Server" : "Official Remote")) {
+        useOfficial = !useOfficial;
+        if (useOfficial) {
+            snprintf(hostBuf, sizeof(hostBuf), "%s", HARPOON_OFFICIAL_HOST);
+            CVarSetString("gNetwork.Harpoon.Host", HARPOON_OFFICIAL_HOST);
+            CVarSetInteger("gNetwork.Harpoon.Port", HARPOON_OFFICIAL_PORT);
+        }
+    }
+    if (useOfficial) {
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0.3f, 0.7f, 1.0f, 1.0f), "Official");
+    }
+    ImGui::EndDisabled();
+
+    ImGui::Separator();
+
+    ImGui::BeginDisabled(inputLocked);
+    ImGui::Text("Name:");
+    ImGui::SameLine();
+    if (ImGui::InputText("##HarpoonName", nameBuf, sizeof(nameBuf))) {
+        CVarSetString("gNetwork.Harpoon.Name", nameBuf);
+    }
+    ImGui::EndDisabled();
+
+    // Your tunic color, and the color your name and nametag are drawn in for everyone else. The
+    // server hands it to the room from the handshake, so it is locked for the session once you
+    // connect — same as the host and the name.
+    ImGui::BeginDisabled(inputLocked);
+    Color_RGBA8 color = CVarGetColor("gNetwork.Harpoon.Color.Value", { 100, 255, 100, 255 });
+    float colorF[3] = { color.r / 255.0f, color.g / 255.0f, color.b / 255.0f };
+    if (ImGui::ColorEdit3("Color", colorF)) {
+        color.r = (u8)(colorF[0] * 255);
+        color.g = (u8)(colorF[1] * 255);
+        color.b = (u8)(colorF[2] * 255);
+        CVarSetColor("gNetwork.Harpoon.Color.Value", color);
+    }
+    ImGui::EndDisabled();
+    if (inputLocked) {
+        ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Color is set when you connect.");
+    }
+
+    ImGui::Separator();
+
+    // Connect / Disconnect
+    if (!isConnected && !isConnecting) {
+        if (ImGui::Button("Connect")) {
+            harpoon->Enable();
+        }
+    } else if (isConnecting) {
+        ImGui::BeginDisabled(true);
+        ImGui::Button("Connecting...");
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Connecting...");
+    } else {
+        if (ImGui::Button("Disconnect")) {
+            harpoon->Disable();
+        }
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Connected");
+    }
+
+    {
+        std::string err = harpoon->LastError();
+        if (!err.empty()) {
+            ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "Error: %s", err.c_str());
+        }
+    }
+
+    // Waiting for handshake ACK
+    if (isConnected && !isReady) {
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.2f, 1.0f), "Waiting for handshake ACK...");
+        ImGui::TextWrapped("The server hasn't issued our client id yet. Room creation and "
+                           "joining will be enabled once HARPOON.SERVER_INFO arrives.");
+    }
+
+    // Room browser (ready, not in a room)
+    if (isReady && !inRoom) {
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1.0f, 0.84f, 0.0f, 1.0f), "Rooms");
+
+        static char roomIdBuf[64] = "";
+        static char roomPassBuf[64] = "";
+        static char roomNameBuf[64] = "";
+        static char gameModeBuf[64] = "";
+
+        std::vector<std::string> gamemodes = HarpoonSkinSync::GetInstalledGamemodes();
+        bool hasGamemodes = !gamemodes.empty();
+        if (gameModeBuf[0] == '\0' && hasGamemodes) {
+            snprintf(gameModeBuf, sizeof(gameModeBuf), "%s", gamemodes.front().c_str());
+        }
+
+        ImGui::Text("Room Name:");
+        ImGui::SameLine();
+        if (roomNameBuf[0] == '\0') {
+            snprintf(roomNameBuf, sizeof(roomNameBuf), "%s's Room", nameBuf);
+        }
+        ImGui::InputText("##RoomName", roomNameBuf, sizeof(roomNameBuf));
+
+        ImGui::Text("Game Mode:");
+        ImGui::SameLine();
+        ImGui::BeginDisabled(!hasGamemodes);
+        const char* preview = hasGamemodes ? gameModeBuf : "(none installed)";
+        if (ImGui::BeginCombo("##GameMode", preview)) {
+            for (const auto& gm : gamemodes) {
+                bool isSelected = (gm == gameModeBuf);
+                if (ImGui::Selectable(gm.c_str(), isSelected)) {
+                    snprintf(gameModeBuf, sizeof(gameModeBuf), "%s", gm.c_str());
+                }
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndDisabled();
+
+        if (!hasGamemodes) {
+            ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "No gamemodes installed.");
+            ImGui::TextWrapped("Drop pack folders into harpoon/gamemodes/ (each must contain "
+                               "gamemode.yaml).");
+        }
+
+        ImGui::Text("Password:");
+        ImGui::SameLine();
+        ImGui::InputText("##RoomPass", roomPassBuf, sizeof(roomPassBuf));
+
+        ImGui::BeginDisabled(!hasGamemodes);
+        if (ImGui::Button("Create Room")) {
+            harpoon->SetGameMode(gameModeBuf);
+            harpoon->CreateRoom(roomNameBuf, roomPassBuf);
+        }
+        ImGui::EndDisabled();
+
+        ImGui::Separator();
+
+        ImGui::Text("Room ID:");
+        ImGui::SameLine();
+        ImGui::InputText("##RoomId", roomIdBuf, sizeof(roomIdBuf));
+        if (ImGui::Button("Join Room")) {
+            harpoon->JoinRoom(roomIdBuf, roomPassBuf);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Refresh")) {
+            harpoon->RequestRoomList();
+        }
+
+        auto rooms = harpoon->GetRoomListSnapshot();
+        if (!rooms.empty()) {
+            ImGui::Separator();
+            ImGui::Text("Available Rooms:");
+            for (auto& room : rooms) {
+                ImGui::PushID(room.roomId.c_str());
+                ImGui::Text("  %s (%s) [%d/%d] %s%s", room.name.c_str(), room.gameMode.c_str(), room.playerCount,
+                            room.maxPlayers, room.state.c_str(), room.hasPassword ? " [PASS]" : "");
+                ImGui::SameLine();
+                if (ImGui::SmallButton("Join")) {
+                    snprintf(roomIdBuf, sizeof(roomIdBuf), "%s", room.roomId.c_str());
+                    harpoon->JoinRoom(room.roomId, roomPassBuf);
+                }
+                ImGui::PopID();
+            }
+        }
+    }
+
+    // In-room view
+    if (inRoom) {
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1.0f, 0.84f, 0.0f, 1.0f), "Room: %s", harpoon->CurrentRoomId().c_str());
+        ImGui::Text("Mode: %s", harpoon->GameMode().c_str());
+        if (ImGui::Button("Leave Room")) {
+            harpoon->LeaveRoom();
+        }
+
+        ImGui::Separator();
+        ImGui::Text("Players:");
+        ImGui::TextColored(ImVec4(0.6f, 0.9f, 0.6f, 1.0f), "  %s (You)",
+                           CVarGetString("gNetwork.Harpoon.Name", "Player"));
+        for (auto& c : harpoon->GetClientsSnapshot()) {
+            ImVec4 nameColor = ImVec4(((c.colorRgba >> 24) & 0xFF) / 255.0f, ((c.colorRgba >> 16) & 0xFF) / 255.0f,
+                                      ((c.colorRgba >> 8) & 0xFF) / 255.0f, 1.0f);
+            ImGui::TextColored(nameColor, "  %s", c.name.c_str());
+            if (c.sceneId >= 0) {
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "[Scene %d]", c.sceneId);
+            }
+        }
+    }
+
+    // What the room's gamemode.yaml turns on (PvP is not a manual toggle), plus the one display
+    // choice that is each player's own: whether they see the other players' nametags.
+    if (inRoom) {
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1.0f, 0.84f, 0.0f, 1.0f), "Active mode: %s", harpoon->GameMode().c_str());
+        ImGui::Text("PvP %s", harpoon->IsPvpActive() ? "ON" : "OFF");
+
+        bool showNametags = CVarGetInteger("gNetwork.Harpoon.ShowNametags", 1) != 0;
+        if (ImGui::Checkbox("Show player nametags", &showNametags)) {
+            CVarSetInteger("gNetwork.Harpoon.ShowNametags", showNametags);
+        }
+        if (harpoon->IsGeoguessr()) {
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f),
+                               "Geoguessr is meant to be played with these off - find each other by sight.");
+        }
+    }
+}
+
+void BenMenu::AddNetwork() {
+    AddMenuEntry("Network", "gSettings.Menu.NetworkSidebarSection");
+    AddSidebarEntry("Network", "Harpoon", 1);
+    WidgetPath path = { "Network", "Harpoon", SECTION_COLUMN_1 };
+    AddWidget(path, "Harpoon", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) { HarpoonMainMenu(); });
+}
+
+// "Skijer's NEI" — mirror of the same menu in Ship (Shipwright). The sidebar tabs and their
+// contents are kept 1:1 with soh/soh/SohGui/SohMenuNEI.cpp so a feature is always in the same
+// place in both games; anything a game genuinely lacks (Ship's .pak player models, 2ship's boss
+// remains) is simply absent from that game's tab rather than shown as a dead toggle.
+// ---------------------------------------------------------------------------
+// Item Editor — per-item live tuning (Skijer's NEI)
+// ---------------------------------------------------------------------------
+// One section per custom item. Every control writes a `gItemEditor.<Item>.*`
+// CVar that the item's behavior TU reads once per frame, so edits land live and
+// the CVar names are shared with Ship (a preset carries over between games).
+// More items get their own section below as they are made tunable.
+namespace {
+
+struct CapeFloatParam {
+    const char* label;
+    const char* cvar;
+    float min;
+    float max;
+    float def;
+    const char* tooltip;
+};
+
+// Shape ------------------------------------------------------------------
+// Sheikah Slate: where the tablet sits in Link's hand ---------------------
+// Placing a flat slab in a closed fist so it reads like the Hookshot is pure eyeballing, so every
+// part of the transform is exposed. The offsets are applied AFTER the rotations, i.e. along the
+// tablet's own axes, so "up" keeps meaning "up the tablet" whichever way the hand points.
+// Kite Shield — TEMPORARY tuning section (2026-08-20) ---------------------
+// Both transforms were ported from OoT unchanged on the assumption that the two games share a limb
+// space. They do not: the on-back shield needed a placement OoT applies and MM does not, and the
+// surfing board lands flat but yawed. These sliders exist ONLY to dial the MM values in game; once
+// they are right the numbers get baked back into the #defines and this whole section is deleted
+// again, the way the Ship-side popup already was.
+const CapeFloatParam kKiteBoardParams[] = {
+    { "Board Right/Left", "gItemEditor.KiteSurf.BoardOffX", -4000.0f, 4000.0f, -126.82f,
+      "Slides the board across Link." },
+    { "Board Height", "gItemEditor.KiteSurf.BoardOffY", -4000.0f, 1000.0f, -885.38f,
+      "Raises or lowers the board. Drop it until it meets his soles." },
+    { "Board Fwd/Back", "gItemEditor.KiteSurf.BoardOffZ", -4000.0f, 4000.0f, -225.91f,
+      "Slides the board along his facing." },
+    { "Board Pitch (X)", "gItemEditor.KiteSurf.BoardRotX", -180.0f, 180.0f, 51.81f, "Nose up / nose down." },
+    { "Board Yaw (Y)", "gItemEditor.KiteSurf.BoardRotY", -180.0f, 180.0f, 47.84f,
+      "Spins the board flat under him. THIS IS THE ONE to try first in MM: the board comes out\n"
+      "flat but turned sideways, so the answer is almost certainly this value +/- 90." },
+    { "Board Roll (Z)", "gItemEditor.KiteSurf.BoardRotZ", -180.0f, 180.0f, 13.16f, "Tips the board side to side." },
+    { "Board Scale", "gItemEditor.KiteSurf.BoardScale", 1.0f, 200.0f, 46.95f,
+      "Drawn size of the board. Physics does not follow it." },
+};
+
+// The HELD / ON-BACK shield placement. This is also what the equipment page's Link doll shows,
+// because that doll renders the live player skeleton — so if the shield reads wrong there, it is
+// these values, not the kaleido code (the 12 ext icons all draw through one identical path at
+// 32x32, and the Kite Shield's PNG is 32x32 like every other one).
+const CapeFloatParam kKiteShieldHeldParams[] = {
+    { "Shield Offset X", "gItemEditor.KiteSurf.ShieldOffX", -2000.0f, 2000.0f, -508.0f, "Across the shield limb." },
+    { "Shield Offset Y", "gItemEditor.KiteSurf.ShieldOffY", -2000.0f, 2000.0f, -372.0f, "Along the arm." },
+    { "Shield Offset Z", "gItemEditor.KiteSurf.ShieldOffZ", -2000.0f, 2000.0f, -5.0f, "Into / out of the arm." },
+    { "Shield Pitch (X)", "gItemEditor.KiteSurf.ShieldRotX", -180.0f, 180.0f, -95.0f, "" },
+    { "Shield Yaw (Y)", "gItemEditor.KiteSurf.ShieldRotY", -180.0f, 180.0f, -27.0f, "" },
+    { "Shield Roll (Z)", "gItemEditor.KiteSurf.ShieldRotZ", -180.0f, 180.0f, -99.0f, "" },
+    { "Shield Scale", "gItemEditor.KiteSurf.ShieldScale", 1.0f, 200.0f, 44.2f,
+      "Size of the held and on-back shield. Shared with the Divine Shield." },
+    { "On-Back Offset X", "gItemEditor.KiteSurf.BackOffX", -2000.0f, 2000.0f, 630.0f,
+      "The extra placement applied ONLY to the on-back copy. OoT applies this and MM does not,\n"
+      "which is why the shield used to sit mirrored on his back." },
+    { "On-Back Offset Y", "gItemEditor.KiteSurf.BackOffY", -2000.0f, 2000.0f, 100.0f, "" },
+    { "On-Back Offset Z", "gItemEditor.KiteSurf.BackOffZ", -2000.0f, 2000.0f, -30.0f, "" },
+    { "On-Back Roll (Z)", "gItemEditor.KiteSurf.BackRotZ", -180.0f, 180.0f, 180.0f,
+      "Half a turn is what OoT uses. If the back copy is mirrored, this is the value." },
+};
+
+const CapeFloatParam kSlateHandParams[] = {
+    { "Offset Right/Left", "gItemEditor.Slate.OffsetX", -20.0f, 20.0f, -3.036f, "Slides the tablet across the palm." },
+    { "Offset Up/Down", "gItemEditor.Slate.OffsetY", -20.0f, 30.0f, -12.327f,
+      "Slides the tablet along the grip. Raise it until the hand meets the middle of the back." },
+    { "Offset Fwd/Back", "gItemEditor.Slate.OffsetZ", -20.0f, 20.0f, -0.264f,
+      "Pushes the tablet away from or into the palm." },
+    { "Rotate Pitch (X)", "gItemEditor.Slate.RotX", -180.0f, 180.0f, 78.416f,
+      "Tips the top of the tablet toward or away from Link." },
+    { "Rotate Yaw (Y)", "gItemEditor.Slate.RotY", -180.0f, 180.0f, 180.0f,
+      "Turns the screen to face left/right. 90 puts the screen across the grip." },
+    { "Rotate Roll (Z)", "gItemEditor.Slate.RotZ", -180.0f, 180.0f, 13.664f, "Spins the tablet in its own plane." },
+    { "Scale", "gItemEditor.Slate.Scale", 0.005f, 0.2f, 0.146f,
+      "Size of the held tablet. The get-item model is unaffected." },
+};
+
+const CapeFloatParam kCapeShapeParams[] = {
+    { "Scale", "gItemEditor.Cape.Scale", 0.1f, 5.0f, 1.0f,
+      "Master multiplier over both the cape's length and its width." },
+    { "Segment Length", "gItemEditor.Cape.Length", 0.5f, 30.0f, 4.5f,
+      "Length of one cloth segment. The cape is 12 joints deep, so the total\n"
+      "hanging length is about 11x this value. Vanilla: 4.5." },
+    { "Width", "gItemEditor.Cape.Width", 0.1f, 5.0f, 1.0f,
+      "Multiplier over the shoulder-to-shoulder span the cloth is pinned across." },
+    { "Arc Span (deg)", "gItemEditor.Cape.ArcSpan", 10.0f, 360.0f, 180.0f,
+      "Angle the 12 strand roots are spread over. 180 is the vanilla half-circle\n"
+      "around the shoulders; lower values bunch the cape into a narrower cloak,\n"
+      "higher values wrap it further around the body." },
+    { "Arc Bulge", "gItemEditor.Cape.ArcBulge", 0.0f, 4.0f, 1.0f,
+      "Depth of the parabolic arc the roots trace — how far the middle of the cape\n"
+      "bows out behind Link. 0 flattens the arc into a straight line across the\n"
+      "shoulders." },
+    { "Arc Spread", "gItemEditor.Cape.ArcSpread", 0.0f, 4.0f, 1.0f, "Width of that same arc along the shoulder line." },
+};
+
+// Placement & rotation ---------------------------------------------------
+const CapeFloatParam kCapePlacementParams[] = {
+    { "Offset Back/Forward", "gItemEditor.Cape.OffsetX", -50.0f, 50.0f, 0.0f,
+      "Shifts the whole attachment arc backwards (+) or into Link's back (-)." },
+    { "Offset Up/Down", "gItemEditor.Cape.OffsetY", -50.0f, 50.0f, 0.0f,
+      "Raises (+) or lowers (-) the attachment arc along Link's spine." },
+    { "Offset Left/Right", "gItemEditor.Cape.OffsetZ", -50.0f, 50.0f, 0.0f,
+      "Slides the attachment arc sideways along the shoulder line." },
+    { "Yaw (deg)", "gItemEditor.Cape.Yaw", -180.0f, 180.0f, 0.0f,
+      "Turns the cape around Link's vertical axis, on top of the angle derived\n"
+      "from his shoulders." },
+    { "Pitch (deg)", "gItemEditor.Cape.Pitch", -180.0f, 180.0f, 0.0f, "Tips the cape forwards/backwards." },
+    { "Roll (deg)", "gItemEditor.Cape.Roll", -180.0f, 180.0f, 0.0f, "Banks the cape sideways." },
+};
+
+// Physics ----------------------------------------------------------------
+const CapeFloatParam kCapePhysicsParams[] = {
+    { "Gravity", "gItemEditor.Cape.Gravity", -20.0f, 5.0f, -3.0f,
+      "Downward pull applied to every joint each tick. Vanilla: -3.0.\n"
+      "Positive values make the cape float upwards." },
+    { "Back Push", "gItemEditor.Cape.BackPush", -20.0f, 20.0f, -4.0f,
+      "Constant push away from Link's back that keeps the cloth from clipping\n"
+      "into him while standing still. Vanilla: -4.0." },
+    { "Body Radius", "gItemEditor.Cape.MinDist", 0.0f, 60.0f, 8.0f,
+      "How far from Link's center the cloth is held off. Raise it if the cape\n"
+      "clips through a wider custom model. Vanilla: 8.0." },
+    { "Floor Limit", "gItemEditor.Cape.FloorOffset", -400.0f, 0.0f, -200.0f,
+      "Lowest the cloth may hang, relative to Link's feet. Vanilla: -200." },
+    { "Back Sway", "gItemEditor.Cape.BackSway", 0.0f, 3.0f, 0.3f,
+      "Backwards billow per unit of running speed. Vanilla: 0.3." },
+    { "Side Sway", "gItemEditor.Cape.SideSway", 0.0f, 3.0f, 0.15f,
+      "Sideways flutter per unit of running speed. Vanilla: 0.15." },
+    { "Damping", "gItemEditor.Cape.Damping", 0.0f, 1.0f, 0.8f,
+      "Fraction of a joint's velocity carried into the next tick. Lower = stiffer,\n"
+      "higher = floatier and slower to settle. Vanilla: 0.8." },
+    { "Velocity Clamp", "gItemEditor.Cape.VelClamp", 0.5f, 30.0f, 5.0f,
+      "Per-axis speed limit for a joint. Keeps the cloth from exploding on hard\n"
+      "camera cuts. Vanilla: 5.0." },
+    { "Settle Rate", "gItemEditor.Cape.Decel", 0.0f, 1.0f, 0.1f,
+      "How quickly leftover motion bleeds away when Link stops. Vanilla: 0.1." },
+};
+
+void ItemEditorCapeColorWidget(WidgetInfo& info) {
+    float col[4] = {
+        CVarGetInteger("gItemEditor.Cape.ColorR", 255) / 255.0f,
+        CVarGetInteger("gItemEditor.Cape.ColorG", 255) / 255.0f,
+        CVarGetInteger("gItemEditor.Cape.ColorB", 255) / 255.0f,
+        CVarGetInteger("gItemEditor.Cape.ColorA", 255) / 255.0f,
+    };
+
+    if (ImGui::ColorEdit4("Cape Color##ItemEditorCape", col, ImGuiColorEditFlags_AlphaBar)) {
+        CVarSetInteger("gItemEditor.Cape.ColorR", (int32_t)(col[0] * 255.0f + 0.5f));
+        CVarSetInteger("gItemEditor.Cape.ColorG", (int32_t)(col[1] * 255.0f + 0.5f));
+        CVarSetInteger("gItemEditor.Cape.ColorB", (int32_t)(col[2] * 255.0f + 0.5f));
+        CVarSetInteger("gItemEditor.Cape.ColorA", (int32_t)(col[3] * 255.0f + 0.5f));
+        Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+    }
+    UIWidgets::Tooltip("Tints the Ganondorf cape texture. White = untouched.\n"
+                       "Dropping the alpha below 255 also moves the cloth onto the translucent\n"
+                       "render pass so it actually blends instead of being drawn opaque.");
+}
+
+void ItemEditorResetSlate() {
+    for (const auto& p : kSlateHandParams) {
+        CVarSetFloat(p.cvar, p.def);
+    }
+    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+}
+
+void ItemEditorResetCape() {
+    static const char* kIntCVars[] = { "gItemEditor.Cape.ColorR", "gItemEditor.Cape.ColorG", "gItemEditor.Cape.ColorB",
+                                       "gItemEditor.Cape.ColorA" };
+
+    for (const auto& p : kCapeShapeParams) {
+        CVarSetFloat(p.cvar, p.def);
+    }
+    for (const auto& p : kCapePlacementParams) {
+        CVarSetFloat(p.cvar, p.def);
+    }
+    for (const auto& p : kCapePhysicsParams) {
+        CVarSetFloat(p.cvar, p.def);
+    }
+    for (const char* cvar : kIntCVars) {
+        CVarSetInteger(cvar, 255);
+    }
+    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+}
+
+// ---------------------------------------------------------------------------
+// Sheikah Sensor rune — the five wished-for items (Skijer's NEI)
+// ---------------------------------------------------------------------------
+// Mirror of Ship's picker in SohMenuNEI.cpp, over MM's own item table.
+
+const std::vector<std::pair<int32_t, std::string>>& SensorItemChoices() {
+    static std::vector<std::pair<int32_t, std::string>> choices;
+
+    if (choices.empty()) {
+        for (auto& [randoItemId, item] : Rando::StaticData::Items) {
+            if (randoItemId <= RI_NONE || randoItemId >= RI_MAX || item.name == nullptr || item.name[0] == '\0') {
+                continue;
+            }
+            choices.emplace_back((int32_t)randoItemId, item.name);
+        }
+        std::sort(choices.begin(), choices.end(), [](const auto& a, const auto& b) { return a.second < b.second; });
+    }
+    return choices;
+}
+
+std::string SensorDesireName(int32_t randoItemId) {
+    auto item = Rando::StaticData::Items.find((RandoItemId)randoItemId);
+
+    if (item == Rando::StaticData::Items.end() || item->second.name == nullptr || item->second.name[0] == '\0') {
+        return "(empty)";
+    }
+    return item->second.name;
+}
+
+} // namespace
+
+void DrawSensorDesirePicker() {
+    static char search[SENSOR_DESIRE_SLOTS][64] = {};
+
+    ImGui::TextWrapped("Casting the Sheikah Slate's Sensor rune answers for the FIRST of these still "
+                       "out there, so the order is the priority. Each answer costs a Heart Container.");
+
+    for (int32_t slot = 0; slot < SENSOR_DESIRE_SLOTS; slot++) {
+        std::string cvar = std::string(CVAR_SENSOR_DESIRE_PREFIX) + std::to_string(slot);
+        int32_t current = CVarGetInteger(cvar.c_str(), RI_NONE);
+        std::string label = "Desire " + std::to_string(slot + 1) + "##sensorDesire" + std::to_string(slot);
+
+        if (ImGui::BeginCombo(label.c_str(), SensorDesireName(current).c_str())) {
+            ImGui::InputTextWithHint("##sensorSearch", "Search", search[slot], sizeof(search[slot]));
+
+            if (ImGui::Selectable("(empty)", current <= RI_NONE)) {
+                CVarSetInteger(cvar.c_str(), RI_NONE);
+                Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+            }
+            for (const auto& [randoItemId, name] : SensorItemChoices()) {
+                if (search[slot][0] != '\0' && name.find(search[slot]) == std::string::npos) {
+                    continue;
+                }
+                if (ImGui::Selectable(name.c_str(), randoItemId == current)) {
+                    CVarSetInteger(cvar.c_str(), randoItemId);
+                    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+                }
+            }
+            ImGui::EndCombo();
+        }
+    }
+}
+
+void BenMenu::AddNEI() {
+    AddMenuEntry("Skijer's NEI", "gSettings.Menu.SkijerNEISidebarSection");
+
+    // Sidebar order is shared with Ship's Skijer's NEI menu.
+    AddSidebarEntry("Skijer's NEI", "Custom Items", 3);
+    AddSidebarEntry("Skijer's NEI", "Item Editor", 2);
+    AddSidebarEntry("Skijer's NEI", "Masks", 1);
+    AddSidebarEntry("Skijer's NEI", "Spells", 1);
+    AddSidebarEntry("Skijer's NEI", "Modes", 1);
+    AddSidebarEntry("Skijer's NEI", "Controls", 1);
+
+    // ===================== Tab: Custom Items =====================
+    WidgetPath itemsPath = { "Skijer's NEI", "Custom Items", SECTION_COLUMN_1 };
+    AddWidget(itemsPath, "Custom Items", WIDGET_SEPARATOR_TEXT);
+    AddWidget(itemsPath, "Custom Items Page", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.CustomItems.Enabled")
+        .Options(CheckboxOptions()
+                     .Tooltip("Second item-kaleido page with the NEI custom items.\nPress L on the item page to "
+                              "cycle pages.")
+                     .DefaultValue(true));
+    AddWidget(itemsPath, "Give All Custom Items (one-shot)", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.CustomItems.GiveAll")
+        .Options(CheckboxOptions().Tooltip("Grants every NEI custom item on the next gameplay frame, then clears."));
+
+    // --- OoT Quest Page (mirror of Ship's "MM Quest Page" block) ---
+    AddWidget(itemsPath, "OoT Quest Page", WIDGET_SEPARATOR_TEXT);
+    AddWidget(itemsPath, "Interact With OoT Quest Page", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.SkijerNEI.QuestPageInteract")
+        .Options(CheckboxOptions().DefaultValue(true).Tooltip(
+            "On the pause quest page, press L to flip to OoT's Quest Status layout. While on (the "
+            "default), a cursor (stick/DPad) lets you EQUIP a medallion to a C button (hover it + "
+            "C-left/down/right) and toggle a spiritual stone's passive buff (hover it + A)."));
+    AddWidget(itemsPath, "Songs: Pause Play (skip minigame)", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.SkijerNEI.PausePlay")
+        .Options(CheckboxOptions().Tooltip(
+            "On the OoT Quest Status page, if you hold an ocarina (Ocarina of Time or, once added, the "
+            "Fairy Ocarina), pressing A on a learned song plays it overworld-style — a quick playback + "
+            "its effect (the song event is latched for the warp/effect pass) — INSTEAD of the learn-it "
+            "minigame. OFF (default) = the learn-it minigame. Requires 'Interact With OoT Quest Page'."));
+    itemsPath.column = SECTION_COLUMN_2;
+    AddWidget(itemsPath, "Weapon Upgrade Appearance", WIDGET_SEPARATOR_TEXT);
+    AddWidget(itemsPath, "Gilded Sword: use Gilded look", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.SkijerNEI.GildedUsesGildedLook")
+        .Options(CheckboxOptions().Tooltip("Kokiri chain shows the Gilded model/icon at level 2.").DefaultValue(true));
+    AddWidget(itemsPath, "Biggoron Upgrade: use Great Fairy's Sword look", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.SkijerNEI.BgsUsesGfsLook")
+        .Options(CheckboxOptions().Tooltip("BGS upgrade shows the GFS model/icon.").DefaultValue(true));
+    AddWidget(itemsPath, "Enable Extra Equipment", WIDGET_CVAR_CHECKBOX)
+        .CVar("gCheats.ExtEquip.Enabled")
+        .Options(CheckboxOptions().Tooltip(
+            "Adds 12 new equipment pieces (3 swords, 3 shields, 3 tunics, 3 boots).\n"
+            "Press L on the equipment page to toggle between vanilla and extended equipment."));
+    itemsPath.column = SECTION_COLUMN_3;
+    AddWidget(itemsPath, "Roc's Items", WIDGET_SEPARATOR_TEXT);
+    AddWidget(itemsPath, "Roc's Items Use MM Animations", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.RocsItemsUseMmAnims")
+        .Options(CheckboxOptions().Tooltip("Roc's Feather/Cape jump uses the MM anim set."));
+    AddWidget(itemsPath, "Invert Roc's Items Animations", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.RocsItems.InvertAnims")
+        .PreFunc([](WidgetInfo& info) {
+            if (!CVarGetInteger("gEnhancements.RocsItemsUseMmAnims", 0)) {
+                info.options->disabled = true;
+                info.options->disabledTooltip = "Enable 'Roc's Items Use MM Animations' first.";
+            }
+        })
+        .Options(CheckboxOptions().Tooltip("Swap which anim plays on jump vs double-jump."));
+    AddWidget(itemsPath, "NEI Aim Cycle (R/L while aiming)", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.NeiAimCycle")
+        .Options(CheckboxOptions().Tooltip("Cycle between elements while aiming. R = next, L = previous.\n"
+                                           "Applies to the bow, the slingshot and the Gust Jar; the arrow wheel also\n"
+                                           "includes Bombchus once you own any."));
+
+    // ===================== Tab: Item Editor =====================
+    WidgetPath editorPath = { "Skijer's NEI", "Item Editor", SECTION_COLUMN_1 };
+    AddWidget(editorPath, "Item Editor", WIDGET_SEPARATOR_TEXT);
+    AddWidget(editorPath,
+              "Live tuning for the custom items. Everything here writes gItemEditor.* CVars that the "
+              "item's behavior reads every frame, so changes apply instantly and are shared with Ship "
+              "(the same preset works in both games). One section per item — more items land here as "
+              "they are made tunable.",
+              WIDGET_TEXT);
+
+    // ── Dual Cane wheel shape (user 2026-08-06). Four configurations for the shared cell 45 wheel;
+    // a base cane only leaves the wheel once its own end-item is owned (Nei_CaneTypeVisible). The
+    // CVar name is shared with Ship so the option carries over between games.
+    AddWidget(editorPath, "Dual Cane", WIDGET_SEPARATOR_TEXT);
+    static std::unordered_map<int32_t, const char*> caneWheelModeOptions = {
+        { 0, "Somaria - Trirod - Pacci - Ultrahand" },
+        { 1, "Trirod - Ultrahand" },
+        { 2, "Somaria - Trirod - Ultrahand" },
+        { 3, "Trirod - Pacci - Ultrahand" },
+    };
+    AddWidget(editorPath, "Cane Wheel Shape", WIDGET_CVAR_COMBOBOX)
+        .CVar("gItemEditor.CaneWheelMode")
+        .Options(ComboboxOptions()
+                     .ComboMap(&caneWheelModeOptions)
+                     .DefaultIndex(0)
+                     .Tooltip("Which canes ride the shared wheel. A base cane is only hidden once\n"
+                              "its own end-item (Trirod / Ultrahand) is owned, so the cell can\n"
+                              "never lose the only cane you have."));
+
+    AddWidget(editorPath, "Sheikah Sensor: Desired Items", WIDGET_SEPARATOR_TEXT);
+    AddWidget(editorPath, "Desired Items", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        DrawSensorDesirePicker();
+    });
+
+    // ── Sheikah Slate: in-hand placement. The tablet is drawn off the forearm→hand vector every
+    // frame (object_sheikah_slate.c), so these land live while it is out — draw it with C and drag.
+    AddWidget(editorPath, "Sheikah Slate (in hand)", WIDGET_SEPARATOR_TEXT);
+    AddWidget(editorPath, "Reset Slate to Defaults", WIDGET_BUTTON)
+        .Callback([](WidgetInfo& info) { ItemEditorResetSlate(); })
+        .Options(ButtonOptions()
+                     .Size(Sizes::Inline)
+                     .Tooltip("Puts the hand placement back to the values the slate ships with."));
+    for (const auto& p : kSlateHandParams) {
+        AddWidget(editorPath, p.label, WIDGET_CVAR_SLIDER_FLOAT)
+            .CVar(p.cvar)
+            .Options(FloatSliderOptions().Min(p.min).Max(p.max).DefaultValue(p.def).Step(0.005f).Format("%.3f").Tooltip(
+                p.tooltip));
+    }
+
+    // ── Kite Shield: TEMPORARY. Equip the Kite Shield (ext shield 2) and jump to get on the board;
+    // the shield rows also drive what the equipment page's Link doll shows. Delete this whole block
+    // once the values are dialled and baked. Skijer's NEI
+    AddWidget(editorPath, "Kite Shield (TEMP - bake and remove)", WIDGET_SEPARATOR_TEXT);
+    AddWidget(editorPath, "Reset Kite Shield to Defaults", WIDGET_BUTTON)
+        .Callback([](WidgetInfo& info) {
+            for (const auto& p : kKiteBoardParams) {
+                CVarSetFloat(p.cvar, p.def);
+            }
+            for (const auto& p : kKiteShieldHeldParams) {
+                CVarSetFloat(p.cvar, p.def);
+            }
+            Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+        })
+        .Options(ButtonOptions().Size(Sizes::Inline).Tooltip("Back to the values baked in the code."));
+    for (const auto& p : kKiteBoardParams) {
+        AddWidget(editorPath, p.label, WIDGET_CVAR_SLIDER_FLOAT)
+            .CVar(p.cvar)
+            .Options(FloatSliderOptions().Min(p.min).Max(p.max).DefaultValue(p.def).Step(0.01f).Format("%.2f").Tooltip(
+                p.tooltip));
+    }
+    for (const auto& p : kKiteShieldHeldParams) {
+        AddWidget(editorPath, p.label, WIDGET_CVAR_SLIDER_FLOAT)
+            .CVar(p.cvar)
+            .Options(FloatSliderOptions().Min(p.min).Max(p.max).DefaultValue(p.def).Step(0.01f).Format("%.2f").Tooltip(
+                p.tooltip));
+    }
+
+    AddWidget(editorPath, "Magic Cape", WIDGET_SEPARATOR_TEXT);
+    AddWidget(editorPath, "Enable Custom Cape Settings", WIDGET_CVAR_CHECKBOX)
+        .CVar("gItemEditor.Cape.Custom")
+        .Options(
+            CheckboxOptions().Tooltip("Master switch for this section. OFF (default) makes the cape use its built-in\n"
+                                      "values and ignore every control below, so you can A/B a tune against vanilla\n"
+                                      "without resetting anything."));
+    AddWidget(editorPath, "Reset Cape to Defaults", WIDGET_BUTTON)
+        .Callback([](WidgetInfo& info) { ItemEditorResetCape(); })
+        .Options(ButtonOptions()
+                     .Size(Sizes::Inline)
+                     .Tooltip("Puts every cape control below back to the value the cloth ships with."));
+
+    AddWidget(editorPath, "Cape: Shape & Size", WIDGET_SEPARATOR_TEXT);
+    for (const auto& p : kCapeShapeParams) {
+        AddWidget(editorPath, p.label, WIDGET_CVAR_SLIDER_FLOAT)
+            .CVar(p.cvar)
+            .PreFunc([](WidgetInfo& info) {
+                if (!CVarGetInteger("gItemEditor.Cape.Custom", 0)) {
+                    info.options->disabled = true;
+                    info.options->disabledTooltip = "Enable 'Enable Custom Cape Settings' first.";
+                }
+            })
+            .Options(FloatSliderOptions().Min(p.min).Max(p.max).DefaultValue(p.def).Step(0.05f).Format("%.2f").Tooltip(
+                p.tooltip));
+    }
+
+    AddWidget(editorPath, "Cape: Placement & Rotation", WIDGET_SEPARATOR_TEXT);
+    for (const auto& p : kCapePlacementParams) {
+        AddWidget(editorPath, p.label, WIDGET_CVAR_SLIDER_FLOAT)
+            .CVar(p.cvar)
+            .PreFunc([](WidgetInfo& info) {
+                if (!CVarGetInteger("gItemEditor.Cape.Custom", 0)) {
+                    info.options->disabled = true;
+                    info.options->disabledTooltip = "Enable 'Enable Custom Cape Settings' first.";
+                }
+            })
+            .Options(FloatSliderOptions().Min(p.min).Max(p.max).DefaultValue(p.def).Step(0.5f).Format("%.1f").Tooltip(
+                p.tooltip));
+    }
+
+    editorPath.column = SECTION_COLUMN_2;
+    AddWidget(editorPath, "Cape: Physics", WIDGET_SEPARATOR_TEXT);
+    for (const auto& p : kCapePhysicsParams) {
+        AddWidget(editorPath, p.label, WIDGET_CVAR_SLIDER_FLOAT)
+            .CVar(p.cvar)
+            .PreFunc([](WidgetInfo& info) {
+                if (!CVarGetInteger("gItemEditor.Cape.Custom", 0)) {
+                    info.options->disabled = true;
+                    info.options->disabledTooltip = "Enable 'Enable Custom Cape Settings' first.";
+                }
+            })
+            .Options(FloatSliderOptions().Min(p.min).Max(p.max).DefaultValue(p.def).Step(0.05f).Format("%.2f").Tooltip(
+                p.tooltip));
+    }
+
+    AddWidget(editorPath, "Cape: Color", WIDGET_SEPARATOR_TEXT);
+    AddWidget(editorPath, "Cape Color", WIDGET_CUSTOM).CustomFunction(ItemEditorCapeColorWidget);
+
+    // ===================== Tab: Masks =====================
+    WidgetPath masksPath = { "Skijer's NEI", "Masks", SECTION_COLUMN_1 };
+    AddWidget(masksPath, "Mask Transformations", WIDGET_SEPARATOR_TEXT);
+    AddWidget(masksPath, "Kafei Mask Transform", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.KafeiMaskTransform")
+        .Options(CheckboxOptions().Tooltip("Kafei mask transforms the player."));
+    AddWidget(masksPath, "Gerudo Mask Transform", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.GerudoMaskTransform")
+        .Options(CheckboxOptions().Tooltip("Gerudo mask transforms the player."));
+    AddWidget(masksPath, "Garo Mask Transform", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.GaroMaskTransform")
+        .Options(CheckboxOptions().DefaultValue(true).Tooltip("Garo mask transforms the player."));
+
+    AddWidget(masksPath, "MM Masks", WIDGET_SEPARATOR_TEXT);
+    AddWidget(masksPath, "MM Masks Page (Inventory + Effects)", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.MmMasks.InventoryEnabled")
+        .Options(CheckboxOptions().Tooltip("Third item-kaleido page listing the MM masks.").DefaultValue(true));
+    AddWidget(masksPath, "Enable Transformation Masks", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.TransformMasks.Enabled")
+        .Options(CheckboxOptions().Tooltip("Deku/Goron/Zora/FD transformation-mask systems.").DefaultValue(true));
+    AddWidget(masksPath, "Instant Transform", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.TransformMasks.InstantTransform")
+        .Options(CheckboxOptions().Tooltip("Skip the transformation cutscene."));
+    AddWidget(masksPath, "Instant Blast Mask", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.BlastMask.Instant")
+        .Options(CheckboxOptions().Tooltip("Blast Mask detonates instantly."));
+    AddWidget(masksPath, "Mute MM Audio", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.SkijerNEI.MuteMmAudio")
+        .Options(CheckboxOptions().Tooltip("Mutes the ported MM sound effects."));
+
+    // --- Boss Remains (wearable masks). 2ship only — Ship has no boss-remains system. ---
+    AddWidget(masksPath, "Boss Remains", WIDGET_SEPARATOR_TEXT);
+    AddWidget(masksPath, "Enable Boss Remains Masks", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.BossRemains.Enabled")
+        .Options(CheckboxOptions().DefaultValue(true).Tooltip(
+            "The 4 boss remains (Odolwa/Goht/Gyorg/Twinmold) become wearable masks. Equip one to a C or "
+            "D-pad button from the quest page (hover it + C-left/down/right, or a D-pad slot with DpadEquips), "
+            "then press that button in-game to don/doff it on Link's face. While worn, A does a custom action."));
+
+    // ===================== Tab: Spells =====================
+    WidgetPath spellsPath = { "Skijer's NEI", "Spells", SECTION_COLUMN_1 };
+    AddWidget(spellsPath, "Spells & Spiritual Stones", WIDGET_SEPARATOR_TEXT);
+    AddWidget(spellsPath, "SW97 Medallion Spells", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.SkijerNEI.SW97Medallions")
+        .Options(CheckboxOptions().DefaultValue(true).Tooltip(
+            "Equip quest medallions to C-buttons from Quest Status.\n"
+            "C = cast elemental spell, L+C = set elemental arrow/slingshot bullet.\n\n"
+            "Credit: z64proto/sw97 team (spell/arrow actors)"));
+    AddWidget(spellsPath, "Enable Spiritual Stones", WIDGET_CVAR_CHECKBOX)
+        .CVar("gMods.SpiritualStones.Enabled")
+        .Options(CheckboxOptions().DefaultValue(true).Tooltip(
+            "Master toggle for the custom Spiritual Stones behavior.\n"
+            "ON: each owned stone toggles (A on the Quest page) a passive buff\n"
+            "(Kokiri = faster walk, Goron = climb, Zora = swim), and held on a C/D-pad slot\n"
+            "sets/warps to a saved waypoint statue.\n"
+            "OFF: the stones behave like vanilla (no custom behavior)."));
+
+    // ===================== Tab: Modes =====================
+    WidgetPath modesPath = { "Skijer's NEI", "Modes", SECTION_COLUMN_1 };
+    AddWidget(modesPath, "Crossover Items", WIDGET_SEPARATOR_TEXT);
+    AddWidget(modesPath, "Enable Crossover Items", WIDGET_CVAR_CHECKBOX)
+        .CVar("gBrokenItems.Enabled")
+        .Options(CheckboxOptions().Tooltip(
+            "Form selector (Link / Mario / Pikachu) on the equipment page's transform sub-page (L cycles).\n"
+            "Mario needs the Mario Mask and Pikachu needs the Pokeball; both are randomizer items\n"
+            "(see 'Include Mario Mask' / 'Include Pikachu Pokeball' in the rando item pool).\n"
+            "Pikachu has no transformation in 2Ship yet — the form selects but Link does not change."));
+
+    // Quick transform. The pad button is read straight from SDL (CrossoverHotkey_Tick in
+    // BenPort.cpp) because Back/Select has no N64 button to map it onto.
+    static std::unordered_map<int32_t, const char*> quickTransformKeyOptions = {
+        { SDL_SCANCODE_0, "0 (default)" }, { SDL_SCANCODE_1, "1" }, { SDL_SCANCODE_2, "2" }, { SDL_SCANCODE_3, "3" },
+        { SDL_SCANCODE_4, "4" },           { SDL_SCANCODE_5, "5" }, { SDL_SCANCODE_6, "6" }, { SDL_SCANCODE_7, "7" },
+        { SDL_SCANCODE_8, "8" },           { SDL_SCANCODE_9, "9" }, { SDL_SCANCODE_T, "T" }, { SDL_SCANCODE_G, "G" },
+        { SDL_SCANCODE_V, "V" },
+    };
+    static std::unordered_map<int32_t, const char*> quickTransformPadOptions = {
+        { SDL_CONTROLLER_BUTTON_BACK, "Back / Select (default)" },
+        { SDL_CONTROLLER_BUTTON_GUIDE, "Guide / Home" },
+        { SDL_CONTROLLER_BUTTON_LEFTSTICK, "Left stick click" },
+        { SDL_CONTROLLER_BUTTON_RIGHTSTICK, "Right stick click" },
+    };
+
+    AddWidget(modesPath, "Quick Transform", WIDGET_CVAR_CHECKBOX)
+        .CVar("gCrossover.Hotkey.Enabled")
+        .Options(CheckboxOptions().DefaultValue(true).Tooltip(
+            "One key/button turns you into the form equipped on the Crossover Items sub-page and\n"
+            "back into Link, without opening the pause menu.\n"
+            "Ignored while the pause menu or this menu is open."));
+    AddWidget(modesPath, "Quick Transform Key", WIDGET_CVAR_COMBOBOX)
+        .CVar("gCrossover.Hotkey.Key")
+        .PreFunc([](WidgetInfo& info) { info.isHidden = !CVarGetInteger("gCrossover.Hotkey.Enabled", 1); })
+        .Options(ComboboxOptions().ComboMap(&quickTransformKeyOptions).DefaultIndex(SDL_SCANCODE_0));
+    AddWidget(modesPath, "Quick Transform Button", WIDGET_CVAR_COMBOBOX)
+        .CVar("gCrossover.Hotkey.Pad")
+        .PreFunc([](WidgetInfo& info) { info.isHidden = !CVarGetInteger("gCrossover.Hotkey.Enabled", 1); })
+        .Options(ComboboxOptions().ComboMap(&quickTransformPadOptions).DefaultIndex(SDL_CONTROLLER_BUTTON_BACK));
+
+    // ===================== Tab: Randomizer =====================
+    // The Fleet Ship Combo block is this tab's only content, so the sidebar entry follows it.
+    if (FleetShipCombo_ShowMenuUi()) {
+        AddSidebarEntry("Skijer's NEI", "Randomizer", 1);
+        WidgetPath path = { "Skijer's NEI", "Randomizer", SECTION_COLUMN_1 };
+        AddFleetComboSection(path);
+    }
+
+    // (The "Bomb Arrows: Auto-grant with Bomb Bag" checkbox lives in the randomizer's Shuffles tab
+    // now, as the middle value of the "Shuffle Bomb Arrows" dropdown — Bomb Arrows stopped being an
+    // inventory item and became the last entry of the bow's element wheel. Skijer's NEI)
+
+    // ===================== Tab: Controls =====================
+    WidgetPath controlsPath = { "Skijer's NEI", "Controls", SECTION_COLUMN_1 };
+    AddWidget(controlsPath, "Pause Menu", WIDGET_SEPARATOR_TEXT);
+    AddWidget(controlsPath, "Equip Items on D-Pad", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.Dpad.DpadEquips")
+        .Options(CheckboxOptions().Tooltip(
+            "Allow equipping items to the D-Pad directions.\n"
+            "Same setting as Enhancements > Items > D-Pad Equips — surfaced here for convenience."));
+
+    AddWidget(controlsPath, "Camera", WIDGET_SEPARATOR_TEXT);
+    AddWidget(controlsPath, "Free Camera", WIDGET_CVAR_CHECKBOX)
+        .CVar("gEnhancements.Camera.FreeLook.Enable")
+        .Options(CheckboxOptions().Tooltip(
+            "Enables free camera control (right stick / mouse).\n"
+            "Same setting as Enhancements > Camera > Free Look — surfaced here for convenience."));
+}
+
+// Fleet Ship Combo: live MM <-> OoT switch (mirrors Ship > Skijer's NEI > Randomizer).
+// CVar namespace ("isFleetShipCombo[X]"):
+//   isFleetShipCombo.Enabled - master toggle / launcher bootstrap (see FleetShipCombo.cpp)
+//   isPlayerIn2Ship          - persistent "where is the player": 1 = Majora's Mask (2ship),
+//                              0 = Ocarina of Time (Ship). Single source of truth for the
+//                              active game; also drives auto-start on next launch.
+// For now this only flips & persists isPlayerIn2Ship. Frente B wires the real seamless
+// hand-off (pause the inactive game's session + cross-process shared-texture compositing).
+void BenMenu::AddFleetComboSection(WidgetPath& path) {
+    AddWidget(path, "Fleet Ship Combo (MM <-> OoT)", WIDGET_SEPARATOR_TEXT);
+
+    AddWidget(path, "Enable Fleet Ship Combo", WIDGET_CVAR_CHECKBOX)
+        .CVar("isFleetShipCombo.Enabled")
+        .Options(
+            CheckboxOptions().Tooltip("Master switch for running OoT (Ship) and MM (2ship) together.\n\n"
+                                      "RESTART REQUIRED after toggling: the second game is launched at boot.\n"
+                                      "Place 2ship.exe in a '2ship' folder next to soh.exe (Ship/2ship/2ship.exe)."));
+
+    // Live status so you always know which game you're in (and whether the combo is up).
+    AddWidget(path, "Combo Status", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        int32_t active = FleetShipCombo_GetActiveGame();
+        if (active < 0) {
+            ImGui::TextColored(ImVec4(0.95f, 0.7f, 0.3f, 1.0f), "Combo NOT running (single game).");
+            ImGui::TextWrapped("Enable above + restart, and put 2ship.exe under Ship/2ship/.");
+        } else {
+            ImGui::TextColored(ImVec4(0.6f, 0.9f, 0.6f, 1.0f), "Active game: %s",
+                               active == 1 ? "Majora's Mask (2ship)" : "Ocarina of Time (Ship)");
+        }
+    });
+
+    AddWidget(path, "Switch Active Game", WIDGET_BUTTON)
+        .Callback([](WidgetInfo& info) {
+            // Use shared memory as the source of truth for the CURRENT active game so
+            // the toggle stays correct no matter which process last switched.
+            int32_t cur = FleetShipCombo_GetActiveGame();
+            if (cur < 0) {
+                // No shared region -> the combo isn't actually running two games.
+                Notification::Emit({
+                    .message = "Combo not running - enable it and restart (need 2ship.exe under Ship/2ship/).",
+                });
+                return;
+            }
+            int32_t next = cur ? 0 : 1; // 1 = MM (2ship), 0 = OoT (Ship)
+            Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+            // Publish to shared memory so BOTH processes freeze/unfreeze + show/hide in sync.
+            FleetShipCombo_SetActiveGame(next);
+            FleetShipCombo_SetUiFocus(next); // front window follows the newly-active game
+            Notification::Emit({
+                .message = next ? "Switching to Majora's Mask..." : "Switching to Ocarina of Time...",
+            });
+        })
+        .Options(ButtonOptions().Tooltip(
+            "Toggle the active game between Ocarina of Time and Majora's Mask at any time.\n"
+            "Both games stay loaded and running; the inactive one's session is paused (seamless).\n\n"
+            "Persists 'isPlayerIn2Ship' so the combo remembers which game you're in and can\n"
+            "auto-start there next launch.\n\n"
+            "NOTE: the runtime hand-off (session pause + cross-process compositing) is still\n"
+            "being wired up. For now this just flips and remembers the active game."));
+
+    // The "Back to Ship UI" switch moved to the menu's top tab row (DrawFleetShipComboTabs):
+    // selecting the "Ship of Harkinian" tab parks 2ship off-screen and returns to Ship.
+}
+
 BenMenu::BenMenu(const std::string& consoleVariable, const std::string& name)
     : Menu(consoleVariable, name, 0, UIWidgets::Colors::LightBlue) {
 }
@@ -2326,6 +3309,8 @@ void BenMenu::InitElement() {
     AddSettings();
     AddEnhancements();
     AddDevTools();
+    AddNetwork();
+    AddNEI();
 
     if (CVarGetInteger("gSettings.Menu.SidebarSearch", 0)) {
         InsertSidebarSearch();

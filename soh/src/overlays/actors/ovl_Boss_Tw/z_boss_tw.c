@@ -6,6 +6,7 @@
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/transformation_masks/boss_super_damage.h"
 #include "soh/Enhancements/savestate_serialize.h"
 
 #include <string.h>
@@ -2901,13 +2902,59 @@ void BossTw_Update(Actor* thisx, PlayState* play) {
         this->collider.dim.height = 120;
         this->collider.dim.yShift = -30;
 
+        // ALWAYS register AC (even with INVINC_TIMER) so Gigantamax can hit.
+        // FD/Pika: widen the witch's bumper to accept EVERY damage flag so FD's remote sword
+        // beam (EnMThunder, dmgFlags 0x02000000) reliably lands its AC/AT hit — without an
+        // accepted flag the beam's AT_HIT never fires, so it neither damages NOR despawns
+        // (it just flies through = the "multi-hit that won't die" look). Only while in form,
+        // so normal play is unaffected.
+        if (BossSuperDamage_IsFormActive(play)) {
+            this->collider.info.bumper.dmgFlags = 0xFFFFFFFF;
+        }
+        Collider_UpdateCylinder(&this->actor, &this->collider);
+        CollisionCheck_SetAC(play, &play->colChkCtx, &this->collider.base);
+
+        // FD / Pika Gigantamax — PHASE 1 (the two witches). User request: each hit counts
+        // as one shield-magic reflect. Vanilla makes you charge the Mirror Shield with an
+        // element and reflect a beam to score a hit (health++ on a witch); the witches
+        // merge once their combined health reaches 4 (checked in BossTw_Wait on the
+        // TW_TWINROVA actor, which requires BOTH witches in FlyTo). So here a direct FD/Pika
+        // hit just does health++ and sends the witch to FlyTo; when the running total hits
+        // the merge threshold we push BOTH witches to FlyTo so the merge fires. Throttled
+        // by INVINC_TIMER. Detected by accepted AC hit OR the geometric FD reach (bypasses
+        // dmgFlags). Gated on IsFormActive → normal shield-reflect play is untouched.
+        // The witches fly HIGH, so FD's ground-level sword can't reach them by raw 3D
+        // distance (Pika's huge AOE does). Project the witch down to the player's Y so the
+        // horizontal FD swing/touch reaches it — same trick used for Barinade's high parts.
+        Vec3f twWitchFlat = this->actor.world.pos;
+        twWitchFlat.y = GET_PLAYER(play)->actor.world.pos.y + 40.0f;
+        if (BossSuperDamage_IsFormActive(play) && (this->work[INVINC_TIMER] == 0) &&
+            (this->actionFunc != BossTw_MergeCS) &&
+            ((this->collider.base.acFlags & AC_HIT) ||
+             BossSuperDamage_FormAttackReaches(play, &twWitchFlat, BossSuperDamage_FormAttackRange(play) + 100.0f))) {
+            this->collider.base.acFlags &= ~AC_HIT;
+            this->actor.colChkInfo.health++;
+            this->work[INVINC_TIMER] = 10; // short → you can MASH (hits land during the reel too)
+            BossSuperDamage_StartElectricSparks(&this->actor, 60); // FD/Pika electric VFX on the witch
+            Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_YOUNG_DAMAGE);
+            play->envCtx.unk_D8 = 1.0f;
+            // Play the "hit by reflected beam" reel ONCE (don't restart it every mash hit) —
+            // mashing keeps incrementing health while she reels.
+            if (this->actionFunc != BossTw_HitByBeam) {
+                BossTw_SetupHitByBeam(this, play);
+            }
+            // Once the combined total reaches the merge threshold, force BOTH witches to FlyTo
+            // so the Twinrova actor's BossTw_Wait sees both in FlyTo with sum>=4 → merge CS.
+            if ((sKoumePtr->actor.colChkInfo.health + sKotakePtr->actor.colChkInfo.health) >= 4) {
+                BossTw_SetupFlyTo(sKoumePtr, play);
+                BossTw_SetupFlyTo(sKotakePtr, play);
+            }
+        }
+
         if (this->work[INVINC_TIMER] == 0) {
             if (this->collider.base.acFlags & AC_HIT) {
                 this->collider.base.acFlags &= ~AC_HIT;
             }
-
-            Collider_UpdateCylinder(&this->actor, &this->collider);
-            CollisionCheck_SetAC(play, &play->colChkCtx, &this->collider.base);
             CollisionCheck_SetAT(play, &play->colChkCtx, &this->collider.base);
         }
 
@@ -3083,6 +3130,33 @@ void BossTw_TwinrovaUpdate(Actor* thisx, PlayState* play2) {
     this->collider.dim.height = 150;
     this->collider.dim.yShift = -60;
     Collider_UpdateCylinder(&this->actor, &this->collider);
+
+    // FD / Pika Gigantamax — PHASE 2 (merged Twinrova): unified paralyze-or-damage.
+    // BossTw_TwinrovaDamage already branches on state — if she is NOT in BossTw_TwinrovaStun
+    // it plays the charged-attack-hit stun (paralyze); if she IS stunned it subtracts the
+    // damage and runs the death CS at 0. So one call gives "stun, then mash to death", like
+    // the vanilla reflect→sword loop. Throttled by INVINC_TIMER (the damage branch sets it
+    // to 20; we add a short gap after a fresh stun). Detected by accepted AC hit OR the
+    // geometric FD reach (bypasses dmgFlags). Gated on IsFormActive → normal shield-reflect
+    // play is untouched.
+    // Twinrova also floats high, so project her to the player's Y (Barinade trick) so the
+    // FD ground swing reaches her geometrically; the AC_HIT path covers her beam/Pika.
+    Vec3f twFlat = this->actor.world.pos;
+    twFlat.y = GET_PLAYER(play)->actor.world.pos.y + 40.0f;
+    if (BossSuperDamage_IsFormActive(play) && (this->work[INVINC_TIMER] == 0) &&
+        ((s8)this->actor.colChkInfo.health > 0) && (this->actionFunc != BossTw_Wait) &&
+        (this->actionFunc != BossTw_TwinrovaMergeCS) &&
+        ((this->collider.base.acFlags & AC_HIT) ||
+         BossSuperDamage_FormAttackReaches(play, &twFlat, BossSuperDamage_FormAttackRange(play) + 100.0f))) {
+        u8 wasStunned = (this->actionFunc == BossTw_TwinrovaStun);
+        this->collider.base.acFlags &= ~AC_HIT;
+        BossSuperDamage_StartElectricSparks(&this->actor, 90);
+        BossTw_TwinrovaDamage(this, play,
+                              BossSuperDamage_FormDamage(play)); // not stunned → stun; stunned → -dmg (death CS at 0)
+        if (!wasStunned) {
+            this->work[INVINC_TIMER] = 12; // brief gap between the stun and the first damage
+        }
+    }
 
     if (this->work[INVINC_TIMER] == 0) {
         if (this->actionFunc != BossTw_TwinrovaStun) {
@@ -3558,6 +3632,16 @@ void BossTw_Draw(Actor* thisx, PlayState* play2) {
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    // FD / Pika Gigantamax electric glow on a hit witch (phase 1). Two anchors — body +
+    // head. No-op when the spark timer is 0 (not recently hit).
+    {
+        Vec3f limbs[2];
+        limbs[0] = this->actor.world.pos;
+        limbs[1] = this->actor.world.pos;
+        limbs[1].y += 60.0f;
+        BossSuperDamage_DrawElectricSparks(&this->actor, play, limbs, 2, 1.2f);
+    }
 }
 
 void* D_8094A9B0[] = {
@@ -3887,6 +3971,16 @@ void BossTw_TwinrovaDraw(Actor* thisx, PlayState* play2) {
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    // FD / Pika Gigantamax electric glow on the merged Twinrova (phase 2). Two anchors —
+    // body + head. No-op when the spark timer is 0 (not recently hit).
+    {
+        Vec3f limbs[2];
+        limbs[0] = this->actor.world.pos;
+        limbs[1] = this->actor.world.pos;
+        limbs[1].y += 80.0f;
+        BossSuperDamage_DrawElectricSparks(&this->actor, play, limbs, 2, 1.4f);
+    }
 }
 
 void BossTw_BlastFire(BossTw* this, PlayState* play) {

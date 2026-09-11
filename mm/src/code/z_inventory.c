@@ -238,7 +238,7 @@ u8 gItemSlots[77] = {
     SLOT_ARROW_FIRE,         // ITEM_ARROW_FIRE
     SLOT_ARROW_ICE,          // ITEM_ARROW_ICE
     SLOT_ARROW_LIGHT,        // ITEM_ARROW_LIGHT
-    SLOT_TRADE_DEED,         // ITEM_OCARINA_FAIRY
+    SLOT_OCARINA,            // ITEM_OCARINA_FAIRY (NEI: the combo's OoT ocarina, not a trade item)
     SLOT_BOMB,               // ITEM_BOMB
     SLOT_BOMBCHU,            // ITEM_BOMBCHU
     SLOT_DEKU_STICK,         // ITEM_DEKU_STICK

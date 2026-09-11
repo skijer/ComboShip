@@ -7,6 +7,7 @@
 
 #include "z_bg_jya_goroiwa.h"
 #include "objects/object_goroiwa/object_goroiwa.h"
+#include "mods/items/logic/weapon_upgrades.h" // Skijer's NEI: Iron Knuckle's Axe prop-smash
 
 #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED
 
@@ -203,6 +204,12 @@ void BgJyaGoroiwa_Update(Actor* thisx, PlayState* play) {
 
     if (!(player->stateFlags1 &
           (PLAYER_STATE1_TALKING | PLAYER_STATE1_DEAD | PLAYER_STATE1_IN_ITEM_CS | PLAYER_STATE1_IN_CUTSCENE))) {
+        // NEI: the Iron Knuckle's Axe shatters this rolling boulder in one hit (drops a reward).
+        if (WeaponUpgrade_IKAxeStrike(&this->actor, play, 1, 120.0f)) {
+            Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0);
+            Actor_Kill(&this->actor);
+            return;
+        }
         this->actionFunc(this, play);
         BgJyaGoroiwa_UpdateRotation(this);
         pos.x = this->actor.world.pos.x;

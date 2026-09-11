@@ -182,6 +182,10 @@ std::vector<std::string>& GetModFiles(bool enabled) {
     return enabled ? enabledModFiles : disabledModFiles;
 }
 
+const std::vector<std::string>& ModMenu_GetEnabledMods() {
+    return enabledModFiles;
+}
+
 std::shared_ptr<Ship::ArchiveManager> GetArchiveManager() {
     return Ship::Context::GetRawInstance()->GetResourceManager()->GetArchiveManager();
 }

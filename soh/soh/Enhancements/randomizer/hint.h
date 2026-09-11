@@ -54,6 +54,17 @@ class Hint {
     int GetNum();
     void ResetVariables();
 
+    /**
+     * @brief Names an area that lives in the OTHER game (combo rando), per slot.
+     *
+     * RandomizerArea only enumerates OoT areas, so a reward placed in Majora's Mask has no enum to
+     * point at and the hint would fall back to RA_NONE. When the slot has a non-empty override here
+     * GetAreaName returns it verbatim ("Great Bay Temple") instead of looking up the enum table.
+     * Slots left empty behave exactly as before.
+     */
+    void SetForeignAreas(std::vector<std::string> foreignAreas_);
+    const std::vector<std::string>& GetForeignAreas() const;
+
   private:
     RandomizerHint ownKey = RH_NONE;
     HintType hintType = HINT_TYPE_HINT_KEY;
@@ -70,5 +81,7 @@ class Hint {
     std::vector<uint8_t> itemNamesChosen = {};
     std::vector<uint8_t> hintTextsChosen = {};
     std::vector<uint8_t> areaNamesChosen = {};
+    // Nombre de área del otro juego por slot; vacío = usar el enum `areas`. Ver SetForeignAreas.
+    std::vector<std::string> foreignAreas = {};
 };
 } // namespace Rando

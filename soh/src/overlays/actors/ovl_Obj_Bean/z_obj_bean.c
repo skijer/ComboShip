@@ -9,6 +9,7 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "vt.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/extended_inventory.h" // Skijer's NEI: Seasons_* set the bean's stage
 
 #define FLAGS ACTOR_FLAG_IGNORE_POINTLIGHTS
 
@@ -227,14 +228,29 @@ void ObjBean_SetDrawMode(ObjBean* this, u8 drawFlag) {
     this->stateFlags |= drawFlag;
 }
 
+// The flight path is authored in the ADULT setup only — and a child's bean spot carries 0x1F, the
+// "no path" index — so a season that grows the plant for a child names the path itself. NULL
+// outside Spring. Skijer's NEI
+Path* SeasonBean_Path(PlayState* play);
+
+static Path* ObjBean_Path(ObjBean* this, PlayState* play) {
+    Path* seasonPath = SeasonBean_Path(play);
+
+    if (seasonPath != NULL) {
+        return seasonPath;
+    }
+    return &play->setupPathList[(this->dyna.actor.params >> 8) & 0x1F];
+}
+
 void ObjBean_SetupPathCount(ObjBean* this, PlayState* play) {
-    this->pathCount = play->setupPathList[(this->dyna.actor.params >> 8) & 0x1F].count - 1;
+    this->pathCount = ObjBean_Path(this, play)->count - 1;
     this->currentPointIndex = 0;
     this->nextPointIndex = 1;
 }
 
 void ObjBean_SetupPath(ObjBean* this, PlayState* play) {
-    Path* path = &play->setupPathList[(this->dyna.actor.params >> 8) & 0x1F];
+    Path* path = ObjBean_Path(this, play);
+
     Math_Vec3s_ToVec3f(&this->pathPoints, SEGMENTED_TO_VIRTUAL(path->points));
 }
 
@@ -252,7 +268,7 @@ void ObjBean_FollowPath(ObjBean* this, PlayState* play) {
     f32 mag;
 
     Math_StepToF(&this->dyna.actor.speedXZ, sBeanSpeeds[this->unk_1F6].velocity, sBeanSpeeds[this->unk_1F6].accel);
-    path = &play->setupPathList[(this->dyna.actor.params >> 8) & 0x1F];
+    path = ObjBean_Path(this, play);
     nextPathPoint = &((Vec3s*)SEGMENTED_TO_VIRTUAL(path->points))[this->nextPointIndex];
 
     Math_Vec3s_ToVec3f(&pathPointsFloat, nextPathPoint);
@@ -465,15 +481,43 @@ void ObjBean_Grown(ObjBean* this) {
     }
 }
 
+// A season sets the stage outright, whatever the age and the planted flag say. Summer's stage is
+// the soil only because season_scene replaces the spot with a Deku Flower right after. Skijer's NEI
+typedef enum {
+    BEAN_SEASON_VANILLA = -1,
+    BEAN_SEASON_SOIL,
+    BEAN_SEASON_SPROUT,
+    BEAN_SEASON_PLATFORM,
+} ObjBeanSeasonStage;
+
+static s32 ObjBean_SeasonStage(void) {
+    if (Seasons_SeasonCount() == 0) {
+        return BEAN_SEASON_VANILLA;
+    }
+    switch (Seasons_GetSeason()) {
+        case SEASON_WINTER:
+        case SEASON_SUMMER:
+            return BEAN_SEASON_SOIL;
+        case SEASON_AUTUMN:
+            return BEAN_SEASON_SPROUT;
+        case SEASON_SPRING:
+            return BEAN_SEASON_PLATFORM;
+        default:
+            return BEAN_SEASON_VANILLA;
+    }
+}
+
 void ObjBean_Init(Actor* thisx, PlayState* play) {
     s32 path;
     s32 linkAge;
     ObjBean* this = (ObjBean*)thisx;
+    s32 stage = ObjBean_SeasonStage();
+    u8 planted = Flags_GetSwitch(play, this->dyna.actor.params & 0x3F) || (mREG(1) == 1);
 
     Actor_ProcessInitChain(&this->dyna.actor, sInitChain);
-    if (LINK_AGE_IN_YEARS == YEARS_ADULT) {
-        if (Flags_GetSwitch(play, this->dyna.actor.params & 0x3F) || (mREG(1) == 1)) {
-            path = (this->dyna.actor.params >> 8) & 0x1F;
+    if ((stage == BEAN_SEASON_PLATFORM) || ((stage == BEAN_SEASON_VANILLA) && (LINK_AGE_IN_YEARS == YEARS_ADULT))) {
+        if (planted || (stage == BEAN_SEASON_PLATFORM)) {
+            path = (SeasonBean_Path(play) != NULL) ? 0 : ((this->dyna.actor.params >> 8) & 0x1F);
             if (path == 0x1F) {
                 osSyncPrintf(VT_COL(RED, WHITE));
                 // "No path data?"
@@ -482,7 +526,7 @@ void ObjBean_Init(Actor* thisx, PlayState* play) {
                 Actor_Kill(&this->dyna.actor);
                 return;
             }
-            if (play->setupPathList[path].count < 3) {
+            if (ObjBean_Path(this, play)->count < 3) {
                 osSyncPrintf(VT_COL(RED, WHITE));
                 // "Incorrect number of path data"
                 osSyncPrintf("パスデータ数が不正(%s %d)(arg_data %xH)\n", __FILE__, __LINE__, this->dyna.actor.params);
@@ -507,7 +551,7 @@ void ObjBean_Init(Actor* thisx, PlayState* play) {
             Actor_Kill(&this->dyna.actor);
             return;
         }
-    } else if ((Flags_GetSwitch(play, this->dyna.actor.params & 0x3F) != 0) || (mREG(1) == 1)) {
+    } else if ((stage == BEAN_SEASON_SPROUT) || ((stage == BEAN_SEASON_VANILLA) && planted)) {
         ObjBean_SetupWaitForWater(this);
     } else {
         ObjBean_SetupWaitForBean(this);

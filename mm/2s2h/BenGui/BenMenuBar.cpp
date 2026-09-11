@@ -1,23 +1,20 @@
 #include "BenMenuBar.h"
 #include <fast/Fast3dGui.h>
+#include "2s2h/ShipUtils.h"
 #include <imgui.h>
 #include "UIWidgets.hpp"
 #include <string>
-
-#include <fast/Fast3dGui.h>
 
 namespace BenGui {
 
 void DrawMenuBarIcon() {
     static bool gameIconLoaded = false;
     if (!gameIconLoaded) {
-        std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-            ->LoadTextureFromRawImage("Game_Icon", "textures/icons/g2ShipIcon.png");
+        Ship_GetFast3dGui()->LoadTextureFromRawImage("Game_Icon", "textures/icons/g2ShipIcon.png");
         gameIconLoaded = true;
     }
 
-    if (std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-            ->HasTextureByName("Game_Icon")) {
+    if (Ship_GetFast3dGui()->HasTextureByName("Game_Icon")) {
 #ifdef __SWITCH__
         ImVec2 iconSize = ImVec2(20.0f, 20.0f);
         float posScale = 1.0f;
@@ -29,9 +26,7 @@ void DrawMenuBarIcon() {
         float posScale = 1.0f;
 #endif
         ImGui::SetCursorPos(ImVec2(5, 5) * posScale);
-        ImGui::Image(std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                         ->GetTextureByName("Game_Icon"),
-                     iconSize);
+        ImGui::Image(Ship_GetFast3dGui()->GetTextureByName("Game_Icon"), iconSize);
         ImGui::SameLine();
         ImGui::SetCursorPos(ImVec2(25, 0) * posScale);
     }

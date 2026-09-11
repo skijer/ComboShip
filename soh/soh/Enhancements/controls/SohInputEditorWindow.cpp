@@ -1482,6 +1482,14 @@ void SohInputEditorWindow::DrawCameraControlPanel() {
     }
     CVarSliderInt("Camera Transition Speed: %d", CVAR_SETTING("FreeLook.TransitionSpeed"),
                   IntSliderOptions().Color(THEME_COLOR).Min(0).Max(900).DefaultValue(25).ShowButtons(true));
+    CVarCheckbox("Free Camera in Item Cutscenes", CVAR_SETTING("FreeLook.TurnAroundCam"),
+                 CheckboxOptions()
+                     .Color(THEME_COLOR)
+                     .Tooltip("Lets free look take over the scripted \"turn around\" camera: getting an item (both "
+                              "the animation and its textbox), opening doors, drinking a bottle, playing the "
+                              "ocarina...\n"
+                              "The vanilla shot plays as usual until you push the right stick, and the camera then "
+                              "follows you for the rest of the scene at the distance set above."));
     Ship::GuiWindow::EndGroupPanel(0);
 }
 

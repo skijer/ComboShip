@@ -44,12 +44,12 @@ cmake -B build/x64 -A x64
 Helper scripts in `scripts/` wrap `cmake --build` and default to a Debug build (pass `--Release` for Release):
 
 ```powershell
-./scripts/build-comboship.ps1  ->  ComboShip.exe
+./scripts/build-comboship.ps1  ->  Fleet.exe
 ```
 
 ## Packaging
 
-`cpack` produces a single Windows ZIP bundling the full runtime (`ComboShip.exe`, the engine and UI DLLs, both ports, and assets):
+`cpack` produces a single Windows ZIP bundling the full runtime (`Fleet.exe`, the engine and UI DLLs, both ports, and assets):
 
 ```powershell
 cpack

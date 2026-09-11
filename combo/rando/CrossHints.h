@@ -416,9 +416,17 @@ inline nlohmann::json Generate(uint32_t masterSeed, const std::string& sohDumpJs
     // Area text for an OOT item wherever it landed, in either game. nullopt = the item is in no
     // check at all (starting item, or not shuffled in), so no hint may name a location for it.
     // yourPocket mirrors the native Hint flag: only hints that set it say "your pocket".
+    auto findOotItem = [&](const std::string& name) {
+        return std::find_if(placements.begin(), placements.end(),
+                            [&](const CwPlacedItem& p) { return p.itemGame == GAME_OOT && p.item == name; });
+    };
     auto itemAreaText = [&](const char* itemName, bool yourPocket = false) -> std::optional<Tri> {
-        auto it = std::find_if(placements.begin(), placements.end(),
-                               [&](const CwPlacedItem& p) { return p.itemGame == GAME_OOT && p.item == itemName; });
+        auto it = findOotItem(itemName);
+        // A hint names the concrete item while the pool may only carry the chain that grants it
+        // (Master Sword -> Progressive Master Sword under NEI weapon upgrades). Missing this dropped
+        // the whole Ganondorf hint, not just its sword clause.
+        if (it == placements.end())
+            it = findOotItem("Progressive " + std::string(itemName));
         if (it == placements.end())
             return std::nullopt;
         if (it->checkGame != GAME_OOT) {
@@ -739,7 +747,28 @@ inline nlohmann::json Generate(uint32_t masterSeed, const std::string& sohDumpJs
         mmGossipPool.push_back({ { "weight", c.required ? 3 : 1 }, { "text", text } });
     }
 
+    // Where every OOT-namespace item ended up, in EITHER game. soh's static NPC hints (Greg, Sheik,
+    // Dampe, Saria, Mido, the boss keys, Fishing Pole) resolve their target by searching OOT's own
+    // locations only, so an item the fill sent to Termina renders as "an Isolated Place" without this.
+    nlohmann::json ootItemAreas = nlohmann::json::object();
+    for (auto& p : placements) {
+        if (p.itemGame != GAME_OOT || ootItemAreas.contains(p.item))
+            continue;
+        std::string area;
+        if (p.checkGame == GAME_OOT) {
+            auto ck = ootChecks.find(p.check);
+            if (ck != ootChecks.end() && !ck->second.area.empty())
+                area = areaText("oot:" + ck->second.area).en;
+        } else {
+            auto mk = mmLocationHints.find(p.check);
+            area = areaText("mm:" + (mk != mmLocationHints.end() ? mk->second : p.check)).en;
+        }
+        if (!area.empty())
+            ootItemAreas[p.item] = area;
+    }
+
     out["oot"] = std::move(ootHints);
+    out["ootItemAreas"] = std::move(ootItemAreas);
     out["mm"] = { { "gossipPool", std::move(mmGossipPool) }, { "itemLocations", std::move(mmItemLocations) } };
     out["stats"] = { { "hintsProduced", producedHints }, { "junkProduced", producedJunk } };
     return out;

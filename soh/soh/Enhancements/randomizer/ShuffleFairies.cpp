@@ -78,7 +78,7 @@ CheckIdentity ShuffleFairies_GetFairyIdentity(int32_t params, ActorID id) {
 
 static bool SpawnFairy(f32 posX, f32 posY, f32 posZ, int32_t params, FairyType fairyType, ActorID id) {
     CheckIdentity fairyIdentity = ShuffleFairies_GetFairyIdentity(params, id);
-    if (!Flags_GetRandomizerInf(fairyIdentity.randomizerInf)) {
+    if (!Flags_GetRandomizerInf(fairyIdentity.randomizerInf) && !(fairyIdentity.randomizerInf == RAND_INF_MAX)) {
         Actor* fairy =
             Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_ELF, posX, posY - 30.0f, posZ, 0, 0, 0, fairyType);
         ObjectExtension::GetInstance().Set<CheckIdentity>(fairy, std::move(fairyIdentity));
@@ -86,6 +86,33 @@ static bool SpawnFairy(f32 posX, f32 posY, f32 posZ, int32_t params, FairyType f
         return true;
     }
     return false;
+}
+
+// Mask of Truth talk-reveal: spawn the normal (non-storms) gossip-stone fairy as
+// a randomizer check, mirroring the song path in the VB_SPAWN_GOSSIP_STONE_FAIRY
+// handler below. Returns true if the randomizer owns this stone's fairy (caller
+// must NOT spawn the vanilla heal fairy), false when stone-fairy shuffle is off
+// so the caller falls back to vanilla behaviour. Skijer's NEI
+extern "C" s32 ShuffleFairies_SpawnStoneFairyOnTalk(EnGs* gossipStone) {
+    if (!(IS_RANDO && RAND_GET_OPTION(RSK_SHUFFLE_STONE_FAIRIES))) {
+        return false;
+    }
+
+    int32_t params = (gPlayState->sceneNum == SCENE_GROTTOS) ? Grotto_CurrentGrotto() : 0;
+    params = TWO_ACTOR_PARAMS(params, (int32_t)gossipStone->actor.world.pos.z);
+
+    CheckIdentity fairyIdentity = ShuffleFairies_GetFairyIdentity(params, ACTOR_EN_ELF);
+    if (!ShuffleFairies_FairyExists(fairyIdentity)) {
+        Player* player = GET_PLAYER(gPlayState);
+        if (SpawnFairy(player->actor.world.pos.x, (player->actor.world.pos.y + 20), player->actor.world.pos.z, params,
+                       FAIRY_HEAL, ACTOR_EN_ELF)) {
+            Audio_PlayActorSound2(&gossipStone->actor, NA_SE_EV_BUTTERFRY_TO_FAIRY);
+            gossipStone->unk_19D = 0;
+        }
+    }
+    // Randomizer owns stone fairies in this mode — never fall back to the vanilla
+    // heal fairy (whether we just spawned it, it already exists, or it's collected).
+    return true;
 }
 
 void RegisterShuffleFairies() {

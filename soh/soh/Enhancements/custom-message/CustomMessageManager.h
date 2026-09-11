@@ -142,6 +142,16 @@ class CustomMessage {
     void InsertNames(std::vector<CustomMessage> toInsert);
 
     /**
+     * @brief Replaces any [[N]] token InsertNames did not fill with `fallback`.
+     *
+     * InsertNames only substitutes tokens 1..toInsert.size(); anything the template asks for beyond
+     * that stays in the string and is drawn to the player verbatim. That happens in the combo rando
+     * whenever a hinted item lives in the other game, so the area list comes up short. Call this
+     * after InsertNames on any message built from a variable-length list.
+     */
+    void ReplaceUnfilledNames(const std::string& fallback);
+
+    /**
      * @brief Replaces various symbols with the control codes necessary to
      * display them in OoT's textboxes. i.e. special characters, colors, newlines,
      * wait for input, etc. Also adds the item icon to each page of the textbox.

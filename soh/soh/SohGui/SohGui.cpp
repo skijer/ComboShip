@@ -20,9 +20,11 @@
 
 #include "soh/Enhancements/debugger/MessageViewer.h"
 #include "soh/Notification/Notification.h"
+#include "soh/FleetShipCombo/FleetShipCombo.h"
 #include "soh/Enhancements/TimeDisplay/TimeDisplay.h"
 #include "soh/Enhancements/mod_menu.h"
 #include "soh/Network/Anchor/Anchor.h"
+#include "soh/Network/Harpoon/RemoteSaveEditor.h"
 
 namespace SohGui {
 
@@ -73,6 +75,7 @@ std::shared_ptr<ColViewerWindow> mColViewerWindow;
 std::shared_ptr<SaveEditorWindow> mSaveEditorWindow;
 std::shared_ptr<HookDebuggerWindow> mHookDebuggerWindow;
 std::shared_ptr<DLViewerWindow> mDLViewerWindow;
+std::shared_ptr<AnimationViewerWindow> mAnimationViewerWindow;
 std::shared_ptr<ValueViewerWindow> mValueViewerWindow;
 std::shared_ptr<MessageViewer> mMessageViewerWindow;
 std::shared_ptr<GameplayStatsWindow> mGameplayStatsWindow;
@@ -90,6 +93,7 @@ std::shared_ptr<SohModalWindow> mModalWindow;
 std::shared_ptr<Notification::Window> mNotificationWindow;
 std::shared_ptr<TimeDisplayWindow> mTimeDisplayWindow;
 std::shared_ptr<AnchorRoomWindow> mAnchorRoomWindow;
+std::shared_ptr<HarpoonRemoteSaveEditor::RemoteSaveEditorWindow> mHarpoonRemoteSaveEditorWindow;
 
 UIWidgets::Colors GetMenuThemeColor() {
     return mSohMenu->GetMenuThemeColor();
@@ -117,6 +121,13 @@ void SetupMenuElements() {
 
 void SetupGuiElements() {
     auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui();
+
+#ifndef COMBO_BUILD
+    // Fleet Ship Combo: picture-in-picture window that shows 2ship (MM) inside Ship.
+    FleetShipCombo_RegisterConsumerWindow();
+    // Fleet Ship Combo: ventana del tab "Shared" (tests del oráculo + opciones del rando de MM).
+    FleetShipCombo_RegisterSharedWindow();
+#endif
 
     mConsoleWindow = std::make_shared<SohConsoleWindow>(CVAR_WINDOW("SohConsole"), "Console##SoH", ImVec2(820, 630));
     gui->AddGuiWindow(mConsoleWindow);
@@ -159,6 +170,9 @@ void SetupGuiElements() {
     mDLViewerWindow =
         std::make_shared<DLViewerWindow>(CVAR_WINDOW("DisplayListViewer"), "Display List Viewer", ImVec2(520, 600));
     gui->AddGuiWindow(mDLViewerWindow);
+    mAnimationViewerWindow =
+        std::make_shared<AnimationViewerWindow>(CVAR_WINDOW("AnimationViewer"), "Animation Viewer", ImVec2(520, 600));
+    gui->AddGuiWindow(mAnimationViewerWindow);
     mValueViewerWindow =
         std::make_shared<ValueViewerWindow>(CVAR_WINDOW("ValueViewer"), "Value Viewer", ImVec2(520, 600));
     gui->AddGuiWindow(mValueViewerWindow);
@@ -207,6 +221,9 @@ void SetupGuiElements() {
     mAnchorRoomWindow = std::make_shared<AnchorRoomWindow>(CVAR_WINDOW("AnchorRoom"), "Anchor Room");
     gui->AddGuiWindow(mAnchorRoomWindow);
 #endif
+    mHarpoonRemoteSaveEditorWindow = std::make_shared<HarpoonRemoteSaveEditor::RemoteSaveEditorWindow>(
+        CVAR_WINDOW("HarpoonRemoteSaveEditor"), "Remote Save Editor", ImVec2(620, 700));
+    gui->AddGuiWindow(mHarpoonRemoteSaveEditorWindow);
 }
 
 void Destroy() {
@@ -225,6 +242,7 @@ void Destroy() {
     mHintTrackerSettingsWindow = nullptr;
     mGameplayStatsWindow = nullptr;
     mDLViewerWindow = nullptr;
+    mAnimationViewerWindow = nullptr;
     mValueViewerWindow = nullptr;
     mMessageViewerWindow = nullptr;
     mSaveEditorWindow = nullptr;
@@ -243,6 +261,7 @@ void Destroy() {
     mPlandomizerWindow = nullptr;
     mTimeDisplayWindow = nullptr;
     mAnchorRoomWindow = nullptr;
+    mHarpoonRemoteSaveEditorWindow = nullptr;
 }
 
 void RegisterPopup(std::string title, std::string message, std::string button1, std::string button2,
