@@ -1,10 +1,12 @@
 #include "z64skybox.h"
 #include "global.h"
 #include "BenPort.h"
+#include "libultraship/bridge/consolevariablebridge.h"
 #include "assets/misc/skyboxes/d2_cloud_static.h"
 #include "assets/misc/skyboxes/d2_fine_static.h"
 #include "assets/misc/skyboxes/d2_fine_pal_static.h"
 #include "assets/2s2h_assets.h"
+#include "2s2h/Enhancements/Audio/MMWeather.h"
 
 typedef struct SkyboxFaceParams {
     /* 0x00 */ s32 xStart;
@@ -58,6 +60,112 @@ TexturePtr sSkyboxTextures[2][6] = {
     { gSkyboxCloudy1Tex, gSkyboxCloudy2Tex, gSkyboxCloudy3Tex, gSkyboxCloudy4Tex, gSkyboxCloudy5Tex,
       gSkyboxCloudy5Tex },
 };
+
+// Explicit Alt paths keep the OoT companion's native CI8 sky out of this
+// full-color path. The complete pack is checked once at scene initialization.
+#define OOT_SKY_FACES(folder, name)                                                                       \
+    {                                                                                                     \
+        "__OTR__alt/textures/" folder "/" name "1Tex", "__OTR__alt/textures/" folder "/" name "2Tex",     \
+            "__OTR__alt/textures/" folder "/" name "3Tex", "__OTR__alt/textures/" folder "/" name "4Tex", \
+            "__OTR__alt/textures/" folder "/" name "5Tex"                                                 \
+    }
+static const ALIGN_ASSET(2) char sOotSkyTextures[2][4][5][96] = {
+    { OOT_SKY_FACES("vr_fine0_static", "gSunriseSkybox"), OOT_SKY_FACES("vr_fine1_static", "gDaySkybox"),
+      OOT_SKY_FACES("vr_fine2_static", "gSunsetSkybox"), OOT_SKY_FACES("vr_fine3_static", "gNightSkybox") },
+    { OOT_SKY_FACES("vr_cloud0_static", "gSunriseOvercastSkybox"),
+      OOT_SKY_FACES("vr_cloud1_static", "gDayOvercastSkybox"),
+      OOT_SKY_FACES("vr_cloud2_static", "gSunsetOvercastSkybox"),
+      OOT_SKY_FACES("vr_cloud3_static", "gNightOvercastSkybox") },
+};
+#undef OOT_SKY_FACES
+
+static s32 Skybox_HasOotTextures(void) {
+    if (!CVarGetInteger("gEnhancements.Graphics.UseOotSkyTextures", 0) || !ResourceMgr_IsAltAssetsEnabled()) {
+        return false;
+    }
+    for (s32 weather = 0; weather < 2; weather++) {
+        for (s32 phase = 0; phase < 4; phase++) {
+            for (s32 face = 0; face < 5; face++) {
+                if (!ResourceMgr_FileExists(sOotSkyTextures[weather][phase][face])) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+s32 Skybox_IsOotSkyActive(const SkyboxContext* skyboxCtx, s16 skyboxId) {
+    return ((skyboxId == SKYBOX_NORMAL_SKY) || (skyboxId == SKYBOX_3)) && skyboxCtx->ootSkyDLists[0] &&
+           skyboxCtx->ootSkyDLists[1] && CVarGetInteger("gEnhancements.Graphics.UseOotSkyTextures", 0) &&
+           ResourceMgr_IsAltAssetsEnabled();
+}
+
+s32 Skybox_PrepareOot(SkyboxContext* skyboxCtx, s16 skyboxId, u16 time, u8* timeBlend) {
+    u8 first = 3;
+    u8 second = 3;
+    u16 start = 0;
+    u16 end = 0;
+
+    if (!Skybox_IsOotSkyActive(skyboxCtx, skyboxId)) {
+        return false;
+    }
+
+    // Match MM's dawn/day/sunset/night schedule, retaining full-color OoT art.
+    if ((time >= CLOCK_TIME(4, 0)) && (time < CLOCK_TIME(6, 0))) {
+        first = 3;
+        second = 0;
+        start = CLOCK_TIME(4, 0);
+        end = CLOCK_TIME(6, 0);
+    } else if ((time >= CLOCK_TIME(6, 0)) && (time < CLOCK_TIME(8, 0))) {
+        first = 0;
+        second = 1;
+        start = CLOCK_TIME(6, 0);
+        end = CLOCK_TIME(8, 0);
+    } else if ((time >= CLOCK_TIME(8, 0)) && (time < CLOCK_TIME(16, 0))) {
+        first = second = 1;
+    } else if ((time >= CLOCK_TIME(16, 0)) && (time < CLOCK_TIME(17, 0))) {
+        first = 1;
+        second = 2;
+        start = CLOCK_TIME(16, 0);
+        end = CLOCK_TIME(17, 0);
+    } else if ((time >= CLOCK_TIME(17, 0)) && (time < CLOCK_TIME(18, 0))) {
+        first = second = 2;
+    } else if ((time >= CLOCK_TIME(18, 0)) && (time < CLOCK_TIME(19, 0))) {
+        first = 2;
+        second = 3;
+        start = CLOCK_TIME(18, 0);
+        end = CLOCK_TIME(19, 0);
+    }
+    *timeBlend = (start == end) ? 0 : ((u32)(time - start) * 255 / (end - start));
+
+    if ((first != skyboxCtx->ootSkyPhases[0]) || (second != skyboxCtx->ootSkyPhases[1])) {
+        // Reuse the native geometry; only texture references differ. Separate
+        // lists let the cloud overlay blend independently of the time transition.
+        SkyboxContext layer = *skyboxCtx;
+        for (s32 weather = 0; weather < 2; weather++) {
+            layer.dListBuf = skyboxCtx->ootSkyDLists[weather];
+            for (s32 face = 0; face < 6; face++) {
+                s32 textureFace = (face == 5) ? 4 : face;
+                layer.staticSegments[0][face] = (void*)sOotSkyTextures[weather][first][textureFace];
+                layer.staticSegments[1][face] = (void*)sOotSkyTextures[weather][second][textureFace];
+            }
+            Skybox_Calculate128(&layer, 5);
+        }
+        skyboxCtx->ootSkyPhases[0] = first;
+        skyboxCtx->ootSkyPhases[1] = second;
+    }
+    return true;
+}
+
+u8 Skybox_GetOotCloudBlend(SkyboxContext* skyboxCtx, s16 blend) {
+    // Environment_UpdateSkybox has already applied native day/story weather and
+    // the optional outdoor-weather fade to these two synchronous bindings.
+    s32 firstCloudy = skyboxCtx->staticSegments[0][0] == sSkyboxTextures[SKYBOX_TEXTURES_CLOUD][0];
+    s32 secondCloudy = skyboxCtx->staticSegments[1][0] == sSkyboxTextures[SKYBOX_TEXTURES_CLOUD][0];
+    blend = CLAMP(blend, 0, 255);
+    return MMWeather_ResolveOotCloudBlend(firstCloudy * (255 - blend) + secondCloudy * blend);
+}
 
 /**
  * Build the vertex and display list data for a skybox with 128x128 and 128x64 face textures.
@@ -409,6 +517,8 @@ void Skybox_Reload(PlayState* play, SkyboxContext* skyboxCtx, s16 skyboxId) {
 void Skybox_Init(GameState* gameState, SkyboxContext* skyboxCtx, s16 skyboxId) {
     skyboxCtx->shouldDraw = false;
     skyboxCtx->rot.x = skyboxCtx->rot.y = skyboxCtx->rot.z = 0.0f;
+    skyboxCtx->ootSkyDLists[0] = skyboxCtx->ootSkyDLists[1] = NULL;
+    skyboxCtx->ootSkyPhases[0] = skyboxCtx->ootSkyPhases[1] = 255;
 
     Skybox_Setup(gameState, skyboxCtx, skyboxId);
 
@@ -423,6 +533,11 @@ void Skybox_Init(GameState* gameState, SkyboxContext* skyboxCtx, s16 skyboxId) {
             // Allocate enough space for the vertices for a 5 sided skybox (bottom is missing)
             skyboxCtx->roomVtx = THA_AllocTailAlign16(&gameState->tha, 5 * 32 * sizeof(Vtx));
             Skybox_Calculate128(skyboxCtx, 5);
+        }
+        if (((skyboxId == SKYBOX_NORMAL_SKY) || (skyboxId == SKYBOX_3)) && Skybox_HasOotTextures()) {
+            for (s32 weather = 0; weather < 2; weather++) {
+                skyboxCtx->ootSkyDLists[weather] = THA_AllocTailAlign16(&gameState->tha, 12 * 150 * sizeof(Gfx));
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
 #include <exception>
 #include <vector>
 #include <string>
+#include "ComboItemReceiptPresentation.h"
 
 #include "../../../include/z64item.h"
 #include "../../../include/z64.h"
@@ -39,6 +40,8 @@ typedef enum {
  */
 class CustomMessage {
   public:
+    CwItemReceiptPresentation receiptPresentation{};
+    bool capeVisibilityChoice = false;
     CustomMessage() = default;
     CustomMessage(std::string english_, std::string german_, std::string french_,
                   TextBoxType type_ = TEXTBOX_TYPE_BLACK, TextBoxPosition position_ = TEXTBOX_POS_BOTTOM);
@@ -140,6 +143,16 @@ class CustomMessage {
      * @brief Replaces [[1]] style variable strings with the provided vector of customMessages
      */
     void InsertNames(std::vector<CustomMessage> toInsert);
+
+    /**
+     * @brief Replaces any [[N]] token InsertNames did not fill with `fallback`.
+     *
+     * InsertNames only substitutes tokens 1..toInsert.size(); anything the template asks for beyond
+     * that stays in the string and is drawn to the player verbatim. That happens in the combo rando
+     * whenever a hinted item lives in the other game, so the area list comes up short. Call this
+     * after InsertNames on any message built from a variable-length list.
+     */
+    void ReplaceUnfilledNames(const std::string& fallback);
 
     /**
      * @brief Replaces various symbols with the control codes necessary to

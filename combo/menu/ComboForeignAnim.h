@@ -40,6 +40,8 @@
 #define CFA_ALLOC(gfxCtx, size) GRAPH_ALLOC(gfxCtx, size)
 #define CFA_LOAD_MTX(pkt, gfxCtx) MATRIX_FINALIZE_AND_LOAD(pkt, gfxCtx)
 #define CFA_LIMB_ARG Actor*
+#define CFA_ROTATE_X(angle, mode) Matrix_RotateXF(angle, mode)
+#define CFA_TO_MTX(dest) Matrix_ToMtx(dest)
 #else
 #define CFA_SETUP_OPA(gfxCtx) Gfx_SetupDL_25Opa(gfxCtx)
 #define CFA_SETUP_XLU(gfxCtx) Gfx_SetupDL_25Xlu(gfxCtx)
@@ -47,6 +49,8 @@
 #define CFA_LOAD_MTX(pkt, gfxCtx) \
     gSPMatrix(pkt, Matrix_NewMtx(gfxCtx, (char*)__FILE__, __LINE__), G_MTX_MODELVIEW | G_MTX_LOAD)
 #define CFA_LIMB_ARG void*
+#define CFA_ROTATE_X(angle, mode) Matrix_RotateX(angle, mode)
+#define CFA_TO_MTX(dest) Matrix_ToMtx(dest, (char*)__FILE__, __LINE__)
 #endif
 
 #include <ship/Context.h>
@@ -66,6 +70,10 @@
 extern "C" {
 void FrameInterpolation_RecordOpenChild(const void* a, int b);
 void FrameInterpolation_RecordCloseChild(void);
+// Native opaque-only callers keep their original segment state. Foreign flex
+// skeletons may replay the same limb meshes on XLU, which needs the same palette.
+void SkelAnime_DrawFlexOpaWithXlu(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                                  OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, CFA_LIMB_ARG arg);
 }
 
 // ---- Local mirrors of MM's loaded TextureAnimation layout (mm/2s2h/resource/type/
@@ -281,12 +289,31 @@ inline bool CfaValidateTexAnim(const CfaMatEntry* mat) {
     return seg < 0; // must have hit the negative-segment terminator
 }
 
+// Both resource factories expose the loaded skeleton kind in this header byte. MM's public
+// SkeletonHeader omits it, so use the factory layout rather than reading host-struct padding.
+// A replacement may turn a vanilla rigid skeleton into a flex skeleton; its shared limb
+// matrices must be generated even when the foreign recipe describes the vanilla rigid model.
+struct CfaLoadedSkeletonHeader {
+    void** segment;
+    uint8_t limbCount;
+    uint8_t skeletonType;
+};
+struct CfaLoadedFlexSkeletonHeader {
+    CfaLoadedSkeletonHeader sh;
+    uint8_t dListCount;
+};
+static_assert(sizeof(CfaLoadedSkeletonHeader) == sizeof(SkeletonHeader));
+static_assert(sizeof(CfaLoadedFlexSkeletonHeader) == sizeof(FlexSkeletonHeader));
+constexpr uint8_t kCfaSkeletonNormal = 0;
+constexpr uint8_t kCfaSkeletonFlex = 1;
+
 // ---- Per-item caches. Resources are held as shared_ptr so they stay alive in the owning RM's
 // cache; SkelAnime/jointTable storage is node-stable (unordered_map). Negative results are cached
 // (ok=false) so a broken item costs one attempt, then falls back to the sentinel forever.
 
 struct CfaSkelEntry {
     bool ok = false;
+    bool nonFlexSkeleton = false; // selected from the loaded asset, not the vanilla recipe
     std::shared_ptr<Ship::IResource> skelRes;
     std::shared_ptr<Ship::IResource> animRes;
     SkelAnime skelAnime{};
@@ -344,13 +371,20 @@ inline Gfx* CfaRouteLimbDList(Gfx* dList) {
     if (s == nullptr || strncmp(s, "__OTR__", 7) != 0) {
         return dList; // raw pointer (or null) — covered by the RM bracket instead
     }
+    if (s[7] == '@') {
+        return dList; // Rigid post-limb callbacks receive the already-routed override DL.
+    }
     if (sCfaCurrentGame == nullptr) {
         return NULL; // no direction set: drop the limb rather than submit an unrouted foreign DL
     }
-    static std::unordered_map<const void*, std::string> sRouted; // node-based: values pointer-stable
-    auto it = sRouted.find(s);
-    if (it == sRouted.end()) {
-        it = sRouted.emplace(s, std::string("__OTR__@") + sCfaCurrentGame + ":" + (s + 7)).first;
+    // A shared path literal can describe effects owned by either game. Keep the
+    // owner and path contents in the routing cache. Resources can be reloaded at
+    // the same address, so pointer identity must not select an earlier model.
+    static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> sRouted;
+    auto& paths = sRouted[sCfaCurrentGame]; // node-based: returned strings remain pointer-stable
+    auto it = paths.find(s);
+    if (it == paths.end()) {
+        it = paths.emplace(s, std::string("__OTR__@") + sCfaCurrentGame + ":" + (s + 7)).first;
     }
     return (Gfx*)it->second.c_str();
 }
@@ -503,11 +537,73 @@ inline void CfaRestoreSegs(PlayState* play, const int32_t* segs, int32_t count) 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
+// Native DrawBarinade's procedural surgery. These semantic indices match its rig; loaded
+// normal/flex skeleton dispatch stays independent so compatible custom rigs retain their matrices.
+inline void CfaBarinadeOverride(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot) {
+    const int16_t phase = (int16_t)(play->gameplayFrames * 0xC31);
+    OPEN_DISPS(play->state.gfxCtx);
+    if (limbIndex == 20) {
+        gDPPipeSync(POLY_OPA_DISP++);
+        gSPSegment(POLY_OPA_DISP++, 8,
+                   (uintptr_t)Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, 0, 8, 16, 1, 0,
+                                                 (play->gameplayFrames * -2) % 64, 16, 16, 0, 0, 0, -2));
+        gDPSetEnvColor(POLY_OPA_DISP++, 0, 0, 0, 200);
+        CFA_ROTATE_X(-1.57079632679489661923f, MTXMODE_APPLY); // native -M_PIf / 2
+    } else if (limbIndex >= 10 && limbIndex < 20) {
+        rot->x -= 0x4000;
+        *dList = NULL;
+    } else if (limbIndex == 6) {
+        const float scale = Math_SinS(phase) * 0.05f + 1.0f;
+        Matrix_Scale(scale, scale, scale, MTXMODE_APPLY);
+    } else if (limbIndex == 61) {
+        const float scale = Math_CosS(phase) * 0.1f + 1.0f;
+        Matrix_Scale(scale, scale, scale, MTXMODE_APPLY);
+    } else if (limbIndex == 7) {
+        rot->x -= 0xCCC;
+    }
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+inline void CfaBarinadePost(PlayState* play, s32 limbIndex, Gfx** dList) {
+    Gfx* dl = nullptr;
+    OPEN_DISPS(play->state.gfxCtx);
+    if (limbIndex == 25) {
+        gSPSegment(POLY_XLU_DISP++, 9,
+                   (uintptr_t)Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, (play->gameplayFrames * 10) % 128, 16, 32, 1,
+                                                 0, (play->gameplayFrames * 5) % 128, 16, 32, 0, 10, 0, 5));
+        dl = (Gfx*)sCfaInfo->proceduralDlPaths[0];
+    } else if (limbIndex >= 10 && limbIndex < 20) {
+        dl = (Gfx*)sCfaInfo->proceduralDlPaths[1];
+    } else if (dList != nullptr && *dList != nullptr && limbIndex >= 29 && limbIndex < 56) {
+        dl = *dList;
+    }
+    if (dl != nullptr) {
+        CFA_LOAD_MTX(POLY_XLU_DISP++, play->state.gfxCtx);
+        gSPDisplayList(POLY_XLU_DISP++, CfaRouteLimbDList(dl));
+    }
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+inline void CfaBarinadeBegin(PlayState* play) {
+    OPEN_DISPS(play->state.gfxCtx);
+    CFA_SETUP_XLU(play->state.gfxCtx);
+    gSPSegment(POLY_OPA_DISP++, 8,
+               (uintptr_t)Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, 0, 8, 16, 1, 0,
+                                             (play->gameplayFrames * -10) % 16, 16, 16, 0, 0, 0, -10));
+    gSPSegment(POLY_OPA_DISP++, 9,
+               (uintptr_t)Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, (play->gameplayFrames * -10) % 32, 16, 32, 1, 0,
+                                             (play->gameplayFrames * -5) % 32, 16, 32, 0, -10, 0, -5));
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
 inline s32 CfaOverrideLimbDrawOpa(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot,
                                   CFA_LIMB_ARG arg) {
     const CwItemAnimDrawInfo* info = sCfaInfo;
     if (info == nullptr || dList == NULL) {
         return false;
+    }
+    if (info->proceduralProfile == CW_ANIM_PROFILE_OOT_BARINADE) {
+        CfaBarinadeOverride(play, limbIndex, dList, rot);
     }
     bool synced = false;
     OPEN_DISPS(play->state.gfxCtx);
@@ -548,6 +644,9 @@ inline s32 CfaOverrideLimbDrawOpa(PlayState* play, s32 limbIndex, Gfx** dList, V
 }
 
 inline void CfaPostLimbDrawOpa(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot, CFA_LIMB_ARG arg) {
+    if (sCfaInfo != nullptr && sCfaInfo->proceduralProfile == CW_ANIM_PROFILE_OOT_BARINADE) {
+        CfaBarinadePost(play, limbIndex, dList);
+    }
     const CwAnimLimbDL* l = CfaFindLimbDL(limbIndex);
     if (l == nullptr || (l->postSelf == 0 && l->postDlPath == NULL)) {
         return;
@@ -576,6 +675,21 @@ inline void CfaPostLimbDrawOpa(PlayState* play, s32 limbIndex, Gfx** dList, Vec3
 // perturb the model transform.
 inline void CfaDrawFlame(PlayState* play, const CwItemAnimDrawInfo* info, const char* game, int32_t* segs,
                          int32_t* segCount) {
+#ifdef COMBO_FOREIGN_ANIM_HOST_MM
+    if (info->flameDlPath != nullptr && strcmp(game, "mm") == 0 && !info->flameGrayscale && info->flameBillboardFirst &&
+        info->flameTranslate[0] == 0.0f && info->flameTranslate[1] == 0.0f && info->flameTranslate[2] == 0.0f &&
+        strcmp(info->flameDlPath, "__OTR__objects/gameplay_keep/gameplay_keep_DL_01ACF0") == 0) {
+        DrawMmSoulFlame(play, info->flameColor, info->flameScale);
+        return;
+    }
+    // OoT boss models retain their owning RM and replacement skeleton. Only their
+    // blue-fire composite pass uses MM's native soul renderer in the MM host.
+    if (info->flameDlPath != nullptr && strcmp(game, "oot") == 0 && info->flameGrayscale &&
+        strcmp(info->flameDlPath, "__OTR__objects/object_gi_fire/gGiBlueFireFlameDL") == 0) {
+        DrawOotSoulFlame(play, info->flameColor, info->flameTranslate, info->flameScale);
+        return;
+    }
+#endif
     Gfx* dl = CfaRouteLimbDList((Gfx*)info->flameDlPath);
     if (dl == NULL) {
         return;
@@ -600,6 +714,11 @@ inline void CfaDrawFlame(PlayState* play, const CwItemAnimDrawInfo* info, const 
     OPEN_DISPS(play->state.gfxCtx);
     CFA_LOAD_MTX(POLY_XLU_DISP++, play->state.gfxCtx);
     if (info->flameGrayscale) {
+        // The animated path bypasses the static foreign drawer's color pin. A shelf's
+        // preceding material can leave PRIMITIVE alpha at zero; replacement flame DLs
+        // that inherit that state then disappear even though the skeleton still draws.
+        gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, 255);
+        gDPSetEnvColor(POLY_XLU_DISP++, 255, 255, 255, 255);
         gDPSetGrayscaleColor(POLY_XLU_DISP++, info->flameColor[0], info->flameColor[1], info->flameColor[2], 255);
         gSPGrayscale(POLY_XLU_DISP++, true);
     } else {
@@ -614,6 +733,19 @@ inline void CfaDrawFlame(PlayState* play, const CwItemAnimDrawInfo* info, const 
     }
     CLOSE_DISPS(play->state.gfxCtx);
     Matrix_Pop();
+}
+
+// Native Twinmold's GI binds 23 extra matrices on segment 13. Its canonical head is
+// rigid and does not populate them; initialize every slot instead of exposing allocator bytes.
+// A selected flex replacement uses the normal flex traversal's own populated matrix array.
+inline void CfaTwinmoldMatrices(PlayState* play) {
+    Mtx* matrices = (Mtx*)CFA_ALLOC(play->state.gfxCtx, 23 * sizeof(Mtx));
+    for (int32_t i = 0; i < 23; ++i) {
+        CFA_TO_MTX(&matrices[i]);
+    }
+    OPEN_DISPS(play->state.gfxCtx);
+    gSPSegment(POLY_OPA_DISP++, 13, (uintptr_t)matrices);
+    CLOSE_DISPS(play->state.gfxCtx);
 }
 
 // Reject anything the OPA path cannot express BEFORE a single command is submitted: an out-of-range
@@ -640,6 +772,20 @@ inline bool CfaValidateSegBind(const CwAnimSegBind* b) {
 }
 
 inline bool CfaValidateOpaInfo(const CwItemAnimDrawInfo* info) {
+    if (info->proceduralProfile < CW_ANIM_PROFILE_NONE || info->proceduralProfile > CW_ANIM_PROFILE_MM_TWINMOLD ||
+        (info->freezeLastFrame != 0 && info->freezeLastFrame != 1)) {
+        return false;
+    }
+    if (info->proceduralProfile == CW_ANIM_PROFILE_OOT_BARINADE &&
+        (info->limbCount != 64 || info->segCount != 0 || !CfaIsOtrPath(info->proceduralDlPaths[0]) ||
+         !CfaIsOtrPath(info->proceduralDlPaths[1]))) {
+        return false;
+    }
+    if (info->proceduralProfile == CW_ANIM_PROFILE_MM_TWINMOLD &&
+        (info->limbCount != 13 || info->segCount != 1 || info->segs[0].kind != CW_ANIM_SEG_PATH ||
+         info->segs[0].segment != 8 || !info->segs[0].onOpa)) {
+        return false;
+    }
     if (info->segCount < 0 || info->segCount > CW_ANIM_MAX_SEGS || info->limbColorCount < 0 ||
         info->limbColorCount > CW_ANIM_MAX_LIMB_COLORS || info->limbDLCount < 0 ||
         info->limbDLCount > CW_ANIM_MAX_LIMB_DLS) {
@@ -679,7 +825,8 @@ inline int32_t ComboForeignAnim_Draw(const CwItemAnimDrawInfo* info, const char*
     if (info->opa && !CfaValidateOpaInfo(info)) {
         return 0; // unexpressible recipe — sentinel beats an unbound-segment draw
     }
-    if (Ship::CrossRMRegistry::Get(game) == nullptr) {
+    auto owningRm = Ship::CrossRMRegistry::Get(game);
+    if (owningRm == nullptr) {
         return 0; // owning game not resident: bail before any Gfx is emitted
     }
 
@@ -687,7 +834,10 @@ inline int32_t ComboForeignAnim_Draw(const CwItemAnimDrawInfo* info, const char*
 
     // -- skeleton + animation (keyed by skel+anim; all variants sharing a pair share one instance,
     //    so like MM's single-instance approach all on-screen copies animate in unison) --
-    std::string skelKey = std::string(info->skelPath) + "|" + info->animPath;
+    // Keep the owner and its live Alt selection in the key. Otherwise toggling assets leaves
+    // cached limb pointers/type from the first draw paired with the other selection's DLs.
+    std::string skelKey = std::string(game) + "|" + (owningRm->IsAltAssetsEnabled() ? "alt|" : "vanilla|") +
+                          info->skelPath + "|" + info->animPath + (info->freezeLastFrame ? "|frozen" : "|loop");
     auto skelIt = sCfaSkelCache.find(skelKey);
     if (skelIt == sCfaSkelCache.end()) {
         skelIt = sCfaSkelCache.emplace(skelKey, CfaSkelEntry{}).first;
@@ -704,26 +854,33 @@ inline int32_t ComboForeignAnim_Draw(const CwItemAnimDrawInfo* info, const char*
                 e.animRes = rm->LoadResource(info->animPath);
             }
 
-            FlexSkeletonHeader* skel = e.skelRes ? (FlexSkeletonHeader*)e.skelRes->GetRawPointer() : NULL;
+            auto* skel = e.skelRes ? (CfaLoadedSkeletonHeader*)e.skelRes->GetRawPointer() : nullptr;
             AnimationHeader* anim = e.animRes ? (AnimationHeader*)e.animRes->GetRawPointer() : NULL;
             // soh's SkelAnime_Init/InitFlex assert limbCount == sh.limbCount + 1 — pre-validate instead.
-            if (skel != NULL && anim != NULL && info->limbCount > 0 && (s32)skel->sh.limbCount + 1 == info->limbCount) {
+            if (skel != NULL && anim != NULL && info->limbCount > 0 && (s32)skel->limbCount + 1 == info->limbCount &&
+                (skel->skeletonType == kCfaSkeletonNormal || skel->skeletonType == kCfaSkeletonFlex) &&
+                (info->opa || skel->skeletonType == kCfaSkeletonFlex)) {
+                e.nonFlexSkeleton = skel->skeletonType == kCfaSkeletonNormal;
                 e.jointTable.resize(info->limbCount);
                 if (info->opa) {
                     e.morphTable.resize(info->limbCount);
-                    if (info->nonFlexSkeleton) {
+                    if (e.nonFlexSkeleton) {
                         SkelAnime_Init(play, &e.skelAnime, (SkeletonHeader*)skel, anim, e.jointTable.data(),
                                        e.morphTable.data(), info->limbCount);
                     } else {
-                        SkelAnime_InitFlex(play, &e.skelAnime, skel, anim, e.jointTable.data(), e.morphTable.data(),
-                                           info->limbCount);
+                        SkelAnime_InitFlex(play, &e.skelAnime, (FlexSkeletonHeader*)skel, anim, e.jointTable.data(),
+                                           e.morphTable.data(), info->limbCount);
                     }
                     if (info->playSpeed != 0.0f) {
                         e.skelAnime.playSpeed = info->playSpeed;
                     }
+                    if (info->freezeLastFrame) {
+                        const float lastFrame = Animation_GetLastFrame(anim);
+                        Animation_Change(&e.skelAnime, anim, 1.0f, lastFrame, lastFrame, ANIMMODE_ONCE, 0.0f);
+                    }
                 } else {
-                    SkelAnime_InitFlex(play, &e.skelAnime, skel, anim, e.jointTable.data(), e.jointTable.data(),
-                                       info->limbCount);
+                    SkelAnime_InitFlex(play, &e.skelAnime, (FlexSkeletonHeader*)skel, anim, e.jointTable.data(),
+                                       e.jointTable.data(), info->limbCount);
                 }
                 e.ok = true;
             }
@@ -789,6 +946,11 @@ inline int32_t ComboForeignAnim_Draw(const CwItemAnimDrawInfo* info, const char*
                 return 0;
             }
         }
+        if (info->proceduralProfile == CW_ANIM_PROFILE_OOT_BARINADE) {
+            CfaBarinadeBegin(play);
+            segs[segCount++] = 8;
+            segs[segCount++] = 9;
+        }
         // MM's AnimatedMat_Draw inside the enemy-soul funcs: bind the animated material on the OPA
         // stream (the skeleton samples it there), restored with the rest below.
         int32_t matSegs[kMaxMatEntries];
@@ -817,18 +979,26 @@ inline int32_t ComboForeignAnim_Draw(const CwItemAnimDrawInfo* info, const char*
         gSPComboRMPush(POLY_XLU_DISP++, game);
         CLOSE_DISPS(play->state.gfxCtx);
 
-        if (info->nonFlexSkeleton) {
+        if (info->proceduralProfile == CW_ANIM_PROFILE_MM_TWINMOLD && skelEntry.nonFlexSkeleton) {
+            CfaTwinmoldMatrices(play);
+        }
+        if (skelEntry.nonFlexSkeleton) {
             SkelAnime_DrawOpa(play, skelEntry.skelAnime.skeleton, skelEntry.skelAnime.jointTable,
                               CfaOverrideLimbDrawOpa, CfaPostLimbDrawOpa, NULL);
         } else {
-            SkelAnime_DrawFlexOpa(play, skelEntry.skelAnime.skeleton, skelEntry.skelAnime.jointTable,
-                                  skelEntry.skelAnime.dListCount, CfaOverrideLimbDrawOpa, CfaPostLimbDrawOpa, NULL);
+            SkelAnime_DrawFlexOpaWithXlu(play, skelEntry.skelAnime.skeleton, skelEntry.skelAnime.jointTable,
+                                         skelEntry.skelAnime.dListCount, CfaOverrideLimbDrawOpa, CfaPostLimbDrawOpa,
+                                         NULL);
         }
 
         OPEN_DISPS(play->state.gfxCtx);
         gSPComboRMPop(POLY_OPA_DISP++);
         gSPComboRMPop(POLY_XLU_DISP++);
         CLOSE_DISPS(play->state.gfxCtx);
+        if (!skelEntry.nonFlexSkeleton || info->proceduralProfile == CW_ANIM_PROFILE_MM_TWINMOLD) {
+            const int32_t matrixSegment = 13;
+            CfaRestoreSegs(play, &matrixSegment, 1);
+        }
 
         if (info->flameDlPath != NULL && info->flameAfter) {
             CfaDrawFlame(play, info, game, segs, &segCount); // MM: flame inherits the model transform

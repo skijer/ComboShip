@@ -5,6 +5,7 @@
  */
 
 #include "z_demo_sa.h"
+#include "soh/Enhancements/cosmetics/NativeNpcModels.h"
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
 #include "overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
 #include "objects/object_sa/object_sa.h"
@@ -217,7 +218,9 @@ void func_8098E76C(DemoSa* this, AnimationHeader* animHeaderSeg, u8 arg2, f32 tr
 }
 
 void func_8098E7FC(DemoSa* this, PlayState* play) {
-    SkelAnime_InitFlex(play, &this->skelAnime, &gSariaSkel, &gSariaWaitArmsToSideAnim, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, &this->skelAnime,
+                       (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sSariaNpcModel, gSariaSkel),
+                       &gSariaWaitArmsToSideAnim, NULL, NULL, 0);
     this->actor.shape.yOffset = -10000.0f;
     DemoSa_SetEyeIndex(this, SARIA_EYE_HALF);
     DemoSa_SetMouthIndex(this, SARIA_MOUTH_CLOSED2);
@@ -358,7 +361,8 @@ void func_8098ECF4(DemoSa* this, PlayState* play) {
     SkelAnime* skelAnime = &this->skelAnime;
     f32 frameCount = Animation_GetLastFrame(&gSariaSealGanonAnim);
 
-    SkelAnime_InitFlex(play, skelAnime, &gSariaSkel, NULL, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, skelAnime, (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sSariaNpcModel, gSariaSkel),
+                       NULL, NULL, NULL, 0);
     Animation_Change(skelAnime, &gSariaSealGanonAnim, 1.0f, 0.0f, frameCount, ANIMMODE_ONCE, 0.0f);
     this->action = 7;
     this->actor.shape.shadowAlpha = 0;
@@ -458,6 +462,25 @@ void func_8098F16C(DemoSa* this, PlayState* play) {
     func_8098E554(this, play);
 }
 
+static void DemoSa_SelectModelLimb(DemoSa* this, s32 limbIndex, Gfx** dList) {
+    /* Demo_Sa and En_Sa use different native mouth table order. */
+    static const u8 mouthMap[] = { 0, 3, 4, 1, 2 };
+    if (limbIndex == 16) {
+        s32 mouth = this->mouthIndex >= 0 && this->mouthIndex < 5 ? mouthMap[this->mouthIndex] : 0;
+        *dList = NativeNpcModel_SelectHead(&sSariaNpcModel, *dList, this->eyeIndex, mouth);
+    }
+    if (limbIndex == 15 && this->unk_1B0 != 0 && NativeNpcModel_IsActive(&sSariaNpcModel)) {
+        *dList = NativeNpcModel_SariaOcarina(*dList);
+    }
+    *dList = NativeNpcPose_SelectLimb(&this->skelAnime, limbIndex, *dList);
+}
+
+static s32 DemoSa_ModelXluOverride(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* thisx,
+                                   Gfx** gfx) {
+    DemoSa_SelectModelLimb((DemoSa*)thisx, limbIndex, dList);
+    return false;
+}
+
 void DemoSa_DrawXlu(DemoSa* this, PlayState* play) {
     s32 pad[2];
     s16 eyeIndex = this->eyeIndex;
@@ -477,14 +500,16 @@ void DemoSa_DrawXlu(DemoSa* this, PlayState* play) {
     gDPSetEnvColor(POLY_XLU_DISP++, 0, 0, 0, this->alpha);
     gSPSegment(POLY_XLU_DISP++, 0x0C, D_80116280);
 
-    POLY_XLU_DISP = SkelAnime_DrawFlex(play, skelAnime->skeleton, skelAnime->jointTable, skelAnime->dListCount, NULL,
-                                       NULL, NULL, POLY_XLU_DISP);
+    POLY_XLU_DISP = SkelAnime_DrawFlex(play, skelAnime->skeleton, skelAnime->jointTable, skelAnime->dListCount,
+                                       DemoSa_ModelXluOverride, NULL, this, POLY_XLU_DISP);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
 void func_8098F390(DemoSa* this, PlayState* play) {
-    SkelAnime_InitFlex(play, &this->skelAnime, &gSariaSkel, &gSariaWaitArmsToSideAnim, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, &this->skelAnime,
+                       (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sSariaNpcModel, gSariaSkel),
+                       &gSariaWaitArmsToSideAnim, NULL, NULL, 0);
     this->action = 10;
     this->drawConfig = 1;
 }
@@ -496,7 +521,9 @@ void func_8098F3F0(DemoSa* this, PlayState* play) {
 }
 
 void func_8098F420(DemoSa* this, PlayState* play) {
-    SkelAnime_InitFlex(play, &this->skelAnime, &gSariaSkel, &gSariaSitting3Anim, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, &this->skelAnime,
+                       (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sSariaNpcModel, gSariaSkel),
+                       &gSariaSitting3Anim, NULL, NULL, 0);
     this->action = 11;
     this->drawConfig = 0;
     this->actor.shape.shadowAlpha = 0;
@@ -612,7 +639,9 @@ void func_8098F7FC(DemoSa* this, PlayState* play) {
 void func_8098F83C(DemoSa* this, PlayState* play) {
     Vec3f* thisPos = &this->actor.world.pos;
 
-    SkelAnime_InitFlex(play, &this->skelAnime, &gSariaSkel, &gSariaWaitOnBridgeAnim, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, &this->skelAnime,
+                       (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sSariaNpcModel, gSariaSkel),
+                       &gSariaWaitOnBridgeAnim, NULL, NULL, 0);
     Actor_SpawnAsChild(&play->actorCtx, &this->actor, play, ACTOR_EN_ELF, thisPos->x, thisPos->y, thisPos->z, 0, 0, 0,
                        FAIRY_KOKIRI);
     this->action = 16;
@@ -790,6 +819,7 @@ s32 DemoSa_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* 
     if ((limbIndex == 15) && (this->unk_1B0 != 0)) {
         *dList = gSariaRightHandAndOcarinaDL;
     }
+    DemoSa_SelectModelLimb(this, limbIndex, dList);
     return false;
 }
 

@@ -39,7 +39,11 @@ typedef struct SkyboxContext {
     /* 0x220 */ s16 angle;
     /* 0x222 */ Color_RGB8 prim;
     /* 0x225 */ Color_RGB8 env;
-} SkyboxContext; // size = 0x228
+    // Optional OoT color-sky lists, owned by the scene arena. Native lists remain
+    // available for immediate fallback when the option or Alt Assets is disabled.
+    Gfx (*ootSkyDLists[2])[150];
+    u8 ootSkyPhases[2];
+} SkyboxContext; // Original N64 size: 0x228; port-owned fields expand this structure.
 
 void Skybox_Reload(struct PlayState* play, SkyboxContext* skyboxCtx, s16 skyboxId);
 void Skybox_Init(struct GameState* gameState, SkyboxContext* skyboxCtx, s16 skyboxId);
@@ -49,6 +53,9 @@ void Skybox_Draw(SkyboxContext* skyboxCtx, struct GraphicsContext* gfxCtx, s16 s
                  f32 z);
 void Skybox_Update(SkyboxContext* skyboxCtx);
 void Skybox_Calculate128(SkyboxContext* skyboxCtx, s32 nFaces);
+s32 Skybox_IsOotSkyActive(const SkyboxContext* skyboxCtx, s16 skyboxId);
+s32 Skybox_PrepareOot(SkyboxContext* skyboxCtx, s16 skyboxId, u16 time, u8* timeBlend);
+u8 Skybox_GetOotCloudBlend(SkyboxContext* skyboxCtx, s16 blend);
 
 // #region 2S2H [Port]
 typedef enum SkyboxTexturesIndex {

@@ -1,3 +1,4 @@
+// vim: ft=cpp
 #pragma once
 
 #define BTN_CUSTOM_MODIFIER1 0x0040
@@ -74,6 +75,9 @@ class OTRGlobals {
     void ScaleImGui();
     void Initialize();
     void RunExtract(int argc, char* argv[]);
+    // Fleet Ship Combo: pump the window with a "waiting" modal while 2ship's VISIBLE extractor
+    // (2ship.exe --fleet-extract) builds mm.o2r; returns when that child exits. Skijer's NEI
+    void RunFleetGuestExtractWait();
     bool HasMasterQuest();
     bool HasOriginal();
     uint32_t GetInterpolationFPS();
@@ -91,6 +95,8 @@ void DeinitOTR(void);
 void OTRMessage_Init();
 void Graph_StartFrame();
 void Graph_ProcessGfxCommands(Gfx* commands);
+void PreludeLoadProbe_BeginStateReload(void);
+void PreludeLoadProbe_EndStateReload(void);
 void OTRGfxPrint(const char* str, void* printer, void (*printImpl)(void*, char));
 void OTRGetPixelDepthPrepare(float x, float y);
 uint16_t OTRGetPixelDepth(float x, float y);
@@ -129,6 +135,8 @@ uint8_t Randomizer_IsSeedGenerated();
 uint8_t Randomizer_IsSpoilerLoaded();
 void Randomizer_SetSpoilerLoaded(bool spoilerLoaded);
 uint8_t Randomizer_GenerateRandomizer();
+bool Randomizer_IsGenerating();
+void Randomizer_WaitForGeneration();
 void Randomizer_ShowRandomizerMenu();
 // ComboShip: combo (cross-world) generation, driven from the file-select randomizer screen.
 void SOH_TriggerComboGenerate(void);
@@ -158,6 +166,24 @@ void Messagebox_ShowErrorBox(char* title, char* body);
 extern "C" {
 #endif
 uint64_t GetUnixTimestamp();
+
+// The NEI asset folder for THIS game ("nei", or "nei/soh" in ComboShip, where both games share one
+// Ship directory and their packs collide by name). Build every nei/ path from this, never a literal.
+const char* Nei_AssetDir(void);
+// Lock/unlock the audio thread's mutex (the SAME `audio.mutex` instance held in
+// OTRAudio_Thread while AudioMgr_CreateNextAudioBuffer runs the mixer). Game-thread
+// code that mutates state the mixer reads (e.g. the MM SFX bank engine) must hold
+// this for the duration of the mutation. Declared extern "C" so BOTH C and C++ mod
+// TUs can call it. Do NOT call from the audio thread / mixer (it already holds the
+// lock — re-locking a std::mutex is undefined / self-deadlock).
+void OTRAudio_LockMutex(void);
+void OTRAudio_UnlockMutex(void);
+
+// Sheikah Sensor rune: the five wished-for items, consulted in slot order. Each CVar holds a
+// RandomizerGet outright, so the menu writes exactly what the rune reads.
+#define SENSOR_DESIRE_SLOTS 5
+#define CVAR_SENSOR_DESIRE_PREFIX "gNei.SensorDesire"
+uint8_t Randomizer_SensorBuildHint(void);
 #ifdef __cplusplus
 };
 #endif

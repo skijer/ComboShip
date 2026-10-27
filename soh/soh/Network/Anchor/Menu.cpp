@@ -1,7 +1,11 @@
+#include "../../../../combo/ComboGameMode.h"
+#include <ship/Context.h>
+
 #include "Anchor.h"
 #include "soh/SohGui/SohGui.hpp"
 #include "soh/SohGui/SohMenu.h"
 #include "soh/util.h"
+#include "soh/SohGui/UIWidgets.hpp"
 
 namespace SohGui {
 extern std::shared_ptr<SohMenu> mSohMenu;
@@ -128,18 +132,18 @@ void AnchorMainMenu(WidgetInfo& info) {
     ImGui::SeparatorText("Current Room");
     ImGui::Text("%s Connected", ICON_FA_CHECK);
 
-#ifndef COMBO_BUILD
-    // ComboShip: replaced in combo builds by the shared "Resync team state" control in the combo
-    // menu's Anchor panel, which syncs BOTH games. Kept here for standalone SoH.
-    UIWidgets::PushStyleButton(THEME_COLOR);
-    if (ImGui::Button("Request Team State")) {
-        anchor->SendPacket_RequestTeamState();
-    }
-    UIWidgets::Tooltip("Try this if you are missing items or flags that your team members have collected");
-    UIWidgets::PopStyleButton();
+    if (!Combo_IsCombinedGame()) {
+        // ComboShip: replaced in combo builds by the shared "Resync team state" control in the combo
+        // menu's Anchor panel, which syncs BOTH games. Kept here for standalone SoH.
+        UIWidgets::PushStyleButton(THEME_COLOR);
+        if (ImGui::Button("Request Team State")) {
+            anchor->SendPacket_RequestTeamState();
+        }
+        UIWidgets::Tooltip("Try this if you are missing items or flags that your team members have collected");
+        UIWidgets::PopStyleButton();
 
-    ImGui::SameLine();
-#endif
+        ImGui::SameLine();
+    }
 
     UIWidgets::WindowButton("Toggle Anchor Room Window", CVAR_WINDOW("AnchorRoom"), SohGui::mAnchorRoomWindow);
 
@@ -157,6 +161,13 @@ void AnchorMainMenu(WidgetInfo& info) {
                            "Visibility is restricted according to the Show Locations mode for the room."
                          : "Cannot show other players because the room's Show Locations mode is set to None."));
     ImGui::EndDisabled();
+
+    if (UIWidgets::CVarCheckbox("Hide Player Nametags", CVAR_REMOTE_ANCHOR("HideNameTags"),
+                                UIWidgets::CheckboxOptions()
+                                    .Color(THEME_COLOR)
+                                    .Tooltip("Hide the floating name tags above other players. Local-only setting."))) {
+        Anchor::Instance->RefreshClientNameTags();
+    }
 
     ImGui::Spacing();
 
@@ -248,28 +259,28 @@ void AnchorInstructionsMenu(WidgetInfo& info) {
 
 void RegisterAnchorMenu() {
     WidgetPath path = { "Network", "Anchor", SECTION_COLUMN_1 };
-#ifndef COMBO_BUILD
-    // ComboShip: the connection UI is combo-native (comboui Anchor panel) in combo builds; hide soh's
-    // AnchorMainMenu so it's not duplicated. Admin/Instructions stay (combo replaces them).
-    SohGui::mSohMenu->AddWidget(path, "AnchorMainMenu", WIDGET_CUSTOM)
-        .CustomFunction(AnchorMainMenu)
-        .HideInSearch(true);
-#endif
+    if (!Combo_IsCombinedGame()) {
+        // ComboShip: the connection UI is combo-native (comboui Anchor panel) in combo builds; hide soh's
+        // AnchorMainMenu so it's not duplicated. Admin/Instructions stay (combo replaces them).
+        SohGui::mSohMenu->AddWidget(path, "AnchorMainMenu", WIDGET_CUSTOM)
+            .CustomFunction(AnchorMainMenu)
+            .HideInSearch(true);
+    }
     path.column = SECTION_COLUMN_2;
-#ifndef COMBO_BUILD
-    // ComboShip: room-admin UI is combo-native (comboui Anchor panel) in combo builds; hide
-    // soh's AnchorAdminMenu so it's not duplicated. Instructions stay (combo replaces them).
-    SohGui::mSohMenu->AddWidget(path, "AnchorAdminMenu", WIDGET_CUSTOM)
-        .CustomFunction(AnchorAdminMenu)
-        .HideInSearch(true);
-#endif
-#ifndef COMBO_BUILD
-    // ComboShip: the entire Anchor UI is combo-native (comboui panel + room window) in combo builds;
-    // hide soh's Instructions too so the combo panels are the sole Anchor UI.
-    SohGui::mSohMenu->AddWidget(path, "AnchorInstructionsMenu", WIDGET_CUSTOM)
-        .CustomFunction(AnchorInstructionsMenu)
-        .HideInSearch(true);
-#endif
+    if (!Combo_IsCombinedGame()) {
+        // ComboShip: room-admin UI is combo-native (comboui Anchor panel) in combo builds; hide
+        // soh's AnchorAdminMenu so it's not duplicated. Instructions stay (combo replaces them).
+        SohGui::mSohMenu->AddWidget(path, "AnchorAdminMenu", WIDGET_CUSTOM)
+            .CustomFunction(AnchorAdminMenu)
+            .HideInSearch(true);
+    }
+    if (!Combo_IsCombinedGame()) {
+        // ComboShip: the entire Anchor UI is combo-native (comboui panel + room window) in combo builds;
+        // hide soh's Instructions too so the combo panels are the sole Anchor UI.
+        SohGui::mSohMenu->AddWidget(path, "AnchorInstructionsMenu", WIDGET_CUSTOM)
+            .CustomFunction(AnchorInstructionsMenu)
+            .HideInSearch(true);
+    }
 }
 
 static RegisterMenuInitFunc menuInitFunc(RegisterAnchorMenu);

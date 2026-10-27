@@ -1,0 +1,1855 @@
+{
+  "version": 1,
+  "raw_bytes": 52758332,
+  "raw_sha256": "f5c81897902e8f9dbf6945d80245b0eba119ff36a01a267c30fd8974bec6859d",
+  "packed_bytes": 10356747,
+  "packed_sha256": "ea4745ba956ad98429533fa4101b3de32223993c925c9e7c7fd742c0e2cd4601",
+  "parts": [
+    {
+      "name": "pool.zlib.001.b64",
+      "encoded_bytes": 131072,
+      "sha256": "c7082181c9a7dd9e42ef06b7f6663ce02da57da66d867be828aa61aa6fa80725"
+    },
+    {
+      "name": "pool.zlib.002.b64",
+      "encoded_bytes": 131072,
+      "sha256": "a881c8ef9d17c0b9529e5d9b24c89681b1e36458e07feccce6ddbada0954fc1a"
+    },
+    {
+      "name": "pool.zlib.003.b64",
+      "encoded_bytes": 131072,
+      "sha256": "714c4b76a6262fc0e7687c5c836d3d6095e52eb377daa753e6623bfda1234117"
+    },
+    {
+      "name": "pool.zlib.004.b64",
+      "encoded_bytes": 131072,
+      "sha256": "1d6cd9cbef8f0b2b216da0fe89569c336999b088cd2a68d73fc8b21f25238f96"
+    },
+    {
+      "name": "pool.zlib.005.b64",
+      "encoded_bytes": 131072,
+      "sha256": "76e9ee480eaa74504a0bf00b552c0fae4dc05ca9cf2d6e7c5dd7970f3eef8fbe"
+    },
+    {
+      "name": "pool.zlib.006.b64",
+      "encoded_bytes": 131072,
+      "sha256": "617918c7dd9ee5dc64f1da5f290c86d3da655dcee795c240dece03b528ca3861"
+    },
+    {
+      "name": "pool.zlib.007.b64",
+      "encoded_bytes": 131072,
+      "sha256": "3ec232a3371a43866b2c5f0325a02968ca5df7b3fe3ee0dd9f297603c6337b7b"
+    },
+    {
+      "name": "pool.zlib.008.b64",
+      "encoded_bytes": 131072,
+      "sha256": "8afa5044e7b7c924c1289e56a75780a225b59bd6fe976cc5b1c0ac71d6697dbe"
+    },
+    {
+      "name": "pool.zlib.009.b64",
+      "encoded_bytes": 131072,
+      "sha256": "6b85b94c447848ce6198f7c7267149fa56fb2683eaae0172b44d6e383f823c2c"
+    },
+    {
+      "name": "pool.zlib.010.b64",
+      "encoded_bytes": 131072,
+      "sha256": "ce9410b67f76961458998973c9ce2775334b2eb416aeca21099789a69d49e9e5"
+    },
+    {
+      "name": "pool.zlib.011.b64",
+      "encoded_bytes": 131072,
+      "sha256": "ecbdf88edc829bee3d3ef85658aff6b7a529c9200948c33527760207e4b13585"
+    },
+    {
+      "name": "pool.zlib.012.b64",
+      "encoded_bytes": 131072,
+      "sha256": "360d46cf6ec66563a9204e408859e241d3540f7cc4a6ac6b5d808706557848c0"
+    },
+    {
+      "name": "pool.zlib.013.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b0d35282f864966609544ca38210db1a71edecb2d7dad8c890d92c7a922f2886"
+    },
+    {
+      "name": "pool.zlib.014.b64",
+      "encoded_bytes": 131072,
+      "sha256": "e3a46c04ee3425bd640551f46830e2303dba9c4f3dc615dbb446f8fd527c89fb"
+    },
+    {
+      "name": "pool.zlib.015.b64",
+      "encoded_bytes": 131072,
+      "sha256": "1397b24f7cfc141872ad9005b6aa6b094a66dedaa2afefe53a8ad314e46134cf"
+    },
+    {
+      "name": "pool.zlib.016.b64",
+      "encoded_bytes": 131072,
+      "sha256": "e249d4423dedf049d702a7dbffa59be8020879dee6035da69c1be7298647da52"
+    },
+    {
+      "name": "pool.zlib.017.b64",
+      "encoded_bytes": 131072,
+      "sha256": "8bd5334b07a7c05fb22d64ba9b406cc86df108938d7486e652495c6c4886b187"
+    },
+    {
+      "name": "pool.zlib.018.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b77ebf8b857ffbb4d663b0d875f599e8ad6321ab82476636679ae7737659fdd4"
+    },
+    {
+      "name": "pool.zlib.019.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b86614bd632ae8787dccea09be2d903e8dfc2399a0440d5f85506f4deb13d509"
+    },
+    {
+      "name": "pool.zlib.020.b64",
+      "encoded_bytes": 131072,
+      "sha256": "57f5ab0fd4214d3ede3aad20c5e340b65b84edc70e2d46bfd5d79d9b46556acf"
+    },
+    {
+      "name": "pool.zlib.021.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b9f49db1a3678d11a1f4a4930011ab80ad70326ffefd8eb44e3bd41003bf0a51"
+    },
+    {
+      "name": "pool.zlib.022.b64",
+      "encoded_bytes": 131072,
+      "sha256": "f425ee59b1cba19c171ac366c557b3ac45f30d66bc1e30455a432b86af317a51"
+    },
+    {
+      "name": "pool.zlib.023.b64",
+      "encoded_bytes": 131072,
+      "sha256": "17eaa591576ccd71baaf5be642a5ac302f90d27ba52d472c27309988538251ab"
+    },
+    {
+      "name": "pool.zlib.024.b64",
+      "encoded_bytes": 131072,
+      "sha256": "cee6e59cde8b2a1c4dc4cb59350734f67a6e037ae568584944f909c575e61467"
+    },
+    {
+      "name": "pool.zlib.025.b64",
+      "encoded_bytes": 131072,
+      "sha256": "96864b376c67ed67fb915c22055ca862739995eab5c2ca79ee63a60700ceae42"
+    },
+    {
+      "name": "pool.zlib.026.b64",
+      "encoded_bytes": 131072,
+      "sha256": "f72b092b024d976f41be4aa980d67035a18115ac1598edcdb87ed2b7b30cf943"
+    },
+    {
+      "name": "pool.zlib.027.b64",
+      "encoded_bytes": 131072,
+      "sha256": "87a087ef033b5637b0211e670e21672e83637ccd917e049ef67ab8a8ab06cb59"
+    },
+    {
+      "name": "pool.zlib.028.b64",
+      "encoded_bytes": 131072,
+      "sha256": "a1e5a47d95e72b31ca903f03537a23f3a8ae7f2a24bbde6ce08c7f022987a1d8"
+    },
+    {
+      "name": "pool.zlib.029.b64",
+      "encoded_bytes": 131072,
+      "sha256": "f64f821aaaf19b3a0e95b7e2af73841abc2d4e79972281b445d4966e6efba891"
+    },
+    {
+      "name": "pool.zlib.030.b64",
+      "encoded_bytes": 131072,
+      "sha256": "2a6971fab1cd4c409b8b35da19857497c8e5bcb0fb9d106ab50e9b96e5f115cf"
+    },
+    {
+      "name": "pool.zlib.031.b64",
+      "encoded_bytes": 131072,
+      "sha256": "7f55381f75d2b3dc12a233a3b86ab8e26aef4601f94557cdac96100147f4738b"
+    },
+    {
+      "name": "pool.zlib.032.b64",
+      "encoded_bytes": 131072,
+      "sha256": "de0c028454eb913992da65f2a47e3d9e52d166fe51de946a74da4d21e185854a"
+    },
+    {
+      "name": "pool.zlib.033.b64",
+      "encoded_bytes": 131072,
+      "sha256": "cbd65d6ff85132336a7f53243dd88e514e3260d7a5092fabf938e8b550014874"
+    },
+    {
+      "name": "pool.zlib.034.b64",
+      "encoded_bytes": 131072,
+      "sha256": "30a5bc431ee92a85f04bd7d16883c1240177094d519c258dc11efe9438626409"
+    },
+    {
+      "name": "pool.zlib.035.b64",
+      "encoded_bytes": 131072,
+      "sha256": "fd18a5157fd8aa058cabaa221118c8ee032ea4c38dd132365cecae7c7e74f31f"
+    },
+    {
+      "name": "pool.zlib.036.b64",
+      "encoded_bytes": 131072,
+      "sha256": "1b71535613c86a85e0650005d01eb2975c630c0b31c3fafd961725b181dd4cb0"
+    },
+    {
+      "name": "pool.zlib.037.b64",
+      "encoded_bytes": 131072,
+      "sha256": "c894d99ce83fa27bb5021ad400a3eaf215fecc8ba2d16bacff55fd9e8d48b333"
+    },
+    {
+      "name": "pool.zlib.038.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b54ae01fa3656c16332e97e0c523268b2460ac97a11392d35068fddf77d79188"
+    },
+    {
+      "name": "pool.zlib.039.b64",
+      "encoded_bytes": 131072,
+      "sha256": "51f43022bebad1df7878c39d5e96d05edf65343169242a584b4e80ccfdee4383"
+    },
+    {
+      "name": "pool.zlib.040.b64",
+      "encoded_bytes": 131072,
+      "sha256": "11f69f868aa51e57121c1fe267027af6b782fdf9bb1370603ae817488c5cd899"
+    },
+    {
+      "name": "pool.zlib.041.b64",
+      "encoded_bytes": 131072,
+      "sha256": "67ea69343afd5e7eb2f7ddc4f3e75c676e581927bd54b3fb54ef07ca87343312"
+    },
+    {
+      "name": "pool.zlib.042.b64",
+      "encoded_bytes": 131072,
+      "sha256": "8eaa64aedee35bf6659fe371337d9dff2129db7fdb6a3148d9cca4e56b2cc107"
+    },
+    {
+      "name": "pool.zlib.043.b64",
+      "encoded_bytes": 131072,
+      "sha256": "554703cdfd548162799d128dd5a92c8093ea49da8958d5ffad67e781905a20e4"
+    },
+    {
+      "name": "pool.zlib.044.b64",
+      "encoded_bytes": 131072,
+      "sha256": "1aff97fec643fb60e2d776bcf3eafef6ca5d0d43977d4db89c3ce47552f74434"
+    },
+    {
+      "name": "pool.zlib.045.b64",
+      "encoded_bytes": 131072,
+      "sha256": "226e82ea820e0357540e1edf2a07ea7d2ee3f61ece4b8d2c66f7b7c98a78b32d"
+    },
+    {
+      "name": "pool.zlib.046.b64",
+      "encoded_bytes": 131072,
+      "sha256": "4594554d229f33b596ef152959ab0d378d82af9d5b9bda8c0836dde1e590c8c0"
+    },
+    {
+      "name": "pool.zlib.047.b64",
+      "encoded_bytes": 131072,
+      "sha256": "9b9e734b0ca1451ed7e49bd39f03f512acedfe54cfc3d600c50f8add947221d7"
+    },
+    {
+      "name": "pool.zlib.048.b64",
+      "encoded_bytes": 131072,
+      "sha256": "977f7476fa989657303bd3877d984b5ebe668f5ce4dcb55fa83c0e72f4800015"
+    },
+    {
+      "name": "pool.zlib.049.b64",
+      "encoded_bytes": 131072,
+      "sha256": "ab9e45bd062377a8b8006cdfdf8c7166b31468246242ba8386b30b3b48b078d7"
+    },
+    {
+      "name": "pool.zlib.050.b64",
+      "encoded_bytes": 131072,
+      "sha256": "6941c0adb2db6fedd7e227f09416a45efaa842ad9b81bf187eda9ef8d9d7ab27"
+    },
+    {
+      "name": "pool.zlib.051.b64",
+      "encoded_bytes": 131072,
+      "sha256": "c48c131c5b5fe44b04694226dac069176c54999201bdce8a8a3680c921ab78ff"
+    },
+    {
+      "name": "pool.zlib.052.b64",
+      "encoded_bytes": 131072,
+      "sha256": "16b35f568dfd4b73e5f8c5ec6e187ad81af141ae957390de36487005be223a75"
+    },
+    {
+      "name": "pool.zlib.053.b64",
+      "encoded_bytes": 131072,
+      "sha256": "fdba679ef58cd00658551ecd1c8e3cfb325f5daee7227a3c177afa899c203932"
+    },
+    {
+      "name": "pool.zlib.054.b64",
+      "encoded_bytes": 131072,
+      "sha256": "42cc9ace32398014d0e6947ed259ed9f1bf566c46f7945119c5dd10c87948b79"
+    },
+    {
+      "name": "pool.zlib.055.b64",
+      "encoded_bytes": 131072,
+      "sha256": "4761b6e31110d9b2a0330f12cafb765c9c660d3ac8db6b69ebf6585adcc33a05"
+    },
+    {
+      "name": "pool.zlib.056.b64",
+      "encoded_bytes": 131072,
+      "sha256": "41831545fdbb53480b1de1efbaad16db530fa0fc8b9f527a68823e2e71200b00"
+    },
+    {
+      "name": "pool.zlib.057.b64",
+      "encoded_bytes": 131072,
+      "sha256": "d912607fd5c9938c04cfe54250ff07def788799bb35fc031272830ffcd13cf80"
+    },
+    {
+      "name": "pool.zlib.058.b64",
+      "encoded_bytes": 131072,
+      "sha256": "94c6178ee66ce37458fe4a9d7c28330fd561f690e9bfad651e7446d397f1f7c1"
+    },
+    {
+      "name": "pool.zlib.059.b64",
+      "encoded_bytes": 131072,
+      "sha256": "607a0615e5274e2e97eed21af733dba459f173caf3aa55a69b0e9c3a4a30afbf"
+    },
+    {
+      "name": "pool.zlib.060.b64",
+      "encoded_bytes": 131072,
+      "sha256": "42c165cc6822e1e903d2c918f091d12d6b7d8209fb1563e85f534028a20b568d"
+    },
+    {
+      "name": "pool.zlib.061.b64",
+      "encoded_bytes": 131072,
+      "sha256": "5a2b3218c7eeb0a1b773e5eb91c647ed5f81dce1ebdf0c5940bd41b65b380de4"
+    },
+    {
+      "name": "pool.zlib.062.b64",
+      "encoded_bytes": 131072,
+      "sha256": "6120b5599c69e10b5996b9ac710d41870bdc7291342e9a491ecceddf19099165"
+    },
+    {
+      "name": "pool.zlib.063.b64",
+      "encoded_bytes": 131072,
+      "sha256": "d2fdd0c53dab4715d0a93739d73d16099cbf6a60eb69914884fb1cb26fb3a841"
+    },
+    {
+      "name": "pool.zlib.064.b64",
+      "encoded_bytes": 131072,
+      "sha256": "833f7ea94a30e224733c2a2defcbe7075688aafa7e9e66c374ed99e8786faf1f"
+    },
+    {
+      "name": "pool.zlib.065.b64",
+      "encoded_bytes": 131072,
+      "sha256": "3929410d8c7d0247a522dd6258f5bcee23e7462107ded476e1716f136a3c6dfe"
+    },
+    {
+      "name": "pool.zlib.066.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b3b8b4161b2e849422f7ba348042af423acac964cb4280a6c4701258bbbc46af"
+    },
+    {
+      "name": "pool.zlib.067.b64",
+      "encoded_bytes": 131072,
+      "sha256": "2a8141a998208c0f0dd58f35ed68947a5255c960321960045f0876c0928d81e1"
+    },
+    {
+      "name": "pool.zlib.068.b64",
+      "encoded_bytes": 131072,
+      "sha256": "4d1b35f5009c8ed0e27f04d2be4dba256cc7f805c977a75b6f2dd149b4712d2a"
+    },
+    {
+      "name": "pool.zlib.069.b64",
+      "encoded_bytes": 131072,
+      "sha256": "3f0c29a3c2da257543e15af48e8988ef63fa1246e72d5e3fe18962d3d22ca256"
+    },
+    {
+      "name": "pool.zlib.070.b64",
+      "encoded_bytes": 131072,
+      "sha256": "cf72e69699e85c3638e591fe9775f06791ec033c29db5211fb20dba14aee1a98"
+    },
+    {
+      "name": "pool.zlib.071.b64",
+      "encoded_bytes": 131072,
+      "sha256": "44f6242781457ce80539fc767ee44deae8810b5f62870b0036527294e1943d1f"
+    },
+    {
+      "name": "pool.zlib.072.b64",
+      "encoded_bytes": 131072,
+      "sha256": "86bfadd4469d7529f066a2451c05f15dfb7f1b8fb5aa0fc3414dbc3fb8c07ce3"
+    },
+    {
+      "name": "pool.zlib.073.b64",
+      "encoded_bytes": 131072,
+      "sha256": "119b81006a1d93eaae1ac847a46d00819c0385eab006294efa70291d44ce780a"
+    },
+    {
+      "name": "pool.zlib.074.b64",
+      "encoded_bytes": 131072,
+      "sha256": "88059c9ff5b2255bf3fa2b5260d3f66cf49d94529e8a8cc21085d0ebc5eb098c"
+    },
+    {
+      "name": "pool.zlib.075.b64",
+      "encoded_bytes": 131072,
+      "sha256": "9f306f91f08d64c09bbf03bdc8a3109dbf05303fc83cc2b5c4ec0ec84d72a7f5"
+    },
+    {
+      "name": "pool.zlib.076.b64",
+      "encoded_bytes": 131072,
+      "sha256": "a7c550624a13f49f27c72919a8537b769a29d392b2c55ea6c09aa32fc029bbef"
+    },
+    {
+      "name": "pool.zlib.077.b64",
+      "encoded_bytes": 131072,
+      "sha256": "322d9d9808f7e3971c193c5d719691b6259aeda6ed8da20676af8865ebb1d9c2"
+    },
+    {
+      "name": "pool.zlib.078.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b0d673f2cc9ad6517bb5688a53927c447badea3845df4eb6759351738def84a8"
+    },
+    {
+      "name": "pool.zlib.079.b64",
+      "encoded_bytes": 131072,
+      "sha256": "61ff99f218520ce71a0b169d0a466b7d582728aaa7ac06fb7801552f31373bd9"
+    },
+    {
+      "name": "pool.zlib.080.b64",
+      "encoded_bytes": 131072,
+      "sha256": "319945c083a26b64bb9d91097b8416f5d906e53b142151b6023f363c8489f5fa"
+    },
+    {
+      "name": "pool.zlib.081.b64",
+      "encoded_bytes": 131072,
+      "sha256": "1db13c3785b186b368c6e18ca63e55bbdd84921fcf5f6aafc54f43c4bdeff668"
+    },
+    {
+      "name": "pool.zlib.082.b64",
+      "encoded_bytes": 131072,
+      "sha256": "c6431a110e6e33e42b6a1f422acdf1d3a5a5f059df2d5ba2ea35174b98d194ed"
+    },
+    {
+      "name": "pool.zlib.083.b64",
+      "encoded_bytes": 131072,
+      "sha256": "826166fac5b806a9b8a2bf0d207b82483cabe3a611f990fb64f8e283855d589e"
+    },
+    {
+      "name": "pool.zlib.084.b64",
+      "encoded_bytes": 131072,
+      "sha256": "b529c26e29b11d5d00b650b3895ab7af9de7e03b2f5a122f35e29e013ecd2545"
+    },
+    {
+      "name": "pool.zlib.085.b64",
+      "encoded_bytes": 131072,
+      "sha256": "c2eacafe246fd999245dd54ff6a610b953007ef8ecdc2349b903c6b7ef385cbe"
+    },
+    {
+      "name": "pool.zlib.086.b64",
+      "encoded_bytes": 131072,
+      "sha256": "086259e437a550b92ee7a43b60455230b0762747613830e7b174eafa52d063ae"
+    },
+    {
+      "name": "pool.zlib.087.b64",
+      "encoded_bytes": 131072,
+      "sha256": "e211a89d30bd3fca9615b5a365290f47aee4b6d4d627c6383227acfc7401d7c7"
+    },
+    {
+      "name": "pool.zlib.088.b64",
+      "encoded_bytes": 131072,
+      "sha256": "8b4963ef4791cb900b65d2c67bb7db562ff43abf65e192a2e79cb547fd5aa60c"
+    },
+    {
+      "name": "pool.zlib.089.b64",
+      "encoded_bytes": 131072,
+      "sha256": "13cc8a613defdb7af8d9d3ee751276ae31ed2092e2618ab1f27875db34040e69"
+    },
+    {
+      "name": "pool.zlib.090.b64",
+      "encoded_bytes": 131072,
+      "sha256": "4cdb5b55b616522691c3d102d883d94ce558ff10e3b86258d231f5da5e0a3804"
+    },
+    {
+      "name": "pool.zlib.091.b64",
+      "encoded_bytes": 131072,
+      "sha256": "df3a0657726a0bb6c3fb4968e728c4e77e637abfd7b626e9e59e7fa6dfe40a73"
+    },
+    {
+      "name": "pool.zlib.092.b64",
+      "encoded_bytes": 131072,
+      "sha256": "edbf68fa4738fecadf33d5ee7ed7a34fdaf0d30a81ba7246b22f16ed89da7e8f"
+    },
+    {
+      "name": "pool.zlib.093.b64",
+      "encoded_bytes": 131072,
+      "sha256": "6f807c41f31489358bccedc14e8b21c16ea95d632b17a7ffa3b963e5dada4841"
+    },
+    {
+      "name": "pool.zlib.094.b64",
+      "encoded_bytes": 131072,
+      "sha256": "595accf5408849ef51ce600ff5d077e1488f75488d6d326b9a83dfa5cb1515f7"
+    },
+    {
+      "name": "pool.zlib.095.b64",
+      "encoded_bytes": 131072,
+      "sha256": "a3c7d246fb01474cfa5fb309a74c113cc22a25ace6b49c70603e0adb61dbf2f8"
+    },
+    {
+      "name": "pool.zlib.096.b64",
+      "encoded_bytes": 131072,
+      "sha256": "4fcf13c5596172b58328631ceaf893f1f85d1dbb5b5bd2ce4c6e3279db43bde9"
+    },
+    {
+      "name": "pool.zlib.097.b64",
+      "encoded_bytes": 131072,
+      "sha256": "802e244c915d84337efd7b6da5e54e6ca3825cd6a1d299a10b40e7c6843e8d64"
+    },
+    {
+      "name": "pool.zlib.098.b64",
+      "encoded_bytes": 131072,
+      "sha256": "9ba24fba9ce415252083c762f555dd66a581cfd899e6c4334cffc0c4dd2e61c2"
+    },
+    {
+      "name": "pool.zlib.099.b64",
+      "encoded_bytes": 131072,
+      "sha256": "4a86da71b678290a2eac31045a0919fd53bab89374d828268902f05756d3bbe4"
+    },
+    {
+      "name": "pool.zlib.100.b64",
+      "encoded_bytes": 131072,
+      "sha256": "3e2cc40628f7c48c8eb5f68f9314781a1fbbc857ddd0bb741d94c4a9f9b0b922"
+    },
+    {
+      "name": "pool.zlib.101.b64",
+      "encoded_bytes": 131072,
+      "sha256": "97bc54793d65f5d76a9b4907b42eaa89e2087015cdf8b915cf621a0be08767d6"
+    },
+    {
+      "name": "pool.zlib.102.b64",
+      "encoded_bytes": 131072,
+      "sha256": "5c4ee71154e55c78e5cb09e36a3f18fb8ae5495c97d15c9794764d9255d0794c"
+    },
+    {
+      "name": "pool.zlib.103.b64",
+      "encoded_bytes": 131072,
+      "sha256": "d8288b21796df1678153e13c4817e4080128fbc8760a75486ce4e6bd024c6f71"
+    },
+    {
+      "name": "pool.zlib.104.b64",
+      "encoded_bytes": 131072,
+      "sha256": "520048bee74cc9b4f409e60dc5c6f0c397eb12650a9815fce998991fb806152a"
+    },
+    {
+      "name": "pool.zlib.105.b64",
+      "encoded_bytes": 131072,
+      "sha256": "cf5f59676483879eb1bd2b00665922b26dbc8b24e9854dee6f1c469e0fbecdfb"
+    },
+    {
+      "name": "pool.zlib.106.b64",
+      "encoded_bytes": 46436,
+      "sha256": "605c25f34e09d621857e4f1fd7beefbf0386bccca41b05051b71b498e8d967e5"
+    }
+  ],
+  "files": [
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/arcane_level2_circle/gArcaneLevel2ContinuityVtx",
+      "sha256": "0c36ee87eef8083bd0d8a6fd7b16539058c3def2c7045cc558d1d2d9f73429f5",
+      "bytes": 3192,
+      "offset": 2099628
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/burst0",
+      "sha256": "7d85cc96ded583f61b2226d79427449e1a279e9b0143db255242180b83f25dde",
+      "bytes": 2097244,
+      "offset": 27429740
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/burst1",
+      "sha256": "5ac1c3b2a5a32d8c4857cff6d82b409922fc1c8f0fc0019cc46b89a570a6c95e",
+      "bytes": 2097244,
+      "offset": 23095172
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/charge",
+      "sha256": "58ec1844f2ed9dbe64e067fbaf1524de5098592f71c891c5e435c590bba22b24",
+      "bytes": 344,
+      "offset": 23094828
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/cylinder_great",
+      "sha256": "bba667bf5c14e58cb5a007849fe3edb3ba8bd2a00c3e4ef725f322328c80fb8f",
+      "bytes": 872,
+      "offset": 48483912
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/cylinder_regular",
+      "sha256": "ee5e1af55b6dc02a0b9d9bb962ec27fd166c7984a0d9dfa9725eb1c9a2385d19",
+      "bytes": 872,
+      "offset": 50650272
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/disk_great",
+      "sha256": "85f51a96baaa9fe96d1b9a3ae3ebea97e1036659ddfcada3911b7fb21f036e86",
+      "bytes": 2056,
+      "offset": 29526984
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/disk_regular",
+      "sha256": "f01c955461ba3c66a7e6cd49eb17d6755404ec9bbec19bafa1a0747679c54f1c",
+      "bytes": 872,
+      "offset": 50651144
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "b160f5cf78b321318cb539c250923333a03094d68149507e2554e09cde6a7dd8",
+      "bytes": 8388700,
+      "offset": 40025688
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/burst0",
+      "sha256": "d61faeaa8d7a3e83089a4e1676a4cdee5395d79b447495c995e213e995b09037",
+      "bytes": 2097244,
+      "offset": 48486528
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/burst1",
+      "sha256": "2f8a3395e1471b45914188a8266b2e05dbcb88affa8333c9641b10c2a677077b",
+      "bytes": 2097244,
+      "offset": 12598708
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/charge",
+      "sha256": "abb213c5a11b29b63f4f9a8981d805319fba3b331307756d2cdb46f319256007",
+      "bytes": 344,
+      "offset": 40023288
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/charge0",
+      "sha256": "67d814eebbe556a149eafad748e5d25b326852b8806b3c41a79549f857e55b2b",
+      "bytes": 65628,
+      "offset": 27362552
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/charge1",
+      "sha256": "659bd2b39e19b06bcdcfd0863031113eea6afe7754430bffc34d77b20de92ee1",
+      "bytes": 65628,
+      "offset": 27293900
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/cylinder_great",
+      "sha256": "66013e92623d1ac90ab3a4f07c04cae4151bbcb570b899cb21a9cf9f0d348c60",
+      "bytes": 872,
+      "offset": 27359528
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/cylinder_regular",
+      "sha256": "b94f821a015294a5b3e2fa00b6899fe0f7d5bb5fd5b804edd7ace65ccfa9ffe6",
+      "bytes": 872,
+      "offset": 48483040
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/disk_great",
+      "sha256": "f36e4f1dc889798ce825afebeae89503ae4c0bfc3b723be4623f0a994f4bbe58",
+      "bytes": 872,
+      "offset": 50655040
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/disk_regular",
+      "sha256": "b67ffe0de5f57a6a873fe8784a2498a4f831b37b482a063179c07297a766e6b6",
+      "bytes": 872,
+      "offset": 48480016
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gAstralCorona2Tex",
+      "sha256": "50266df662d1dfdcfa66dc361937c90d83a72e546704a87b4c7c213fabaeaf76",
+      "bytes": 8388700,
+      "offset": 14704384
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gAstralSigil1Tex",
+      "sha256": "00761b38a72cd0453bdb201fa1b3ed8e26b8ce7cd1dee289a6a5144f1e450c8c",
+      "bytes": 2097244,
+      "offset": 872
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gAstralSigil2Tex",
+      "sha256": "5dcdc23da8eca9528509977fb8fa9013ccb421ca33a62a39f981249491a85714",
+      "bytes": 2097244,
+      "offset": 25193632
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gSpinCircular1Vtx",
+      "sha256": "942d194dd6b407dded92c7a67f0fe0bed669021ce1b2482a4dc447e3a267a5b8",
+      "bytes": 2152,
+      "offset": 29530256
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gSpinCircular2Vtx",
+      "sha256": "13f72ff9b530e3acba619e122153a3ace0dd6bd1c645f3508ce7e43015ce293f",
+      "bytes": 2152,
+      "offset": 2104972
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gSpinCircular3Vtx",
+      "sha256": "4e401f6ff5f7d8f0d5664feb3fdef3e9c828f00166c4d0401fd20023b1a0156d",
+      "bytes": 2152,
+      "offset": 14702232
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/astral_mm/spin_astral_rupture_poc1/gSpinCircular4Vtx",
+      "sha256": "f9d0b9b6e6ca68ed464ae4769741f5c1f5027626b0eea1c17e7311c4abdc0905",
+      "bytes": 2152,
+      "offset": 52756180
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/arcane_level2_circle/gArcaneLevel2ContinuityVtx",
+      "sha256": "a790182b4434597db8aacc375199cb0a3e877ac2d3723ac95bc59328bc19374e",
+      "bytes": 3192,
+      "offset": 31631396
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/burst0",
+      "sha256": "7d85cc96ded583f61b2226d79427449e1a279e9b0143db255242180b83f25dde",
+      "bytes": 2097244,
+      "offset": 27429740
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/burst1",
+      "sha256": "5ac1c3b2a5a32d8c4857cff6d82b409922fc1c8f0fc0019cc46b89a570a6c95e",
+      "bytes": 2097244,
+      "offset": 23095172
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/charge",
+      "sha256": "5b7b6e17c7cd6a3f656f4585c7e062d22a432228855eb1f8f25a47decc5bfaba",
+      "bytes": 344,
+      "offset": 25193288
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/cylinder_great",
+      "sha256": "681652d8cd57efc35f04f34beafdcd71de1722646810faadd38f66ab9a44d4d9",
+      "bytes": 872,
+      "offset": 27428180
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/cylinder_regular",
+      "sha256": "400b62e8040bf7d8e2a8de161f4329ce9a7e36d76591da66f1e8479006aea1c6",
+      "bytes": 872,
+      "offset": 14699848
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/disk_great",
+      "sha256": "b02e39db4cd6a3b634a4a29f17bbcbff6785797cd9fb3709287939400c39af4c",
+      "bytes": 2056,
+      "offset": 40023632
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/disk_regular",
+      "sha256": "62f02afb8b6edb6601c838db7f88e466a964043ee7f565cab6b8bfcd712aa15c",
+      "bytes": 872,
+      "offset": 27290876
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "0607553f57c3e9d40c6732088932e7f1eab838681021a0c76569555d81789513",
+      "bytes": 296,
+      "offset": 2098988
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "f7a4348a089581328ffe7177f46251fe4bee9366d99ea7c6e336c4695bb5cc1a",
+      "bytes": 2152,
+      "offset": 52754028
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "3845f5ecd72e708423a01c7ce2abf78f0e680496b575fa617969a6402c2790e2",
+      "bytes": 2152,
+      "offset": 14697696
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "66ceec5bc935e99c57a1c7dc4796d7caf7367f497850720649bb02183d5ce851",
+      "bytes": 2152,
+      "offset": 27360400
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "f34c524b365ebc31da1953f84ee0f4c9b9d418553db239d79bf5f5f7112f6177",
+      "bytes": 2152,
+      "offset": 50652888
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "b160f5cf78b321318cb539c250923333a03094d68149507e2554e09cde6a7dd8",
+      "bytes": 8388700,
+      "offset": 40025688
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/burst0",
+      "sha256": "f44165751e774f931a7e8dcf36767b0245cecce351324851687d6671d359d27d",
+      "bytes": 2097244,
+      "offset": 50656784
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/burst1",
+      "sha256": "196b4f5a3c7c6c5006b16a52bba6b29dba6fda05165c1c78a6e4f4dac81e2d49",
+      "bytes": 2097244,
+      "offset": 2107124
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/charge",
+      "sha256": "7d13388502409ba5306d5b640356a15b813c3dba059a6fbc392f7ca5161633b8",
+      "bytes": 344,
+      "offset": 27429396
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/cylinder_great",
+      "sha256": "972179aa730ff959fa2f36f10d826a23d12cf3b74befbe5248996f0870a53b23",
+      "bytes": 872,
+      "offset": 29532408
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/cylinder_regular",
+      "sha256": "28d54d873f336ad9486cb219abbba00011670d788090aec5895abd035b71d410",
+      "bytes": 872,
+      "offset": 12597836
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/disk_great",
+      "sha256": "347a83ef6357de38da12ea5f24ddcb1bb2258e0b0b442ee96f8a7b969e8ce5e7",
+      "bytes": 872,
+      "offset": 14696824
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/disk_regular",
+      "sha256": "d5158849d0da97d42aa1f33986a6c025c3297bb8dc48d0d8c8e3a80e52cb48a5",
+      "bytes": 872,
+      "offset": 48485656
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "a7ffdd55e15991677dadf3b1a0a0e96b83133e02aed6823c7b8bb2172687c68a",
+      "bytes": 8388700,
+      "offset": 31634588
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/burst0",
+      "sha256": "f44165751e774f931a7e8dcf36767b0245cecce351324851687d6671d359d27d",
+      "bytes": 2097244,
+      "offset": 50656784
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/burst1",
+      "sha256": "5dcdc23da8eca9528509977fb8fa9013ccb421ca33a62a39f981249491a85714",
+      "bytes": 2097244,
+      "offset": 25193632
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/charge",
+      "sha256": "0bdcfd8ec7996b9e2d022639a5c226d04c9ea8350f942a96b5dee7678de50482",
+      "bytes": 344,
+      "offset": 2099284
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/cylinder_great",
+      "sha256": "1f59faf3bcc184445ba7bebd0a91322bc965ca31755acffb739ed1bedac392ab",
+      "bytes": 872,
+      "offset": 4205240
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/cylinder_regular",
+      "sha256": "202b42317e6aa175acfa41e1fa70cab2c37a5b4e3bc386c7cb30213bfc76f0d6",
+      "bytes": 872,
+      "offset": 4206112
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/disk_great",
+      "sha256": "000d41e564fe67901ef0d0bc3671b8c7e4a86ff9c0f77d31d8054e9f22d71b18",
+      "bytes": 872,
+      "offset": 0
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/disk_regular",
+      "sha256": "5b1cb531d4f626c61b07853f40db5d4e71f56743bacee896993fd4439878bf77",
+      "bytes": 872,
+      "offset": 25192416
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "a7ffdd55e15991677dadf3b1a0a0e96b83133e02aed6823c7b8bb2172687c68a",
+      "bytes": 8388700,
+      "offset": 31634588
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/burst0",
+      "sha256": "f44165751e774f931a7e8dcf36767b0245cecce351324851687d6671d359d27d",
+      "bytes": 2097244,
+      "offset": 50656784
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/burst1",
+      "sha256": "00761b38a72cd0453bdb201fa1b3ed8e26b8ce7cd1dee289a6a5144f1e450c8c",
+      "bytes": 2097244,
+      "offset": 872
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/charge",
+      "sha256": "89783277da57267bc16f2c6d9d19325094c17426229a8d46b5d77d8a29a3282f",
+      "bytes": 344,
+      "offset": 29529040
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/cylinder_great",
+      "sha256": "a64b60c8b26051f88e93897fcd8f293f77b727bf7787099d99f62597e926ce74",
+      "bytes": 872,
+      "offset": 31630524
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/cylinder_regular",
+      "sha256": "05aba339130a8b68d55a2a262aecadb87d464c6f36c23502f2750ed56235ccda",
+      "bytes": 872,
+      "offset": 2098116
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/disk_great",
+      "sha256": "ede2edcc25b888d10f2129b37949bb1cdaacf7e774b9f69405aa20f61b34e0c8",
+      "bytes": 872,
+      "offset": 50649400
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/disk_regular",
+      "sha256": "2fc69a2d165e3322ab1ac6da7da18a953da991f721dc96227cc1273b3b22afa0",
+      "bytes": 872,
+      "offset": 14695952
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "a7ffdd55e15991677dadf3b1a0a0e96b83133e02aed6823c7b8bb2172687c68a",
+      "bytes": 8388700,
+      "offset": 31634588
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/burst0",
+      "sha256": "7d85cc96ded583f61b2226d79427449e1a279e9b0143db255242180b83f25dde",
+      "bytes": 2097244,
+      "offset": 27429740
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/burst1",
+      "sha256": "a18138c24847ed9f6446a8eb6be797c6ea8cff8f6b734cbfa4e665bdd645eab2",
+      "bytes": 2097244,
+      "offset": 29533280
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/charge",
+      "sha256": "456f07469c44fd789811c770bf44c26789b60cda35d4987ddbf0dd6321d3a019",
+      "bytes": 344,
+      "offset": 14700720
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/cylinder_great",
+      "sha256": "f2bba46fa6f5d0b329f3eb502822deb228680d69e29c876a61924fe70f57ad5f",
+      "bytes": 872,
+      "offset": 50652016
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/cylinder_regular",
+      "sha256": "1da97643d9b3cfd0784b022ff7e46d2063325de7677b3c7db3aa1ed8f83aa16b",
+      "bytes": 872,
+      "offset": 4204368
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/disk_great",
+      "sha256": "c677cdaeafe99b71367cef080fe27628d4dd097d66cb1e6205045b228d4dbaa4",
+      "bytes": 872,
+      "offset": 48484784
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/disk_regular",
+      "sha256": "519cad8c2e2a4f1fb6736210f777c8a81e824d1471cf89e658f7e76322c3b1a8",
+      "bytes": 872,
+      "offset": 23093084
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "mm/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "219d40aaeeaa87ea97813f742f168466ea0ab7b8b20a31eaea26a217434adc94",
+      "bytes": 8388700,
+      "offset": 4209136
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/arcane_level2_circle/gArcaneLevel2ContinuityVtx",
+      "sha256": "0c36ee87eef8083bd0d8a6fd7b16539058c3def2c7045cc558d1d2d9f73429f5",
+      "bytes": 3192,
+      "offset": 2099628
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/burst0",
+      "sha256": "7d85cc96ded583f61b2226d79427449e1a279e9b0143db255242180b83f25dde",
+      "bytes": 2097244,
+      "offset": 27429740
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/burst1",
+      "sha256": "5ac1c3b2a5a32d8c4857cff6d82b409922fc1c8f0fc0019cc46b89a570a6c95e",
+      "bytes": 2097244,
+      "offset": 23095172
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/charge",
+      "sha256": "58ec1844f2ed9dbe64e067fbaf1524de5098592f71c891c5e435c590bba22b24",
+      "bytes": 344,
+      "offset": 23094828
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/cylinder_great",
+      "sha256": "bba667bf5c14e58cb5a007849fe3edb3ba8bd2a00c3e4ef725f322328c80fb8f",
+      "bytes": 872,
+      "offset": 48483912
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/cylinder_regular",
+      "sha256": "ee5e1af55b6dc02a0b9d9bb962ec27fd166c7984a0d9dfa9725eb1c9a2385d19",
+      "bytes": 872,
+      "offset": 50650272
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/disk_great",
+      "sha256": "85f51a96baaa9fe96d1b9a3ae3ebea97e1036659ddfcada3911b7fb21f036e86",
+      "bytes": 2056,
+      "offset": 29526984
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/disk_regular",
+      "sha256": "f01c955461ba3c66a7e6cd49eb17d6755404ec9bbec19bafa1a0747679c54f1c",
+      "bytes": 872,
+      "offset": 50651144
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/arcane/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "b160f5cf78b321318cb539c250923333a03094d68149507e2554e09cde6a7dd8",
+      "bytes": 8388700,
+      "offset": 40025688
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/burst0",
+      "sha256": "7d85cc96ded583f61b2226d79427449e1a279e9b0143db255242180b83f25dde",
+      "bytes": 2097244,
+      "offset": 27429740
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/burst1",
+      "sha256": "2f8a3395e1471b45914188a8266b2e05dbcb88affa8333c9641b10c2a677077b",
+      "bytes": 2097244,
+      "offset": 12598708
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/charge",
+      "sha256": "76d576a926d32c9cdec3128670d6c85f4fec79fd751557d4e718541f79d3b875",
+      "bytes": 344,
+      "offset": 27429052
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/charge0",
+      "sha256": "67d814eebbe556a149eafad748e5d25b326852b8806b3c41a79549f857e55b2b",
+      "bytes": 65628,
+      "offset": 27362552
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/charge1",
+      "sha256": "659bd2b39e19b06bcdcfd0863031113eea6afe7754430bffc34d77b20de92ee1",
+      "bytes": 65628,
+      "offset": 27293900
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/cylinder_great",
+      "sha256": "f3b514ee4e8ee4cb9cb396e0ab0399ba40cc987261cb6fe1378b5ccf5b1fbb37",
+      "bytes": 872,
+      "offset": 50655912
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/cylinder_regular",
+      "sha256": "526253b68ed4682bffa7c3c987ca0f4585370a42e092052b262b05cadbc5d0c0",
+      "bytes": 872,
+      "offset": 23093956
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/disk_great",
+      "sha256": "8b22553f0ce4e9d23ce16bc71090116fff8e2d72e39f2e78461b937091920cb0",
+      "bytes": 872,
+      "offset": 29529384
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/disk_regular",
+      "sha256": "466e550a8052b26c8e231bf69913ea0347b75040dbfab8a4bcd861e0b004dfaf",
+      "bytes": 872,
+      "offset": 14701064
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gAstralCorona2Tex",
+      "sha256": "50266df662d1dfdcfa66dc361937c90d83a72e546704a87b4c7c213fabaeaf76",
+      "bytes": 8388700,
+      "offset": 14704384
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gAstralFlowTex",
+      "sha256": "d61faeaa8d7a3e83089a4e1676a4cdee5395d79b447495c995e213e995b09037",
+      "bytes": 2097244,
+      "offset": 48486528
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gAstralSigil1Tex",
+      "sha256": "00761b38a72cd0453bdb201fa1b3ed8e26b8ce7cd1dee289a6a5144f1e450c8c",
+      "bytes": 2097244,
+      "offset": 872
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gAstralSigil2Tex",
+      "sha256": "5dcdc23da8eca9528509977fb8fa9013ccb421ca33a62a39f981249491a85714",
+      "bytes": 2097244,
+      "offset": 25193632
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gSpinCircular1Vtx",
+      "sha256": "942d194dd6b407dded92c7a67f0fe0bed669021ce1b2482a4dc447e3a267a5b8",
+      "bytes": 2152,
+      "offset": 29530256
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gSpinCircular2Vtx",
+      "sha256": "13f72ff9b530e3acba619e122153a3ace0dd6bd1c645f3508ce7e43015ce293f",
+      "bytes": 2152,
+      "offset": 2104972
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gSpinCircular3Vtx",
+      "sha256": "4e401f6ff5f7d8f0d5664feb3fdef3e9c828f00166c4d0401fd20023b1a0156d",
+      "bytes": 2152,
+      "offset": 14702232
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/astral_soh/spin_astral_rupture_poc1/gSpinCircular4Vtx",
+      "sha256": "f9d0b9b6e6ca68ed464ae4769741f5c1f5027626b0eea1c17e7311c4abdc0905",
+      "bytes": 2152,
+      "offset": 52756180
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/arcane_level2_circle/gArcaneLevel2ContinuityVtx",
+      "sha256": "a790182b4434597db8aacc375199cb0a3e877ac2d3723ac95bc59328bc19374e",
+      "bytes": 3192,
+      "offset": 31631396
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/burst0",
+      "sha256": "7d85cc96ded583f61b2226d79427449e1a279e9b0143db255242180b83f25dde",
+      "bytes": 2097244,
+      "offset": 27429740
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/burst1",
+      "sha256": "5ac1c3b2a5a32d8c4857cff6d82b409922fc1c8f0fc0019cc46b89a570a6c95e",
+      "bytes": 2097244,
+      "offset": 23095172
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/charge",
+      "sha256": "5b7b6e17c7cd6a3f656f4585c7e062d22a432228855eb1f8f25a47decc5bfaba",
+      "bytes": 344,
+      "offset": 25193288
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/cylinder_great",
+      "sha256": "681652d8cd57efc35f04f34beafdcd71de1722646810faadd38f66ab9a44d4d9",
+      "bytes": 872,
+      "offset": 27428180
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/cylinder_regular",
+      "sha256": "400b62e8040bf7d8e2a8de161f4329ce9a7e36d76591da66f1e8479006aea1c6",
+      "bytes": 872,
+      "offset": 14699848
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/disk_great",
+      "sha256": "b02e39db4cd6a3b634a4a29f17bbcbff6785797cd9fb3709287939400c39af4c",
+      "bytes": 2056,
+      "offset": 40023632
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/disk_regular",
+      "sha256": "62f02afb8b6edb6601c838db7f88e466a964043ee7f565cab6b8bfcd712aa15c",
+      "bytes": 872,
+      "offset": 27290876
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "0607553f57c3e9d40c6732088932e7f1eab838681021a0c76569555d81789513",
+      "bytes": 296,
+      "offset": 2098988
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "f7a4348a089581328ffe7177f46251fe4bee9366d99ea7c6e336c4695bb5cc1a",
+      "bytes": 2152,
+      "offset": 52754028
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "3845f5ecd72e708423a01c7ce2abf78f0e680496b575fa617969a6402c2790e2",
+      "bytes": 2152,
+      "offset": 14697696
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "66ceec5bc935e99c57a1c7dc4796d7caf7367f497850720649bb02183d5ce851",
+      "bytes": 2152,
+      "offset": 27360400
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "f34c524b365ebc31da1953f84ee0f4c9b9d418553db239d79bf5f5f7112f6177",
+      "bytes": 2152,
+      "offset": 50652888
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/dark_energy/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "b160f5cf78b321318cb539c250923333a03094d68149507e2554e09cde6a7dd8",
+      "bytes": 8388700,
+      "offset": 40025688
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/burst0",
+      "sha256": "f44165751e774f931a7e8dcf36767b0245cecce351324851687d6671d359d27d",
+      "bytes": 2097244,
+      "offset": 50656784
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/burst1",
+      "sha256": "196b4f5a3c7c6c5006b16a52bba6b29dba6fda05165c1c78a6e4f4dac81e2d49",
+      "bytes": 2097244,
+      "offset": 2107124
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/charge",
+      "sha256": "7d13388502409ba5306d5b640356a15b813c3dba059a6fbc392f7ca5161633b8",
+      "bytes": 344,
+      "offset": 27429396
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/cylinder_great",
+      "sha256": "972179aa730ff959fa2f36f10d826a23d12cf3b74befbe5248996f0870a53b23",
+      "bytes": 872,
+      "offset": 29532408
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/cylinder_regular",
+      "sha256": "28d54d873f336ad9486cb219abbba00011670d788090aec5895abd035b71d410",
+      "bytes": 872,
+      "offset": 12597836
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/disk_great",
+      "sha256": "347a83ef6357de38da12ea5f24ddcb1bb2258e0b0b442ee96f8a7b969e8ce5e7",
+      "bytes": 872,
+      "offset": 14696824
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/disk_regular",
+      "sha256": "d5158849d0da97d42aa1f33986a6c025c3297bb8dc48d0d8c8e3a80e52cb48a5",
+      "bytes": 872,
+      "offset": 48485656
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/fire/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "a7ffdd55e15991677dadf3b1a0a0e96b83133e02aed6823c7b8bb2172687c68a",
+      "bytes": 8388700,
+      "offset": 31634588
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/burst0",
+      "sha256": "f44165751e774f931a7e8dcf36767b0245cecce351324851687d6671d359d27d",
+      "bytes": 2097244,
+      "offset": 50656784
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/burst1",
+      "sha256": "5dcdc23da8eca9528509977fb8fa9013ccb421ca33a62a39f981249491a85714",
+      "bytes": 2097244,
+      "offset": 25193632
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/charge",
+      "sha256": "0bdcfd8ec7996b9e2d022639a5c226d04c9ea8350f942a96b5dee7678de50482",
+      "bytes": 344,
+      "offset": 2099284
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/cylinder_great",
+      "sha256": "1f59faf3bcc184445ba7bebd0a91322bc965ca31755acffb739ed1bedac392ab",
+      "bytes": 872,
+      "offset": 4205240
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/cylinder_regular",
+      "sha256": "202b42317e6aa175acfa41e1fa70cab2c37a5b4e3bc386c7cb30213bfc76f0d6",
+      "bytes": 872,
+      "offset": 4206112
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/disk_great",
+      "sha256": "000d41e564fe67901ef0d0bc3671b8c7e4a86ff9c0f77d31d8054e9f22d71b18",
+      "bytes": 872,
+      "offset": 0
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/disk_regular",
+      "sha256": "5b1cb531d4f626c61b07853f40db5d4e71f56743bacee896993fd4439878bf77",
+      "bytes": 872,
+      "offset": 25192416
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/ice/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "a7ffdd55e15991677dadf3b1a0a0e96b83133e02aed6823c7b8bb2172687c68a",
+      "bytes": 8388700,
+      "offset": 31634588
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/burst0",
+      "sha256": "f44165751e774f931a7e8dcf36767b0245cecce351324851687d6671d359d27d",
+      "bytes": 2097244,
+      "offset": 50656784
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/burst1",
+      "sha256": "00761b38a72cd0453bdb201fa1b3ed8e26b8ce7cd1dee289a6a5144f1e450c8c",
+      "bytes": 2097244,
+      "offset": 872
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/charge",
+      "sha256": "89783277da57267bc16f2c6d9d19325094c17426229a8d46b5d77d8a29a3282f",
+      "bytes": 344,
+      "offset": 29529040
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/cylinder_great",
+      "sha256": "a64b60c8b26051f88e93897fcd8f293f77b727bf7787099d99f62597e926ce74",
+      "bytes": 872,
+      "offset": 31630524
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/cylinder_regular",
+      "sha256": "05aba339130a8b68d55a2a262aecadb87d464c6f36c23502f2750ed56235ccda",
+      "bytes": 872,
+      "offset": 2098116
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/disk_great",
+      "sha256": "ede2edcc25b888d10f2129b37949bb1cdaacf7e774b9f69405aa20f61b34e0c8",
+      "bytes": 872,
+      "offset": 50649400
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/disk_regular",
+      "sha256": "2fc69a2d165e3322ab1ac6da7da18a953da991f721dc96227cc1273b3b22afa0",
+      "bytes": 872,
+      "offset": 14695952
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/light/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "a7ffdd55e15991677dadf3b1a0a0e96b83133e02aed6823c7b8bb2172687c68a",
+      "bytes": 8388700,
+      "offset": 31634588
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/burst0",
+      "sha256": "7d85cc96ded583f61b2226d79427449e1a279e9b0143db255242180b83f25dde",
+      "bytes": 2097244,
+      "offset": 27429740
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/burst1",
+      "sha256": "a18138c24847ed9f6446a8eb6be797c6ea8cff8f6b734cbfa4e665bdd645eab2",
+      "bytes": 2097244,
+      "offset": 29533280
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/charge",
+      "sha256": "456f07469c44fd789811c770bf44c26789b60cda35d4987ddbf0dd6321d3a019",
+      "bytes": 344,
+      "offset": 14700720
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/charge0",
+      "sha256": "b1c089465df2527095bfddcd8db92233dcc46194bfa08ff6ed42ff14c532f853",
+      "bytes": 65628,
+      "offset": 48414388
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/charge1",
+      "sha256": "d9e9506d34774f438a12f03e381ace624d39dc26b1b8c25f672d87d158fbb706",
+      "bytes": 65628,
+      "offset": 50583772
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/cylinder_great",
+      "sha256": "f2bba46fa6f5d0b329f3eb502822deb228680d69e29c876a61924fe70f57ad5f",
+      "bytes": 872,
+      "offset": 50652016
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/cylinder_regular",
+      "sha256": "1da97643d9b3cfd0784b022ff7e46d2063325de7677b3c7db3aa1ed8f83aa16b",
+      "bytes": 872,
+      "offset": 4204368
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/disk_great",
+      "sha256": "c677cdaeafe99b71367cef080fe27628d4dd097d66cb1e6205045b228d4dbaa4",
+      "bytes": 872,
+      "offset": 48484784
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/disk_regular",
+      "sha256": "519cad8c2e2a4f1fb6736210f777c8a81e824d1471cf89e658f7e76322c3b1a8",
+      "bytes": 872,
+      "offset": 23093084
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinChargeVtx",
+      "sha256": "497aa6fd408e5ce67aa3ab9fb3c0265a45d03bd06913f0eb70c435f697514095",
+      "bytes": 296,
+      "offset": 14701936
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular1Vtx",
+      "sha256": "20e8e4061180bb8cc5cbc565a999a90a0b7f9869f73f01d51cee22fa4c51000b",
+      "bytes": 2152,
+      "offset": 4206984
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular2Vtx",
+      "sha256": "b70899d2fcb2417a3d236d98c44596353eab705dd3ac0299419f6b3ce6e1a63c",
+      "bytes": 2152,
+      "offset": 48480888
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular3Vtx",
+      "sha256": "11b8aca2c09b876b3be3066f6c20cce71d547c6784190b1adbc92bd86e203d4e",
+      "bytes": 2152,
+      "offset": 2102820
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinCircular4Vtx",
+      "sha256": "63b1096e4489c590ffafc7d02e2789607db666b209c2e7b2f4dcfce5d2a1fb5c",
+      "bytes": 2152,
+      "offset": 27291748
+    },
+    {
+      "path": "soh/assets/custom/objects/combo_spin/lightning/spin_lightning_mm_poc1/gSpinLightningLevel2Tex",
+      "sha256": "219d40aaeeaa87ea97813f742f168466ea0ab7b8b20a31eaea26a217434adc94",
+      "bytes": 8388700,
+      "offset": 4209136
+    }
+  ]
+}

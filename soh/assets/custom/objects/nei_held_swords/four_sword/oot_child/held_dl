@@ -1,0 +1,6 @@
+<DisplayList Version="0">
+<Matrix Path="objects/nei_held_swords/four_sword/oot_child/grip_mtx" Param="G_MTX_PUSH"/>
+<CallDisplayList Path="objects/nei_gi_redesign/four_sword/gi_dl"/>
+<PopMatrix Param="G_MTX_MODELVIEW"/>
+<EndDisplayList/>
+</DisplayList>

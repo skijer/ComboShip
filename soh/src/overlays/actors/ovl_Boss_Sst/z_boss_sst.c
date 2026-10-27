@@ -11,9 +11,9 @@
 #include "overlays/actors/ovl_Bg_Sst_Floor/z_bg_sst_floor.h"
 #include "overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
 #include "soh/frame_interpolation.h"
-#include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/transformation_masks/boss_super_damage.h"
 #include "soh/Enhancements/savestate_serialize.h"
 
 #define FLAGS                                                                                 \
@@ -270,6 +270,7 @@ const ActorInit Boss_Sst_InitVars = {
 };
 
 #include "z_boss_sst_colchk.c"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 static AnimationHeader* sHandIdleAnims[] = { &gBongoLeftHandIdleAnim, &gBongoRightHandIdleAnim };
 static AnimationHeader* sHandFlatPoses[] = { &gBongoLeftHandFlatPoseAnim, &gBongoRightHandFlatPoseAnim };
@@ -366,8 +367,6 @@ void BossSst_Destroy(Actor* thisx, PlayState* play) {
     Collider_DestroyJntSph(play, &this->colliderJntSph);
     Collider_DestroyCylinder(play, &this->colliderCyl);
     Audio_StopSfxByPos(&this->center);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void BossSst_HeadSetupLurk(BossSst* this) {
@@ -379,21 +378,12 @@ void BossSst_HeadSetupLurk(BossSst* this) {
 }
 
 void BossSst_HeadLurk(BossSst* this, PlayState* play) {
-    if (CVarGetInteger(CVAR_ENHANCEMENT("QuickBongoKill"), 0)) {
-        this->colliderCyl.base.acFlags |= AC_ON;
-    }
-
     if (this->actor.yDistToPlayer < 1000.0f) {
         BossSst_HeadSetupIntro(this, play);
     }
 }
 
 void BossSst_HeadSetupIntro(BossSst* this, PlayState* play) {
-    // Make sure to restore original behavior if the quick kill didn't happen
-    if (CVarGetInteger(CVAR_ENHANCEMENT("QuickBongoKill"), 0)) {
-        this->colliderCyl.base.acFlags &= ~AC_ON;
-    }
-
     Player* player = GET_PLAYER(play);
 
     this->timer = 611;
@@ -1066,7 +1056,7 @@ void BossSst_HeadDeath(BossSst* this, PlayState* play) {
     }
 
     Math_StepToF(&this->actor.world.pos.y, this->actor.home.pos.y - 140.0f, 20.0f);
-    if (this->timer == 0) {
+    if (GameInteractor_Should(VB_BONGO_BONGO_DEATH_SCENE, this->timer == 0, this, sHands[LEFT], sHands[RIGHT])) {
         BossSst_HandSetupThrash(sHands[LEFT]);
         BossSst_HandSetupThrash(sHands[RIGHT]);
         BossSst_HeadSetupThrash(this);
@@ -1121,7 +1111,7 @@ void BossSst_HeadSetupDarken(BossSst* this) {
 }
 
 void BossSst_HeadDarken(BossSst* this, PlayState* play) {
-    if (this->timer != 0) {
+    if (GameInteractor_Should(VB_BONGO_BONGO_DEATH_SCENE, this->timer != 0, this, sHands[LEFT], sHands[RIGHT])) {
         this->timer--;
     }
 
@@ -2549,6 +2539,34 @@ void BossSst_HeadSfx(BossSst* this, u16 sfxId) {
 }
 
 void BossSst_HandCollisionCheck(BossSst* this, PlayState* play) {
+    // FD / Pika Gigantamax: hitting EITHER hand stuns Bongo's head directly (→ Stunned →
+    // Vulnerable), so you don't have to damage both hands and bait a charge first — then
+    // the head is open for damage (BossSst_HeadCollisionCheck). Only stuns when the head
+    // is in a stunnable state, so it never interrupts an active damage window or the
+    // intro. Detected by an accepted hand AC hit OR the geometric FD-sword/touch reach.
+    // Gated on IsFormActive → normal play (and the vanilla two-hand route) is untouched.
+    if (BossSuperDamage_IsFormActive(play) && ((s8)sHead->actor.colChkInfo.health > 0) &&
+        (this->colliderJntSph.base.colType != COLTYPE_HARD) && (sHead->actionFunc != BossSst_HeadStunned) &&
+        (sHead->actionFunc != BossSst_HeadVulnerable) && (sHead->actionFunc != BossSst_HeadDamage) &&
+        (sHead->actionFunc != BossSst_HeadLurk) && (sHead->actionFunc != BossSst_HeadIntro) &&
+        ((this->colliderJntSph.base.acFlags & AC_HIT) ||
+         BossSuperDamage_FormAttackReaches(play, &this->actor.world.pos,
+                                           BossSuperDamage_FormAttackRange(play) + 60.0f))) {
+        this->colliderJntSph.base.acFlags &= ~AC_HIT;
+        BossSuperDamage_StartElectricSparks(&sHead->actor, 90); // glow the HEAD (it draws sparks; the
+                                                                // hand draw doesn't → would leak a slot)
+        BossSst_HeadSetupStunned(sHead);
+        if (HAND_STATE(sHands[RIGHT]) == HAND_FROZEN) {
+            BossSst_IceShatter(sHands[RIGHT]);
+        } else if (HAND_STATE(sHands[LEFT]) == HAND_FROZEN) {
+            BossSst_IceShatter(sHands[LEFT]);
+        }
+        BossSst_HandSetupStunned(sHands[RIGHT]);
+        BossSst_HandSetupStunned(sHands[LEFT]);
+        Audio_PlayActorSound2(&this->actor, NA_SE_EN_SHADEST_DAMAGE_HAND);
+        return;
+    }
+
     if ((this->colliderJntSph.base.acFlags & AC_HIT) && (this->colliderJntSph.base.colType != COLTYPE_HARD)) {
         s32 bothHands = true;
 
@@ -2582,6 +2600,52 @@ void BossSst_HandCollisionCheck(BossSst* this, PlayState* play) {
 }
 
 void BossSst_HeadCollisionCheck(BossSst* this, PlayState* play) {
+    // FD / Pika Gigantamax: paralyze-or-damage on the head/eye, bypassing the normal
+    // requirement to stun BOTH hands first. "Fightable" = alive and not in a pre-fight /
+    // recovery / death state, so we never stun during the intro/lurk or re-kill mid-death.
+    // Detected geometrically (FormAttackReaches reaches the floating head) OR by an
+    // accepted eye AC hit while in form — both bypass the damage table, which FD's
+    // sword/beam and Pika's electric don't reliably populate. Vulnerable/Damage → damage
+    // (mash to kill); any other fightable state → stun the head + both hands (paralyze),
+    // which leads it into the Vulnerable window. Gated on IsFormActive → normal play
+    // (and the lens/hand-stun route) is untouched.
+    // HeadDamage (the hit-reaction anim) is excluded so it acts as a per-hit cooldown:
+    // a hit drops the head into HeadDamage, which ignores further hits until it returns
+    // to HeadVulnerable — that paces the mashing instead of melting -4 every frame.
+    u8 headFightable = ((s8)this->actor.colChkInfo.health > 0) && (this->actionFunc != BossSst_HeadLurk) &&
+                       (this->actionFunc != BossSst_HeadIntro) && (this->actionFunc != BossSst_HeadRecover) &&
+                       (this->actionFunc != BossSst_HeadUnfreezeHand) && (this->actionFunc != BossSst_HeadDamage);
+    if (BossSuperDamage_IsFormActive(play) && headFightable &&
+        ((this->colliderCyl.base.acFlags & AC_HIT) ||
+         BossSuperDamage_FormAttackReaches(play, &this->actor.world.pos,
+                                           BossSuperDamage_FormAttackRange(play) + 60.0f))) {
+        this->colliderCyl.base.acFlags &= ~AC_HIT;
+        BossSuperDamage_StartElectricSparks(&this->actor, 90);
+        if (this->actionFunc == BossSst_HeadVulnerable) {
+            this->actor.colChkInfo.health -= BossSuperDamage_FormDamage(play);
+            if ((s8)this->actor.colChkInfo.health <= 0) {
+                this->actor.colChkInfo.health = 0;
+                Enemy_StartFinishingBlow(play, &this->actor);
+                BossSst_HeadSetupDeath(this, play);
+                GameInteractor_ExecuteOnBossDefeat(&this->actor);
+            } else {
+                BossSst_HeadSetupDamage(this);
+            }
+            BossSst_HandSetupDamage(sHands[LEFT]);
+            BossSst_HandSetupDamage(sHands[RIGHT]);
+        } else {
+            BossSst_HeadSetupStunned(this);
+            if (HAND_STATE(sHands[RIGHT]) == HAND_FROZEN) {
+                BossSst_IceShatter(sHands[RIGHT]);
+            } else if (HAND_STATE(sHands[LEFT]) == HAND_FROZEN) {
+                BossSst_IceShatter(sHands[LEFT]);
+            }
+            BossSst_HandSetupStunned(sHands[RIGHT]);
+            BossSst_HandSetupStunned(sHands[LEFT]);
+        }
+        return;
+    }
+
     if (this->colliderCyl.base.acFlags & AC_HIT) {
         this->colliderCyl.base.acFlags &= ~AC_HIT;
         if ((this->actor.colChkInfo.damageEffect != 0) || (this->actor.colChkInfo.damage != 0)) {
@@ -2634,7 +2698,8 @@ void BossSst_UpdateHand(Actor* thisx, PlayState* play) {
         CollisionCheck_SetAT(play, &play->colChkCtx, &this->colliderJntSph.base);
     }
 
-    if ((sHead->actionFunc != BossSst_HeadLurk) && (sHead->actionFunc != BossSst_HeadIntro) &&
+    if (GameInteractor_Should(VB_ALLOW_QUICK_BONGO_KILL,
+                              (this->actionFunc != BossSst_HeadLurk) && (this->actionFunc != BossSst_HeadIntro)) &&
         (this->colliderJntSph.base.acFlags & AC_ON)) {
         CollisionCheck_SetAC(play, &play->colChkCtx, &this->colliderJntSph.base);
     }
@@ -2690,8 +2755,8 @@ void BossSst_UpdateHead(Actor* thisx, PlayState* play) {
         CollisionCheck_SetAT(play, &play->colChkCtx, &this->colliderJntSph.base);
     }
 
-    if ((this->actionFunc != BossSst_HeadLurk || CVarGetInteger(CVAR_ENHANCEMENT("QuickBongoKill"), 0)) &&
-        (this->actionFunc != BossSst_HeadIntro)) {
+    if (GameInteractor_Should(VB_ALLOW_QUICK_BONGO_KILL,
+                              (this->actionFunc != BossSst_HeadLurk) && (this->actionFunc != BossSst_HeadIntro))) {
         if (this->colliderCyl.base.acFlags & AC_ON) {
             CollisionCheck_SetAC(play, &play->colChkCtx, &this->colliderCyl.base);
         }
@@ -2972,6 +3037,9 @@ void BossSst_DrawHead(Actor* thisx, PlayState* play) {
 
     SkinMatrix_Vec3fMtxFMultXYZ(&play->viewProjectionMtxF, &this->actor.focus.pos, &this->center);
     BossSst_DrawEffect(&this->actor, play);
+
+    // Skijer's NEI: FD/Pika electric glow
+    BossSuperDamage_DrawGlowFromSpheres(&this->actor, play, &this->colliderJntSph, 11, 1.4f);
 }
 
 void BossSst_SpawnHeadShadow(BossSst* this) {

@@ -1,0 +1,377 @@
+{
+  "resources": {
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_00": {
+      "bytes": 1707,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_00",
+      "sha256": "3d6795fc46482eab49ab740fe480897832a7bcafb8f2adef0f561d60c813d16b",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_00"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_01": {
+      "bytes": 1697,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_01",
+      "sha256": "6c647f32f4f0385de1cbda18db108fbd1f63b1ec0ad2de49f385ba627494d00a",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_01"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_02": {
+      "bytes": 1706,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_02",
+      "sha256": "ffd0128c8b1bde28324ff58181f1c57e214c92d0530493e6b21ad573636f1fbf",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_02"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_03": {
+      "bytes": 1707,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_03",
+      "sha256": "65de0ea031cc7e24d494ca94aa7902b93c1b792c700481c3102621dc156bfdd4",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_03"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_04": {
+      "bytes": 1708,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_04",
+      "sha256": "bf5f71416b4ee822c8d870a171471007c4c222a4aecf5c6a052aedb4bd26074b",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_04"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_05": {
+      "bytes": 1707,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_05",
+      "sha256": "9a1e7f0a91cc3a1ab6cc3ee71854ab034ed3e2f14c6102fde3a4675f3fdace66",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_05"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_06": {
+      "bytes": 1704,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_06",
+      "sha256": "1307f6a67e793c05b93487e4bef56872b6a59c3baf1adbfae67db2df4618f7fa",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_06"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_07": {
+      "bytes": 1712,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_07",
+      "sha256": "d9b8ca1adf3703a152959a87d751fc0ecf814639aac3a22dc7e811442188f7cc",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_07"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_08": {
+      "bytes": 1710,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_08",
+      "sha256": "4a30644656b971d52bb182f3a047825a38be2ac8d117275bb8a62ff71f4581c0",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_08"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_09": {
+      "bytes": 1708,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_09",
+      "sha256": "260f1f089e7279c8a504c01dc4310f96eb97c16bd5683c5fe8a1a37560cd4dca",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_09"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_10": {
+      "bytes": 1706,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_10",
+      "sha256": "ce7bec0ea096e58f5337c377bddc73b84ffa8445d02b9af0c118e4ec03ff80a7",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_10"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_11": {
+      "bytes": 1708,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_11",
+      "sha256": "8b09f3605f519898d915d27be1fd175d41120c28a4b6be3fec072e5039957c9b",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_11"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_12": {
+      "bytes": 1708,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_12",
+      "sha256": "1cec263a54ce149e4fd9f14c2498f48f16750ca8745cd85805223555c61a050b",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_12"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_13": {
+      "bytes": 1709,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_13",
+      "sha256": "8fd8f2182b13c99c58f95611e84e8cf47b0f2de07a38981795cf1bad8a74ddbc",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_13"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_15": {
+      "bytes": 1706,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_15",
+      "sha256": "75a4e471c461b40e23d9f7b78f7726edea14d3e51c25463de73b195672cf98f0",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_15"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_17": {
+      "bytes": 1706,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_17",
+      "sha256": "e21f043c5664b4a09d839bbb5ecf70515c152c2ea31883e3c887987055fe6953",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_17"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_18": {
+      "bytes": 1705,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_18",
+      "sha256": "b09555cddf8dac3cdb9ed57295132403147a52df8ab41e13e29f594e7473576a",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_18"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_19": {
+      "bytes": 1709,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_19",
+      "sha256": "bfb495b04c468cc2e2f34716b62c1503103d3eb4017017fe09c7400b8c9bd820",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_19"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_21": {
+      "bytes": 1706,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_21",
+      "sha256": "cfc4ca343cc743234325033561ea84dc6018db6759f5187c20e680f7ca572107",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_21"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_22": {
+      "bytes": 1708,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_22",
+      "sha256": "ce424ab083b5b7b9684e314bb4f0a42d8b338fa9b667944cbac51165b96837a8",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_22"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_23": {
+      "bytes": 1707,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_23",
+      "sha256": "30da730d943cd81c0654acf85372340840e84debf6be0dc62e4bc6d0d1fa0b30",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_23"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_24": {
+      "bytes": 1708,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_24",
+      "sha256": "246a01fac47ced6ac37ee9dde2190a5ec2c7e28f2087c2b8559a8a317e1cfb16",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_24"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_30": {
+      "bytes": 1710,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_30",
+      "sha256": "1067d61fb70120a57c8cb153d53c0a53a5f34bdd438b5c5824de5c20897e35c1",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_30"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_31": {
+      "bytes": 1711,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_31",
+      "sha256": "05edf00699dc3584227bb8726e231c4e5e669dad4bc3d67e80170b1f2a30240c",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_31"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_33": {
+      "bytes": 2481,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_33",
+      "sha256": "89d150017f825f90e9d9ce5c5e5e11e2348e1962b427cbeba94a1603a6a212de",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_Time_33"
+    },
+    "scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_time_25": {
+      "bytes": 1707,
+      "kind": "material",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_time_25",
+      "sha256": "e69ce49e0857fa360893c8363adc6080142177ab75913a4ee618147abc1c699d",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mat_tokinoma_room_0DL_008128_Temple_of_time_25"
+    },
+    "scenes/shared/tokinoma_scene/mjin_flash_mode_0": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/mjin_flash_mode_0",
+      "sha256": "8ec95827d7b597b018b239bd9754b63d4e6f1501fe8ed6fc13c4389db17df66c",
+      "source_path": "alt/scenes/shared/tokinoma_scene/mjin_flash_mode_0"
+    },
+    "scenes/shared/tokinoma_scene/toki_dai_01_5400": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_dai_01_5400",
+      "sha256": "be8e9c62388f10af8fd10ba6fc23718212064f8c532c7adfb391696ef5f37eb3",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_dai_01_5400"
+    },
+    "scenes/shared/tokinoma_scene/toki_dai_02_7E00": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_dai_02_7E00",
+      "sha256": "761e65d193eb5616a6bcd68bb479ad1dda7453f1bee6a13306e1960c112cbf05",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_dai_02_7E00"
+    },
+    "scenes/shared/tokinoma_scene/toki_dai_03_D200": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_dai_03_D200",
+      "sha256": "1562d3f8a98ac5c1b171b86bbc613ccd3f63e64783b65f7e5e515755ff93ac90",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_dai_03_D200"
+    },
+    "scenes/shared/tokinoma_scene/toki_glass_01bx_12600": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_glass_01bx_12600",
+      "sha256": "c61c78bf0301762e626d0eefbff18020c8e0aeb805a03858e8d263145627ec3a",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_glass_01bx_12600"
+    },
+    "scenes/shared/tokinoma_scene/toki_glass_01x_18A00": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_glass_01x_18A00",
+      "sha256": "257d226d50b64aaded604e61e75ca775824294fdf35a6c55891778617694405d",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_glass_01x_18A00"
+    },
+    "scenes/shared/tokinoma_scene/toki_glass_01xx_1B200": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_glass_01xx_1B200",
+      "sha256": "c380107fa55d85ed2c0636d5adf2548e801af17996a1351cfe0a58eec8e80f35",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_glass_01xx_1B200"
+    },
+    "scenes/shared/tokinoma_scene/toki_kabe_01_22B00": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_01_22B00",
+      "sha256": "9e3ed9e0775612c7fbc39ef66fc8b9f632057fe26126221343669d268b8109e4",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_01_22B00"
+    },
+    "scenes/shared/tokinoma_scene/toki_kabe_02_25500": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_02_25500",
+      "sha256": "e51831e171755900a70ab2d12a2c0b56c90723659cbb38f60f0e6126b1771688",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_02_25500"
+    },
+    "scenes/shared/tokinoma_scene/toki_kabe_03_27F00": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_03_27F00",
+      "sha256": "358536fb8979d0b3a9364a25b5fa6c7073d55710063f0f97620ed74bd56b50eb",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_03_27F00"
+    },
+    "scenes/shared/tokinoma_scene/toki_kabe_04_25500": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_04_25500",
+      "sha256": "a67f94bb0b3add9dd42a191c910f09487334cde44a29bd7b3d18d7d866206eff",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_04_25500"
+    },
+    "scenes/shared/tokinoma_scene/toki_kabe_05x_35100": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_05x_35100",
+      "sha256": "ec7738d72a7e39c672e782e1105464c9cea2c954fb65aa75ce837964b4f6c2ac",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_05x_35100"
+    },
+    "scenes/shared/tokinoma_scene/toki_kabe_06_32700": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_06_32700",
+      "sha256": "c1515de6802bc54a60e9a09ef908f6de63d5696fe45c27667927c4ee4c1cb1f7",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_kabe_06_32700"
+    },
+    "scenes/shared/tokinoma_scene/toki_mark_01_39000": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_mark_01_39000",
+      "sha256": "927227439b46e74f51f4d6e2d1809275e66ebceffcc9ca90970d7b9b2209c3a2",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_mark_01_39000"
+    },
+    "scenes/shared/tokinoma_scene/toki_poal_01_39000": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_poal_01_39000",
+      "sha256": "962a3b62c59f62439fd7bf620df74bb8b32c14889680fe5ecf453ef7782e7a57",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_poal_01_39000"
+    },
+    "scenes/shared/tokinoma_scene/toki_saku_01_41880": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_saku_01_41880",
+      "sha256": "1f13ee8c8b6ac9004686987dbd03a102946705b9901aeca526a3ffe23cc0d292",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_saku_01_41880"
+    },
+    "scenes/shared/tokinoma_scene/toki_step_01_42280": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_step_01_42280",
+      "sha256": "633bc878729b58ed73a1665b426d3acc21cbaad1ec82b61d14bd23a23462c3d5",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_step_01_42280"
+    },
+    "scenes/shared/tokinoma_scene/toki_ten_01x_44C80": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_ten_01x_44C80",
+      "sha256": "75cc2bdfb63e085f76a560236fa2b5437e8717f9686a2fb458453360fea5e74e",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_ten_01x_44C80"
+    },
+    "scenes/shared/tokinoma_scene/toki_ten_02_40880": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_ten_02_40880",
+      "sha256": "6fae899dde45275d87667a390681d2a15d9487ac3a69558a4b953d063aaef4eb",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_ten_02_40880"
+    },
+    "scenes/shared/tokinoma_scene/toki_ten_04_46480": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_ten_04_46480",
+      "sha256": "41b79e09d6fd609c660e7cb40a9d0e4ce60319f49a9778240ad214e5dd8cd10a",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_ten_04_46480"
+    },
+    "scenes/shared/tokinoma_scene/toki_try_01_47480": {
+      "bytes": 604,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_try_01_47480",
+      "sha256": "8081c22f6e94bc7740e9697a3bd7164290c84767b4b5947497a09c4e06892a45",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_try_01_47480"
+    },
+    "scenes/shared/tokinoma_scene/toki_try_02_47F00": {
+      "bytes": 604,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_try_02_47F00",
+      "sha256": "baf3e5764018a333c9131e1e21dfe23d18a5a3162357381f6cf5dd1cc9593c11",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_try_02_47F00"
+    },
+    "scenes/shared/tokinoma_scene/toki_try_03_48980": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_try_03_48980",
+      "sha256": "09e34be168cda22f471dbb6bd750ec52498f45b5793f96d28720edddeed3b736",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_try_03_48980"
+    },
+    "scenes/shared/tokinoma_scene/toki_yuka_01_44A80": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_01_44A80",
+      "sha256": "258b4ace3a42381d82c329fc9522204e1647fb381349b796d98cffbc5943b132",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_01_44A80"
+    },
+    "scenes/shared/tokinoma_scene/toki_yuka_02x_47480": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_02x_47480",
+      "sha256": "d4b52b74e7dd78b37658963a030e89eb642285a655f56cc21edd82124f160e81",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_02x_47480"
+    },
+    "scenes/shared/tokinoma_scene/toki_yuka_03_50780": {
+      "bytes": 8284,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_03_50780",
+      "sha256": "944a4a5355055939de73214c8f4c8b13b35522b50af7d1255a035d24e870345c",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_03_50780"
+    },
+    "scenes/shared/tokinoma_scene/toki_yuka_04_51201": {
+      "bytes": 4188,
+      "kind": "texture",
+      "optional_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_04_51201",
+      "sha256": "1534c37fa06918c59d24e51d4e8aeef3adb1b6c47b93b75d81c9934498f98b44",
+      "source_path": "alt/scenes/shared/tokinoma_scene/toki_yuka_04_51201"
+    }
+  },
+  "schema": 1,
+  "scope": "Optional host visual material and texture dependencies only"
+}

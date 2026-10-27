@@ -5,13 +5,15 @@
  */
 
 #include "z_en_ko.h"
+#include "soh/Enhancements/cosmetics/NativeNpcModels.h"
+#include "soh/Enhancements/cosmetics/YoungFadoNpc.h"
 #include "objects/object_fa/object_fa.h"
 #include "objects/object_os_anime/object_os_anime.h"
 #include "objects/object_km1/object_km1.h"
 #include "objects/object_kw1/object_kw1.h"
 #include "vt.h"
-#include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -564,8 +566,8 @@ s16 EnKo_UpdateTalkState(PlayState* play, Actor* thisx) {
                 case 0x10B7:
                 case 0x10B8:
                     if (this->unk_210 == 0) {
-                        Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         this->unk_210 = 1;
                     }
             }
@@ -1151,8 +1153,6 @@ void EnKo_Init(Actor* thisx, PlayState* play) {
 void EnKo_Destroy(Actor* thisx, PlayState* play) {
     EnKo* this = (EnKo*)thisx;
     Collider_DestroyCylinder(play, &this->collider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void func_80A99048(EnKo* this, PlayState* play) {
@@ -1160,8 +1160,13 @@ void func_80A99048(EnKo* this, PlayState* play) {
         this->actor.flags &= ~ACTOR_FLAG_UPDATE_CULLING_DISABLED;
         this->actor.objBankIndex = this->legsObjectBankIdx;
         gSegments[6] = VIRTUAL_TO_PHYSICAL(play->objectCtx.status[this->actor.objBankIndex].segment);
-        SkelAnime_InitFlex(play, &this->skelAnime, sSkeleton[sModelInfo[ENKO_TYPE].legsId].flexSkeletonHeader, NULL,
-                           this->jointTable, this->morphTable, 16);
+        const char* skeleton = NativeNpcModel_SelectSkeleton(
+            NativeNpcModel_Kokiri(ENKO_TYPE), (const char*)sSkeleton[sModelInfo[ENKO_TYPE].legsId].flexSkeletonHeader);
+        if (ENKO_TYPE == ENKO_TYPE_CHILD_FADO) {
+            skeleton = YoungFadoNpc_SelectSkeleton(skeleton);
+        }
+        SkelAnime_InitFlex(play, &this->skelAnime, (FlexSkeletonHeader*)skeleton, NULL, this->jointTable,
+                           this->morphTable, 16);
         ActorShape_Init(&this->actor.shape, 0.0f, ActorShadow_DrawCircle, 18.0f);
         gSegments[6] = VIRTUAL_TO_PHYSICAL(play->objectCtx.status[this->osAnimeBankIndex].segment);
         Collider_InitCylinder(play, &this->collider);
@@ -1318,7 +1323,11 @@ s32 EnKo_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* po
         gSegments[6] = VIRTUAL_TO_PHYSICAL(play->objectCtx.status[this->headObjectBankIdx].segment);
 
         headId = sModelInfo[ENKO_TYPE].headId;
-        *dList = sHead[headId].dList;
+        *dList =
+            NativeNpcModel_SelectHead(NativeNpcModel_Kokiri(ENKO_TYPE), sHead[headId].dList, this->eyeTextureIndex, 0);
+        if (ENKO_TYPE == ENKO_TYPE_CHILD_FADO) {
+            *dList = YoungFadoNpc_SelectHead(*dList);
+        }
         if (sHead[headId].eyeTextures != NULL) {
             eyeTexture = sHead[headId].eyeTextures[this->eyeTextureIndex];
             gSPSegment((*gfx)++, 0x0A, SEGMENTED_TO_VIRTUAL(eyeTexture));
@@ -1341,6 +1350,7 @@ s32 EnKo_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* po
         rot->y += Math_SinS(this->fidgetTableY[limbIndex]) * 200.0f;
         rot->z += Math_CosS(this->fidgetTableZ[limbIndex]) * 200.0f;
     }
+    *dList = NativeNpcPose_SelectLimb(&this->skelAnime, limbIndex, *dList);
     return false;
 }
 

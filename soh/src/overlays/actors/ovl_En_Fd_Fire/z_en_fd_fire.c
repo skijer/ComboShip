@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 #include "z_en_fd_fire.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 
@@ -109,6 +110,8 @@ s32 EnFdFire_CheckCollider(EnFdFire* this, PlayState* play) {
     }
 
     if (this->collider.base.acFlags & AC_HIT) {
+        DinFireSword_FinishConfirmedHit(play, &this->collider.base, this->collider.info.acHitInfo,
+                                        this->collider.info.bumper.dmgFlags);
         this->collider.base.acFlags &= ~AC_HIT;
         return true;
     }

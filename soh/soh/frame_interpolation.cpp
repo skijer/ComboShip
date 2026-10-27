@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "frame_interpolation.h"
+#include "soh/Enhancements/debugger/FrameTimingProbe.h"
 #include "soh/OTRGlobals.h"
 
 /*
@@ -202,6 +203,8 @@ Data& append(Op op) {
 }
 
 struct InterpolateCtx {
+    bool collect = false;
+    uint64_t branches = 0, fallbackBranches = 0, operations = 0, matchedOperations = 0, matrices = 0;
     float step;
     float w;
     unordered_map<Mtx*, MtxF> mtx_replacements;
@@ -211,6 +214,8 @@ struct InterpolateCtx {
     MtxF actor_mtx;
 
     MtxF* new_replacement(Mtx* addr) {
+        if (collect)
+            ++matrices;
         return &mtx_replacements[addr];
     }
 
@@ -293,7 +298,11 @@ struct InterpolateCtx {
     }
 
     void interpolate_branch(Path* old_path, Path* new_path) {
+        if (collect)
+            ++branches;
         for (auto& item : new_path->items) {
+            if (collect)
+                ++operations;
             Data& new_op = new_path->ops[item.first][item.second];
 
             if (item.first == Op::OpenChild) {
@@ -302,6 +311,8 @@ struct InterpolateCtx {
                     interpolate_branch(&it->second[new_op.open_child.idx],
                                        &new_path->children.find(new_op.open_child.key)->second[new_op.open_child.idx]);
                 } else {
+                    if (collect)
+                        ++fallbackBranches;
                     interpolate_branch(&new_path->children.find(new_op.open_child.key)->second[new_op.open_child.idx],
                                        &new_path->children.find(new_op.open_child.key)->second[new_op.open_child.idx]);
                 }
@@ -310,6 +321,8 @@ struct InterpolateCtx {
 
             if (auto it = old_path->ops.find(item.first); it != old_path->ops.end()) {
                 if (item.second < it->second.size()) {
+                    if (collect)
+                        ++matchedOperations;
                     Data& old_op = it->second[item.second];
                     switch (item.first) {
                         case Op::OpenChild:
@@ -443,9 +456,18 @@ struct InterpolateCtx {
 
 unordered_map<Mtx*, MtxF> FrameInterpolation_Interpolate(float step) {
     InterpolateCtx ctx;
+    ctx.collect = FrameTiming_IsActive() != 0;
     ctx.step = step;
     ctx.w = 1.0f - step;
     ctx.interpolate_branch(&previous_recording.root_path, &current_recording.root_path);
+    if (ctx.collect) {
+        FrameTiming_Count("interpolation.branches", ctx.branches);
+        FrameTiming_Count("interpolation.fallback_branches", ctx.fallbackBranches);
+        FrameTiming_Count("interpolation.operations", ctx.operations);
+        FrameTiming_Count("interpolation.matched_operations", ctx.matchedOperations);
+        FrameTiming_Count("interpolation.matrix_writes", ctx.matrices);
+        FrameTiming_Count("interpolation.camera_epoch_changes", camera_epoch != previous_camera_epoch ? 1 : 0);
+    }
     return ctx.mtx_replacements;
 }
 

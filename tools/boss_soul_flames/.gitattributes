@@ -1,0 +1,2 @@
+# Preserve the exact archived shader evidence, including original line endings.
+source-shaders/* -text -whitespace

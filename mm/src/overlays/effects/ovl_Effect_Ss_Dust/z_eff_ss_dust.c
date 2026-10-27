@@ -6,6 +6,10 @@
 
 #include "z_eff_ss_dust.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "2s2h/BenPort.h"
+#include "2s2h/BenGui/CosmeticEditor.h"
+#include <libultraship/bridge/consolevariablebridge.h>
+#include <libultraship/bridge/resourcebridge.h>
 
 #define rPrimColorR regs[0]
 #define rPrimColorG regs[1]
@@ -82,6 +86,29 @@ u32 EffectSsDust_Init(PlayState* play, u32 index, EffectSs* this, void* initPara
     return 1;
 }
 
+// The eight frames are an optional set, resolved per draw so existing particles
+// follow Alt toggles and archive changes without retaining a resource pointer.
+static const void* EffectSsDust_SelectTexture(u16 drawFlags, s16 frame, const void* fallback) {
+    static const char ALIGN_ASSET(2) forest1[] = "__OTR__custom/medallion_magic/spells/forest/dust1Tex";
+    static const char ALIGN_ASSET(2) forest2[] = "__OTR__custom/medallion_magic/spells/forest/dust2Tex";
+    static const char ALIGN_ASSET(2) forest3[] = "__OTR__custom/medallion_magic/spells/forest/dust3Tex";
+    static const char ALIGN_ASSET(2) forest4[] = "__OTR__custom/medallion_magic/spells/forest/dust4Tex";
+    static const char ALIGN_ASSET(2) forest5[] = "__OTR__custom/medallion_magic/spells/forest/dust5Tex";
+    static const char ALIGN_ASSET(2) forest6[] = "__OTR__custom/medallion_magic/spells/forest/dust6Tex";
+    static const char ALIGN_ASSET(2) forest7[] = "__OTR__custom/medallion_magic/spells/forest/dust7Tex";
+    static const char ALIGN_ASSET(2) forest8[] = "__OTR__custom/medallion_magic/spells/forest/dust8Tex";
+    static const char* forestTextures[] = { forest1, forest2, forest3, forest4, forest5, forest6, forest7, forest8 };
+    if (!(drawFlags & EFFECT_SS_DUST_DRAW_SW97_FOREST) || !ResourceMgr_IsAltAssetsEnabled()) {
+        return fallback;
+    }
+    for (s32 i = 0; i < ARRAY_COUNT(forestTextures); ++i) {
+        if (!ResourceMgr_FileAltExists(forestTextures[i]) || ResourceGetDataByName(forestTextures[i]) == NULL) {
+            return fallback;
+        }
+    }
+    return forestTextures[frame];
+}
+
 void EffectSsDust_Draw(PlayState* play, u32 index, EffectSs* this) {
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     MtxF mfTrans;
@@ -106,7 +133,9 @@ void EffectSsDust_Draw(PlayState* play, u32 index, EffectSs* this) {
     if (mtx != NULL) {
         gSPMatrix(POLY_XLU_DISP++, mtx, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
         gDPPipeSync(POLY_XLU_DISP++);
-        gSPSegment(POLY_XLU_DISP++, 0x08, Lib_SegmentedToVirtual(sDustTextures[this->rTexIndex]));
+        gSPSegment(POLY_XLU_DISP++, 0x08,
+                   Lib_SegmentedToVirtual((void*)EffectSsDust_SelectTexture(this->rDrawFlags, this->rTexIndex,
+                                                                            sDustTextures[this->rTexIndex])));
         POLY_XLU_DISP = Gfx_SetupDL(POLY_XLU_DISP, SETUPDL_0);
         gDPPipeSync(POLY_XLU_DISP++);
 
@@ -122,9 +151,17 @@ void EffectSsDust_Draw(PlayState* play, u32 index, EffectSs* this) {
             gSPClearGeometryMode(POLY_XLU_DISP++, G_LIGHTING);
         }
 
+        Color_RGBA8 primary = { this->rPrimColorR, this->rPrimColorG, this->rPrimColorB, 255 };
+        Color_RGBA8 secondary = { this->rEnvColorR, this->rEnvColorG, this->rEnvColorB, this->rEnvColorA };
+        if (this->rDrawFlags & EFFECT_SS_DUST_DRAW_SW97_FOREST) {
+            primary = CosmeticEditor_GetChangedColor(primary.r, primary.g, primary.b, primary.a,
+                                                     COSMETIC_ID("Magic.MedallionForestPrimary"));
+            secondary = CosmeticEditor_GetChangedColor(secondary.r, secondary.g, secondary.b, secondary.a,
+                                                       COSMETIC_ID("Magic.MedallionForestSecondary"));
+        }
         gDPPipeSync(POLY_XLU_DISP++);
-        gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, this->rPrimColorR, this->rPrimColorG, this->rPrimColorB, 255);
-        gDPSetEnvColor(POLY_XLU_DISP++, this->rEnvColorR, this->rEnvColorG, this->rEnvColorB, this->rEnvColorA);
+        gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, primary.r, primary.g, primary.b, 255);
+        gDPSetEnvColor(POLY_XLU_DISP++, secondary.r, secondary.g, secondary.b, this->rEnvColorA);
         gSPDisplayList(POLY_XLU_DISP++, this->gfx);
     }
 

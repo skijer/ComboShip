@@ -1,0 +1,59 @@
+{
+  "source": "leaves-generated.png",
+  "source_sha256": "39231b7ae9e862a8d3133c96183c57d5a16db9fdd901f3b56c30ad54076819c4",
+  "source_pixels": [
+    1254,
+    1254
+  ],
+  "generator": "built-in imagegen",
+  "textures": {
+    "crimson": {
+      "path": "mm/assets/custom/objects/nei_autumn/leaves/crimson_tex",
+      "logical_tile": [
+        32,
+        32
+      ],
+      "pixels": [
+        128,
+        128
+      ],
+      "sha256": "a0b0420d5f228d9818c732940a5d9b68706007985b0a1b726c5f82d67d5e85bb"
+    },
+    "orange": {
+      "path": "mm/assets/custom/objects/nei_autumn/leaves/orange_tex",
+      "logical_tile": [
+        32,
+        32
+      ],
+      "pixels": [
+        128,
+        128
+      ],
+      "sha256": "0e9b93e9e8af2263190d7d93ee0f440bbabc264625d9d720ebdbc07ccfa26c43"
+    },
+    "gold": {
+      "path": "mm/assets/custom/objects/nei_autumn/leaves/gold_tex",
+      "logical_tile": [
+        32,
+        32
+      ],
+      "pixels": [
+        128,
+        128
+      ],
+      "sha256": "2d579d757e7f3e93c0664af2516315ce89e3d92601c23bb00ec91217004ebd3f"
+    },
+    "copper": {
+      "path": "mm/assets/custom/objects/nei_autumn/leaves/copper_tex",
+      "logical_tile": [
+        32,
+        32
+      ],
+      "pixels": [
+        128,
+        128
+      ],
+      "sha256": "869debce4a1f6dd7d29836ca33dd65821d2b5650a99429d9b3fd18372fd131f6"
+    }
+  }
+}

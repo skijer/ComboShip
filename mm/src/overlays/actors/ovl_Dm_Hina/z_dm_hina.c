@@ -109,6 +109,7 @@ void func_80A1F75C(DmHina* this, PlayState* play) {
             Math_SmoothStepToF(&this->unk14C, 1.0f, 0.4f, 0.05f, 0.001f);
             this->unk17F = this->unk14C * 255.0f;
             this->unk150 = Math_SinS(play->state.frames * 0x1F40);
+            Environment_ClearNativeLightningAmbient();
             for (i = 0; i < ARRAY_COUNT(play->envCtx.adjLightSettings.light1Color); i++) {
                 play->envCtx.adjLightSettings.ambientColor[i] = play->envCtx.adjLightSettings.fogColor[i] =
                     play->envCtx.adjLightSettings.light1Color[i] = -255.0f * this->unk14C;

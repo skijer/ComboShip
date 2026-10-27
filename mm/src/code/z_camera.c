@@ -5277,8 +5277,92 @@ s32 Camera_Data3(Camera* camera) {
     return Camera_Noop(camera);
 }
 
+void Camera_SetOotShopFaceAngle(Camera* camera, f32 angleDegrees) {
+    if ((camera != NULL) && (camera->setting == CAM_SET_BLACK_MARKET_OOT)) {
+        camera->paramData.ootShop.faceAngle = angleDegrees;
+    }
+}
+
+/**
+ * OoT Camera_Data4: a fixed scene eye with the shopkeeper's fractional yaw.
+ * Only the appended private setting opts in; all original MM settings keep
+ * their previous Data4 no-op. Item selection never changes this camera.
+ */
 s32 Camera_Data4(Camera* camera) {
-    return Camera_Noop(camera);
+    OotShopData4* data4 = &camera->paramData.ootShop;
+    CameraModeValue* values;
+    BgCamFuncData* sceneData;
+    VecGeo eyeAtOffset;
+    VecGeo atOffset;
+    Vec3f offsetTarget;
+    Vec3f atTarget;
+    Vec3f lookAt;
+    f32 focalActorHeight;
+    f32 yNormal;
+
+    if (camera->setting != CAM_SET_BLACK_MARKET_OOT) {
+        return Camera_Noop(camera);
+    }
+
+    focalActorHeight = Camera_GetFocalActorHeight(camera);
+    if (RELOAD_PARAMS(camera)) {
+        values = sCameraSettings[camera->setting].cameraModes[camera->mode].values;
+        // OoT's default R_CAM_YOFFSET_NORM is -10. MM has no equivalent OREG.
+        yNormal = (1.0f - 0.1f) - (-0.1f * (68.0f / focalActorHeight));
+        data4->yOffset = GET_NEXT_SCALED_RO_DATA(values) * focalActorHeight * yNormal;
+        data4->fov = GET_NEXT_RO_DATA(values);
+        data4->interfaceFlags = GET_NEXT_RO_DATA(values);
+        sceneData = (BgCamFuncData*)Camera_GetBgCamOrActorCsCamFuncData(camera, camera->bgCamIndex);
+        data4->eyePosRot.pos = Camera_Vec3sToVec3f(&sceneData->pos);
+        data4->eyePosRot.rot = sceneData->rot;
+        if (sceneData->fov != -1) {
+            data4->fov = sceneData->fov < 361 ? sceneData->fov : CAM_RODATA_UNSCALE(sceneData->fov);
+        }
+        data4->axes = sceneData->unk_0E; // OoT's BGCAM_JFIFID yaw/pitch control bits
+        camera->eye = data4->eyePosRot.pos;
+    }
+
+    sCameraInterfaceFlags = data4->interfaceFlags;
+    if (camera->animState == 0) {
+        camera->animState++;
+        // func_80043B60 in OoT uses 0.001; MM's Slow helper uses 0.01.
+        camera->rUpdateRateInv = 1800.0f;
+        camera->yawUpdateRateInv = 1800.0f;
+        camera->pitchUpdateRateInv = 1800.0f;
+        camera->xzOffsetUpdateRate = 0.001f;
+        camera->yOffsetUpdateRate = 0.001f;
+        camera->fovUpdateRate = 0.001f;
+    }
+
+    // OoT Camera_CalcAtDefault(..., false), using MM's identical interpolation
+    // helper. MM's general CalcAtDefault adds a floor clamp absent in the donor.
+    offsetTarget.x = 0.0f;
+    offsetTarget.y = focalActorHeight + data4->yOffset;
+    offsetTarget.z = 0.0f;
+    Camera_ScaledStepToCeilVec3f(&offsetTarget, &camera->focalActorAtOffset, camera->xzOffsetUpdateRate,
+                                 camera->yOffsetUpdateRate, 0.1f);
+    atTarget.x = camera->focalActorPosRot.pos.x + camera->focalActorAtOffset.x;
+    atTarget.y = camera->focalActorPosRot.pos.y + camera->focalActorAtOffset.y;
+    atTarget.z = camera->focalActorPosRot.pos.z + camera->focalActorAtOffset.z;
+    Camera_ScaledStepToCeilVec3f(&atTarget, &camera->at, camera->atLerpStepScale, camera->atLerpStepScale, 0.2f);
+    eyeAtOffset = OLib_Vec3fDiffToVecGeo(&camera->eye, &camera->at);
+    atOffset.r = eyeAtOffset.r;
+    atOffset.yaw =
+        (data4->axes & 1) ? (s16)(data4->faceAngle * 182.04167f + .5f) + data4->eyePosRot.rot.y : eyeAtOffset.yaw;
+    // OoT's geographic conversion uses 0x3FFF, MM's uses 0x4000. Translate the
+    // pitch representation at this boundary to retain the donor's native math.
+    atOffset.pitch =
+        (data4->axes & 2) ? (s16)(camera->data3 * 182.04167f + .5f) + data4->eyePosRot.rot.x + 1 : eyeAtOffset.pitch;
+    camera->at = OLib_AddVecGeoToVec3f(&camera->eye, &atOffset);
+
+    lookAt = camera->focalActorPosRot.pos;
+    lookAt.y += focalActorHeight;
+    camera->dist = OLib_Vec3fDist(&lookAt, &camera->eye);
+    camera->roll = 0;
+    camera->xzSpeed = 0.0f;
+    camera->fov = data4->fov;
+    camera->atLerpStepScale = 0.0f;
+    return true;
 }
 
 s32 Camera_Unique1(Camera* camera) {

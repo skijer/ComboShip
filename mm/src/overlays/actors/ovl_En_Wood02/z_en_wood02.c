@@ -5,7 +5,10 @@
  */
 
 #include "z_en_wood02.h"
+#include "mods/items/objects/object_autumn_leaves.h"
 #include "objects/object_wood02/object_wood02.h"
+#include "2s2h/BenPort.h"
+#include "2s2h/Enhancements/Audio/MMWeather.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS 0x00000000
@@ -97,6 +100,72 @@ Gfx* D_808C4D70[] = {
     object_wood02_DL_000700,
 };
 
+// Leaves do not use their collectible flag. Reserve an otherwise unreachable
+// value for ambient autumn leaves so Off/story presentation can remove them.
+#define WOOD_AUTUMN_LEAF_MARKER (-2)
+#define WOOD_AUTUMN_LEAF_PARAMS ((0x7F << 8) | WOOD_LEAF_YELLOW)
+#define WOOD_AUTUMN_LEAF_LIMIT 8
+#define WOOD_AUTUMN_LEAF_CADENCE 40
+#define WOOD_AUTUMN_LEAF_INTERVAL 12
+
+static PlayState* sAutumnLeafPlay;
+static s16 sAutumnLeafScene = -1;
+static s8 sAutumnLeafRoom = -1;
+static u32 sAutumnLeafFrame;
+
+static s32 EnWood02_IsTree(EnWood02* this) {
+    return (this->actor.params <= WOOD_TREE_KAKARIKO_ADULT) || (this->actor.params == WOOD_TREE_SPECIAL);
+}
+
+static s32 EnWood02_UsesNativeFoliage(EnWood02* this) {
+    const char* list = (this->actor.params == WOOD_LEAF_GREEN || this->actor.params == WOOD_LEAF_YELLOW)
+                           ? object_wood02_DL_000700
+                           : (const char*)D_808C4D70[this->drawType & 0xF];
+
+    // Keep selected replacement display lists and their materials owned by the
+    // asset pack. Texture-only replacements continue through the native draw.
+    return !ResourceMgr_IsAltAssetsEnabled() || !ResourceMgr_FileAltExists(list);
+}
+
+static void EnWood02_SpawnAutumnLeaf(EnWood02* this, PlayState* play) {
+    Actor* prop;
+    s32 count = 0;
+    u32 phase = (u32)(s32)this->actor.home.pos.x ^ ((u32)(s32)this->actor.home.pos.z << 1);
+
+    if (!EnWood02_IsTree(this) || this->unk_146 < -1 || this->actor.xzDistToPlayer > 600.0f ||
+        fabsf(this->actor.playerHeightRel) > 250.0f || !(this->actor.flags & ACTOR_FLAG_INSIDE_CULLING_VOLUME) ||
+        play->pauseCtx.state != PAUSE_STATE_OFF || (play->gameplayFrames + phase) % WOOD_AUTUMN_LEAF_CADENCE != 0 ||
+        MMWeather_SeasonForPlay(play) != SEASON_AUTUMN || !EnWood02_UsesNativeFoliage(this)) {
+        return;
+    }
+
+    if (sAutumnLeafPlay == play && sAutumnLeafScene == play->sceneId && sAutumnLeafRoom == play->roomCtx.curRoom.num &&
+        play->gameplayFrames >= sAutumnLeafFrame &&
+        play->gameplayFrames - sAutumnLeafFrame < WOOD_AUTUMN_LEAF_INTERVAL) {
+        return;
+    }
+    sAutumnLeafPlay = play;
+    sAutumnLeafScene = play->sceneId;
+    sAutumnLeafRoom = play->roomCtx.curRoom.num;
+    sAutumnLeafFrame = play->gameplayFrames;
+
+    // Count existing native impact leaves as well; ambient leaves never consume
+    // more slots when the player has just shaken a tree. The native burst stays
+    // unrestricted. At most one nearby tree scans/spawns in each interval.
+    for (prop = play->actorCtx.actorLists[ACTORCAT_PROP].first; prop != NULL; prop = prop->next) {
+        if (prop->id == ACTOR_EN_WOOD02 && prop->update != NULL &&
+            (prop->params == WOOD_LEAF_GREEN || prop->params == WOOD_LEAF_YELLOW) &&
+            ++count >= WOOD_AUTUMN_LEAF_LIMIT) {
+            return;
+        }
+    }
+    Actor_Spawn(&play->actorCtx, play, ACTOR_EN_WOOD02,
+                this->actor.world.pos.x + (MMWeather_RandomFloat() - 0.5f) * 80.0f * this->actor.scale.x,
+                this->actor.world.pos.y + 200.0f * this->actor.scale.y,
+                this->actor.world.pos.z + (MMWeather_RandomFloat() - 0.5f) * 80.0f * this->actor.scale.z, 0,
+                (s16)((MMWeather_RandomFloat() - 0.5f) * 65535.0f), 0, WOOD_AUTUMN_LEAF_PARAMS);
+}
+
 s32 EnWood02_SpawnZoneCheck(EnWood02* this, PlayState* play, Vec3f* arg2) {
     f32 phi_f12;
 
@@ -178,6 +247,7 @@ void EnWood02_Init(Actor* thisx, PlayState* play) {
     s16 spawnType = 0;
     f32 actorScale = 1.0f;
     EnWood02* this = (EnWood02*)thisx;
+    s32 autumnLeaf = thisx->params == WOOD_AUTUMN_LEAF_PARAMS;
     s32 pad;
     CollisionPoly* outPoly;
     s32 bgId;
@@ -191,6 +261,9 @@ void EnWood02_Init(Actor* thisx, PlayState* play) {
 
     if (this->unk_144 & 0x80) {
         this->unk_144 = -1;
+    }
+    if (autumnLeaf) {
+        this->unk_144 = WOOD_AUTUMN_LEAF_MARKER;
     }
 
     this->actor.params &= 0xFF;
@@ -271,9 +344,16 @@ void EnWood02_Init(Actor* thisx, PlayState* play) {
         case WOOD_LEAF_YELLOW:
             this->unk_14A[0] = 75;
             actorScale = 0.02f;
-            this->actor.velocity.x = Rand_CenteredFloat(6.0f);
-            this->actor.velocity.z = Rand_CenteredFloat(6.0f);
-            this->actor.velocity.y = (Rand_ZeroOne() * 1.25f) + -3.1f;
+            if (autumnLeaf) {
+                // Ambient presentation must not advance the gameplay/drop RNG.
+                this->actor.velocity.x = (MMWeather_RandomFloat() - 0.5f) * 6.0f;
+                this->actor.velocity.z = (MMWeather_RandomFloat() - 0.5f) * 6.0f;
+                this->actor.velocity.y = MMWeather_RandomFloat() * 1.25f - 3.1f;
+            } else {
+                this->actor.velocity.x = Rand_CenteredFloat(6.0f);
+                this->actor.velocity.z = Rand_CenteredFloat(6.0f);
+                this->actor.velocity.y = (Rand_ZeroOne() * 1.25f) + -3.1f;
+            }
             break;
 
         default:
@@ -453,6 +533,10 @@ void EnWood02_Update(Actor* thisx, PlayState* play2) {
             Actor_PlaySfx(thisx, NA_SE_EV_TREE_SWING);
         }
     } else { // Leaves
+        if (this->unk_144 == WOOD_AUTUMN_LEAF_MARKER && MMWeather_SeasonForPlay(play) != SEASON_AUTUMN) {
+            Actor_Kill(thisx);
+            return;
+        }
         this->unk_146++;
         Math_ApproachF(&thisx->velocity.x, 0.0f, 1.0f, 5.0f * 0.01f);
         Math_ApproachF(&thisx->velocity.z, 0.0f, 1.0f, 5.0f * 0.01f);
@@ -471,6 +555,8 @@ void EnWood02_Update(Actor* thisx, PlayState* play2) {
         thisx->shape.rot.x = Math_CosS(thisx->yawTowardsPlayer - thisx->shape.rot.y) * wobbleAmplitude;
         thisx->shape.rot.z = Math_SinS(thisx->yawTowardsPlayer - thisx->shape.rot.y) * wobbleAmplitude;
     }
+
+    EnWood02_SpawnAutumnLeaf(this, play);
 }
 
 void EnWood02_Draw(Actor* thisx, PlayState* play) {
@@ -479,6 +565,20 @@ void EnWood02_Draw(Actor* thisx, PlayState* play) {
     u8 red;
     u8 green;
     u8 blue;
+    s32 season = MMWeather_SeasonForPlay(play);
+    s32 spring = EnWood02_IsTree(this) && season == SEASON_SPRING;
+    s32 frost = EnWood02_IsTree(this) && season == SEASON_WINTER;
+    s32 autumn = (EnWood02_IsTree(this) || ((thisx->params == WOOD_LEAF_GREEN || thisx->params == WOOD_LEAF_YELLOW) &&
+                                            EnWood02_UsesNativeFoliage(this))) &&
+                 season == SEASON_AUTUMN;
+
+    if (autumn && this->unk_144 == WOOD_AUTUMN_LEAF_MARKER) {
+        // Ambient leaves use the generated art too. Native impact leaves keep
+        // their original material and behavior.
+        Gfx_SetupDL25_Xlu(gfxCtx);
+        AutumnLeaves_Draw(play, (unsigned)this->actor.home.rot.y, 200);
+        return;
+    }
 
     OPEN_DISPS(gfxCtx);
 
@@ -496,6 +596,19 @@ void EnWood02_Draw(Actor* thisx, PlayState* play) {
         red = green = blue = 255;
     }
 
+    if (autumn) {
+        // Stable per-tree copper/gold variation, without replacing native art
+        // or mutating the resource's palette. The native opaque trunk stays as-is.
+        u32 variant = ((u32)(s32)thisx->home.pos.x ^ (u32)(s32)thisx->home.pos.z) & 1;
+        red = variant ? 220 : 195;
+        green = variant ? 145 : 90;
+        blue = variant ? 35 : 25;
+    } else if (frost) {
+        red = 204;
+        green = 220;
+        blue = 238;
+    }
+
     Gfx_SetupDL25_Xlu(gfxCtx);
 
     if ((thisx->params == WOOD_LEAF_GREEN) || (thisx->params == WOOD_LEAF_YELLOW)) {
@@ -503,13 +616,41 @@ void EnWood02_Draw(Actor* thisx, PlayState* play) {
 
         gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, red, green, blue, 127);
 
+        if (autumn) {
+            gDPSetGrayscaleColor(POLY_OPA_DISP++, red, green, blue, 255);
+            gSPGrayscale(POLY_OPA_DISP++, true);
+        }
         Gfx_DrawDListOpa(play, object_wood02_DL_000700);
+        if (autumn) {
+            gSPGrayscale(POLY_OPA_DISP++, false);
+        }
     } else if (D_808C4D70[this->drawType & 0xF] != NULL) {
         Gfx_DrawDListOpa(play, D_808C4D54[this->drawType & 0xF]);
 
         gDPSetEnvColor(POLY_XLU_DISP++, red, green, blue, 0);
         MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
+        if (spring || autumn || frost) {
+            // Some native canopies bake green into their own commands. Scope
+            // the renderer tint to the canopy so those trees change as well.
+            // Lift the dark actor canopies into readable blossom pink without
+            // retaining a green blend; opaque bark and native impact leaves stay native.
+            gDPSetGrayscaleColor(POLY_XLU_DISP++,
+                                 spring  ? 246
+                                 : frost ? 226
+                                         : 239,
+                                 spring  ? 193
+                                 : frost ? 238
+                                         : 72,
+                                 spring  ? 217
+                                 : frost ? 233
+                                         : 76,
+                                 255);
+            gSPGrayscale(POLY_XLU_DISP++, spring || frost ? 3 : 2);
+        }
         gSPDisplayList(POLY_XLU_DISP++, D_808C4D70[this->drawType & 0xF]);
+        if (spring || autumn || frost) {
+            gSPGrayscale(POLY_XLU_DISP++, false);
+        }
     } else {
         Gfx_SetupDL25_Xlu(gfxCtx);
 

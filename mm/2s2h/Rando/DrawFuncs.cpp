@@ -111,33 +111,85 @@ void ObjTokeidai_RotateOnHourChange(ObjTokeidai* thisx, PlayState* play);
     SETUP_DRAW_TYPE(LIMB_MAX, SKEL_HEADER, ANIM_HEADER, SkelAnime_InitFlex, FlexSkeletonHeader)
 
 // Soul Effects
-extern void DrawEnLight(Color_RGB8 flameColor, Vec3f flameSize) {
+static void DrawSoulFlame(PlayState* play, Color_RGB8 flameColor, Vec3f flameSize) {
     Gfx* sp68;
     static s8 unk_144 = (s8)(Rand_ZeroOne() * 255.0f);
     static u32 lastUpdate = 0;
 
-    OPEN_DISPS(gPlayState->state.gfxCtx);
+    OPEN_DISPS(play->state.gfxCtx);
 
-    Gfx_SetupDL25_Xlu(gPlayState->state.gfxCtx);
-    Matrix_ReplaceRotation(&gPlayState->billboardMtxF);
+    Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+    Matrix_ReplaceRotation(&play->billboardMtxF);
 
     gSPSegment(POLY_XLU_DISP++, 0x08,
-               (uintptr_t)Gfx_TwoTexScrollEx(gPlayState->state.gfxCtx, 0, 0, 0, 0x10, 0x20, 1, (unk_144 * 2) & 0x3F,
+               (uintptr_t)Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, 0, 0x10, 0x20, 1, (unk_144 * 2) & 0x3F,
                                              (unk_144 * -6) & 0x7F, 0x10, 0x20, 0, 0, 2, -6));
     sp68 = (Gfx*)gameplay_keep_DL_01ACF0;
     gDPSetPrimColor(POLY_XLU_DISP++, 0xC0, 0xC0, flameColor.r, flameColor.g, flameColor.b, 0);
     gDPSetEnvColor(POLY_XLU_DISP++, flameColor.r, flameColor.g, flameColor.b, 0);
     Matrix_Scale(flameSize.x, flameSize.y, flameSize.z, MTXMODE_APPLY);
 
-    MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gPlayState->state.gfxCtx);
+    MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
     gSPDisplayList(POLY_XLU_DISP++, sp68);
 
-    CLOSE_DISPS(gPlayState->state.gfxCtx);
+    CLOSE_DISPS(play->state.gfxCtx);
 
-    if (gPlayState != NULL && lastUpdate != gPlayState->state.frames) {
-        lastUpdate = gPlayState->state.frames;
+    if (lastUpdate != play->state.frames) {
+        lastUpdate = play->state.frames;
         unk_144++;
     }
+}
+
+extern void DrawEnLight(Color_RGB8 flameColor, Vec3f flameSize) {
+    DrawSoulFlame(gPlayState, flameColor, flameSize);
+}
+
+// Use the same phase and draw body as native MM boss souls, scoped for the shared consumer.
+void DrawMmSoulFlame(PlayState* play, const uint8_t color[3], const float scale[3]) {
+    Matrix_Push();
+    OPEN_DISPS(play->state.gfxCtx);
+    gSPComboRMPush(POLY_XLU_DISP++, "mm");
+    gSPGrayscale(POLY_XLU_DISP++, false);
+    CLOSE_DISPS(play->state.gfxCtx);
+    DrawSoulFlame(play, { color[0], color[1], color[2] }, { scale[0], scale[1], scale[2] });
+    Gfx* empty = (Gfx*)GRAPH_ALLOC(play->state.gfxCtx, 8 * sizeof(Gfx));
+    for (int i = 0; i < 8; ++i) {
+        gSPEndDisplayList(&empty[i]);
+    }
+    OPEN_DISPS(play->state.gfxCtx);
+    gSPComboRMPop(POLY_XLU_DISP++);
+    gSPSegment(POLY_XLU_DISP++, 8, (uintptr_t)empty);
+    gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, 255);
+    gDPSetEnvColor(POLY_XLU_DISP++, 255, 255, 255, 255);
+    CLOSE_DISPS(play->state.gfxCtx);
+    Matrix_Pop();
+}
+
+// MM owns this effect even when OoT owns the surrounding boss skeleton. Match the
+// vanilla OoT quad's bounds: x +/-12, y 2..42 versus MM x +/-400, y -480..1440.
+void DrawOotSoulFlame(PlayState* play, const uint8_t color[3], const float translate[3], const float scale[3]) {
+    Matrix_Push();
+    Matrix_Translate(translate[0], translate[1] + 12.0f * scale[1], translate[2], MTXMODE_APPLY);
+    OPEN_DISPS(play->state.gfxCtx);
+    gSPComboRMPush(POLY_XLU_DISP++, "mm");
+    gSPGrayscale(POLY_XLU_DISP++, false);
+    CLOSE_DISPS(play->state.gfxCtx);
+
+    DrawSoulFlame(play, { color[0], color[1], color[2] }, { scale[0] * 0.03f, scale[1] / 48.0f, scale[2] * 0.03f });
+
+    // The native drawer changes the matrix, segment 8 and prim/env colors. Keep
+    // those changes inside this pass so the skull, jaw and next item stay intact.
+    Gfx* empty = (Gfx*)GRAPH_ALLOC(play->state.gfxCtx, 8 * sizeof(Gfx));
+    for (int i = 0; i < 8; ++i) {
+        gSPEndDisplayList(&empty[i]);
+    }
+    OPEN_DISPS(play->state.gfxCtx);
+    gSPComboRMPop(POLY_XLU_DISP++);
+    gSPSegment(POLY_XLU_DISP++, 8, (uintptr_t)empty);
+    gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, 255);
+    gDPSetEnvColor(POLY_XLU_DISP++, 255, 255, 255, 255);
+    CLOSE_DISPS(play->state.gfxCtx);
+    Matrix_Pop();
 }
 
 // Limb Override Functions
@@ -1146,7 +1198,16 @@ extern void DrawWolfos() {
 }
 
 // Boss Souls
+#ifdef COMBO_BUILD
+extern "C" int32_t ComboDrawNativeMmBossSoul(RandoItemId id);
+#endif
+
 extern void DrawGoht() {
+#ifdef COMBO_BUILD
+    if (ComboDrawNativeMmBossSoul(RI_SOUL_BOSS_GOHT)) {
+        return;
+    }
+#endif
     SETUP_DRAW(GOHT_LIMB_MAX);
     Gfx_SetupDL25_Opa(gPlayState->state.gfxCtx);
     Matrix_Translate(0.0f, -20.0f, 0.0f, MTXMODE_APPLY);
@@ -1161,6 +1222,11 @@ extern void DrawGoht() {
 }
 
 extern void DrawGyorg() {
+#ifdef COMBO_BUILD
+    if (ComboDrawNativeMmBossSoul(RI_SOUL_BOSS_GYORG)) {
+        return;
+    }
+#endif
     SETUP_DRAW(GYORG_LIMB_MAX);
     Gfx_SetupDL25_Opa(gPlayState->state.gfxCtx);
     Matrix_Translate(0.0f, -20.0f, 0.0f, MTXMODE_APPLY);
@@ -1174,6 +1240,11 @@ extern void DrawGyorg() {
 }
 
 extern void DrawOdolwa() {
+#ifdef COMBO_BUILD
+    if (ComboDrawNativeMmBossSoul(RI_SOUL_BOSS_ODOLWA)) {
+        return;
+    }
+#endif
     SETUP_DRAW(ODOLWA_LIMB_MAX);
     Gfx_SetupDL25_Opa(gPlayState->state.gfxCtx);
     Gfx_SetupDL25_Xlu(gPlayState->state.gfxCtx);
@@ -1187,7 +1258,16 @@ extern void DrawOdolwa() {
     DrawEnLight({ 145, 20, 133 }, { 25.0f, 25.0f, 25.0f });
 }
 
+#ifdef COMBO_BUILD
+extern "C" int32_t ComboDrawNativeTwinmoldSoul();
+#endif
+
 extern void DrawTwinmold() {
+#ifdef COMBO_BUILD
+    if (ComboDrawNativeTwinmoldSoul()) {
+        return;
+    }
+#endif
     SETUP_DRAW(TWINMOLD_HEAD_LIMB_MAX);
     Gfx_SetupDL25_Opa(gPlayState->state.gfxCtx);
     Matrix_Scale(0.06f, 0.06f, 0.06f, MTXMODE_APPLY);

@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 /*
  * File: z_en_md.c
  * Overlay: ovl_En_Md
@@ -7,7 +8,6 @@
 #include "z_en_md.h"
 #include "objects/object_md/object_md.h"
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
-#include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
 #define FLAGS                                                                                  \
@@ -411,7 +411,8 @@ u16 EnMd_GetTextLostWoods(PlayState* play, EnMd* this) {
     this->messageEntry = 0;
     this->messageState = TEXT_STATE_NONE;
 
-    if (Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_PHANTOM_GANON,
+                                        Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP))) {
         if (Flags_GetInfTable(INFTABLE_19)) {
             return 0x1071;
         }
@@ -676,8 +677,6 @@ void EnMd_Init(Actor* thisx, PlayState* play) {
 void EnMd_Destroy(Actor* thisx, PlayState* play) {
     EnMd* this = (EnMd*)thisx;
     Collider_DestroyCylinder(play, &this->collider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void EnMd_Idle(EnMd* this, PlayState* play) {
@@ -773,8 +772,8 @@ void EnMd_ListenToOcarina(EnMd* this, PlayState* play) {
         this->actionFunc = EnMd_BlockPath;
         play->msgCtx.ocarinaMode = OCARINA_MODE_04;
     } else if (play->msgCtx.ocarinaMode == OCARINA_MODE_03) {
-        Audio_PlaySoundGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         this->actor.textId = 0x1067;
         Actor_OfferTalk(&this->actor, play, this->collider.dim.radius + 30.0f);
 

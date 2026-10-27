@@ -1,0 +1,1366 @@
+{
+  "baseline": "1fa85cd66db705e23160e7e61aec25ec6df229cc",
+  "source": "c45c0059ca1c0d71b8ceaaa9437d1e65b7cc59de",
+  "release": "0.4.0",
+  "runtime_tested": false,
+  "workflow_sha256": "4a3a3176fe3a45a47e1d83724aa3006c27bae0770369f0de140b2158fd16195b",
+  "checks": [
+    {
+      "command": "python3 scripts/check-asset-collisions.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "67bfa8a3217fb721734659317bb09d2ff6c99034faef600cd4c70a2ce8e2f0c8"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_combo_pak_visibility_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "c3923f2bad18ef17667b98200c955eee297e5dc8e8facb13f095b3bfb3c7410a"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_voice_pack_discovery_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "5f093a0aa27c6a44c979018969b6c85c102e01a6c76fd4b1ae712cc8d5b5cf97"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_combo_shared_test.py --json-include /usr/include",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "60cb628d9c4557d61b240cd0b52018cad13d07745df390031061bf9777eea26c"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_combo_grant_tests.py --json-include /usr/include",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "15216f8c85b115a3afbca7faf6969e7d78d3b00b97e7d0c4521d3667b76c6bea"
+    },
+    {
+      "command": "python3 tests/dungeon_rewards/run_tests.py --json-include /usr/include",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d8ef8b44c3d10781fd562454e9ad61c5b02d4b3953619a70c27c5ec8365d75e5"
+    },
+    {
+      "command": "python3 tests/item_grant_audit/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "64ec0f742df4c2a9a55d0b0785e799c1e1968ce14a9ffa49b55efa75e4c7a787"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_combo_reward_delivery_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "07e7bd439c08f4907f1fdd844e2cdbd080fb4f2ec5223aad7c2dd6b66dcbd2b7"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_combo_reward_delivery_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "07e7bd439c08f4907f1fdd844e2cdbd080fb4f2ec5223aad7c2dd6b66dcbd2b7"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_combo_save_compat_tests.py --json-include /usr/include",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "c78ecec2b3000b47c812fd7be6d0de5d6a30f56a2edd50b80d9c74f6c64c7a77"
+    },
+    {
+      "command": "python3 -B tests/oot_equipment_pause/run_age_requirement_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "32db67083ba88be5d6ee9dc13c7bc0811b8e6531bb1398022b9407b848f43add"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_silver_rupee_cosmetic_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8026d2d1a340e6600da0da640e4890b6d0e1ce26d6b2e9b35edf33c4826b5440"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_silver_rupee_cosmetic_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8026d2d1a340e6600da0da640e4890b6d0e1ce26d6b2e9b35edf33c4826b5440"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_fast_transformation_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ed854921bfb99dd250704d171603904efd0547790250eb7ca0eb3a50549b0f14"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_hint_item_area_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f67508763735d2ea03e6824cb1c4c09693c4b2b755178a5e841b639c2d35440c"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_hint_item_name_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "11fa9f02d581323efe03eea5f94df7228fe176a11ee2568e2893717d93b2715a"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_combo_crash_owner_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "42b834eb3f16edc49d8c89ff2aecc1c9654805181e0784efc6b744c89cb38ae1"
+    },
+    {
+      "command": "python3 -B tools/nei_gi/test_tunic_clearance.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "38a44eec9d7c585d69525855f70487d21a24688083244c917d33706387229eb3"
+    },
+    {
+      "command": "python3 -B tools/nei_gi/SOURCE/mario_sm64_poc3.py --verify",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "0509a156c95dd79b53585f266fdeb5de0801a64ae5a13c4138788c7b3afb689f"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_nei_gi_tests.py --held --combo",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "877bca7bdd45032ad2e42feedae9ee24aedab7321335f89d0f399686f0bb694c"
+    },
+    {
+      "command": "python3 -B tests/elemental_arrow_gi/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "23936aabaf5f3729415b869ec4191933fd5ffa5018639333a22504bc2b316b8e"
+    },
+    {
+      "command": "python3 -B tests/reward_gi/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "be4dc4334ca325fe704baa9bba6e28a31df440fd40ef7ed1513411864c79a45e"
+    },
+    {
+      "command": "python3 -B tests/reward_gi/run_asset_packaging_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "39b13ef99b0ce9a93e82b1301007651f143d5b6c811eb5d235714f4632842432"
+    },
+    {
+      "command": "python3 -B tests/nei_gi/run_flame_arena_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "20b68b7b67662c895ae5a7799eddca03640c22b5c4dd19836fc505923c32ee2f"
+    },
+    {
+      "command": "python3 -B tests/nei_gi/run_sages_tunic_particle_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "dc8bcaa66f0cbab271992288b3d0aad9f97c95982140224fa313cf14e22fa100"
+    },
+    {
+      "command": "python3 -B tools/nei_gi/check_time_gate_solidity.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "1dd135963ddb11273cc1f332f25dff6edca091bf57f847985f92a920ec1c1795"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_item_presentation_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "768590c5aeba23d30948c31e378485550de235231305fc953d93cdf4852a531c"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_static_gi_bridge_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3dc8bdc3dbae52da48810164569dc0b514a1aa2c8d226f73ff7214b1a9d17264"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_tunic_material_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3d04b57eb91234cf8f8871db796a1b350024fc8ef4c426518b5ca54071da6c80"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_item_receipt_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8e9dd70d08fa73c7eacaa57975117a359a970ce36ee5f2f9d1ab974426a234bf"
+    },
+    {
+      "command": "python3 -B tests/item_receipts/run_key_receipt_tests.py --sanitizers",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "77e22a37139c06040dce8130b6e64ef57940cc746e986b52c8c159ed40eb0997"
+    },
+    {
+      "command": "python3 -B tests/cape_choice/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8667875712527259ffa3de21f78985afbbeed9c95b052be920f0dde6f1d3d164"
+    },
+    {
+      "command": "python3 -B tests/cape_choice/run_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8667875712527259ffa3de21f78985afbbeed9c95b052be920f0dde6f1d3d164"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_anklet_icon_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "657481678c1e800cf70619e7555616e38c22f46d16a0efd4a53fb393424c583f"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_native_heart_receipt_icon_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a621d232c1d70d02b3f5ab16f67bf4a7fc32b37697921eb519a5419bc4592564"
+    },
+    {
+      "command": "python3 -B tests/item_receipts/run_seed_settings_tests.py --sanitizers",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "5660eea3a728ff17bcc9f7914e8927f15bec230d72e26a8c917cf3f138133273"
+    },
+    {
+      "command": "python3 -B tests/item_receipts/run_mm_first_seed_gate_test.py --sanitizers",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "4aefa91a2a8c41cc07f7bad20757ba3d3793976582ddbe6eca0e258cfc838733"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_receipt_syntax_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3e90d0fbfb27f13ffbf47f97095bb91263e9bce97e3448a5cda04846d19d6d81"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_song_gi_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "4529932270ebe27393b4eebc5b8df434707e2e4dc62e6bb8f68f26befccdafc0"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_sword_pose_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2bd241e9a740dc59af6e54645046ac90296a4ae5d7da9532075da6e0b8a00e35"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_sword_mod_gi_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "4614264f536390a813cdbc9a2f9a0856ceb5c563efd0cec7c57810880d50357d"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_sword_fallback_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f0a1af3c96152b26231410ec33fc079a2c3624593805456844199d6943b67be5"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_sword_receipt_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d5181dcf0e9c66346c48edd0e004494517daffc9711121080f527b9912ac7462"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_sword_asset_toggle_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "450d83a6ea7d0c747c31c6bcf180d02b1726e7aca636f89d3fc6adeeaf81707d"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_sword_resource_view_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b930c63aa0fd77a53236ab035efb182a99eee1d65cf726008689d2fd02098972"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_fairy_bottle_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "7b27c5bf2221e617d6c22b693cb0c9b971f8b35b3acc44d0b308985cd23ce750"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_bottle_polish_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "80209776243b095536f1cadb7a7360c0128ab75ff4213ce29d9d5de4fd991aa8"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_bottle_contents_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "0c8d4db8f3a183d7a332a78aebb7d215ecc02f30495b79584c6dd9d6a472478a"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_bottle_gi_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "c9dc0623cd266b47b2f1fcd8893cbc62d19fde9dcb14d24c51ccc1dd9cdfad8d"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d6f09c511bafe4454b27adf0398210f19583e38c0f4430b768653a9bc537df15"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_mode_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "1453c2286384193e19198e1eed38919c62636684a3e867e1a23efe9c5a666867"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_oot_mode_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "06aba48d7368ba3012bdd35d8090dff13fd46b8d7e15ecd88b8eade631551ed6"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_mode_pool_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b724698a983c17778b0dc0eab63f0931b3598f19dc99a6edb5a6e68b6c157625"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_mode_save_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b8bd36ff2a165171aedf8a2bde6310421517e3009558fd5c911fd4098284e719"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_native_weather_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "7a2aba0363cc0bf4f26f78f8dac0e9981616e70ba21d225be03d60528b0e5d30"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_generated_leaf_texture_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "5efe1cb1071385f82dac259aaf138fced6ada1335c741582f81737ba79e72bdf"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_leaf_combiner_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "4312b12aad34e616d8be48e8e2c28a3d2ce7c77cc30edcf97919d5b72b40a81e"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_autumn_foliage_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f31d3c56ca78f4efee1f18f099e70950b092b1a230e45387be53a5f0d48805d9"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_autumn_scene_foliage_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "15e9b97f3ebf00d7048157ab19b3eeeaba38bda7f8db6943305d05fc86220fbe"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_autumn_surface_texture_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "fc406cd7a2fed57ce35ab09f9676859f767fb20e65de44a8be9509e403f45484"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_season_selector_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "46040328669c12710542d2b83a4d96f416ee596fcd879e69a9305d1a27c543cb"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_rod_lifecycle_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b0b8d72b668a601e2c157f5e31e3c7c9f56c09677f0eace7445e9b2018448828"
+    },
+    {
+      "command": "python3 -B tests/seasons/run_oot_shop_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "da12b2ccb8b0e6116348a0143e772fec8a8a878cf43dd8e3b5eded7f265f7fcb"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_mask_bridge_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2cf0117b31eddfbcac9fcedc622ddf2aa6702a0d76ddf72788cc6344d708bf04"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mask_transformation_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "27653e5a786246eb72bd0ac100f85ce3fcc87152a0372f54ac073014a0a93742"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mask_progression_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "562067cbd90b7ae1b175e49099e2deac51a0cb97713b68ac9ed2ab9352ce8757"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_gerudo_mask_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d022178a17c5504296ebd9df29f36fce9896b8d1d6448908c828a72e82947f53"
+    },
+    {
+      "command": "python3 -B tests/great_fairy_facial/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "16fa5af801460f78bcfe220ba12a0ffafd87bdf023883e66efd69daf72273583"
+    },
+    {
+      "command": "python3 -B tests/oot_zora/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2af5071a3259d966624c43c47e1de6198b0e64921f3852b251ab25da86fac5c4"
+    },
+    {
+      "command": "python3 -B tests/mm_presentation/run_foreign_scale_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "19c793122320e2b0718dc8755b5753617bdb5f855fc6b96607d0ef930608d340"
+    },
+    {
+      "command": "python3 -B tests/mm_cape/run_texture_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3a238c50c59ee94797950e5c32c2448f95869df720a6b28c45bc35ad2875a292"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_nei_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "6cab11c8cc0b05a1a1d1e36de51ea5b8d3f9c91378973f86c95c320d1db17f00"
+    },
+    {
+      "command": "python3 -B tests/mm_wallet/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "22aa5440f5ba25956324ed99c4875e965f02aa657fc1662a1d2597583f87b9dd"
+    },
+    {
+      "command": "python3 -B tests/mm_editor/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "39e7bd24f19f34cacb5d3e492118033e702ebf20987b2cf6815524460b634953"
+    },
+    {
+      "command": "python3 -B tests/mm_grace/run_flight_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "803f8dde209d65c89abbcf72e08203a4e9271575f8ee941f5aad297e477731d5"
+    },
+    {
+      "command": "python3 -B tests/mm_grace/run_particle_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "70d10bb94b8d6b710012706c0ce5897161b5a8ef439030a1826c1bc6401f4556"
+    },
+    {
+      "command": "python3 -B tests/mm_grace/run_orientation_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "620f0aa9368055703356998fe2e62400dec86c23e57db62f4aa5cfc026b428e4"
+    },
+    {
+      "command": "python3 -B tests/mm_grace/run_pool_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "bc9e2734541c211a693831c82ba2f47292bc8f856ab6db359cc06f2d332d2699"
+    },
+    {
+      "command": "python3 -B tests/mm_grace/run_save_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f83663603f14e18f2e240a2778d9ee45044ee5aac3a6fa2d023e87f1535dfbac"
+    },
+    {
+      "command": "python3 -B tests/mm_grace/run_settings_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "87215d6aa0af3053e016c72850ef371fdbf40d70b89555c447bc81d2b714c480"
+    },
+    {
+      "command": "python3 -B tests/nei_shared_slot/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "5bf7eccd68ceb829a0fa1771b17162b3b52eddbd7ac4f03153c0cb086d4b2c9e"
+    },
+    {
+      "command": "python3 -B tests/nei_shared_slot/run_ui_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "dbb3a6137e6f2267f91bbc4f3f2a6c20d90f067c15e3f9532506c0b4e800d34c"
+    },
+    {
+      "command": "python3 -B tests/nei_shared_slot/run_sync_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "719a776017ae4a5bd788ca2faaafd7099bcd0517408b189e68758e4cc87a293e"
+    },
+    {
+      "command": "python3 -B tests/nei_shared_slot/run_save_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "613be4e1b226972eba3918493b243eb046a7842ce671263193dece32e112ba07"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_skin_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "72b7db4e3859b9fcc767f2e08a71b57afb251e2e98614f0e245bb996c40cbc49"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_core_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d0fb68f758410aeb9c038c471e9dac1bfe0e3679b424f361ee87ea4cfa9528df"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_material_glow_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "fa399d7699f604d392f4c7bb5cf796dff038686e16c7dc58a16cfef601ec476d"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_bundled_asset_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e487ad47a6783fe7699a6eb7c59ecb60e6521f26301745bdf802d0fc669037a2"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_eye_palette_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "242fcc25054b320742538abe597642219e74c9d2e154e05a5c7f7b38f1a14c3f"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_real_asset_tests.py soh/assets/custom/objects/forms/wolf_link/gWolfLinkData soh/assets/custom/objects/forms/wolf_link/gWolfLinkHDData",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "df3137f13b4c7da48fd55bb1a8a32cdd0324cce9d4a8a4d7dd6acb8269a737c4"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_host_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d6442d0d5fddb21841fd75172a2b501dc31528ae070002f0f04d97363bf515d1"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_audio_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8aa4715915058e37415178d6b05dc17e54d059ed6c4e212afdb63896cafabaf7"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_model_owner_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a178623423ac565aedb152bbd7a0760d01d5bac33a3dc1b80c6b64fa321464c8"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_asset_packaging_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a590116010fdb3636e2e208ac6d906cf391de1118aadab6c9736e2d4a3a63ab4"
+    },
+    {
+      "command": "python3 -B tests/mm_wolf/run_syntax_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b4f5288e515fdfdafc0ed1f53892d4c67b8c5ee979b1226747eac6d39fe79951"
+    },
+    {
+      "command": "python3 -B tests/wand_modes/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "77bff76b03b57223ecdc5cfb260c6c2c748a89cdc738674af683548c621d0120"
+    },
+    {
+      "command": "python3 -B tests/nei_air_magic/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ed7731f4aa0bed280a7023763841f6239da61fef3afedab0b9105e4e2d7e5aa6"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_receipt_soul_color_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b4376e104ffe80ee2dfb28011de4bc163ed7c402f024716d44c98d5f132e39b7"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_nei_identity_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d4fad5efb927385847142f8c60378fb4d0374258150f0c7fe930a7dbd986b62e"
+    },
+    {
+      "command": "python3 -B tests/nei_held/run_hand_fit_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "97a01af06b4283ad7922df6ee42fa894ed7915d0090d1c8664fb7be9dd5c3627"
+    },
+    {
+      "command": "python3 -B tests/nei_held/run_articulated_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "52d2f8202418106458567fbe86c3a4fe3b5832e581256467f78a44cc0df89efe"
+    },
+    {
+      "command": "python3 -B tests/nei_asset_priority/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "adcfbe4a1901e30877affe51737e46d21d2b864beaf4ec1cb230f03b98f94ac2"
+    },
+    {
+      "command": "python3 -B tests/nei_asset_priority/run_oot_gi_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "0833e8a23bfd406f1d527937ebf695dc4e78fc11bccf1fb0dee9c16a053241ec"
+    },
+    {
+      "command": "python3 -B tests/nei_asset_priority/run_tunic_model_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "82d7f923fe8e3a309be8cafdb4590f8dbce706db97e23937f98acd7d794a4022"
+    },
+    {
+      "command": "python3 -B tests/ikana_gi/run_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "50ece5326296056fb168c96b6c712bbcb27848f825f61e0b9d243b303043eed9"
+    },
+    {
+      "command": "python3 -B tests/nei_held/run_equipment_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "03dd0e285a55062308ac4e230b690d402da27f33c840e023912401145861b057"
+    },
+    {
+      "command": "python3 -B tests/nei_held/run_four_sword_visibility_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "32e257896266bd123c6fae0a1fc7f57c5105ada12232066beb79fc1cf8679ca5"
+    },
+    {
+      "command": "python3 -B tests/mm_equipment_pause/run_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "04eb1e0805c14c03099eb641684131c2a8665f87cc8e3f2e071b427142ae1782"
+    },
+    {
+      "command": "python3 -B tests/mm_equipment_pause/run_ownership_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b4611e8be24a5a8d3b57d59c1fee036c5cf360ae55b2475459156799e3f4e092"
+    },
+    {
+      "command": "python3 -B tests/oot_equipment_pause/run_access_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ca689c418b93a02b800f60724b5a16089758a18ee990fa70a8ccbcd8cbbf19ae"
+    },
+    {
+      "command": "python3 -B tests/oot_equipment_pause/run_access_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ca689c418b93a02b800f60724b5a16089758a18ee990fa70a8ccbcd8cbbf19ae"
+    },
+    {
+      "command": "python3 -B tests/mm_equipment_pause/run_preview_transition_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "9e3d74a97c4b23cd1ff3c7b97ff47413feea61b1ca9975a3ce53615daee986d4"
+    },
+    {
+      "command": "python3 -B tests/mm_equipment_pause/run_preview_transition_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "9e3d74a97c4b23cd1ff3c7b97ff47413feea61b1ca9975a3ce53615daee986d4"
+    },
+    {
+      "command": "python3 -B tests/mm_pause_inventory/run_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ebf5ebc066fec1764d764a005329f4f8eab611393ae317744a937395628358dc"
+    },
+    {
+      "command": "python3 -B tests/pause_tutorials/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ec9a02a94a945edf92056097473eafc2cdcdf01dd3bdc415226e081f1ea18401"
+    },
+    {
+      "command": "python3 -B tests/pause_tutorials/run_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ec9a02a94a945edf92056097473eafc2cdcdf01dd3bdc415226e081f1ea18401"
+    },
+    {
+      "command": "python3 -B tests/combo_button_transfer/run_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "97f705bfe4a08e07e6f869286c4cc6b2c733bedfde77d6dd4db3f0bfdd6e6b7c"
+    },
+    {
+      "command": "python3 -B tests/nei_quest_held/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "bc837e7f01eb002aa5168431fdaf924427e849b9c42f9f14657fa7bfd5e9d332"
+    },
+    {
+      "command": "python3 -B tests/nei_used_fx/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ba48b1ad44d13d5c16ee19886952c7233cfd194d8076b2968f24e34a29ec4cad"
+    },
+    {
+      "command": "python3 -B tests/nei_leaf/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "7d60a33107ef7d95185c1a6317f225b98c768ccf58e93b60e3f73b76e6f036e0"
+    },
+    {
+      "command": "python3 -B tests/mm_sfx_lifetime/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f9258266891122d032329810e974fa1a60ec641d50d5ce9ec877deb2450022ff"
+    },
+    {
+      "command": "python3 -B tests/nei_whip/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ae7cd14d82f39e57b9702c17b9567be8d7ce4673203b49efad2720b9d8605d22"
+    },
+    {
+      "command": "python3 -B tests/nei_lantern_grip/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "5900d89010e21fbe8cf8fa1bb00287e3226004d27f5aad00055f834e6a272dc4"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_switch_hook_instant_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "38b7f43feabc24c4b2e7b26b2169a35d1ae463050e3b87201c466a8369050293"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_time_gate_visibility_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2a4903e6ac5bf61806bbc5d67f8c27ba31c01230934a1261661d4f1b316be39e"
+    },
+    {
+      "command": "python3 -B tests/mm_nei/run_timegate_audio_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b09042ae0cea087bd0742b7f4a76c7025af8f1a7bff20ba9a60a0f3ce0e4ffe1"
+    },
+    {
+      "command": "python3 -B tests/nei_item_stow/run_ballchain_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "479eec39dfc1a3d9af26a481b9f028f4c73b9988d3d37d36c134b08614476257"
+    },
+    {
+      "command": "python3 -B tests/nei_item_stow/run_lantern_rod_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "c38955bc708bea5fc6c7d85dffabc2a5fb8c86d1bc6bbfba93b9f40d60ba41d6"
+    },
+    {
+      "command": "python3 -B tests/nei_item_stow/run_stow_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e2f4959d838a593a5b0510b4ae5d89febab897d28b097521fb5b69cd22f789cc"
+    },
+    {
+      "command": "python3 -B tools/nei_held/verify_assets.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "813d6fca01cf791e1e0bb9bab35b41bdc8337efb72a3a501506983e72ef4fcec"
+    },
+    {
+      "command": "python3 -B tools/nei_icons/build.py --verify",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "c1932237ccfb56ef1f2cd091483da0808206778528b2951f34bf80b2c3014234"
+    },
+    {
+      "command": "python3 -B tools/nei_icons/verify_routes.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "dd2d58a87a334447783eb6071a9647559f334fb9fb65e444c404909ec7823eba"
+    },
+    {
+      "command": "python3 -B tests/optional_assets/run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "14a0bcff25f5db381c7b0bed4704ddde0a153caebaa07f6f4d3c9a538447688c"
+    },
+    {
+      "command": "python3 -B tests/build_inputs/run_mod_discovery_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ea63f8fc66567022a661f26397f97412f472ff87516027edc12b5c3f9e3d9035"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_build_metadata_test.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8a966afa916b67d92644f679f723de78a38074f0d0c7bca2f6f630339c5cbb06"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_frame_timing_probe_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e94fe537376462fbb71328f95e842e0de6c487d028f851a7353a51ea10b3e291"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_din_fire_sword_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b6ad5512513da5f9f70b749464f52daf08ca372c3e88c754ca15e4da9110ec6d"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_din_progressive_hand_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b6ae86d74e0df538be13a244425105e11999a5445da08ca5571b65e74321151b"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_din_fire_sword_damage_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "489cb2c468ca264458e4dbd2d84a8119f13dca2442673f6dc2398bf28ecaa5fe"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_din_fire_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "52d7bc9c8250bd579c311f53fbca17282ed34e86317f239390d379f4f9970b2e"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_din_fire_damage_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e34c36f118767a7550ca5574cf63793a9efe37bebff3154276ff79caccd9fa66"
+    },
+    {
+      "command": "python3 -B tests/sm64_caps/run_audio_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8740bbfdc852b65e4d9322b8bb4e9d6b3f1c4ebb3417ef6edd7d86fcd03c3d45"
+    },
+    {
+      "command": "python3 -B tests/oot_timegate/run_audio_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "766ee108e3adad5ab1aab6486758566e15e4ed97e550ca729e001e0579cf9378"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_chest_size_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f7106137a6d81e759ec3d202f53649eb21efca7d3484216bfb3ee2a00b39a1b4"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_chest_contents_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b43b02a655d5465192a4ef2f9597456b0f57b0f91ab71766c5176fb50fb65c89"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_midna_navi_draw_test.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e117f2b08b8208b77eb2dfeb30dadd5d99d71924329b08eeb42d37a575ce6e82"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_midna_audio_test.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "40ff673fb8eb15502e933622be21b80e4365c33a80f8029f17316d959bc34956"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_midna_test.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "55e529de68fdfc820ac48dd3d7d11a6788bb878fffc88170010285ef049d0e1c"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_scene_randomization_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "aab805135c3ae6e9cb5565520506156dcf32179c44a1697eb01310f994c95905"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_audio_runtime_test.py \"$RUNNER_TEMP/mm-audio-runtime\"",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "31965455134d68e65c8b3049b6567836cf017d276e80d5703217cf573f346006"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_audio_decoder_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "0725126cf2b7465bfc8631d98f8234e15965d2b8d11c36190b1c80290d366116"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_streamed_positional_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "62c3019429dc9fbf4519fe9de12670cfc44aa86b4ee6ef56bb156df8f8e9601d"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_audio_pcm_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "416f6c28a39c2c90096430f8cd067bce04adc33bd6083e2b6e4e0297e41e234d"
+    },
+    {
+      "command": "MM_AUDIO_PCM_CFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie\" python3 scripts/diagnostics/run_mm_audio_pcm_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "416f6c28a39c2c90096430f8cd067bce04adc33bd6083e2b6e4e0297e41e234d"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_native_audio_mixer_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "68f81a64072c3260bf0406f464f519de3f477b0c3dc9e6c11753ce168d81e654"
+    },
+    {
+      "command": "python3 tests/audio_mixer/run_pcm_diagnostics_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e7df35fde6a29919602521682f9e7a5fef9e7c07048f774e66868b70d809d735"
+    },
+    {
+      "command": "NATIVE_AUDIO_CFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie\" python3 scripts/diagnostics/run_native_audio_mixer_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "68f81a64072c3260bf0406f464f519de3f477b0c3dc9e6c11753ce168d81e654"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_audio_worker_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2e1be415186b8d21dda6a6e5d71e6a36bbeb82579ea5dda9d7321272b591bf34"
+    },
+    {
+      "command": "MM_AUDIO_WORKER_CXXFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie\" python3 scripts/diagnostics/run_mm_audio_worker_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2e1be415186b8d21dda6a6e5d71e6a36bbeb82579ea5dda9d7321272b591bf34"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_weather_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3f5aad18f1d062eb632f6667b8d30cd8c28b2cf764e029b319ef5a6eaffc5705"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_custom_item_color_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "de3f7eefdfce034479360bf54ab1491610dbb0d51f1a4d92aaf8d046574eea62"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_hud_cosmetics_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "cdbf6cbe7369b2edf6606f2964dd676813ce0724b8c0b3bdd5abd0906a195665"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_drop_lifetime_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "9730fa19073a5cdd4e537c861416863c978cf4309635116afb9086652e8af80c"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_unrestricted_items_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "89941e2cfc4c0a4fab6675f0f6a6815294f63b4cf4025595e6382551c48bf633"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_item_visuals_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "09f1212ab1af8209e6ba4fe5df34ad5ab654fd7ba0f5550e83165e3e3d1c6b83"
+    },
+    {
+      "command": "python3 tests/dungeon_keys/run_asset_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d4933a232e796c4dfe4c86974538ed8b732853ba1aed29fbe40ac49e6e3598fe"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_dungeon_key_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "6ea63082667fc29de68edec36c827c6c6250c9f8f3b6593f34bba03b2c6e5277"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_dungeon_key_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "6ea63082667fc29de68edec36c827c6c6250c9f8f3b6593f34bba03b2c6e5277"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_gfx_patch_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "5cb7e404fa7be861cf7dc3ca2a8662158f084d9b26da72f0224d00bb84e52c5d"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_foreign_soul_skeleton_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "673d59d7f9cb8df11c7eb1b18a00c3b8705b74f28bc17f8c8fd28d2ea1cfc720"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_foreign_soul_skeleton_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "673d59d7f9cb8df11c7eb1b18a00c3b8705b74f28bc17f8c8fd28d2ea1cfc720"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_boss_soul_model_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2f086956e30e40bb8af57dc0808c5f519ec15389c0a09406ef0af99c8e090f15"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_boss_soul_model_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2f086956e30e40bb8af57dc0808c5f519ec15389c0a09406ef0af99c8e090f15"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_barinade_syntax_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "dfd11e5b637c54bca57cf7e8df6e0eae757b0c1c5f8a4dfa1f486d3be56a96c8"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_twinrova_gi_replacement_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "0e9756a059dcfc8214ca9fa4453d9ad6eba536bf57ef5fdd13255c0ea95457f0"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_twinrova_gi_replacement_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "0e9756a059dcfc8214ca9fa4453d9ad6eba536bf57ef5fdd13255c0ea95457f0"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_oot_boss_import_bridge_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d90f118b1ddd4bb9a7f3a645a881860e02542b5180d5dbd005f9bd45d5d9ccde"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_oot_boss_import_bridge_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "d90f118b1ddd4bb9a7f3a645a881860e02542b5180d5dbd005f9bd45d5d9ccde"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_static_gi_bridge_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8d7ee9320037868ca66b0bd72788ab10ea6d78b5f532b92a6fa12fb0181bc8aa"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mm_static_gi_bridge_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3dc8bdc3dbae52da48810164569dc0b514a1aa2c8d226f73ff7214b1a9d17264"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_tunic_material_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3d04b57eb91234cf8f8871db796a1b350024fc8ef4c426518b5ca54071da6c80"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_tunic_material_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "3d04b57eb91234cf8f8871db796a1b350024fc8ef4c426518b5ca54071da6c80"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_foreign_magic_jar_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "91bf9df3ae43ebc1a36bbe60c1f9f3839c29afd2fea19de56ad23691ec6e1278"
+    },
+    {
+      "command": "ASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_foreign_magic_jar_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "91bf9df3ae43ebc1a36bbe60c1f9f3839c29afd2fea19de56ad23691ec6e1278"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_oot_key_cosmetic_bridge_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a6b352a5d8fe1cf2ab1db6f21c258ed998a3e4c40c18581d122b3dc517346c4e"
+    },
+    {
+      "command": "ASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_oot_key_cosmetic_bridge_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a6b352a5d8fe1cf2ab1db6f21c258ed998a3e4c40c18581d122b3dc517346c4e"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_foreign_heart_cosmetic_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e2e04bba25b9e3c808d3d472db1f5cbd7b8c4f4ffb2afc1d806bfab2660e357d"
+    },
+    {
+      "command": "ASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_foreign_heart_cosmetic_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e2e04bba25b9e3c808d3d472db1f5cbd7b8c4f4ffb2afc1d806bfab2660e357d"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_spin_gi_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "6cb3881b8dcc0a1da9a09e0adb900ba84db0a745b9e7d4adf9b0b14996664010"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_spin_gi_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "2ac7d12c237be9d91620bbc77b8b9bc444b04f710cbc6374ce9914cc9c95b903"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mask_shimmer_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "bc8ad91c9c43b5e0746a7c9a5623b4962dc2d2c7aa29e3d7c82981e3af365184"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_mask_shimmer_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "782035e877bc688941639b365cafa8bcf7fb6b82a6285e960ae1289efaacdcde"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_mod_font_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "77c3e557cc2b93a488ec2297c269ec7935d2466962d37addf5cc0837e05556d0"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_performance_trace_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "538abf3c04f3894220b05b55ec4fa0048ad19eb03ee9b1700bb165ff90a3ac7c"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_draw_attribution_tests.py \"$RUNNER_TEMP/draw-attribution\"",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "82289c2c0ceeb042f47c24e7827d2c24e53decbd028860f0c446f24bb20b22fa"
+    },
+    {
+      "command": "python3 libultraship/tests/gpu_timing_query_test.py /usr/include",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "44344e98aef55af23565fdaf51dfe1fdd13f6ba2ab68860e313c0e353d49c954"
+    },
+    {
+      "command": "python3 libultraship/tests/dxgi_pacing_test.py /usr/include",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "e0aa6349ec3767ee0dc5c118af21b140c244cf3ffa0f696463076384ca8e0508"
+    },
+    {
+      "command": "python3 scripts/diagnostics/test_analyze_render_flight.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a6707d4eff38012da33ddc34bc6dc076a3b17151cfc9aef223c8790cbe64c3da"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_gfx_triangle_run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "60389da078687117bdccbc755c0a61ec29dc53375072cf21170d5b00f11a8dc1"
+    },
+    {
+      "command": "GFX_TRIANGLE_TEST_CXXFLAGS='-O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_triangle_run_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "60389da078687117bdccbc755c0a61ec29dc53375072cf21170d5b00f11a8dc1"
+    },
+    {
+      "command": "git apply --reverse --check --directory=libultraship patches/libultraship-custom-tex-scroll-e3cd6591.patch || git apply --check --directory=libultraship patches/libultraship-custom-tex-scroll-e3cd6591.patch",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "bfce0062b5bc0656d7c08fe930bcacbf17401c88191f4fa13b60c31d6c071663"
+    },
+    {
+      "command": "python3 scripts/diagnostics/test_custom_scroll_runtime.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f4f5b5fd6ec2a58fec29cb954b7780a33f1d81ddc5f038fc855dc78c87b53661"
+    },
+    {
+      "command": "GFX_TEXTURE_TEST_CXXFLAGS='-fsanitize=address,undefined -fno-sanitize-recover=all -g -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_texture_address_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "1626ad611e463395f1045e8be9ea8bb21894e47c7f1ebee54c8300e2abee95de"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_gfx_texture_address_tests.py --low-module",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "1626ad611e463395f1045e8be9ea8bb21894e47c7f1ebee54c8300e2abee95de"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_texture_failure_command_tests.py --sanitize",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ab4b9de9c7094921b41771805a8fe02040d71425a7d8c59c3fedd634e118036c"
+    },
+    {
+      "command": "GFX_DL_TEST_CXXFLAGS='-fsanitize=address,undefined -fno-sanitize-recover=all -g -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_display_list_address_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "f9a83db4026bc55f8b961783a401a2eea9414c8895d5b80ba0822743e3ed447b"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_alt_segment_binding_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "092cbea98a0e0e4c912592ffaee797c765739f828ab690cb1e9ccd955c83e201"
+    },
+    {
+      "command": "python3 -B scripts/diagnostics/run_carpet_segment_restore_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "b17b2adf287446095703a739c5049379cadf39479dbc1ebdaec93962b2695a37"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_gfx_vertex_batch_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ee1d2dbe397e016d420459ee6a5b406b119a1126ded57a9e2ac65f1a39cae017"
+    },
+    {
+      "command": "GFX_VERTEX_TEST_CXXFLAGS='-O1 -g -fsanitize=address,undefined,float-cast-overflow -fno-sanitize-recover=all -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_vertex_batch_tests.py --skip-null-test",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ad030f4a47ca4aa4d7b7da987658b2828fcf515400636703f317bc3dce210199"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_back_equipment_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "7dc11eda0d0d374736145b992a698b75b63177ccce2858e8c330808f4ee851e8"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_oot_sky_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "cf1274145fd133a4128bb61eedc483e31ae17df9c2c9da28b67ce4253661bcf0"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_oot_custom_cosmetics_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "103c1edd4efc4c76b5b74d0be72dbf7ae424faea6e8dc1026a5c2e24bcde6305"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_zora_barrier_cosmetics_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "ae96210cd46cc5b43fdbf864c2a3df44aa8b8cad0df9330ad793de2503ea4a47"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_young_epona_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "553a2980131c649c482c726dbfdde3bd57d253386f6676994ae3a96386a4bed3"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_young_epona_actor_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "c496d3ebc0e1fa716f8279eb0fd2ff4b1114fe3efb2f20e511eb8f95790a6e3f"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_young_epona_player_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "73f434c43737a72db3a7fcd2ea35eed5486e8ac2f57eadaffcbb6a7fe3b2f03a"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_young_epona_save_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "c34d8d26d36163cfa672796be3e082b48ab8a5a5a46c9bca79373a8d5e9a96db"
+    },
+    {
+      "command": "python3 scripts/diagnostics/test_young_epona_assets.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "8579b5756957df39d6cbd6d31a65ab954732998d36b3153c0ae2d1f99d864943"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_epona_mask_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "034095706440cca4b05ba453f924930ca5a86c9e8fc0fb1ebec382b00e61520a"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_epona_cosmetics_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a1ffd8927c145f16f137eaa1b56222bebe3c4761c99c06336879d0440f881f6b"
+    },
+    {
+      "command": "python3 scripts/diagnostics/run_mm_epona_cosmetics_tests.py",
+      "exit_code": 0,
+      "status": "passed",
+      "log_sha256": "a7c0de2c5af4d23e44ce64c4560f87ed8e074357250431e8f74d23a7c9707021"
+    }
+  ],
+  "source_blobs": {
+    "CMakeLists.txt": "95218b81bbbf23f1cb980fe42c952a2b205ecd40",
+    "combo/ComboShip.cpp": "7bf3794d5765a308d6bf288a6c64d882d0eb51b2",
+    "combo/menu/ComboItemDrawABI.h": "c46656f514e422edd39af9a2cbf7666f2359db8a",
+    "combo/menu/ComboItemDrawOOT.h": "368ee737a47c727195c5d49f3bdb684618ff4ac4",
+    "combo/menu/ComboForeignDrawMM.h": "7496e3b5aa286ca890bfd11400621291184cb7cc",
+    "mm/2s2h/Enhancements/Masks/FastTransformation.cpp": "b8bf2c8d6b0f96e0fa73db6dde5e852de04bb357",
+    "soh/soh/Enhancements/randomizer/3drando/hints.cpp": "66089ed7c9bff25f12303ef027c46069e50ae43c",
+    "soh/src/overlays/misc/ovl_kaleido_scope/z_kaleido_scope.h": "878a12ba5d5ccb653cc6e71ec14f2483b8c369db"
+  },
+  "native_build": {
+    "release_targets_exit_code": 0,
+    "final_current_source_exit_code": 0,
+    "module_load_exit_code": 0,
+    "launcher_exports": 163,
+    "deployed_identical_recipes": 21682,
+    "source_object_timestamps": 2919,
+    "archive_version": "1.27864.26741",
+    "headless_seed": {
+      "seed": "ci-linux-smoke",
+      "exit_code": 0,
+      "completable": "1/1",
+      "cross_game_placements": 198
+    }
+  }
+}

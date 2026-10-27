@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 #include "2s2h/GameInteractor/GameInteractor.h"
 #include "2s2h/CustomMessage/CustomMessage.h"
@@ -18,26 +19,31 @@ extern "C" {
  * flags and transitions set by func_808BA10C in z_door_warp1.c.
  */
 void HandleGiantsCutsceneSkip() {
+    const bool crossBoss = Combo_MM_CrossBossWarp(gPlayState->sceneId);
     GIEventTransition transition;
     switch (gPlayState->sceneId) {
         case SCENE_MITURIN_BS: // Odolwa's Lair
-            SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+            if (!crossBoss)
+                SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
             SET_WEEKEVENTREG(WEEKEVENTREG_ENTERED_WOODFALL_TEMPLE_PRISON);
             transition.entrance = ENTRANCE(WOODFALL_TEMPLE, 1);
             transition.cutsceneIndex = 0;
             break;
         case SCENE_HAKUGIN_BS: // Goht's Lair
-            SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+            if (!crossBoss)
+                SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
             transition.entrance = ENTRANCE(MOUNTAIN_VILLAGE_SPRING, 7);
             transition.cutsceneIndex = 0;
             break;
         case SCENE_SEA_BS: // Gyorg's Lair
-            SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+            if (!crossBoss)
+                SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
             transition.entrance = ENTRANCE(ZORA_CAPE, 9);
             transition.cutsceneIndex = 0xFFF0;
             break;
         case SCENE_INISIE_BS: // Twinmold's Lair
-            SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+            if (!crossBoss)
+                SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
             transition.entrance = ENTRANCE(IKANA_CANYON, 15);
             transition.cutsceneIndex = 0xFFF2;
             break;
@@ -119,6 +125,34 @@ void handleGiantsCheck(SceneId sceneId) {
                 } });
     }
 }
+
+#ifdef COMBO_BUILD
+// Preview/consume the same queued final target used by the forced rando skip. Runtime consumes it
+// before a cross-dungeon escape so native Giant/Oath bookkeeping finishes before saving the host.
+extern "C" int Combo_MM_GiantsEscape(int32_t* entrance, int32_t* cutscene, int consume) {
+    if (!IS_RANDO || !entrance || !cutscene || !gPlayState)
+        return 0;
+    auto it = std::find_if(GameInteractor::Instance->events.begin(), GameInteractor::Instance->events.end(),
+                           [](const GIEvent& event) {
+                               const auto* transition = std::get_if<GIEventTransition>(&event);
+                               if (!transition || transition->transitionType != gPlayState->sceneId)
+                                   return false;
+                               const auto scene = transition->transitionType;
+                               return scene == SCENE_MITURIN_BS || scene == SCENE_HAKUGIN_BS || scene == SCENE_SEA_BS ||
+                                      scene == SCENE_INISIE_BS;
+                           });
+    if (it == GameInteractor::Instance->events.end())
+        return 0;
+    const auto transition = std::get<GIEventTransition>(*it);
+    *entrance = transition.entrance;
+    *cutscene = transition.cutsceneIndex;
+    if (consume) {
+        GameInteractor::Instance->events.erase(it);
+        handleGiantsCheck(static_cast<SceneId>(transition.transitionType));
+    }
+    return 1;
+}
+#endif
 
 void RegisterSkipGiantsChamber() {
     /*

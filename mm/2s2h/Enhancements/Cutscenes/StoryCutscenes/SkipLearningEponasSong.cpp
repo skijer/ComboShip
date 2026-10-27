@@ -3,6 +3,8 @@
 #include "2s2h/ShipInit.hpp"
 #include "2s2h/CustomItem/CustomItem.h"
 #include "2s2h/Rando/Rando.h"
+#include "2s2h/Rando/ItemReceiptText.h"
+#include "2s2h/Rando/StaticData/StaticData.h"
 #include "2s2h/CustomMessage/CustomMessage.h"
 
 extern "C" {
@@ -36,10 +38,14 @@ void RegisterSkipLearningEponasSong() {
                 .showGetItemCutscene = true,
                 .giveItem =
                     [](Actor* actor, PlayState* play) {
+                        CustomMessage::Entry receipt{ .textboxType = 2,
+                                                      .icon = Rando::StaticData::GetIconForZMessage(RI_SONG_EPONA) };
+                        Rando::ApplyItemReceiptText(RI_SONG_EPONA, receipt);
+                        Rando::AppendReceiptSource(receipt, "");
                         if (CUSTOM_ITEM_FLAGS & CustomItem::GIVE_ITEM_CUTSCENE) {
-                            CustomMessage::SetActiveCustomMessage("You received Epona's Song!", { .textboxType = 2 });
+                            CustomMessage::SetActiveCustomMessage(receipt.msg, receipt);
                         } else {
-                            CustomMessage::StartTextbox("You received Epona's Song!\x1C\x02\x10", { .textboxType = 2 });
+                            CustomMessage::StartTextbox(receipt.msg, receipt);
                         }
                         Item_Give(gPlayState, ITEM_SONG_EPONA);
                     },

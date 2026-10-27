@@ -1,0 +1,10 @@
+<DisplayList Version="0">
+  <CallDisplayList Path="objects/combo_bottle_gi/shell/mat_gGiBlueFireChamberstickDL_BottleOutside" />
+  <CallDisplayList Path="objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_tri_0" />
+  <CallDisplayList Path="objects/combo_bottle_gi/shell/mat_revert_gGiBlueFireChamberstickDL_BottleOutside" />
+  <CallDisplayList Path="objects/combo_bottle_gi/shell/mat_gGiBlueFireChamberstickDL_BottleGlassOutside" />
+  <CallDisplayList Path="objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_tri_1" />
+  <CallDisplayList Path="objects/combo_bottle_gi/shell/mat_revert_gGiBlueFireChamberstickDL_BottleGlassOutside" />
+  <CallDisplayList Path="objects/combo_bottle_gi/CleanupXlu" />
+  <EndDisplayList />
+</DisplayList>

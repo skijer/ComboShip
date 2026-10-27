@@ -1,0 +1,15 @@
+{
+  "native_texture": "objects/object_sa/gSariaFairyOcarinaTex",
+  "native_size": [
+    32,
+    16
+  ],
+  "asset_size": [
+    256,
+    128
+  ],
+  "method": "Built-in image generation edit of extracted native UV texture; downsampled for game export",
+  "prompt": "Faithful 2:1 Fairy Ocarina UV atlas remaster. Preserve peach/apricot ceramic color, broad native shading, and the six original hole positions and sizes. Sharpen recessed dark holes with restrained terracotta bevels; subtle smooth fired ceramic grain and satin glaze. No new holes, object silhouette, lettering, logos, patterns, cracks or geometric changes.",
+  "output_encoding": "Raw RGBA32, horizontal byte scale16 and vertical pixel scale8; 256x128 replacement for the native 32x16 RGBA16 tile",
+  "geometry_uvs_and_grips": "unchanged"
+}

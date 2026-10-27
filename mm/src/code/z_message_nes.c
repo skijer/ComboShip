@@ -1,10 +1,13 @@
 #include "global.h"
 #include "message_data_fmt_nes.h"
 #include "message_data_static.h"
+#include "ComboBossSoulColor.h"
 #include "assets/interface/message_texture_static/message_texture_static.h"
 #include <stdio.h>
 #include <libultraship/bridge/consolevariablebridge.h>
 #include "2s2h/GameInteractor/GameInteractor.h"
+
+int Message_ItemReceiptSpaceWidth(int nativeWidth);
 
 f32 sNESFontWidths[160] = {
     8.0f,  8.0f,  6.0f,  9.0f,  9.0f,  14.0f, 12.0f, 3.0f,  7.0f,  7.0f,  7.0f,  9.0f,  4.0f,  6.0f,  4.0f,  9.0f,
@@ -453,7 +456,7 @@ void Message_DrawTextNES(PlayState* play, Gfx** gfxP, u16 textDrawPos) {
         msgCtx->textPosY = 48;
     }
 
-    if (msgCtx->itemId != 0xFE) {
+    if (!Message_DrawItemReceiptIcon(play, &gfx) && msgCtx->itemId != 0xFE) {
         Message_DrawItemIcon(play, &gfx);
     }
 
@@ -542,6 +545,15 @@ void Message_DrawTextNES(PlayState* play, Gfx** gfxP, u16 textDrawPos) {
                     msgCtx->textColorG = sColorsNormalNES[(s16)((u8)character - 1)].g;
                     msgCtx->textColorB = sColorsNormalNES[(s16)((u8)character - 1)].b;
                 }
+                if ((u8)character == MESSAGE_COLOR_GREEN) {
+                    const uint32_t rgb = ComboBossSoulSpanColor((const uint8_t*)msgCtx->decodedBuffer.schar + i + 1,
+                                                                sizeof(msgCtx->decodedBuffer.schar) - i - 1, true);
+                    if (rgb) {
+                        msgCtx->textColorR = (rgb >> 16) & 0xFF;
+                        msgCtx->textColorG = (rgb >> 8) & 0xFF;
+                        msgCtx->textColorB = rgb & 0xFF;
+                    }
+                }
 
                 if ((i + 1) == msgCtx->textDrawPos ||
                     ((i + 2) == msgCtx->textDrawPos && CVarGetInteger("gEnhancements.Fixes.ControlCharacters", 0))) {
@@ -550,7 +562,7 @@ void Message_DrawTextNES(PlayState* play, Gfx** gfxP, u16 textDrawPos) {
                 break;
 
             case ' ':
-                msgCtx->textPosX += 6;
+                msgCtx->textPosX += Message_ItemReceiptSpaceWidth(6);
                 break;
 
             case MESSAGE_NEWLINE:

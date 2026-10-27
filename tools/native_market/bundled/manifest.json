@@ -1,0 +1,1146 @@
+{
+  "decoded_bytes": 1546689,
+  "decoded_sha256": "1b75185882cacd214b18a74e9aecc8bad19df0eb0aae72aad483cd38c6fddba9",
+  "encoding": "base64+zlib+zip-store",
+  "file": "resources.zlib.b64",
+  "packed_bytes": 172041,
+  "packed_sha256": "56e3aee3444db834658a4638948a1c3c8f87bc2bb69214ed251b851aae6f5cdd",
+  "receipt": {
+    "default_material": "static stock 32x32 RGBA16 bark, neutral primitive tint; no texture pixels copied",
+    "external_resources": [
+      "scenes/nonmq/Z2_26SARUNOMORI/Z2_26SARUNOMORITex_00BAC0"
+    ],
+    "material_count": 28,
+    "preservation": "POC14 geometry/vertices/UVs/collision/scene headers/spawns unchanged; only 28 material bindings adapted",
+    "resource_count": 125,
+    "resources": {
+      "custom/skiejer_market/entrance": {
+        "bytes": 7707,
+        "sha256": "9bded97ca83070ca4f290e7b4c7ace99b490f2759b564f5eb9a2b4a264c6e220",
+        "source_sha256": "9bded97ca83070ca4f290e7b4c7ace99b490f2759b564f5eb9a2b4a264c6e220"
+      },
+      "custom/skiejer_market/entrance_vtx_0": {
+        "bytes": 272,
+        "sha256": "982d7e40c2858d37b11fd072ac095b89dfc3c1a39d8118686a6389094e4a5076",
+        "source_sha256": "982d7e40c2858d37b11fd072ac095b89dfc3c1a39d8118686a6389094e4a5076"
+      },
+      "custom/skiejer_market/entrance_vtx_1": {
+        "bytes": 271,
+        "sha256": "591a83d62ebcadc7ba23cb30580b07dd11443cd771ccdc8ba4606e66d476ba91",
+        "source_sha256": "591a83d62ebcadc7ba23cb30580b07dd11443cd771ccdc8ba4606e66d476ba91"
+      },
+      "custom/skiejer_market/entrance_vtx_10": {
+        "bytes": 264,
+        "sha256": "64152729d43724e3947ba9f2dd84dde505822afa7c64ff86f1ee830fbee9be1b",
+        "source_sha256": "64152729d43724e3947ba9f2dd84dde505822afa7c64ff86f1ee830fbee9be1b"
+      },
+      "custom/skiejer_market/entrance_vtx_11": {
+        "bytes": 267,
+        "sha256": "26e13c858fa4d0d192b939cafbeb7ed1ae2caf5d6d7f7663e40d61bfadc38020",
+        "source_sha256": "26e13c858fa4d0d192b939cafbeb7ed1ae2caf5d6d7f7663e40d61bfadc38020"
+      },
+      "custom/skiejer_market/entrance_vtx_12": {
+        "bytes": 266,
+        "sha256": "1396bd5c7dc4782bf1e7db9e69262b81e19dc013d7d339bd900b7c3ea72bc01c",
+        "source_sha256": "1396bd5c7dc4782bf1e7db9e69262b81e19dc013d7d339bd900b7c3ea72bc01c"
+      },
+      "custom/skiejer_market/entrance_vtx_13": {
+        "bytes": 262,
+        "sha256": "7c54a41dae3a5d4b755d4a54c158e5fcb79230dd00ac320a822211de702ebc72",
+        "source_sha256": "7c54a41dae3a5d4b755d4a54c158e5fcb79230dd00ac320a822211de702ebc72"
+      },
+      "custom/skiejer_market/entrance_vtx_14": {
+        "bytes": 262,
+        "sha256": "8e2d03b6b7d7ad1b8e6bca19ac101111fd4b4668ad71fe7b4a93bb55189107eb",
+        "source_sha256": "8e2d03b6b7d7ad1b8e6bca19ac101111fd4b4668ad71fe7b4a93bb55189107eb"
+      },
+      "custom/skiejer_market/entrance_vtx_15": {
+        "bytes": 266,
+        "sha256": "15daf32282f24d3a8aa034811137a77f40f4fe97807ef081c6758b4a5d4664cf",
+        "source_sha256": "15daf32282f24d3a8aa034811137a77f40f4fe97807ef081c6758b4a5d4664cf"
+      },
+      "custom/skiejer_market/entrance_vtx_16": {
+        "bytes": 281,
+        "sha256": "330ba79a21fad5cdce667365106b4a1b1dc351a380044f482bfab53713dbafcc",
+        "source_sha256": "330ba79a21fad5cdce667365106b4a1b1dc351a380044f482bfab53713dbafcc"
+      },
+      "custom/skiejer_market/entrance_vtx_17": {
+        "bytes": 280,
+        "sha256": "551a2b2a50e10f76c41366430781115144b43a0004f12764cfdcc1cef11a40c0",
+        "source_sha256": "551a2b2a50e10f76c41366430781115144b43a0004f12764cfdcc1cef11a40c0"
+      },
+      "custom/skiejer_market/entrance_vtx_18": {
+        "bytes": 278,
+        "sha256": "129eebe42df08f9e143d993a9dbea30e8a0e623615126049ff10e270ee39a5f2",
+        "source_sha256": "129eebe42df08f9e143d993a9dbea30e8a0e623615126049ff10e270ee39a5f2"
+      },
+      "custom/skiejer_market/entrance_vtx_19": {
+        "bytes": 277,
+        "sha256": "9bfbf7ed079ce3a198b30301bf27789cb52639a27dd0fc316c9d5caf034420ab",
+        "source_sha256": "9bfbf7ed079ce3a198b30301bf27789cb52639a27dd0fc316c9d5caf034420ab"
+      },
+      "custom/skiejer_market/entrance_vtx_2": {
+        "bytes": 272,
+        "sha256": "805cf738d4f2977ef512f0e8e92846380913b31d35d89e4cd927234301d59c76",
+        "source_sha256": "805cf738d4f2977ef512f0e8e92846380913b31d35d89e4cd927234301d59c76"
+      },
+      "custom/skiejer_market/entrance_vtx_20": {
+        "bytes": 276,
+        "sha256": "e9f76af160ebec71dd3e30eb54fab889ab9bfad4d9496e2c1dd48520c653b308",
+        "source_sha256": "e9f76af160ebec71dd3e30eb54fab889ab9bfad4d9496e2c1dd48520c653b308"
+      },
+      "custom/skiejer_market/entrance_vtx_21": {
+        "bytes": 276,
+        "sha256": "fad4bf254ffb2f82c057e3f874d29e0bebf81f558ef8a2e93f8defcca68a1e9a",
+        "source_sha256": "fad4bf254ffb2f82c057e3f874d29e0bebf81f558ef8a2e93f8defcca68a1e9a"
+      },
+      "custom/skiejer_market/entrance_vtx_22": {
+        "bytes": 276,
+        "sha256": "e4c211830444cbe6d0176621e5d946279c088c611389db91b1de38f3524c8cf9",
+        "source_sha256": "e4c211830444cbe6d0176621e5d946279c088c611389db91b1de38f3524c8cf9"
+      },
+      "custom/skiejer_market/entrance_vtx_23": {
+        "bytes": 276,
+        "sha256": "d4091222652609d99617340405e2c0f0353bd390e0089947fa1630f34924c966",
+        "source_sha256": "d4091222652609d99617340405e2c0f0353bd390e0089947fa1630f34924c966"
+      },
+      "custom/skiejer_market/entrance_vtx_24": {
+        "bytes": 264,
+        "sha256": "cb08ab088e5e77cd83f5fa198b8be8688e6aa8a077951d8f3a06fb1abe2e3ef8",
+        "source_sha256": "cb08ab088e5e77cd83f5fa198b8be8688e6aa8a077951d8f3a06fb1abe2e3ef8"
+      },
+      "custom/skiejer_market/entrance_vtx_25": {
+        "bytes": 274,
+        "sha256": "fbc19d11e16f9d50ff1fec087cd3a6fa345cfd91f4c4fed457c36bd48133438b",
+        "source_sha256": "fbc19d11e16f9d50ff1fec087cd3a6fa345cfd91f4c4fed457c36bd48133438b"
+      },
+      "custom/skiejer_market/entrance_vtx_26": {
+        "bytes": 272,
+        "sha256": "4311b7128585d5b2eb86d2cdd9359363fb3d4ffa91cf28754c6ad845528ca0f4",
+        "source_sha256": "4311b7128585d5b2eb86d2cdd9359363fb3d4ffa91cf28754c6ad845528ca0f4"
+      },
+      "custom/skiejer_market/entrance_vtx_27": {
+        "bytes": 274,
+        "sha256": "f1f733cacb26c2dfd7d04c7fedf0e317afca0dc109e55ef0fa265f7716abfef1",
+        "source_sha256": "f1f733cacb26c2dfd7d04c7fedf0e317afca0dc109e55ef0fa265f7716abfef1"
+      },
+      "custom/skiejer_market/entrance_vtx_28": {
+        "bytes": 278,
+        "sha256": "4fca9592e5bb7db15b612793ec76c45e926fb6df357a43765b9d678dff90a8b3",
+        "source_sha256": "4fca9592e5bb7db15b612793ec76c45e926fb6df357a43765b9d678dff90a8b3"
+      },
+      "custom/skiejer_market/entrance_vtx_3": {
+        "bytes": 271,
+        "sha256": "441c4c658057a9a6e1375c708825a01ead756c713cd0fbb68a9963a7423a206f",
+        "source_sha256": "441c4c658057a9a6e1375c708825a01ead756c713cd0fbb68a9963a7423a206f"
+      },
+      "custom/skiejer_market/entrance_vtx_4": {
+        "bytes": 273,
+        "sha256": "1c03c2863c2003dd8a51a70e8258d37bf6bae672312708798abfe79c4f6a83d8",
+        "source_sha256": "1c03c2863c2003dd8a51a70e8258d37bf6bae672312708798abfe79c4f6a83d8"
+      },
+      "custom/skiejer_market/entrance_vtx_5": {
+        "bytes": 273,
+        "sha256": "b4d66c280e98ee726fcf87fd9bfa5e741fddbd0038f28212d0ec3c251a653914",
+        "source_sha256": "b4d66c280e98ee726fcf87fd9bfa5e741fddbd0038f28212d0ec3c251a653914"
+      },
+      "custom/skiejer_market/entrance_vtx_6": {
+        "bytes": 276,
+        "sha256": "93f6818e7bafca0abf3000915b38f6e5db36e5f2a488fb0e93a0767147ad0241",
+        "source_sha256": "93f6818e7bafca0abf3000915b38f6e5db36e5f2a488fb0e93a0767147ad0241"
+      },
+      "custom/skiejer_market/entrance_vtx_7": {
+        "bytes": 276,
+        "sha256": "c06c1300ce0351eb1ba05b66be309e7dd26841d00aa7c030773b1442a96e4c89",
+        "source_sha256": "c06c1300ce0351eb1ba05b66be309e7dd26841d00aa7c030773b1442a96e4c89"
+      },
+      "custom/skiejer_market/entrance_vtx_8": {
+        "bytes": 271,
+        "sha256": "524ae0e26ea6b398c28b9d7894d6084c864d559e0f7195db034bab11778eb557",
+        "source_sha256": "524ae0e26ea6b398c28b9d7894d6084c864d559e0f7195db034bab11778eb557"
+      },
+      "custom/skiejer_market/entrance_vtx_9": {
+        "bytes": 266,
+        "sha256": "78e3e1530032c54989f604d2492606479bf228924ef8b4450c815c75c94bd1a2",
+        "source_sha256": "78e3e1530032c54989f604d2492606479bf228924ef8b4450c815c75c94bd1a2"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548": {
+        "bytes": 5904,
+        "sha256": "2a1bdd82eb41bea744ab2104f696fafd8b15272e031edb3cc8771449ed555b48",
+        "source_sha256": "2a1bdd82eb41bea744ab2104f696fafd8b15272e031edb3cc8771449ed555b48"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_0": {
+        "bytes": 1796,
+        "sha256": "e65fce9b399c4da352c4957e391e2570d6e4cf0998b5ffadc30945ed371181f2",
+        "source_sha256": "e65fce9b399c4da352c4957e391e2570d6e4cf0998b5ffadc30945ed371181f2"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_1": {
+        "bytes": 30749,
+        "sha256": "f8612f45bbe74aaadf0d37ee08bc1f78221b50da1c4c066554fce880b0a4f317",
+        "source_sha256": "f8612f45bbe74aaadf0d37ee08bc1f78221b50da1c4c066554fce880b0a4f317"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_10": {
+        "bytes": 907,
+        "sha256": "76ef9815722e6cf02a96703c025581d928f995b6393ac728aeff58b9378c078f",
+        "source_sha256": "76ef9815722e6cf02a96703c025581d928f995b6393ac728aeff58b9378c078f"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_11": {
+        "bytes": 76730,
+        "sha256": "6c6c267ac8f313c8777b36e876ec5b36cbf440733b3df479ae938696006ead74",
+        "source_sha256": "6c6c267ac8f313c8777b36e876ec5b36cbf440733b3df479ae938696006ead74"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_12": {
+        "bytes": 2337,
+        "sha256": "0f8985d5cdf4a6c87a9f581fc28d6b8875c0e560a51ab9ceb2abe2029fda71db",
+        "source_sha256": "0f8985d5cdf4a6c87a9f581fc28d6b8875c0e560a51ab9ceb2abe2029fda71db"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_13": {
+        "bytes": 1753,
+        "sha256": "d6d525ee1f2b16454a0e5429e7b1176104d5aca6f69699c549944902c0151407",
+        "source_sha256": "d6d525ee1f2b16454a0e5429e7b1176104d5aca6f69699c549944902c0151407"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_14": {
+        "bytes": 18638,
+        "sha256": "423b8e051d0a798c519b990d6264d79d1bb2f949e53765ed3cc33b95fcc84fe5",
+        "source_sha256": "423b8e051d0a798c519b990d6264d79d1bb2f949e53765ed3cc33b95fcc84fe5"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_15": {
+        "bytes": 2620,
+        "sha256": "6d91a76f575f83afd270a7bf39c96eb8a1a82302c25cc2b42406c3908f8b88e6",
+        "source_sha256": "6d91a76f575f83afd270a7bf39c96eb8a1a82302c25cc2b42406c3908f8b88e6"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_16": {
+        "bytes": 1797,
+        "sha256": "45bf60acbecef407d81bb7723e9cb175aacfed26d36ecfce1e9b6c2e2164f22c",
+        "source_sha256": "45bf60acbecef407d81bb7723e9cb175aacfed26d36ecfce1e9b6c2e2164f22c"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_17": {
+        "bytes": 74652,
+        "sha256": "0ee1808b21bb49790bba90f805cab72bae1b0e4b5d13623863ad6b592413177a",
+        "source_sha256": "0ee1808b21bb49790bba90f805cab72bae1b0e4b5d13623863ad6b592413177a"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_18": {
+        "bytes": 3532,
+        "sha256": "46c536a6051a91004529faf9bda5f700921de6b8ef03f865ecd80b5a6acdc0af",
+        "source_sha256": "46c536a6051a91004529faf9bda5f700921de6b8ef03f865ecd80b5a6acdc0af"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_19": {
+        "bytes": 3949,
+        "sha256": "848d34cd672f20bf84e7a654b802389ef826ce5a31dafe132f888770f6c644a6",
+        "source_sha256": "848d34cd672f20bf84e7a654b802389ef826ce5a31dafe132f888770f6c644a6"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_2": {
+        "bytes": 50132,
+        "sha256": "249bba606020ad10f3085a28cce6b10087683a04f1c5a322fdedf7168c32b599",
+        "source_sha256": "249bba606020ad10f3085a28cce6b10087683a04f1c5a322fdedf7168c32b599"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_20": {
+        "bytes": 2025,
+        "sha256": "6e0be548cdd52979d89dfc219d34b8c4d7547c776d62778e4c5c8d35faa8c105",
+        "source_sha256": "6e0be548cdd52979d89dfc219d34b8c4d7547c776d62778e4c5c8d35faa8c105"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_21": {
+        "bytes": 6716,
+        "sha256": "0390a1a63894ab9eb2203b5bb002e0f1502619442a080c0341923c4d7eda1fa8",
+        "source_sha256": "0390a1a63894ab9eb2203b5bb002e0f1502619442a080c0341923c4d7eda1fa8"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_22": {
+        "bytes": 8808,
+        "sha256": "3ed918b47cb19e62e3202dc43b53811bddab2347ccf7c672bc5e8413d9a0dd13",
+        "source_sha256": "3ed918b47cb19e62e3202dc43b53811bddab2347ccf7c672bc5e8413d9a0dd13"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_23": {
+        "bytes": 3226,
+        "sha256": "d5404fa272c720f4c100b72c6e16e9dc6ce04bba843cbda8b129a3f5b01b6e09",
+        "source_sha256": "d5404fa272c720f4c100b72c6e16e9dc6ce04bba843cbda8b129a3f5b01b6e09"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_24": {
+        "bytes": 8758,
+        "sha256": "24ae40a2d2915c97e93b06428f66363263b8ae757b2ef1fc30fb35295122bc3d",
+        "source_sha256": "24ae40a2d2915c97e93b06428f66363263b8ae757b2ef1fc30fb35295122bc3d"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_25": {
+        "bytes": 1168,
+        "sha256": "be2d4fbd93fc3050365819b637663ef9dad0e9311b5f1e5b56b3e7c74c55fc17",
+        "source_sha256": "be2d4fbd93fc3050365819b637663ef9dad0e9311b5f1e5b56b3e7c74c55fc17"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_26": {
+        "bytes": 12385,
+        "sha256": "795884b94c582237112dac2b53840f617af1829e3206eafca0a960e686c412e5",
+        "source_sha256": "795884b94c582237112dac2b53840f617af1829e3206eafca0a960e686c412e5"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_27": {
+        "bytes": 12385,
+        "sha256": "8506fdb90ee8fed25a35a74937da8bf3b2a2f802a75fdba5b534bf061fa059a6",
+        "source_sha256": "8506fdb90ee8fed25a35a74937da8bf3b2a2f802a75fdba5b534bf061fa059a6"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_3": {
+        "bytes": 3942,
+        "sha256": "be5dd3cd7dcda5c083df15a89fb4fd5c64dfafba14299858ed6c4d41fe30fc12",
+        "source_sha256": "be5dd3cd7dcda5c083df15a89fb4fd5c64dfafba14299858ed6c4d41fe30fc12"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_4": {
+        "bytes": 2076,
+        "sha256": "42d12bee42874a3d73dd1e196222b7a671197d91502917af1530df0673d50856",
+        "source_sha256": "42d12bee42874a3d73dd1e196222b7a671197d91502917af1530df0673d50856"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_5": {
+        "bytes": 6320,
+        "sha256": "96365620a016a6db8d363b19cfff0e56698955a96427b7b426d1f486c404d9b5",
+        "source_sha256": "96365620a016a6db8d363b19cfff0e56698955a96427b7b426d1f486c404d9b5"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_6": {
+        "bytes": 47978,
+        "sha256": "b2887a282aa3d3bff4b6691d0e6e07aac0565db650150c7f775d7333f5d381b5",
+        "source_sha256": "b2887a282aa3d3bff4b6691d0e6e07aac0565db650150c7f775d7333f5d381b5"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_7": {
+        "bytes": 1260,
+        "sha256": "da1a0dba1da9d9adea82f3512df81ee8b283aad613a63f4244dd54a2f2816e39",
+        "source_sha256": "da1a0dba1da9d9adea82f3512df81ee8b283aad613a63f4244dd54a2f2816e39"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_8": {
+        "bytes": 25402,
+        "sha256": "85b0dc94f16f123949a065271b7fd7fede7eca6b9fa0ff10a49aa64da558dc8d",
+        "source_sha256": "85b0dc94f16f123949a065271b7fd7fede7eca6b9fa0ff10a49aa64da558dc8d"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_9": {
+        "bytes": 890,
+        "sha256": "d4918166a81cf8961cbd7c3cb76424b3111a8b0806eb7e1c6d6a11461a0f04e6",
+        "source_sha256": "d4918166a81cf8961cbd7c3cb76424b3111a8b0806eb7e1c6d6a11461a0f04e6"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_0": {
+        "bytes": 2040,
+        "sha256": "e4629732b417a834efcdafacfccb9e8c85c1c5fc2701e2e044cea5f7fde0985c",
+        "source_sha256": "e4629732b417a834efcdafacfccb9e8c85c1c5fc2701e2e044cea5f7fde0985c"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_1": {
+        "bytes": 65669,
+        "sha256": "c211f8eca1e952b9590109c7c729def2d868edb60b2b53f7fb1dc12fe1047bbc",
+        "source_sha256": "c211f8eca1e952b9590109c7c729def2d868edb60b2b53f7fb1dc12fe1047bbc"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_10": {
+        "bytes": 3057,
+        "sha256": "539ae86aee8d5c062ef0f682237646d87b38f6248de4631a34cf35b5171922c5",
+        "source_sha256": "539ae86aee8d5c062ef0f682237646d87b38f6248de4631a34cf35b5171922c5"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_11": {
+        "bytes": 140499,
+        "sha256": "c3fd16e679c684e1e7963e4472d82f94bdf65956ba7556253c37ce83e499165f",
+        "source_sha256": "c3fd16e679c684e1e7963e4472d82f94bdf65956ba7556253c37ce83e499165f"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_12": {
+        "bytes": 6502,
+        "sha256": "5e8e76aa2f0ec427da7116da7cc73ab84e48c969f703365f912d15a320585280",
+        "source_sha256": "5e8e76aa2f0ec427da7116da7cc73ab84e48c969f703365f912d15a320585280"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_13": {
+        "bytes": 3069,
+        "sha256": "1c3b4bba365ba05a1dca875b69ada85b5b65949ab588822a0a1793f7a60519d2",
+        "source_sha256": "1c3b4bba365ba05a1dca875b69ada85b5b65949ab588822a0a1793f7a60519d2"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_14": {
+        "bytes": 36305,
+        "sha256": "494e175834e029ed90711ddb8a5058494ba755c6da86a680f7fca926c85456af",
+        "source_sha256": "494e175834e029ed90711ddb8a5058494ba755c6da86a680f7fca926c85456af"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_15": {
+        "bytes": 10254,
+        "sha256": "35a4f8970a64b945159554bf77f94bcc7df52443c78a553cd1863706a3359d9f",
+        "source_sha256": "35a4f8970a64b945159554bf77f94bcc7df52443c78a553cd1863706a3359d9f"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_16": {
+        "bytes": 2090,
+        "sha256": "12817385234427226ca6ddf41d9ef101e28176c32b6c8cf712face555798e24a",
+        "source_sha256": "12817385234427226ca6ddf41d9ef101e28176c32b6c8cf712face555798e24a"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_17": {
+        "bytes": 155398,
+        "sha256": "1a63a6f5e4a247f5f465409d7c99494eabc96bf622df739ba77802894f415fd2",
+        "source_sha256": "1a63a6f5e4a247f5f465409d7c99494eabc96bf622df739ba77802894f415fd2"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_18": {
+        "bytes": 4540,
+        "sha256": "317a1541552dda4c39342f09d60f55f94ff17677492b92e274a71d0da9fdbb72",
+        "source_sha256": "317a1541552dda4c39342f09d60f55f94ff17677492b92e274a71d0da9fdbb72"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_19": {
+        "bytes": 7090,
+        "sha256": "d5ab41bca53e7ad40dfdde646f06c94784ef55f016ca999ea6459698b582f72a",
+        "source_sha256": "d5ab41bca53e7ad40dfdde646f06c94784ef55f016ca999ea6459698b582f72a"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_2": {
+        "bytes": 97643,
+        "sha256": "3794a80512e7c8f5bccb727b08ddc95bb4fe66256f1c4b718ff327f3340b9183",
+        "source_sha256": "3794a80512e7c8f5bccb727b08ddc95bb4fe66256f1c4b718ff327f3340b9183"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_20": {
+        "bytes": 2977,
+        "sha256": "073dcda1aa9b8c02ea9b2502605620c43e2920c11e6e94975e866b3081470dc5",
+        "source_sha256": "073dcda1aa9b8c02ea9b2502605620c43e2920c11e6e94975e866b3081470dc5"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_21": {
+        "bytes": 13518,
+        "sha256": "37b85658a019e8f90c089d14a06596eb3c674e5ccf7674de42ced9143d3a9a15",
+        "source_sha256": "37b85658a019e8f90c089d14a06596eb3c674e5ccf7674de42ced9143d3a9a15"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_22": {
+        "bytes": 16637,
+        "sha256": "508f4df69ed50e42d029cb6948e52c98b07c52b2fbc7700e38f00405e0fa499a",
+        "source_sha256": "508f4df69ed50e42d029cb6948e52c98b07c52b2fbc7700e38f00405e0fa499a"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_23": {
+        "bytes": 6126,
+        "sha256": "1db153601bd93117bc5a3c603ea08877799c0a21a6707635febc5aeff82a88b7",
+        "source_sha256": "1db153601bd93117bc5a3c603ea08877799c0a21a6707635febc5aeff82a88b7"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_24": {
+        "bytes": 15930,
+        "sha256": "ec8b358ff965c1cf9824a8a619c4491b42b3f7a187d8e764a059234b03f25d42",
+        "source_sha256": "ec8b358ff965c1cf9824a8a619c4491b42b3f7a187d8e764a059234b03f25d42"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_25": {
+        "bytes": 1820,
+        "sha256": "8212c96b04d49850051f1a4d8ad568ffc368b1a3f7a8c493818d655400d73672",
+        "source_sha256": "8212c96b04d49850051f1a4d8ad568ffc368b1a3f7a8c493818d655400d73672"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_26": {
+        "bytes": 46552,
+        "sha256": "4decb46dc26d9a51490f44dafaef97912b81b59f1deff8e56e4d000fd0aefd5a",
+        "source_sha256": "4decb46dc26d9a51490f44dafaef97912b81b59f1deff8e56e4d000fd0aefd5a"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_27": {
+        "bytes": 46552,
+        "sha256": "4decb46dc26d9a51490f44dafaef97912b81b59f1deff8e56e4d000fd0aefd5a",
+        "source_sha256": "4decb46dc26d9a51490f44dafaef97912b81b59f1deff8e56e4d000fd0aefd5a"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_3": {
+        "bytes": 10224,
+        "sha256": "7aed2ee86d8a64593c193e2c1ba4f6e813873166478b70f31aa167b8d17bd82e",
+        "source_sha256": "7aed2ee86d8a64593c193e2c1ba4f6e813873166478b70f31aa167b8d17bd82e"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_4": {
+        "bytes": 6512,
+        "sha256": "aca07185b9e36204f55083e37d66501d986a2c4341c5548b25b551617af47fb8",
+        "source_sha256": "aca07185b9e36204f55083e37d66501d986a2c4341c5548b25b551617af47fb8"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_5": {
+        "bytes": 14879,
+        "sha256": "8df013e4ae0e5f9c711221a0a24a2bcc617a9af03277ed532cae5418f76cdb00",
+        "source_sha256": "8df013e4ae0e5f9c711221a0a24a2bcc617a9af03277ed532cae5418f76cdb00"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_6": {
+        "bytes": 114035,
+        "sha256": "a8b5c66666611968efe12061373dc9b5e7b683551360e9413cfd44f2e7128ebf",
+        "source_sha256": "a8b5c66666611968efe12061373dc9b5e7b683551360e9413cfd44f2e7128ebf"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_7": {
+        "bytes": 1974,
+        "sha256": "457153de8c8a3cb204e878c7e2067ccd335634b55d25c13ec10cef20e75c0b76",
+        "source_sha256": "457153de8c8a3cb204e878c7e2067ccd335634b55d25c13ec10cef20e75c0b76"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_8": {
+        "bytes": 49958,
+        "sha256": "8f140cf4185f640f73aa268333ef12f33eb175fd6e78e87169148af211f248f9",
+        "source_sha256": "8f140cf4185f640f73aa268333ef12f33eb175fd6e78e87169148af211f248f9"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_9": {
+        "bytes": 1265,
+        "sha256": "e02650d37989f4120584eb81434e831ed3c13ecafe2b3b08d61d9513c1d92052",
+        "source_sha256": "e02650d37989f4120584eb81434e831ed3c13ecafe2b3b08d61d9513c1d92052"
+      },
+      "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_cull": {
+        "bytes": 674,
+        "sha256": "7c6b07cb31ceec2c3ab9b5aec511c1022d92166e47ec36a60659d58702b1da89",
+        "source_sha256": "7c6b07cb31ceec2c3ab9b5aec511c1022d92166e47ec36a60659d58702b1da89"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop00": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "79f24ad491559e1531a33de0a678adeed4a225b465d05ad9459ec07a6fb51674"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop01": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "f4eecc4742e86022e97426e549e1bbbaa77e22bacaccb2f4c31289797cb93fe2"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop02": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "12d5b3896d8c96dc1c4b4ae09be38b3e4930368a33d7655a91907cd6fc272762"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop03": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "d53211e0c3357aa022570b063d05c63a2ef4b1b10bc9008b849797d0bee447c8"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop04": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "a6312f0d9f2b7489ee2ed584ae83b7760cef658c0eefaf7f08a649ae72470532"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop05": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "f4eecc4742e86022e97426e549e1bbbaa77e22bacaccb2f4c31289797cb93fe2"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop06": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "7a2d77d226b6c32baf839d7359e1b21acf0fccb4ed5675c1fe1111a15b3916e8"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop07": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "b64d9116866eedc0c5a7984ef8026787fc9076ecef1f1b16f841913ae7315633"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop08": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "cd7002d27bdb941cf5dee1ffbcf91c2d2c62e24c396a7cc9dbf136581f1fb848"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop09": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "06fccb46db9c5d3260b18aef52fc436f9dafc6ae3775ba1d18ffe5fba898fa19"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop10": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "12d5b3896d8c96dc1c4b4ae09be38b3e4930368a33d7655a91907cd6fc272762"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop11": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "b64d9116866eedc0c5a7984ef8026787fc9076ecef1f1b16f841913ae7315633"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop12": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "79f24ad491559e1531a33de0a678adeed4a225b465d05ad9459ec07a6fb51674"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop13": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "9b6e5aa2174412f91303f8c0378a2de3fc7c916cff12f45aec7ee39183d7de93"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop14": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "12d5b3896d8c96dc1c4b4ae09be38b3e4930368a33d7655a91907cd6fc272762"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop15": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "d53211e0c3357aa022570b063d05c63a2ef4b1b10bc9008b849797d0bee447c8"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop16": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "a6312f0d9f2b7489ee2ed584ae83b7760cef658c0eefaf7f08a649ae72470532"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop17": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "f4eecc4742e86022e97426e549e1bbbaa77e22bacaccb2f4c31289797cb93fe2"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop18": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "7a2d77d226b6c32baf839d7359e1b21acf0fccb4ed5675c1fe1111a15b3916e8"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop19": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "b64d9116866eedc0c5a7984ef8026787fc9076ecef1f1b16f841913ae7315633"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop20": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "cd7002d27bdb941cf5dee1ffbcf91c2d2c62e24c396a7cc9dbf136581f1fb848"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop21": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "0b6f6b8e8fb4d905e4149621fc3635d3f0a58a2dcb5af0a6935ec4c37b0bf5e5"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop22": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "4412dee2bfbe4dd7776bc8a9d7ab323e6b21556d7831272ebff7d887714dab7a"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop23": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "b64d9116866eedc0c5a7984ef8026787fc9076ecef1f1b16f841913ae7315633"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop24": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "79f24ad491559e1531a33de0a678adeed4a225b465d05ad9459ec07a6fb51674"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop25": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "9b6e5aa2174412f91303f8c0378a2de3fc7c916cff12f45aec7ee39183d7de93"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop26": {
+        "bytes": 1731,
+        "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291",
+        "source_sha256": "12d5b3896d8c96dc1c4b4ae09be38b3e4930368a33d7655a91907cd6fc272762"
+      },
+      "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop27": {
+        "bytes": 1742,
+        "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19",
+        "source_sha256": "d53211e0c3357aa022570b063d05c63a2ef4b1b10bc9008b849797d0bee447c8"
+      },
+      "custom/skiejer_market/geometry/room_boundary_repairs": {
+        "bytes": 1261,
+        "sha256": "f7f0262f1581170926e660ddb0aaa8a2c2822a6a2b07ee52191ff068c2c8025b",
+        "source_sha256": "f7f0262f1581170926e660ddb0aaa8a2c2822a6a2b07ee52191ff068c2c8025b"
+      },
+      "custom/skiejer_market/geometry/room_boundary_repairs_vtx": {
+        "bytes": 1102,
+        "sha256": "841a61e6be558e97beff56a03bf64c0d99e82d217cdc1a009a0b1809388d724b",
+        "source_sha256": "841a61e6be558e97beff56a03bf64c0d99e82d217cdc1a009a0b1809388d724b"
+      },
+      "custom/skiejer_market/room": {
+        "bytes": 227,
+        "sha256": "f83e2800504f905b4aaeddffb67e88d0fa77771c9a1a9006fd5ffa9766c9fa38",
+        "source_sha256": "f83e2800504f905b4aaeddffb67e88d0fa77771c9a1a9006fd5ffa9766c9fa38"
+      },
+      "scenes/nonmq/skiejer_market/collision": {
+        "bytes": 152722,
+        "sha256": "382b641d48d0f84f1a31b5a8660808cec2401344a520d0179c0758bc715a6f48",
+        "source_sha256": "382b641d48d0f84f1a31b5a8660808cec2401344a520d0179c0758bc715a6f48"
+      },
+      "scenes/nonmq/skiejer_market/skiejer_market": {
+        "bytes": 288,
+        "sha256": "fb36e03401c1fd9354820aeff3fec8e5c1df71b75add2751815b67ae05791387",
+        "source_sha256": "fb36e03401c1fd9354820aeff3fec8e5c1df71b75add2751815b67ae05791387"
+      },
+      "scenes/nonmq/skiejer_market/skiejer_market_room_0": {
+        "bytes": 176,
+        "sha256": "1bfb6e74fbe2d5fb12ada806eaa12c444292e3b5d686f2889ce24145383b8dcf",
+        "source_sha256": "1bfb6e74fbe2d5fb12ada806eaa12c444292e3b5d686f2889ce24145383b8dcf"
+      },
+      "scenes/shared/skiejer_market_oot/skiejer_market_oot": {
+        "bytes": 289,
+        "sha256": "18625a52ae343771c4276033a602bee2a0d41e7caee6c0169ddd873d503b665b",
+        "source_sha256": "18625a52ae343771c4276033a602bee2a0d41e7caee6c0169ddd873d503b665b"
+      },
+      "scenes/shared/skiejer_market_oot/skiejer_market_oot_room_0": {
+        "bytes": 157,
+        "sha256": "9f6ed19c3a65ace5aee1493b80608479648c3ff0f5096f12cc389a7a2401100a",
+        "source_sha256": "9f6ed19c3a65ace5aee1493b80608479648c3ff0f5096f12cc389a7a2401100a"
+      }
+    },
+    "runtime": "resource-verified candidate; configured game rendering/traversal unverified",
+    "source_name": "zzzz_Skiejer_Black_Market_POC14_EntranceOrientation.o2r",
+    "source_sha256": "3ac1432d0e8f75e51f08892739a13e16762bb4d820a2bbc7a35469af1db872e2",
+    "version": 1
+  },
+  "resources": {
+    "custom/skiejer_market/entrance": {
+      "bytes": 7707,
+      "sha256": "9bded97ca83070ca4f290e7b4c7ace99b490f2759b564f5eb9a2b4a264c6e220"
+    },
+    "custom/skiejer_market/entrance_vtx_0": {
+      "bytes": 272,
+      "sha256": "982d7e40c2858d37b11fd072ac095b89dfc3c1a39d8118686a6389094e4a5076"
+    },
+    "custom/skiejer_market/entrance_vtx_1": {
+      "bytes": 271,
+      "sha256": "591a83d62ebcadc7ba23cb30580b07dd11443cd771ccdc8ba4606e66d476ba91"
+    },
+    "custom/skiejer_market/entrance_vtx_10": {
+      "bytes": 264,
+      "sha256": "64152729d43724e3947ba9f2dd84dde505822afa7c64ff86f1ee830fbee9be1b"
+    },
+    "custom/skiejer_market/entrance_vtx_11": {
+      "bytes": 267,
+      "sha256": "26e13c858fa4d0d192b939cafbeb7ed1ae2caf5d6d7f7663e40d61bfadc38020"
+    },
+    "custom/skiejer_market/entrance_vtx_12": {
+      "bytes": 266,
+      "sha256": "1396bd5c7dc4782bf1e7db9e69262b81e19dc013d7d339bd900b7c3ea72bc01c"
+    },
+    "custom/skiejer_market/entrance_vtx_13": {
+      "bytes": 262,
+      "sha256": "7c54a41dae3a5d4b755d4a54c158e5fcb79230dd00ac320a822211de702ebc72"
+    },
+    "custom/skiejer_market/entrance_vtx_14": {
+      "bytes": 262,
+      "sha256": "8e2d03b6b7d7ad1b8e6bca19ac101111fd4b4668ad71fe7b4a93bb55189107eb"
+    },
+    "custom/skiejer_market/entrance_vtx_15": {
+      "bytes": 266,
+      "sha256": "15daf32282f24d3a8aa034811137a77f40f4fe97807ef081c6758b4a5d4664cf"
+    },
+    "custom/skiejer_market/entrance_vtx_16": {
+      "bytes": 281,
+      "sha256": "330ba79a21fad5cdce667365106b4a1b1dc351a380044f482bfab53713dbafcc"
+    },
+    "custom/skiejer_market/entrance_vtx_17": {
+      "bytes": 280,
+      "sha256": "551a2b2a50e10f76c41366430781115144b43a0004f12764cfdcc1cef11a40c0"
+    },
+    "custom/skiejer_market/entrance_vtx_18": {
+      "bytes": 278,
+      "sha256": "129eebe42df08f9e143d993a9dbea30e8a0e623615126049ff10e270ee39a5f2"
+    },
+    "custom/skiejer_market/entrance_vtx_19": {
+      "bytes": 277,
+      "sha256": "9bfbf7ed079ce3a198b30301bf27789cb52639a27dd0fc316c9d5caf034420ab"
+    },
+    "custom/skiejer_market/entrance_vtx_2": {
+      "bytes": 272,
+      "sha256": "805cf738d4f2977ef512f0e8e92846380913b31d35d89e4cd927234301d59c76"
+    },
+    "custom/skiejer_market/entrance_vtx_20": {
+      "bytes": 276,
+      "sha256": "e9f76af160ebec71dd3e30eb54fab889ab9bfad4d9496e2c1dd48520c653b308"
+    },
+    "custom/skiejer_market/entrance_vtx_21": {
+      "bytes": 276,
+      "sha256": "fad4bf254ffb2f82c057e3f874d29e0bebf81f558ef8a2e93f8defcca68a1e9a"
+    },
+    "custom/skiejer_market/entrance_vtx_22": {
+      "bytes": 276,
+      "sha256": "e4c211830444cbe6d0176621e5d946279c088c611389db91b1de38f3524c8cf9"
+    },
+    "custom/skiejer_market/entrance_vtx_23": {
+      "bytes": 276,
+      "sha256": "d4091222652609d99617340405e2c0f0353bd390e0089947fa1630f34924c966"
+    },
+    "custom/skiejer_market/entrance_vtx_24": {
+      "bytes": 264,
+      "sha256": "cb08ab088e5e77cd83f5fa198b8be8688e6aa8a077951d8f3a06fb1abe2e3ef8"
+    },
+    "custom/skiejer_market/entrance_vtx_25": {
+      "bytes": 274,
+      "sha256": "fbc19d11e16f9d50ff1fec087cd3a6fa345cfd91f4c4fed457c36bd48133438b"
+    },
+    "custom/skiejer_market/entrance_vtx_26": {
+      "bytes": 272,
+      "sha256": "4311b7128585d5b2eb86d2cdd9359363fb3d4ffa91cf28754c6ad845528ca0f4"
+    },
+    "custom/skiejer_market/entrance_vtx_27": {
+      "bytes": 274,
+      "sha256": "f1f733cacb26c2dfd7d04c7fedf0e317afca0dc109e55ef0fa265f7716abfef1"
+    },
+    "custom/skiejer_market/entrance_vtx_28": {
+      "bytes": 278,
+      "sha256": "4fca9592e5bb7db15b612793ec76c45e926fb6df357a43765b9d678dff90a8b3"
+    },
+    "custom/skiejer_market/entrance_vtx_3": {
+      "bytes": 271,
+      "sha256": "441c4c658057a9a6e1375c708825a01ead756c713cd0fbb68a9963a7423a206f"
+    },
+    "custom/skiejer_market/entrance_vtx_4": {
+      "bytes": 273,
+      "sha256": "1c03c2863c2003dd8a51a70e8258d37bf6bae672312708798abfe79c4f6a83d8"
+    },
+    "custom/skiejer_market/entrance_vtx_5": {
+      "bytes": 273,
+      "sha256": "b4d66c280e98ee726fcf87fd9bfa5e741fddbd0038f28212d0ec3c251a653914"
+    },
+    "custom/skiejer_market/entrance_vtx_6": {
+      "bytes": 276,
+      "sha256": "93f6818e7bafca0abf3000915b38f6e5db36e5f2a488fb0e93a0767147ad0241"
+    },
+    "custom/skiejer_market/entrance_vtx_7": {
+      "bytes": 276,
+      "sha256": "c06c1300ce0351eb1ba05b66be309e7dd26841d00aa7c030773b1442a96e4c89"
+    },
+    "custom/skiejer_market/entrance_vtx_8": {
+      "bytes": 271,
+      "sha256": "524ae0e26ea6b398c28b9d7894d6084c864d559e0f7195db034bab11778eb557"
+    },
+    "custom/skiejer_market/entrance_vtx_9": {
+      "bytes": 266,
+      "sha256": "78e3e1530032c54989f604d2492606479bf228924ef8b4450c815c75c94bd1a2"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548": {
+      "bytes": 5904,
+      "sha256": "2a1bdd82eb41bea744ab2104f696fafd8b15272e031edb3cc8771449ed555b48"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_0": {
+      "bytes": 1796,
+      "sha256": "e65fce9b399c4da352c4957e391e2570d6e4cf0998b5ffadc30945ed371181f2"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_1": {
+      "bytes": 30749,
+      "sha256": "f8612f45bbe74aaadf0d37ee08bc1f78221b50da1c4c066554fce880b0a4f317"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_10": {
+      "bytes": 907,
+      "sha256": "76ef9815722e6cf02a96703c025581d928f995b6393ac728aeff58b9378c078f"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_11": {
+      "bytes": 76730,
+      "sha256": "6c6c267ac8f313c8777b36e876ec5b36cbf440733b3df479ae938696006ead74"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_12": {
+      "bytes": 2337,
+      "sha256": "0f8985d5cdf4a6c87a9f581fc28d6b8875c0e560a51ab9ceb2abe2029fda71db"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_13": {
+      "bytes": 1753,
+      "sha256": "d6d525ee1f2b16454a0e5429e7b1176104d5aca6f69699c549944902c0151407"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_14": {
+      "bytes": 18638,
+      "sha256": "423b8e051d0a798c519b990d6264d79d1bb2f949e53765ed3cc33b95fcc84fe5"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_15": {
+      "bytes": 2620,
+      "sha256": "6d91a76f575f83afd270a7bf39c96eb8a1a82302c25cc2b42406c3908f8b88e6"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_16": {
+      "bytes": 1797,
+      "sha256": "45bf60acbecef407d81bb7723e9cb175aacfed26d36ecfce1e9b6c2e2164f22c"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_17": {
+      "bytes": 74652,
+      "sha256": "0ee1808b21bb49790bba90f805cab72bae1b0e4b5d13623863ad6b592413177a"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_18": {
+      "bytes": 3532,
+      "sha256": "46c536a6051a91004529faf9bda5f700921de6b8ef03f865ecd80b5a6acdc0af"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_19": {
+      "bytes": 3949,
+      "sha256": "848d34cd672f20bf84e7a654b802389ef826ce5a31dafe132f888770f6c644a6"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_2": {
+      "bytes": 50132,
+      "sha256": "249bba606020ad10f3085a28cce6b10087683a04f1c5a322fdedf7168c32b599"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_20": {
+      "bytes": 2025,
+      "sha256": "6e0be548cdd52979d89dfc219d34b8c4d7547c776d62778e4c5c8d35faa8c105"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_21": {
+      "bytes": 6716,
+      "sha256": "0390a1a63894ab9eb2203b5bb002e0f1502619442a080c0341923c4d7eda1fa8"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_22": {
+      "bytes": 8808,
+      "sha256": "3ed918b47cb19e62e3202dc43b53811bddab2347ccf7c672bc5e8413d9a0dd13"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_23": {
+      "bytes": 3226,
+      "sha256": "d5404fa272c720f4c100b72c6e16e9dc6ce04bba843cbda8b129a3f5b01b6e09"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_24": {
+      "bytes": 8758,
+      "sha256": "24ae40a2d2915c97e93b06428f66363263b8ae757b2ef1fc30fb35295122bc3d"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_25": {
+      "bytes": 1168,
+      "sha256": "be2d4fbd93fc3050365819b637663ef9dad0e9311b5f1e5b56b3e7c74c55fc17"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_26": {
+      "bytes": 12385,
+      "sha256": "795884b94c582237112dac2b53840f617af1829e3206eafca0a960e686c412e5"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_27": {
+      "bytes": 12385,
+      "sha256": "8506fdb90ee8fed25a35a74937da8bf3b2a2f802a75fdba5b534bf061fa059a6"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_3": {
+      "bytes": 3942,
+      "sha256": "be5dd3cd7dcda5c083df15a89fb4fd5c64dfafba14299858ed6c4d41fe30fc12"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_4": {
+      "bytes": 2076,
+      "sha256": "42d12bee42874a3d73dd1e196222b7a671197d91502917af1530df0673d50856"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_5": {
+      "bytes": 6320,
+      "sha256": "96365620a016a6db8d363b19cfff0e56698955a96427b7b426d1f486c404d9b5"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_6": {
+      "bytes": 47978,
+      "sha256": "b2887a282aa3d3bff4b6691d0e6e07aac0565db650150c7f775d7333f5d381b5"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_7": {
+      "bytes": 1260,
+      "sha256": "da1a0dba1da9d9adea82f3512df81ee8b283aad613a63f4244dd54a2f2816e39"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_8": {
+      "bytes": 25402,
+      "sha256": "85b0dc94f16f123949a065271b7fd7fede7eca6b9fa0ff10a49aa64da558dc8d"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_9": {
+      "bytes": 890,
+      "sha256": "d4918166a81cf8961cbd7c3cb76424b3111a8b0806eb7e1c6d6a11461a0f04e6"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_0": {
+      "bytes": 2040,
+      "sha256": "e4629732b417a834efcdafacfccb9e8c85c1c5fc2701e2e044cea5f7fde0985c"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_1": {
+      "bytes": 65669,
+      "sha256": "c211f8eca1e952b9590109c7c729def2d868edb60b2b53f7fb1dc12fe1047bbc"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_10": {
+      "bytes": 3057,
+      "sha256": "539ae86aee8d5c062ef0f682237646d87b38f6248de4631a34cf35b5171922c5"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_11": {
+      "bytes": 140499,
+      "sha256": "c3fd16e679c684e1e7963e4472d82f94bdf65956ba7556253c37ce83e499165f"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_12": {
+      "bytes": 6502,
+      "sha256": "5e8e76aa2f0ec427da7116da7cc73ab84e48c969f703365f912d15a320585280"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_13": {
+      "bytes": 3069,
+      "sha256": "1c3b4bba365ba05a1dca875b69ada85b5b65949ab588822a0a1793f7a60519d2"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_14": {
+      "bytes": 36305,
+      "sha256": "494e175834e029ed90711ddb8a5058494ba755c6da86a680f7fca926c85456af"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_15": {
+      "bytes": 10254,
+      "sha256": "35a4f8970a64b945159554bf77f94bcc7df52443c78a553cd1863706a3359d9f"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_16": {
+      "bytes": 2090,
+      "sha256": "12817385234427226ca6ddf41d9ef101e28176c32b6c8cf712face555798e24a"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_17": {
+      "bytes": 155398,
+      "sha256": "1a63a6f5e4a247f5f465409d7c99494eabc96bf622df739ba77802894f415fd2"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_18": {
+      "bytes": 4540,
+      "sha256": "317a1541552dda4c39342f09d60f55f94ff17677492b92e274a71d0da9fdbb72"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_19": {
+      "bytes": 7090,
+      "sha256": "d5ab41bca53e7ad40dfdde646f06c94784ef55f016ca999ea6459698b582f72a"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_2": {
+      "bytes": 97643,
+      "sha256": "3794a80512e7c8f5bccb727b08ddc95bb4fe66256f1c4b718ff327f3340b9183"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_20": {
+      "bytes": 2977,
+      "sha256": "073dcda1aa9b8c02ea9b2502605620c43e2920c11e6e94975e866b3081470dc5"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_21": {
+      "bytes": 13518,
+      "sha256": "37b85658a019e8f90c089d14a06596eb3c674e5ccf7674de42ced9143d3a9a15"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_22": {
+      "bytes": 16637,
+      "sha256": "508f4df69ed50e42d029cb6948e52c98b07c52b2fbc7700e38f00405e0fa499a"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_23": {
+      "bytes": 6126,
+      "sha256": "1db153601bd93117bc5a3c603ea08877799c0a21a6707635febc5aeff82a88b7"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_24": {
+      "bytes": 15930,
+      "sha256": "ec8b358ff965c1cf9824a8a619c4491b42b3f7a187d8e764a059234b03f25d42"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_25": {
+      "bytes": 1820,
+      "sha256": "8212c96b04d49850051f1a4d8ad568ffc368b1a3f7a8c493818d655400d73672"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_26": {
+      "bytes": 46552,
+      "sha256": "4decb46dc26d9a51490f44dafaef97912b81b59f1deff8e56e4d000fd0aefd5a"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_27": {
+      "bytes": 46552,
+      "sha256": "4decb46dc26d9a51490f44dafaef97912b81b59f1deff8e56e4d000fd0aefd5a"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_3": {
+      "bytes": 10224,
+      "sha256": "7aed2ee86d8a64593c193e2c1ba4f6e813873166478b70f31aa167b8d17bd82e"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_4": {
+      "bytes": 6512,
+      "sha256": "aca07185b9e36204f55083e37d66501d986a2c4341c5548b25b551617af47fb8"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_5": {
+      "bytes": 14879,
+      "sha256": "8df013e4ae0e5f9c711221a0a24a2bcc617a9af03277ed532cae5418f76cdb00"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_6": {
+      "bytes": 114035,
+      "sha256": "a8b5c66666611968efe12061373dc9b5e7b683551360e9413cfd44f2e7128ebf"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_7": {
+      "bytes": 1974,
+      "sha256": "457153de8c8a3cb204e878c7e2067ccd335634b55d25c13ec10cef20e75c0b76"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_8": {
+      "bytes": 49958,
+      "sha256": "8f140cf4185f640f73aa268333ef12f33eb175fd6e78e87169148af211f248f9"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_9": {
+      "bytes": 1265,
+      "sha256": "e02650d37989f4120584eb81434e831ed3c13ecafe2b3b08d61d9513c1d92052"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_cull": {
+      "bytes": 674,
+      "sha256": "7c6b07cb31ceec2c3ab9b5aec511c1022d92166e47ec36a60659d58702b1da89"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop00": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop01": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop02": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop03": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop04": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop05": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop06": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop07": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop08": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop09": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop10": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop11": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop12": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop13": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop14": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop15": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop16": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop17": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop18": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop19": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop20": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop21": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop22": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop23": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop24": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop25": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop26": {
+      "bytes": 1731,
+      "sha256": "dc881c5de6657916c69f50fe6d3accb1e3eb70d91771c2320f61e8af28e2b291"
+    },
+    "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop27": {
+      "bytes": 1742,
+      "sha256": "739ad88c960181e8828c779cb28335dcaaa336079f56115abae5830abe60ba19"
+    },
+    "custom/skiejer_market/geometry/room_boundary_repairs": {
+      "bytes": 1261,
+      "sha256": "f7f0262f1581170926e660ddb0aaa8a2c2822a6a2b07ee52191ff068c2c8025b"
+    },
+    "custom/skiejer_market/geometry/room_boundary_repairs_vtx": {
+      "bytes": 1102,
+      "sha256": "841a61e6be558e97beff56a03bf64c0d99e82d217cdc1a009a0b1809388d724b"
+    },
+    "custom/skiejer_market/native_geometry_v1": {
+      "bytes": 26,
+      "sha256": "4bb6ddde91e0fb1b66fc4d763a3752bd7955e14b1be004970c23ebc52e4191c9"
+    },
+    "custom/skiejer_market/room": {
+      "bytes": 227,
+      "sha256": "f83e2800504f905b4aaeddffb67e88d0fa77771c9a1a9006fd5ffa9766c9fa38"
+    },
+    "scenes/nonmq/skiejer_market/collision": {
+      "bytes": 152722,
+      "sha256": "382b641d48d0f84f1a31b5a8660808cec2401344a520d0179c0758bc715a6f48"
+    },
+    "scenes/nonmq/skiejer_market/skiejer_market": {
+      "bytes": 288,
+      "sha256": "fb36e03401c1fd9354820aeff3fec8e5c1df71b75add2751815b67ae05791387"
+    },
+    "scenes/nonmq/skiejer_market/skiejer_market_room_0": {
+      "bytes": 176,
+      "sha256": "1bfb6e74fbe2d5fb12ada806eaa12c444292e3b5d686f2889ce24145383b8dcf"
+    },
+    "scenes/shared/skiejer_market_oot/skiejer_market_oot": {
+      "bytes": 289,
+      "sha256": "18625a52ae343771c4276033a602bee2a0d41e7caee6c0169ddd873d503b665b"
+    },
+    "scenes/shared/skiejer_market_oot/skiejer_market_oot_room_0": {
+      "bytes": 157,
+      "sha256": "9f6ed19c3a65ace5aee1493b80608479648c3ff0f5096f12cc389a7a2401100a"
+    }
+  },
+  "version": 1
+}

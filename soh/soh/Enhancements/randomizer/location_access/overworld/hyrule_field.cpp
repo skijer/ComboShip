@@ -8,7 +8,7 @@ void RegionTable_Init_HyruleField() {
     areaTable[RR_HYRULE_FIELD] = Region("Hyrule Field", SCENE_HYRULE_FIELD, {
         //Events
         EVENT_ACCESS(LOGIC_BIG_POE_KILL,       logic->HasBottle() && logic->CanUse(RG_FAIRY_BOW) && (logic->SummonEpona() || ctx->GetTrickOption(RT_HF_BIG_POE_WITHOUT_EPONA))),
-        EVENT_ACCESS(LOGIC_BORROW_RIGHT_MASKS, logic->IsChild && logic->Get(LOGIC_BORROW_BUNNY_HOOD) && logic->HasItem(RG_KOKIRI_EMERALD) && logic->HasItem(RG_GORON_RUBY) && logic->HasItem(RG_ZORA_SAPPHIRE) && logic->HasItem(RG_CHILD_WALLET) && logic->HasItem(RG_SPEAK_HYLIAN)),
+        EVENT_ACCESS(LOGIC_SOLD_BUNNY_HOOD,    logic->IsChild && logic->HasItem(RG_BUNNY_HOOD) && logic->HasItem(RG_KOKIRI_EMERALD) && logic->HasItem(RG_GORON_RUBY) && logic->HasItem(RG_ZORA_SAPPHIRE) && logic->HasItem(RG_CHILD_WALLET) && logic->HasItem(RG_SPEAK_HYLIAN)),
     }, {
         //Locations
         LOCATION(RC_HF_OCARINA_OF_TIME_ITEM,       logic->IsChild && logic->StoneCount() == 3 && logic->HasItem(RG_BRONZE_SCALE)),
@@ -62,7 +62,7 @@ void RegionTable_Init_HyruleField() {
         LOCATION(RC_HF_NEAR_KF_GRASS_10,           logic->CanCutShrubs()),
         LOCATION(RC_HF_NEAR_KF_GRASS_11,           logic->CanCutShrubs()),
         LOCATION(RC_HF_NEAR_KF_GRASS_12,           logic->CanCutShrubs()),
-        LOCATION(RC_HF_SILVER_BOULDER,             logic->CanUse(RG_SILVER_GAUNTLETS)),
+        LOCATION(RC_HF_SILVER_BOULDER,             logic->CanBreakSilverBoulder()),
         LOCATION(RC_HF_ROCK_1,                     logic->CanBreakRocks()),
         LOCATION(RC_HF_ROCK_2,                     logic->CanBreakRocks()),
         LOCATION(RC_HF_ROCK_3,                     logic->CanBreakRocks()),
@@ -71,13 +71,13 @@ void RegionTable_Init_HyruleField() {
         LOCATION(RC_HF_ROCK_6,                     logic->CanBreakRocks()),
         LOCATION(RC_HF_ROCK_7,                     logic->CanBreakRocks()),
         LOCATION(RC_HF_ROCK_8,                     logic->CanBreakRocks()),
-        LOCATION(RC_HF_BOULDER_NORTH,              logic->BlastOrSmash()),
-        LOCATION(RC_HF_BOULDER_BY_MARKET,          logic->BlastOrSmash()),
-        LOCATION(RC_HF_BOULDER_SOUTH,              logic->BlastOrSmash()),
-        LOCATION(RC_HF_BRONZE_BOULDER_1,           logic->IsAdult && logic->CanUse(RG_MEGATON_HAMMER)),
-        LOCATION(RC_HF_BRONZE_BOULDER_2,           logic->IsAdult && logic->CanUse(RG_MEGATON_HAMMER)),
-        LOCATION(RC_HF_BRONZE_BOULDER_3,           logic->IsAdult && logic->CanUse(RG_MEGATON_HAMMER)),
-        LOCATION(RC_HF_BRONZE_BOULDER_4,           logic->IsAdult && logic->CanUse(RG_MEGATON_HAMMER)),
+        LOCATION(RC_HF_BOULDER_NORTH,              logic->CanBreakBoulder()),
+        LOCATION(RC_HF_BOULDER_BY_MARKET,          logic->CanBreakBoulder()),
+        LOCATION(RC_HF_BOULDER_SOUTH,              logic->CanBreakBoulder()),
+        LOCATION(RC_HF_BRONZE_BOULDER_1,           logic->IsAdult && logic->CanBreakBronzeBoulder()),
+        LOCATION(RC_HF_BRONZE_BOULDER_2,           logic->IsAdult && logic->CanBreakBronzeBoulder()),
+        LOCATION(RC_HF_BRONZE_BOULDER_3,           logic->IsAdult && logic->CanBreakBronzeBoulder()),
+        LOCATION(RC_HF_BRONZE_BOULDER_4,           logic->IsAdult && logic->CanBreakBronzeBoulder()),
         LOCATION(RC_HF_NEAR_LLR_TREE,              logic->CanBonkTrees()),
         LOCATION(RC_HF_NEAR_LH_TREE,               logic->CanBonkTrees()),
         LOCATION(RC_HF_CHILD_NEAR_GV_TREE,         logic->IsChild && logic->CanBonkTrees()),
@@ -191,9 +191,9 @@ void RegionTable_Init_HyruleField() {
         LOCATION(RC_HF_CENTER_EXIT_ARROW_SIGN,     logic->CanRead()),
         LOCATION(RC_HF_RIVER_EXIT_ARROW_SIGN,      logic->CanRead()),
         LOCATION(RC_HF_STAIRS_EXIT_ARROW_SIGN,     logic->CanRead()),
-        LOCATION(RC_HF_WONDER_BRIDGE_1,        	   logic->IsChild),
-        LOCATION(RC_HF_WONDER_BRIDGE_2,        	   logic->IsChild),
-        LOCATION(RC_HF_WONDER_BRIDGE_3,        	   logic->IsChild),
+        LOCATION(RC_HF_WONDER_BRIDGE_1,            logic->IsChild),
+        LOCATION(RC_HF_WONDER_BRIDGE_2,            logic->IsChild),
+        LOCATION(RC_HF_WONDER_BRIDGE_3,            logic->IsChild),
     }, {
         //Exits
         ENTRANCE(RR_LW_BRIDGE,              true),

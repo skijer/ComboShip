@@ -1,0 +1,37 @@
+{
+  "baseline": "eb3c7cadd6419afd4a68015358880b8d27d0601e",
+  "baseline_tree": "cea85584c1e56efc5476f4f53c786e694ca8725d",
+  "inputs": [
+    {
+      "filename": "ComboShip_Bridge_Atmosphere_Followups_Source_20261026.zip",
+      "sha256": "eb0bc63d01738c864dbf23793ae72294afd5a1f7a74fe99504ad6bfe055b7751",
+      "bytes": 496872,
+      "checkpoint": "2e8ca7986648b7e88f0e119f9f5e9b4bdd51f318",
+      "status": "integrated source input"
+    },
+    {
+      "filename": "ComboShip_Material_Bindings_Shimmer_Mirror_Source_20261026.zip",
+      "sha256": "0ec241dfa5411138b4892ace9404c98406676596772f61a088769b8082946822",
+      "bytes": 1761208,
+      "checkpoint": "10232779aef72b9de3ffc76177f88de593c6607f",
+      "status": "integrated source input"
+    },
+    {
+      "filename": "ComboShip_Season_Shop_Bugfix_Source_20261026.zip",
+      "sha256": "6fbf3dfadb53676325f27e564f691717c8184006007769282e7ad056bc3051dc",
+      "bytes": 540680,
+      "checkpoint": "d3f85fab036709e2a1f4e9f07c0df1ee0428a626",
+      "status": "integrated source input"
+    },
+    {
+      "filename": "ComboShip_Summer_Water_Lifetime_Fix_20261026.zip",
+      "sha256": "f0a300d06463d8b054b2f4e14e1f3b959b31dacdc5317578ef18f7723265c2b2",
+      "bytes": 63915,
+      "checkpoint": null,
+      "status": "superseded by season/shop combined patch"
+    }
+  ],
+  "overlap_resolution": "Summer included once via Combined_Bugfixes.patch. Both elf sources reconciled with PR63 halo code retained. Other additions applied as patches, never snapshot overlays.",
+  "runtime_acceptance": false,
+  "master_promoted": false
+}

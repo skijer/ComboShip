@@ -1,4 +1,7 @@
 #include "AudioCollection.h"
+#ifdef COMBO_BUILD
+#include "audio/SceneMusic.h"
+#endif
 #include "sequence.h"
 #include "sfx.h"
 #include "soh/cvar_prefixes.h"
@@ -114,7 +117,7 @@ AudioCollection::AudioCollection() {
         SEQUENCE_MAP_ENTRY(NA_BGM_KOTAKE_KOUME,                 "Kotake & Koume's Theme",                   "NA_BGM_KOTAKE_KOUME",            SEQ_BGM_EVENT,    true,     true),
         SEQUENCE_MAP_ENTRY(NA_BGM_ESCAPE,                       "Escape from Ganon's Castle",               "NA_BGM_ESCAPE",                  SEQ_BGM_EVENT,    true,     true),
         SEQUENCE_MAP_ENTRY(NA_BGM_TIMED_MINI_GAME,              "Mini-Game",                                "NA_BGM_TIMED_MINI_GAME",         SEQ_BGM_EVENT,    true,     true),
-        
+
         // SEQ_INSTRUMENT
         SEQUENCE_MAP_ENTRY(INSTRUMENT_OFFSET + 1,               "Ocarina",                                  "OCARINA_INSTRUMENT_DEFAULT",     SEQ_INSTRUMENT,   true,     true),
         SEQUENCE_MAP_ENTRY(INSTRUMENT_OFFSET + 2,               "Malon",                                    "OCARINA_INSTRUMENT_MALON",       SEQ_INSTRUMENT,   true,     true),
@@ -335,10 +338,23 @@ AudioCollection::AudioCollection() {
         //SEQUENCE_MAP_ENTRY(NA_SE_VO_DUMMY_0x88_YOBI,     "NA_SE_VO_DUMMY_0x88_YOBI",            "NA_SE_VO_DUMMY_0x88_YOBI",       SEQ_VOICE, true, false), // ..
         //SEQUENCE_MAP_ENTRY(NA_SE_VO_DUMMY_0x89_YOBI,     "NA_SE_VO_DUMMY_0x89_YOBI",            "NA_SE_VO_DUMMY_0x89_YOBI",       SEQ_VOICE, true, false), // ..
     };
+#ifdef COMBO_BUILD
+    sequenceMap.emplace(ComboSceneMusic::kForest,SequenceInfo{NA_BGM_SARIA_THEME,"Lost Woods (2Ship)",
+        "COMBO_OOT_LOST_WOODS",SEQ_BGM_WORLD,true,false});
+    sequenceMap.emplace(ComboSceneMusic::kMarket,SequenceInfo{NA_BGM_SHOP,"Skiejer's Black Market",
+        "COMBO_OOT_BLACK_MARKET",SEQ_BGM_WORLD,true,false});
+#endif
+    sequenceMap.emplace(HYRULE_FIELD_NIGHT_MUSIC_ENTRY,
+                        SequenceInfo{NA_BGM_KAKARIKO_ADULT, "Hyrule Field (Night)",
+                                     "HYRULE_FIELD_NIGHT", SEQ_BGM_WORLD, true, false});
     // clang-format on
 }
 
 std::string AudioCollection::GetCvarKey(std::string sfxKey) {
+    // Preserve the existing selector and saved choices while making the night
+    // track participate in the normal shuffle/reset/lock machinery.
+    if (sfxKey == "HYRULE_FIELD_NIGHT")
+        return CVAR_AUDIO("HyruleFieldNightSequence");
     auto prefix = CVAR_AUDIO("ReplacedSequences.");
     return prefix + sfxKey + ".value";
 }
@@ -372,6 +388,12 @@ void AudioCollection::AddToCollection(char* otrPath, uint16_t seqNum) {
 }
 
 uint16_t AudioCollection::GetReplacementSequence(uint16_t seqId) {
+#ifdef COMBO_BUILD
+    if (ComboSceneMusic::IsEntry(seqId))
+        return ComboSceneMusic::ResolveEntry(
+            sequenceMap, seqId, SEQ_BGM_WORLD,
+            [this](const std::string& key, int fallback) { return CVarGetInteger(GetCvarKey(key).c_str(), fallback); });
+#endif
     // if Hyrule Field Morning is about to play, but Hyrule Field is swapped, get the replacement sequence
     // for Hyrule Field instead. Otherwise, leave it alone, so that without any sfx editor modifications we will
     // play the normal track as usual.
@@ -388,10 +410,22 @@ uint16_t AudioCollection::GetReplacementSequence(uint16_t seqId) {
 
     const auto& sequenceInfo = sequenceMap.at(seqId);
     const std::string cvarKey = GetCvarKey(sequenceInfo.sfxKey);
-    int replacementSeq = CVarGetInteger(cvarKey.c_str(), seqId);
+    const bool nightEntry = seqId == HYRULE_FIELD_NIGHT_MUSIC_ENTRY;
+    const auto fallback = nightEntry ? sequenceInfo.sequenceId : seqId;
+    int replacementSeq = CVarGetInteger(cvarKey.c_str(), fallback);
+    if (replacementSeq == HYRULE_FIELD_NIGHT_MUSIC_ENTRY)
+        return fallback;
+#ifdef COMBO_BUILD
+    if (ComboSceneMusic::IsEntry(replacementSeq))
+        return fallback;
+#endif
     if (!sequenceMap.contains(replacementSeq)) {
-        replacementSeq = seqId;
+        return fallback;
     }
+    const auto& replacement = sequenceMap.at(replacementSeq);
+    if (nightEntry && (!replacement.canBeUsedAsReplacement ||
+                       !(replacement.category & (SEQ_BGM_WORLD | SEQ_BGM_EVENT | SEQ_BGM_BATTLE))))
+        return fallback;
     return static_cast<uint16_t>(replacementSeq);
 }
 

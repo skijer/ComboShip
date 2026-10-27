@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "actors": [
+    {
+      "name": "Stalchild",
+      "catalog_id": 25,
+      "oot_actor_id": "0x002A",
+      "mm_actor_id": "0x0212",
+      "poses": [
+        {
+          "pose_id": 0,
+          "name": "Idle",
+          "params": "0x7E0F"
+        },
+        {
+          "pose_id": 1,
+          "name": "Sit laugh",
+          "params": "0x7E1F"
+        },
+        {
+          "pose_id": 2,
+          "name": "Sit tap toes",
+          "params": "0x7E2F"
+        },
+        {
+          "pose_id": 3,
+          "name": "Swing on branch",
+          "params": "0x7E3F"
+        },
+        {
+          "pose_id": 4,
+          "name": "Salute",
+          "params": "0x7E4F"
+        }
+      ]
+    },
+    {
+      "name": "Mikau",
+      "catalog_id": 26,
+      "oot_actor_id": "0x002A",
+      "mm_actor_id": "0x0224",
+      "poses": [
+        {
+          "pose_id": 0,
+          "name": "Idle",
+          "params": "0x7D01"
+        },
+        {
+          "pose_id": 1,
+          "name": "Guitar",
+          "params": "0x7D11"
+        }
+      ]
+    },
+    {
+      "name": "Darmani",
+      "catalog_id": 27,
+      "oot_actor_id": "0x002A",
+      "mm_actor_id": "0x01F7",
+      "poses": [
+        {
+          "pose_id": 0,
+          "name": "Wait",
+          "params": "0x7D02"
+        },
+        {
+          "pose_id": 1,
+          "name": "Fly",
+          "params": "0x7D12"
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "mods/combo_rpg.h"
 #include "interface/parameter_static/parameter_static.h"
 
 #include "BenPort.h"
@@ -226,13 +227,17 @@ void LifeMeter_Draw(PlayState* play) {
     InterfaceContext* interfaceCtx = &play->interfaceCtx;
     Vtx* beatingHeartVtx = interfaceCtx->beatingHeartVtx;
     s32 fractionHeartCount = gSaveContext.save.saveInfo.playerData.health % 0x10;
-    s16 healthCapacity = gSaveContext.save.saveInfo.playerData.healthCapacity / 0x10;
+    s16 healthCapacity = ComboRpg_HeartCount(gSaveContext.save.saveInfo.playerData.healthCapacity);
     s16 fullHeartCount = gSaveContext.save.saveInfo.playerData.health / 0x10;
     s32 pad2;
     f32 lifesize = interfaceCtx->lifeSizeChange * 0.1f;
     u32 curCombineModeSet = 0;
     TexturePtr temp = NULL;
     s32 ddCount = gSaveContext.save.saveInfo.inventory.defenseHearts - 1;
+    // Keep existing Hearts colors until the separate DD entry is customized.
+    s32 ddColorChanged = CVarGetInteger(CVAR_COSMETIC_CHANGED("HUD.DDHearts"), 0);
+    const char* ddColorId = ddColorChanged ? COSMETIC_ID("HUD.DDHearts") : COSMETIC_ID("HUD.Hearts");
+    u8 ddColorMode = ddColorChanged ? COSMETIC_COLOR_MODE_DEFAULT : COSMETIC_COLOR_MODE_SUBTRACT;
 
     OPEN_DISPS(gfxCtx);
 
@@ -311,7 +316,7 @@ void LifeMeter_Draw(PlayState* play) {
                                     interfaceCtx->healthAlpha);
                     // Double Defense Non Active Heart
                     gDPSetEnvColorOverrideEx(OVERLAY_DISP++, sHeartsDDEnv[0][0], sHeartsDDEnv[0][1], sHeartsDDEnv[0][2],
-                                             255, COSMETIC_ID("HUD.Hearts"), COSMETIC_COLOR_MODE_SUBTRACT, 55.0f);
+                                             255, ddColorId, ddColorMode, 55.0f);
                 }
             } else if (i == fullHeartCount) {
                 if (curColorSet != 5) {
@@ -322,8 +327,7 @@ void LifeMeter_Draw(PlayState* play) {
                                     sBeatingHeartsDDPrim[2], interfaceCtx->healthAlpha);
                     // Double Defense Beating Heart
                     gDPSetEnvColorOverrideEx(OVERLAY_DISP++, sBeatingHeartsDDEnv[0], sBeatingHeartsDDEnv[1],
-                                             sBeatingHeartsDDEnv[2], 255, COSMETIC_ID("HUD.Hearts"),
-                                             COSMETIC_COLOR_MODE_SUBTRACT, 55.0f);
+                                             sBeatingHeartsDDEnv[2], 255, ddColorId, ddColorMode, 55.0f);
                 }
             } else if (i > fullHeartCount) {
                 if (curColorSet != 6) {
@@ -334,7 +338,7 @@ void LifeMeter_Draw(PlayState* play) {
                                     interfaceCtx->healthAlpha);
                     // Double Defense Empty Heart
                     gDPSetEnvColorOverrideEx(OVERLAY_DISP++, sHeartsDDEnv[0][0], sHeartsDDEnv[0][1], sHeartsDDEnv[0][2],
-                                             255, COSMETIC_ID("HUD.Hearts"), COSMETIC_COLOR_MODE_SUBTRACT, 55.0f);
+                                             255, ddColorId, ddColorMode, 55.0f);
                 }
             } else if (curColorSet != 7) {
                 curColorSet = 7;

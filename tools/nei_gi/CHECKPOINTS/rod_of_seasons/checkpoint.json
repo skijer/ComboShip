@@ -1,0 +1,25 @@
+{
+  "resource_count": 10,
+  "vertex_records": 1657,
+  "vertex_loads": 58,
+  "slug": "rod_of_seasons",
+  "name": "Rod of Seasons",
+  "entry": "objects/nei_gi_redesign/rod_of_seasons/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 1624,
+  "bounds_author": [
+    [
+      -14.0625,
+      -45.75,
+      -17.5
+    ],
+    [
+      27.5625,
+      56.75,
+      17.5
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

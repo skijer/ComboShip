@@ -1,0 +1,30 @@
+{
+  "resource_count": 9,
+  "vertex_records": 4597,
+  "vertex_loads": 157,
+  "slug": "slate_bomb",
+  "name": "Remote Bomb Rune",
+  "entry": "objects/nei_gi_redesign/slate_bomb/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 4466,
+  "bounds_author": [
+    [
+      -28.0,
+      -32.0,
+      -5.5
+    ],
+    [
+      28.0,
+      47.0,
+      7.75
+    ]
+  ],
+  "markers": {},
+  "notes": [
+    "Upright BotW-inspired charcoal casing, sculpted bronze eye, amber circuitry and wrapped handle.",
+    "Rune iris and badge use the same hex palette as the shared GI effect policy.",
+    "New three-dimensional GI; original gameplay slate resource remains separate."
+  ],
+  "runtime_tested": false
+}

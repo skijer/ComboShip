@@ -1,0 +1,248 @@
+{
+  "generated_on_utc": "2026-10-22",
+  "mode": "built-in imagegen reconstruction",
+  "reference_images": [
+    {
+      "name": "Black-Market-Interior-Preview.png",
+      "sha256": "53e74d50d0305afa29d07e6e13bd567d65fef1370942c092d096adfa354d4230",
+      "role": "prior offline room preview; color/style reference only"
+    }
+  ],
+  "reference_for_roles": "user screenshot image(20261022-040928).png, inspected for material semantics only; no source image given to generation",
+  "assets": [
+    {
+      "name": "ceramic",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque seamless albedo texture for a retained fantasy-game prop mesh. Square image, strict flat orthographic surface scan, edge-to-edge material filling the entire image, no perspective, no separate objects, no borders, no labels, no text, no watermark. Original art, no reference-image copying. Restrained painterly realism for a polished late-1990s fantasy adventure remake. Even neutral albedo illumination, no directional shadows, no cast shadows, no painted specular hotspots; small natural surface variation. Every pixel fully opaque.\nPrimary request: Rich glazed jade and deep desaturated teal ceramic. Fine irregular glaze crazing, very subtle cloudy kiln variation, sparse warm bronze-gold flecks and faint shallow ornamental curls. This is the flat outer ceramic surface material of potion cauldrons and small jars, NOT a drawing of any pot, jar or bowl. Middle-dark jade base, readable muted teal detail, restrained glaze sheen as color variation only. Seamless matching edges. No handle, no rim, no vessel silhouette, no whole object.\n\nReconstruction context: recreate this individual surface for the retained Black Market prop geometry, matching its previous material colors in the attached room preview. The preview is a color/style reference only, not the requested output. Produce only this flat opaque seamless square material edge to edge. No object silhouette, no room, no text, no preview board. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "a01ed02e1ea1c108c3a74790bbf6e8481c590e7c26be106a811b60ad0f1ef6be",
+      "bytes": 516208,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "a429cecb775605de3d641cbedceb32e3fd80ad2eba2cbd3e0574b4ffbf3e43e1"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "ddd8ff5f0820253dfda4e74b7a8bb21419c01f7c8c4e53d2317a9288e1aff492",
+        "bytes": 3458896
+      }
+    },
+    {
+      "name": "bronze",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque seamless albedo texture for a retained fantasy-game prop mesh. Square image, strict flat orthographic surface scan, edge-to-edge material filling the entire image, no perspective, no separate objects, no borders, no labels, no text, no watermark. Original art, no reference-image copying. Restrained painterly realism for a polished late-1990s fantasy adventure remake. Even neutral albedo illumination, no directional shadows, no cast shadows, no painted specular hotspots; small natural surface variation. Every pixel fully opaque.\nPrimary request: Aged muted bronze metal surface for decorative brazier stands, fittings and hanging supports. Smoky bronze-brown base with fine brushed wear, restrained dark grooves and tiny desaturated verdigris patches, quiet warm edge wear. Completely flat repeatable surface, seamless matching edges. No objects, no rivets, no symbols, no relief design, no whole torch or lamp.\n\nReconstruction context: recreate this single opaque repeatable bronze surface so its muted warm bronze-brown palette matches the brazier stand material visible in the attached Black Market room preview. The attached image is a color/style reference only. Produce only the square bronze material texture, filling the output edge to edge; do not recreate the preview scene, panels, text, or room. This is a texture upload for an existing mesh. Target a 512 by 512 square asset.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "c5d17c93cb7c79a2d5fdda77cd5791220bef417fae24b85881d9427e2176ec62",
+      "bytes": 482566,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "14265b052750104a3bd4827a3b314eb313743069cb341ba090f13c16a6c525b0"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "88b328e79785411d4774186427db01c84a520aa5e670b511bd093ee38d493d0a",
+        "bytes": 3602737
+      }
+    },
+    {
+      "name": "wicker",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque seamless albedo texture for a retained fantasy-game prop mesh. Square image, strict flat orthographic surface scan, edge-to-edge material filling the entire image, no perspective, no separate objects, no borders, no labels, no text, no watermark. Original art, no reference-image copying. Restrained painterly realism for a polished late-1990s fantasy adventure remake. Even neutral albedo illumination, no directional shadows, no cast shadows, no painted specular hotspots; small natural surface variation. Every pixel fully opaque.\nPrimary request: Dark honey-brown tightly woven willow wicker, visible vertical slender ribs crossed by fine horizontal woven strands, natural warm brown/copper fibers with dark charcoal recessed gaps. For hanging herb baskets and lattice screens. All gaps are painted dark opaque color, never transparent. Dense regular weave, restrained contrast, fine handworked detail, seamless matching edges. No basket silhouette, no whole basket, no cage outline, no stems, no room.\n\nReconstruction context: recreate this individual surface for the retained Black Market prop geometry, matching its previous material colors in the attached room preview. The preview is a color/style reference only, not the requested output. Produce only this flat opaque seamless square material edge to edge. No object silhouette, no room, no text, no preview board. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "52cd841c267cfcfc41598c1122b4de32c854aa68f90e8cdf5135e53665079ea8",
+      "bytes": 446168,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "010b1f75b4c922f5f8d49fb5bcbaa3ce30796c5ed8f526f9e7d3f0e557dfb5cc"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "1d011ff044338bc4e8aa8d1b0dc9cf06a638201afad5df422fa20b3827f59a5e",
+        "bytes": 2805165
+      }
+    },
+    {
+      "name": "celestial",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque seamless albedo texture for a retained fantasy-game prop mesh. Square image, strict flat orthographic surface scan, edge-to-edge material filling the entire image, no perspective, no separate objects, no borders, no labels, no text, no watermark. Original art, no reference-image copying. Restrained painterly realism for a polished late-1990s fantasy adventure remake. Even neutral albedo illumination, no directional shadows, no cast shadows, no painted specular hotspots; small natural surface variation. Every pixel fully opaque.\nPrimary request: Deep midnight-blue and muted indigo enamel with a delicate original celestial pattern: tiny scattered pale icy blue stars and very fine silvery speckling over a subtly mottled blue enamel surface. For already-modeled faceted star ornaments. A seamless square SURFACE, NOT a large central star icon. Small stars evenly scattered at varied sizes, no large constellation focal point. No text, no borders, no pendant silhouette, no object, no transparency.\n\nReconstruction context: recreate this individual surface for the retained Black Market prop geometry, matching its previous material colors in the attached room preview. The preview is a color/style reference only, not the requested output. Produce only this flat opaque seamless square material edge to edge. No object silhouette, no room, no text, no preview board. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "da370b831378ac8cdea60c3e7890324e80e6c72a6a1f4143e17c05db0aa1356f",
+      "bytes": 523563,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "b0f008b4e408ae24171176fd1ee5b48147ea2714c23769ebd62afeeba0356de5"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "3d7180a9d4be05b4e32c04ae714a9c4d1faedbec04e250cc8226e0aa295ec235",
+        "bytes": 3425334
+      }
+    },
+    {
+      "name": "herbs",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque square albedo texture for existing fantasy-game prop geometry. Strict flat orthographic surface scan, square edge-to-edge, no perspective, no whole object, no border, no watermark, no text. Original art. Restrained hand-painted realism for a polished late-1990s fantasy adventure remake. Every pixel opaque, no alpha holes. Even neutral albedo lighting without cast shadows, directional light or specular hotspots.\nPrimary request: A dense fibrous surface of dry sage and olive-green medicinal leaves with very fine leaf veins, soft dusty ochre fiber and small pale papery root details, to wrap existing modeled hanging herb bundles. Muted smoky olive and sage with subtle tan fibers, calm readable texture, matching seamless edges. Fine scale material detail only. No bundle silhouette, no individual large plant in a scene, no ties, no pot, no basket. Do not depict a photograph or arrangement of cut herbs.\n\nReconstruction context: recreate this material for the retained Black Market meshes, matching its previous material palette and appearance in the attached room preview. The preview is a color/style reference only. Produce only the requested flat opaque square material, no objects, no room, no text, no scene render. Keep all material/atlas divisions exactly as described above. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "8d5e3c2f546745b171cf8f48a3a9d82f90613fa01106ba8ff6f1b5ca2f1e66f7",
+      "bytes": 628417,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "229c80efbade007fba7915c3ebc7728f1d8c06d4c85699adad62fc1fad5c609b"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "c369e794d2baa820ae6ec728a0647c3a9c0b8f4cf671e9607fc04b48e2d5046d",
+        "bytes": 4585484
+      }
+    },
+    {
+      "name": "curios",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque square albedo texture for existing fantasy-game prop geometry. Strict flat orthographic surface scan, square edge-to-edge, no perspective, no whole object, no border, no watermark, no text. Original art. Restrained hand-painted realism for a polished late-1990s fantasy adventure remake. Every pixel opaque, no alpha holes. Even neutral albedo lighting without cast shadows, directional light or specular hotspots.\nPrimary request: A precise four-cell square MATERIAL ATLAS for existing book, mask and bottle UV islands. Split the square exactly at horizontal and vertical midpoint into FOUR equal square quadrants, no gaps or divider borders. Upper-left quadrant: warm aged ivory parchment, fine paper fibers with very faint irregular non-readable brown ink strokes. Upper-right quadrant: dark oxblood/burgundy bookbinding leather, very fine leather grain and restrained shallow gold tooling, no book silhouette. Lower-left quadrant: aged ivory bone, soft cream mineral streaks and fine small pores, no skull illustration. Lower-right quadrant: muted opaque jade/celadon bottle-glass surface, subtle cloudy cyan-green variation, no bottle illustration. Each quadrant is a flat uninterrupted material patch filling its exact quadrant. The atlas contains materials only: no objects, icons, labels, lettering, words, frames or gutters. Quadrant edges must be exactly straight at 50%.\n\nReconstruction context: recreate this material for the retained Black Market meshes, matching its previous material palette and appearance in the attached room preview. The preview is a color/style reference only. Produce only the requested flat opaque square material, no objects, no room, no text, no scene render. Keep all material/atlas divisions exactly as described above. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "2ffe56c06fa7f81cd94ad3e0dd302c6e8cc5b56f3fbd5cafb1c46f10f8be3c90",
+      "bytes": 513861,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "dafb06ad55a94a3098166a3e0757cafe380a30b258e1891c11b6567f7853fd85"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "a41a95e9e25ce409578eb0f021ebac14459c767b0aaa4b2b570d26245836716a",
+        "bytes": 3314422
+      }
+    },
+    {
+      "name": "liquid",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque square albedo texture for existing fantasy-game prop geometry. Strict flat orthographic surface scan, square edge-to-edge, no perspective, no whole object, no border, no watermark, no text. Original art. Restrained hand-painted realism for a polished late-1990s fantasy adventure remake. Every pixel opaque, no alpha holes. Even neutral albedo lighting without cast shadows, directional light or specular hotspots.\nPrimary request: A muted pale turquoise and jade magical potion LIQUID SURFACE with soft small curling eddies, very subtle fine rings and tiny scattered pale bubbles. The flat fluid surface should glow gently through color contrast, with low-contrast teal around milky pale aqua movement. Match seamless edges. Surface material fills the entire square. No bowl, no vessel, no cauldron, no rim, no smoke, no steam column, no object, no central circular vignette. Original subtle fantasy potion liquid albedo, not water photograph.\n\nReconstruction context: recreate this material for the retained Black Market meshes, matching its previous material palette and appearance in the attached room preview. The preview is a color/style reference only. Produce only the requested flat opaque square material, no objects, no room, no text, no scene render. Keep all material/atlas divisions exactly as described above. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "22ab45941f50f8963e24cf1fd34fb2f4b9bd3d36336a4998a0f304e76b59df32",
+      "bytes": 457982,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "a6a1f3337ca9f471b1be7bcb49b6122de5860ad66ecc88ece61a18ff8ab5e437"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "ff268814d6c3661ad4ee7b61caa822ab65df47977746a351480a5d3e4de269f7",
+        "bytes": 2401054
+      }
+    },
+    {
+      "name": "cloth",
+      "prompt": "Use case: stylized-concept\nAsset type: production opaque square albedo texture for existing fantasy-game prop geometry. Strict flat orthographic surface scan, square edge-to-edge, no perspective, no whole object, no border, no watermark, no text. Original art. Restrained hand-painted realism for a polished late-1990s fantasy adventure remake. Every pixel opaque, no alpha holes. Even neutral albedo lighting without cast shadows, directional light or specular hotspots.\nPrimary request: Deep desaturated plum and smoky burgundy woven cloth with fine visible fibers and very small restrained muted bronze-gold diamond brocade motifs. For draped curtains, runners and existing rug meshes. Dense fine weave with soft irregular wear, elegant quiet original pattern, evenly repeated tiny diamonds with lots of dark plum fabric between them. Seamless matching edges. No whole curtain, no rug outline, no border band, no folds, no draped fabric silhouette, no objects, no lettering.\n\nReconstruction context: recreate this material for the retained Black Market meshes, matching its previous material palette and appearance in the attached room preview. The preview is a color/style reference only. Produce only the requested flat opaque square material, no objects, no room, no text, no scene render. Keep all material/atlas divisions exactly as described above. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "93ecac406f9238a7756a0a901619f3b9f5173b2f4217bc7fac0a5172a87d73bf",
+      "bytes": 532268,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "a66f817596289a4df345058a5960769b869b3156ca9cf5743aea688f40b561e5"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "e1131499422a20291753a6a127c26dbec2bdb83184a2a07f6d78e183d14451da",
+        "bytes": 3543529
+      }
+    }
+  ],
+  "processing": "Original PNGs retained byte-for-byte. Optional authoring packs flat material patches into existing UV rectangles and encodes512px uploads; no procedural art, no geometry/UV changes, no transparency.",
+  "build_encoding": "Recorded 512x512 source PNGs; lossless RGBA8 with existing UV atlas layouts; compressed base64 parts no larger than 128 KiB"
+}

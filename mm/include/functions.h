@@ -111,6 +111,7 @@ s32 Actor_OfferTalkExchange(Actor* actor, struct PlayState* play, f32 xzRange, f
 s32 Actor_OfferTalkExchangeEquiCylinder(Actor* actor, struct PlayState* play, f32 radius, PlayerItemAction exchangeItemAction);
 
 void GetItem_Draw(PlayState* play, s16 drawId);
+Gfx* GetItem_DrawDListWithCosmetics(Gfx* gfx, const char* dlist, s16 drawId);
 
 u16 QuestHint_GetTatlTextId(PlayState* play);
 
@@ -253,7 +254,7 @@ void AudioThread_QueueCmdU16(u32 opArgs, u16 data);
 void AudioThread_QueueCmdPtr(u32 opArgs, void* data);
 s32 AudioThread_ScheduleProcessCmds(void);
 u32 AudioThread_GetExternalLoadQueueMsg(u32* retMsg);
-u8* AudioThread_GetFontsForSequence(s32 seqId, u32* outNumFonts, u8* buff);
+s32* AudioThread_GetFontsForSequence(s32 seqId, u32* outNumFonts);
 s32 func_80193C5C(void);
 s32 AudioThread_ResetAudioHeap(s32 specId);
 void AudioThread_PreNMIInternal(void);

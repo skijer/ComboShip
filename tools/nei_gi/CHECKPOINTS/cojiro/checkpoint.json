@@ -1,0 +1,30 @@
+{
+  "resource_count": 3,
+  "vertex_records": 11594,
+  "vertex_loads": 375,
+  "slug": "cojiro",
+  "name": "Cojiro",
+  "entry": "objects/nei_gi_redesign/cojiro/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 9712,
+  "bounds_author": [
+    [
+      -27.1875,
+      -39.0625,
+      -21.9375
+    ],
+    [
+      27.1875,
+      48.3125,
+      31.0625
+    ]
+  ],
+  "markers": {},
+  "notes": [
+    "GI-only cute blue Cojiro with rounded plumage, wide eyes, red comb and golden feet.",
+    "Volumetric front, sides and tail; native actor and user model paths stay separate.",
+    "Authored front faces +Z. The shared GI renderer supplies its normal Y-axis spin."
+  ],
+  "runtime_tested": false
+}

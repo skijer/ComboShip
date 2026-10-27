@@ -1,0 +1,77 @@
+{
+  "authoring_pillow_version": "12.3.0",
+  "decoded_bytes": 1048576,
+  "name": "arcane_stone",
+  "packed_bytes": 699002,
+  "packed_sha256": "53d4dc217adc4393f17df8105c8c5c956c6b97c6afda808291348a2994fa1d6f",
+  "parts": [
+    {
+      "base64_bytes": 131072,
+      "base64_sha256": "8f91feebd2b942dfe7afb9e07d097646debb1a87e53a79f674913f2b053d52db",
+      "bytes": 98304,
+      "name": "shelf.zlib.001.b64",
+      "sha256": "9826897ba3005a9ae27a11c228182f243656e360f649d045da8fb583f4c64c7d"
+    },
+    {
+      "base64_bytes": 131072,
+      "base64_sha256": "97e0bedc809c36782ca5e6a00361110eca7c3824b4ef707ae96062dfc3842852",
+      "bytes": 98304,
+      "name": "shelf.zlib.002.b64",
+      "sha256": "07b42f5bb98ce75b525225f303b3d36ab914bd650aee18b5510cb694a6bc2a4e"
+    },
+    {
+      "base64_bytes": 131072,
+      "base64_sha256": "baa1d65ca077f1511496f75be44252395524c565cb45790e4bff7b84896f1e49",
+      "bytes": 98304,
+      "name": "shelf.zlib.003.b64",
+      "sha256": "5e65b58dd4453ddb5757aed49f6387f6e8bd70f64c8086310811f1912749daa7"
+    },
+    {
+      "base64_bytes": 131072,
+      "base64_sha256": "2d61a8f5f2b462b8485053005cc83028ba14132d0f0b016f0e81ff562a205ef9",
+      "bytes": 98304,
+      "name": "shelf.zlib.004.b64",
+      "sha256": "e4a65124dbc4f4ae5e13c5ba2afd03f83eb857fb0282f2842a0990dd32e7d5e1"
+    },
+    {
+      "base64_bytes": 131072,
+      "base64_sha256": "546bdf13e66bb86cfa07ffcd43efd17e29b86c408e7bc8d0515415805618bf91",
+      "bytes": 98304,
+      "name": "shelf.zlib.005.b64",
+      "sha256": "4b920fd6743b62be61bbc3b74f42fb51b5d28452c29980b7fd860203378c4b0f"
+    },
+    {
+      "base64_bytes": 131072,
+      "base64_sha256": "1e1fcbf1d5216031c02bbeab2b32473510e5ce3833160298f9a4391c91ed0133",
+      "bytes": 98304,
+      "name": "shelf.zlib.006.b64",
+      "sha256": "a3849ab5144c3a5f5ac4db8dbee1fee292113ed9e87825ca7c72f90850eb1620"
+    },
+    {
+      "base64_bytes": 131072,
+      "base64_sha256": "86504d9824984f603139f73a47a48871a4afd9d850fc1bd9f0e9394d5010d84e",
+      "bytes": 98304,
+      "name": "shelf.zlib.007.b64",
+      "sha256": "f144eb1fe19d054cdd4bfbb777ce91df4a2f47d8da8ea48a8aaabee45912e136"
+    },
+    {
+      "base64_bytes": 14500,
+      "base64_sha256": "19612bb862b435fd43014cec309269a8fb116da3980045991a94fd392b39f227",
+      "bytes": 10874,
+      "name": "shelf.zlib.008.b64",
+      "sha256": "00fd5f53862aa15437478596ff4db94a0097400961564f74580902db7c6b7273"
+    }
+  ],
+  "pixels_sha256": "3e2bac601d1a9c3e0317d159aa6b9f5354abaac982a24848edfec5e97dbb3231",
+  "processing": "Exact existing build.py recipe: Image.open(source).convert(\"RGBA\").resize((512,512), Image.Resampling.LANCZOS).tobytes(); zlib9, lossless base64 slices <=96KiB binary/128KiB text; no new art",
+  "runtime": "512x512 opaque RGBA8; current kind1 LOAD_AS_RAW header, logical64; existing native Flow/Veil gSPScrollTexture unchanged",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "source_git_blob": "a674db3a00c96b7622d63ae7534009b97e47df42",
+  "source_mode": "RGB",
+  "source_path": "tools/black_market/assets/arcane_stone.png",
+  "source_sha256": "19c491b0ed659ed4a8735a4e433755839010fa5367524b7cfd7bc8c581c7ca5f",
+  "version": 1
+}

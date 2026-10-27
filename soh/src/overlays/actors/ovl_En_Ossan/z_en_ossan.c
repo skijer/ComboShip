@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 #include "z_en_ossan.h"
 #include "vt.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
@@ -18,6 +19,7 @@
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include <assert.h>
 #include "soh/OTRGlobals.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -425,6 +427,7 @@ s16 ShopItemDisp_GerudoMask(s16 v) {
 void EnOssan_SpawnItemsOnShelves(EnOssan* this, PlayState* play, ShopItem* shopItems) {
     EnTana* shelves;
     s16 itemParams;
+    s16 originalItemParams;
     s32 i;
 
     for (i = 0; i < 8; i++, shopItems++) {
@@ -432,14 +435,13 @@ void EnOssan_SpawnItemsOnShelves(EnOssan* this, PlayState* play, ShopItem* shopI
             this->shelfSlots[i] = NULL;
         } else {
             itemParams = sShopItemReplaceFunc[shopItems->shopItemIndex](shopItems->shopItemIndex);
+            originalItemParams = itemParams;
             if (IS_RANDO && Randomizer_GetSettingValue(RSK_SHOPSANITY) != RO_SHOPSANITY_OFF) {
                 ShopItemIdentity shopItemIdentity = Randomizer_IdentifyShopItem(play->sceneNum, i + 1);
                 if (shopItemIdentity.identity.randomizerCheck != RC_UNKNOWN_CHECK) {
-                    itemParams = shopItemIdentity.enGirlAShopItem;
-
-                    if (Flags_GetRandomizerInf(shopItemIdentity.identity.randomizerInf)) {
-                        itemParams = SI_SOLD_OUT;
-                    }
+                    if (!Flags_GetRandomizerInf(shopItemIdentity.identity.randomizerInf)) {
+                        itemParams = shopItemIdentity.enGirlAShopItem;
+                    } // Otherwise retain the original native shelf stock selected above.
                 }
             }
 
@@ -452,8 +454,10 @@ void EnOssan_SpawnItemsOnShelves(EnOssan* this, PlayState* play, ShopItem* shopI
                     shelves->actor.world.pos.y + shopItems->yOffset, shelves->actor.world.pos.z + shopItems->zOffset,
                     shelves->actor.shape.rot.x, shelves->actor.shape.rot.y + sItemShelfRot[i],
                     shelves->actor.shape.rot.z, itemParams);
-                if (IS_RANDO && Randomizer_GetSettingValue(RSK_SHOPSANITY) != RO_SHOPSANITY_OFF) {
+                if (this->shelfSlots[i] != NULL && IS_RANDO &&
+                    Randomizer_GetSettingValue(RSK_SHOPSANITY) != RO_SHOPSANITY_OFF) {
                     this->shelfSlots[i]->randoSlotIndex = i + 1;
+                    this->shelfSlots[i]->randoOriginalShopItem = originalItemParams;
                 }
             }
         }
@@ -527,7 +531,8 @@ void EnOssan_TalkZoraShopkeeper(PlayState* play) {
 // Goron City, Goron
 void EnOssan_TalkGoronShopkeeper(PlayState* play) {
     if (LINK_AGE_IN_YEARS == YEARS_CHILD) {
-        if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+        if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                            Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
             Message_ContinueTextbox(play, 0x3028);
         } else if (CUR_UPG_VALUE(UPG_STRENGTH) != 0) {
             Message_ContinueTextbox(play, 0x302D);
@@ -535,7 +540,8 @@ void EnOssan_TalkGoronShopkeeper(PlayState* play) {
             Message_ContinueTextbox(play, 0x300F);
         }
     } else if ((!IS_RANDO && !CHECK_QUEST_ITEM(QUEST_MEDALLION_FIRE)) ||
-               (IS_RANDO && !Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP))) {
+               (IS_RANDO && !Combo_SOH_CrossBossLogicalClear(
+                                COMBO_BOSS_VOLVAGIA, Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP)))) {
         Message_ContinueTextbox(play, 0x3057);
     } else {
         Message_ContinueTextbox(play, 0x305B);
@@ -617,9 +623,12 @@ void EnOssan_Init(Actor* thisx, PlayState* play) {
     }
 
     // Don't kill bombchu shop actor in rando, making it so the shop is immediately open
-    // Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) - Completed Dodongo's Cavern
+    // Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+    // Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) - Completed Dodongo's Cavern
     if (this->actor.params == OSSAN_TYPE_BOMBCHUS &&
-        !Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) && !IS_RANDO) {
+        !Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                         Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+        !IS_RANDO) {
         Actor_Kill(&this->actor);
         return;
     }
@@ -1537,8 +1546,10 @@ void EnOssan_BuyGoronCityBombs(PlayState* play, EnOssan* this) {
     if (LINK_AGE_IN_YEARS == YEARS_CHILD) {
         // Let players buy the right side of the goron shop in rando regardless of DC completion
         // Players will still need a bomb bag to buy bombs (handled by vanilla behaviour)
-        // Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) - Completed Dodongo's Cavern
-        if (!IS_RANDO && !Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+        // Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+        // Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) - Completed Dodongo's Cavern
+        if (!IS_RANDO && !Combo_SOH_CrossBossLogicalClear(
+                             COMBO_BOSS_DODONGO, Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
             if (Flags_GetInfTable(INFTABLE_FC)) {
                 EnOssan_SetStateCantGetItem(play, this, 0x302E);
             } else {

@@ -5,10 +5,11 @@
  */
 
 #include "z_en_wallmas.h"
+#include "din_fire_sword.h"
 #include "objects/object_wallmaster/object_wallmaster.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -154,8 +155,6 @@ void EnWallmas_Destroy(Actor* thisx, PlayState* play) {
     EnWallmas* this = (EnWallmas*)thisx;
 
     Collider_DestroyCylinder(play, &this->collider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void EnWallmas_TimerInit(EnWallmas* this, PlayState* play) {
@@ -230,7 +229,7 @@ void EnWallmas_SetupReturnToCeiling(EnWallmas* this) {
 
 void EnWallmas_SetupTakeDamage(EnWallmas* this) {
     Animation_MorphToPlayOnce(&this->skelAnime, &gWallmasterDamageAnim, -3.0f);
-    if (this->collider.info.acHitInfo->toucher.dmgFlags & 0x0001F824) {
+    if (DinFireSword_OriginalDamageFlags(gPlayState, this->collider.info.acHitInfo) & 0x0001F824) {
         this->actor.world.rot.y = this->collider.base.ac->world.rot.y;
     } else {
         this->actor.world.rot.y = Actor_WorldYawTowardActor(&this->actor, this->collider.base.ac) + 0x8000;
@@ -342,9 +341,10 @@ void EnWallmas_WaitToDrop(EnWallmas* this, PlayState* play) {
 void EnWallmas_Drop(EnWallmas* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 
-    if (!Player_InCsMode(play) && !(player->stateFlags2 & PLAYER_STATE2_MOVING_DYNAPOLY) &&
-        (player->invincibilityTimer >= 0) && (this->actor.xzDistToPlayer < 30.0f) &&
-        (this->actor.yDistToPlayer < -5.0f) && (-(f32)(player->cylinder.dim.height + 10) < this->actor.yDistToPlayer)) {
+    if (GameInteractor_Should(VB_ENEMY_GRAB_PLAYER, true, this) && !Player_InCsMode(play) &&
+        !(player->stateFlags2 & PLAYER_STATE2_MOVING_DYNAPOLY) && (player->invincibilityTimer >= 0) &&
+        (this->actor.xzDistToPlayer < 30.0f) && (this->actor.yDistToPlayer < -5.0f) &&
+        (-(f32)(player->cylinder.dim.height + 10) < this->actor.yDistToPlayer)) {
         EnWallmas_SetupTakePlayer(this, play);
     }
 }

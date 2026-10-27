@@ -64,7 +64,12 @@ typedef struct EnBox {
     /* 0x21A */ s16 csId2;
     /* 0x21C */ s32 getItemId;
     /* 0x220 */ s32 collectableFlag;
-} EnBox; // size = 0x224
+    // Optional, validated afresh for each draw. These are resource names, never cached loaded pointers.
+    const char* contentsBodyDL;
+    const char* contentsLidDL;
+    // Actor_Spawn zeroes the full instance; only the pre-init randomizer hook assigns this identity.
+    s16 contentsRandoCheck;
+} EnBox; // Native size = 0x224, followed by port-only appearance state.
 
 
 #endif // Z_EN_BOX_H

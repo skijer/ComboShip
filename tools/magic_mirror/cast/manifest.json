@@ -1,0 +1,38 @@
+{
+  "forest_seal": {
+    "source_sha256": "bf74664ec2dcea8d28f4a197749145969a10c5f5f438dda0cdfd4976da477290",
+    "resource_sha256": "090aa134f050e55e7a8f49d9461c1c506dc08fb09e4058dc4fc0e174616576d8",
+    "source_pixels": [
+      1254,
+      1254
+    ],
+    "resource_pixels": [
+      512,
+      512
+    ],
+    "logical_tile": [
+      32,
+      32
+    ],
+    "margin": 24,
+    "origin": "Built-in ImageGen; original botanical forest VFX, transparent RGBA"
+  },
+  "forest_wisp": {
+    "source_sha256": "8376e584658852c9418d74fec9f1aace2fc4ad5e421f6394d9361f7eb1323328",
+    "resource_sha256": "7c72a5bd4a01c63611e70dc14da4ebb95ea5d8357432c70fb84d6f5a70c180c3",
+    "source_pixels": [
+      1254,
+      1254
+    ],
+    "resource_pixels": [
+      512,
+      512
+    ],
+    "logical_tile": [
+      32,
+      32
+    ],
+    "margin": 16,
+    "origin": "Built-in ImageGen; original botanical forest VFX, transparent RGBA"
+  }
+}

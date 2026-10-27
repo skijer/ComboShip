@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_boss_07.c
  * Overlay: ovl_Boss_07
@@ -32,6 +33,7 @@
 #include "2s2h/GameInteractor/GameInteractor.h"
 
 #ifdef COMBO_BUILD
+#include "ComboGameMode.h"
 // ComboShip: end-gating. Returns 1 iff both games' final bosses are dead (see BenPort.cpp).
 extern int (*gComboFinalBossDefeated)(int game, int fileNum);
 #endif
@@ -1966,7 +1968,8 @@ void Boss07_Wrath_DeathCutscene(Boss07* this, PlayState* play) {
 #ifdef COMBO_BUILD
                         // ComboShip: gate the ending on both bosses. If Ganon isn't dead yet, skip MM's
                         // credits and warp to South Clock Town to go finish OOT via the Clock Tower portal.
-                        if (gComboFinalBossDefeated == NULL || !gComboFinalBossDefeated(1, gSaveContext.fileNum)) {
+                        if (Combo_IsCombinedGame() &&
+                            (gComboFinalBossDefeated == NULL || !gComboFinalBossDefeated(1, gSaveContext.fileNum))) {
                             play->nextEntrance = ENTRANCE(SOUTH_CLOCK_TOWN, 0);
                             gSaveContext.nextCutsceneIndex = 0xFFEF;
                             play->transitionTrigger = TRANS_TRIGGER_START;
@@ -5478,6 +5481,7 @@ void Boss07_Mask_SetupDamaged(Boss07* this, PlayState* play, u8 damage, Actor* h
     this->actor.colChkInfo.health -= damage;
 
     if ((s8)this->actor.colChkInfo.health <= 0) {
+        DinFireSword_FinishFatal(play, &this->actor);
         this->timers[0] = 30;
     }
 

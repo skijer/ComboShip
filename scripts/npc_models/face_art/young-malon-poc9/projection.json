@@ -1,0 +1,14 @@
+{
+  "variant": "young-malon",
+  "source_sha256": "3160899f85770bcd86f664ed73fd7d12277eea2905f42933e79be150e0d2cd3b",
+  "parent_archive_sha256": "da1f2ae86efdaef03897f73b06621a4aa9bf451c80c2f71e19372e2fba74f21f",
+  "artwork_sha256": "78e71386f005f173fbf81814626f1b2316f8805884b08bd747c7e544b282c1c2",
+  "bounds": [
+    -0.095,
+    0.768,
+    0.095,
+    0.92
+  ],
+  "art_method": "Built-in imagegen edit of the original frontal neutral projection; final bake accepts only bounded eye aperture/iris and tiny speck masks.",
+  "integration": "refine_young_malon_face_idle.py; original surrounding artwork retained by explicit mask; half blink accepts visible iris only; closed artwork unchanged"
+}

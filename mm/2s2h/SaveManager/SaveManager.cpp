@@ -1,4 +1,7 @@
+#include "../../../combo/menu/ItemGrantAuditBridge.h"
 #include "SaveManager.h"
+#include "2s2h/Enhancements/Gameplay/BlackMarket.h"
+#include "2s2h/Enhancements/Gameplay/ComboSoloForest.h"
 
 #include <fstream>
 #include <filesystem>
@@ -8,6 +11,7 @@
 #include "BenPort.h"
 #include "2s2h/BenGui/Notification.h"
 #include <ship/window/Window.h>
+#include "2s2h/GameInteractor/GameInteractor.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 
 extern "C" {
@@ -33,9 +37,20 @@ extern SaveContext gSaveContext;
     ((GET_NEWF(save, 0) == 'Z') && (GET_NEWF(save, 1) == 'E') && (GET_NEWF(save, 2) == 'L') && \
      (GET_NEWF(save, 3) == 'D') && (GET_NEWF(save, 4) == 'A') && (GET_NEWF(save, 5) == '3'))
 
-const std::filesystem::path savesFolderPath(Ship::Context::GetPathRelativeToAppDirectory("saves", appShortName));
+// Resolve after session mode selection; DLL static initialization precedes it.
+static std::filesystem::path SaveManager_GetSavesFolderPath() {
+#ifdef COMBO_BUILD
+    if (!Combo_IsCombinedGame())
+        return Ship::Context::GetPathRelativeToAppDirectory("saves/mm", appShortName);
+#endif
+    return Ship::Context::GetPathRelativeToAppDirectory("saves", appShortName);
+}
 
 #ifdef COMBO_BUILD
+#include "rando/CrossDungeonRuntime.h"
+extern "C" int32_t Combo_MM_SaveCrossDungeonCheckpoint(void);
+extern "C" void Combo_MM_LoadCrossDungeonCheckpoint(int32_t index);
+#include "ComboExport.h"        // ComboShip: COMBO_EXPORT for MM_InvalidateOwlBlobSlot
 #include "rando/CrossForeign.h" // ComboShip: merged-save IO callback typedefs + GameId
 
 // ComboShip: launcher-provided .combosav IO. When set, a main per-slot file{N}.json read/write routes
@@ -83,7 +98,7 @@ static int SaveManager_ClassifySaveFile(const std::filesystem::path& fileName, b
 // - Create the migration file in the Migrations folder with the name `{CURRENT_SAVE_VERSION}.cpp`
 // - Add the migration function definition below and add it to the `migrations` map with the key being the previous
 // version
-const uint32_t CURRENT_SAVE_VERSION = 7;
+const uint32_t CURRENT_SAVE_VERSION = 8;
 
 void SaveManager_Migration_1(nlohmann::json& j);
 void SaveManager_Migration_2(nlohmann::json& j);
@@ -92,6 +107,7 @@ void SaveManager_Migration_4(nlohmann::json& j);
 void SaveManager_Migration_5(nlohmann::json& j);
 void SaveManager_Migration_6(nlohmann::json& j);
 void SaveManager_Migration_7(nlohmann::json& j);
+void SaveManager_Migration_8(nlohmann::json& j);
 
 const std::unordered_map<uint32_t, std::function<void(nlohmann::json&)>> migrations = {
     // Pre-1.0.0 Migrations, deprecated
@@ -103,6 +119,7 @@ const std::unordered_map<uint32_t, std::function<void(nlohmann::json&)>> migrati
     { 4, SaveManager_Migration_5 },
     { 5, SaveManager_Migration_6 },
     { 6, SaveManager_Migration_7 },
+    { 7, SaveManager_Migration_8 },
 };
 
 int SaveManager_MigrateSave(nlohmann::json& j) {
@@ -149,28 +166,38 @@ int SaveManager_MigrateSave(nlohmann::json& j) {
 
 void SaveManager_WriteSaveFile(const std::filesystem::path& fileName, nlohmann::json j) {
 #ifdef COMBO_BUILD
+    if (gComboGameMode == COMBO_GAME_MM) {
+        bool isBackup, isGlobal;
+        const int n = SaveManager_ClassifySaveFile(fileName, isBackup, isGlobal);
+        if (n > 0 && !isGlobal) {
+            ComboBlackMarket_SaveState(j, n - 1);
+            ComboSoloForestMm_SaveState(j, n - 1);
+        }
+    }
     // ComboShip: route the main per-slot file into the .combosav container; drop the redundant backup.
-    if (gComboWriteGameSave) {
+    if (Combo_IsCombinedGame() && gComboWriteGameSave) {
         bool isBackup, isGlobal;
         int n = SaveManager_ClassifySaveFile(fileName, isBackup, isGlobal);
         if (isBackup)
             return; // container's atomic write makes MM's per-slot backup redundant
         if (n > 0 && !isGlobal) {
+            j["crossDungeonCheckpoint"] = Combo_MM_SaveCrossDungeonCheckpoint();
+            ComboBlackMarket_SaveState(j, n - 1);
             gComboWriteGameSave(ComboRando::GAME_MM, n - 1, j.dump().c_str());
             return;
         }
         // global.json falls through to disk (per-game globals stay separate).
     }
 #endif
-    const std::filesystem::path filePath = savesFolderPath / fileName;
+    const std::filesystem::path filePath = SaveManager_GetSavesFolderPath() / fileName;
 
     // create_directories (plural) makes any missing parent dirs too; create_directory (single) fails
     // silently if a parent is missing, after which the ofstream open below silently no-ops.
     std::error_code ec;
-    std::filesystem::create_directories(savesFolderPath, ec);
+    std::filesystem::create_directories(SaveManager_GetSavesFolderPath(), ec);
     if (ec) {
         SPDLOG_ERROR("[ComboShip] Could not create saves folder {}: {}",
-                     std::filesystem::absolute(savesFolderPath).string(), ec.message());
+                     std::filesystem::absolute(SaveManager_GetSavesFolderPath()).string(), ec.message());
     }
 
     try {
@@ -197,9 +224,10 @@ int SaveManager_ReadSaveFile(const std::filesystem::path& fileName, nlohmann::js
 extern "C" int gComboOwlBlobSlot = -1;
 #endif
 
-void SaveManager_InitNewSaveForSlot(int mmFileNum, const unsigned char* ootName8) {
-    Sram_InitNewSave();
 #ifdef COMBO_BUILD
+void SaveManager_BuildComboBaseline(const unsigned char* ootName8) {
+    Combo_MM_LoadCrossDungeonCheckpoint(-1);
+    Sram_InitNewSave();
     // ComboShip: carry the OOT-entered file name over (same font codes in both games; anything
     // outside the shared 0x00-0x3F range, e.g. JP glyphs, becomes a space).
     if (ootName8 != nullptr) {
@@ -227,10 +255,22 @@ void SaveManager_InitNewSaveForSlot(int mmFileNum, const unsigned char* ootName8
     SET_WEEKEVENTREG(WEEKEVENTREG_ENTERED_WEST_CLOCK_TOWN);
     SET_WEEKEVENTREG(WEEKEVENTREG_ENTERED_NORTH_CLOCK_TOWN);
     // ComboShip: stamp RANDO before the write, not after. Every caller re-stamps it moments later, but
-    // this function PERSISTS, so leaving it VANILLA opened a window where the container briefly held a
-    // vanilla MM save, which silently disables every IS_RANDO hook. Combo has no vanilla mode.
+    // the caller below PERSISTS, so leaving it VANILLA opened a window where the container briefly held
+    // a vanilla MM save, which silently disables every IS_RANDO hook. Combo has no vanilla mode.
     gSaveContext.save.shipSaveInfo.saveType = SAVETYPE_RANDO;
+}
 #endif
+
+void SaveManager_InitNewSaveForSlot(int mmFileNum, const unsigned char* ootName8) {
+    ItemGrantAudit::Scope itemGrantAuditScope("MM save-init");
+#ifdef COMBO_BUILD
+    if (Combo_IsCombinedGame()) {
+        SaveManager_BuildComboBaseline(ootName8);
+    } else
+#endif
+    {
+        Sram_InitNewSave();
+    }
     nlohmann::json j;
     // Fresh json with no owlSave, and Combo_WriteGameSave replaces the whole mm section — that is what
     // drops a stale owl blob on a new file or a rebake. Do not turn this into a read-modify-write.
@@ -243,7 +283,59 @@ void SaveManager_InitNewSaveForSlot(int mmFileNum, const unsigned char* ootName8
     SaveManager_WriteSaveFile(SaveManager_GetFileName(mmFileNum), j);
 }
 
-void SaveManager_SaveCurrentForCombo() {
+#ifdef COMBO_BUILD
+static bool SaveManager_CapturePortalSession(nlohmann::json& document, int mmFileNum) {
+    if (!gPlayState || gGameState != &gPlayState->state || !gPlayState->state.running ||
+        gSaveContext.gameMode != GAMEMODE_NORMAL)
+        return false;
+    // The portal stops before native scene destruction. Capture live room flags
+    // and retain cycle flags exactly as an ordinary owl save does.
+    Play_SaveCycleSceneFlags(gPlayState);
+    for (int i = 0; i < ARRAY_COUNT(gSaveContext.cycleSceneFlags); ++i) {
+        auto& saved = gSaveContext.save.saveInfo.permanentSceneFlags[i];
+        const auto& cycle = gSaveContext.cycleSceneFlags[i];
+        saved.chest = cycle.chest;
+        saved.switch0 = cycle.switch0;
+        saved.switch1 = cycle.switch1;
+        saved.clearedRoom = cycle.clearedRoom;
+        saved.collectible = cycle.collectible;
+    }
+    // Keep owl/resume metadata on the snapshot so the running game does not quit.
+    SaveContext session = gSaveContext;
+    session.save.isOwlSave = true;
+    session.save.shipSaveInfo.pauseSaveEntrance = session.save.entrance;
+    for (int i = 0; i < RESPAWN_MODE_MAX; ++i)
+        session.save.shipSaveInfo.respawn[i] = session.respawn[i];
+    document["owlSave"] = session;
+    document["comboPortalSession"] = true;
+    gComboOwlBlobSlot = mmFileNum;
+    return true;
+}
+
+static void SaveManager_RestorePortalRespawns(const nlohmann::json& document) {
+    const auto marker = document.find("comboPortalSession");
+    if (marker == document.end() || !marker->is_boolean() || !marker->get<bool>())
+        return;
+    // Native owl loading copies only the prefix before fileNum. Its live
+    // respawn array is outside that prefix; restore a portal's points even
+    // when the optional Remember Save Location hook is disabled.
+    for (int i = 0; i < RESPAWN_MODE_MAX; ++i)
+        gSaveContext.respawn[i] = gSaveContext.save.shipSaveInfo.respawn[i];
+}
+#endif
+
+void SaveManager_SaveCurrentForCombo(bool preservePortalSession) {
+    ItemGrantAudit::Scope itemGrantAuditScope("MM save-write");
+#ifdef COMBO_BUILD
+    // Guard the write itself, not each caller's own gate. 0xFF (no save) reaches here on real,
+    // non-buggy paths (play proceeding after a failed load), so refuse and return — don't assert.
+    if (gSaveContext.fileNum < 0 || gSaveContext.fileNum > 2) {
+        SPDLOG_ERROR("[ComboShip] SaveManager_SaveCurrentForCombo: refusing write, fileNum={} is not a "
+                     "loaded slot",
+                     gSaveContext.fileNum);
+        return;
+    }
+#endif
     int mmFileNum = (int)gSaveContext.fileNum + 1;
     std::string fileName = SaveManager_GetFileName(mmFileNum);
     nlohmann::json j;
@@ -253,9 +345,19 @@ void SaveManager_SaveCurrentForCombo() {
     if (SaveManager_ReadSaveFile(fileName, j) != 0 || SaveManager_MigrateSave(j) != 0) {
         j = nlohmann::json{};
     }
+    if (preservePortalSession && !SaveManager_CapturePortalSession(j, mmFileNum))
+        return;
 #endif
     j["newCycleSave"]["save"] = gSaveContext.save;
 #ifdef COMBO_BUILD
+    // ComboShip (#death-jingle-hang): this is the only save writer with no "don't persist while dead"
+    // guard. Floor health in the SERIALIZED doc only — never touch live gSaveContext or the load path.
+    bool comboDeadForSave = ((gPlayState != nullptr && gPlayState->gameOverCtx.state != GAMEOVER_INACTIVE) ||
+                             gSaveContext.save.saveInfo.playerData.health == 0) &&
+                            gSaveContext.save.saveInfo.playerData.health < 0x30;
+    if (comboDeadForSave) {
+        j["newCycleSave"]["save"]["saveInfo"]["playerData"]["health"] = 0x30;
+    }
     if (j.contains("owlSave")) {
         if (gComboOwlBlobSlot == mmFileNum) {
             // gSaveContext descends from this blob, so refresh the WHOLE SaveContext — same shape the
@@ -271,19 +373,30 @@ void SaveManager_SaveCurrentForCombo() {
                 j["owlSave"]["save"]["shipSaveInfo"]["pauseSaveEntrance"] =
                     keep.at("shipSaveInfo").at("pauseSaveEntrance");
                 j["owlSave"]["save"]["shipSaveInfo"]["respawn"] = keep.at("shipSaveInfo").at("respawn");
+                if (comboDeadForSave) {
+                    j["owlSave"]["save"]["saveInfo"]["playerData"]["health"] = 0x30;
+                }
             } catch (...) {
                 SPDLOG_ERROR("[ComboShip] Owl blob refresh failed; dropping it");
                 j.erase("owlSave");
+                j.erase("comboPortalSession");
                 gComboOwlBlobSlot = -1;
             }
         } else {
-            j.erase("owlSave"); // live state is newer than the blob
+            j.erase("owlSave");
+            j.erase("comboPortalSession"); // live state is newer than the blob
         }
     }
+    if (!j.contains("owlSave"))
+        j.erase("comboPortalSession");
 #endif
     j["version"] = CURRENT_SAVE_VERSION;
     j["type"] = "2S2H_SAVE";
     SaveManager_WriteSaveFile(fileName, j);
+}
+
+void SaveManager_SaveCurrentForCombo() {
+    SaveManager_SaveCurrentForCombo(false);
 }
 
 #ifdef COMBO_BUILD
@@ -299,19 +412,23 @@ extern "C" void Combo_MMDropOwlSaveBlob(void) try {
 
 // ComboShip (#182): the launcher can replace a slot's mm section behind MM's back (copy/erase/evict),
 // which would leave the descent flag pointing at a blob gSaveContext never came from.
-extern "C" __declspec(dllexport) void MM_InvalidateOwlBlobSlot(void) {
+extern "C" COMBO_EXPORT void MM_InvalidateOwlBlobSlot(void) {
     gComboOwlBlobSlot = -1;
 }
 #endif
 
-// ComboShip: nothing usable was loaded, so leave gSaveContext pointing at NO slot. 0xFF is the "no save"
+// ComboShip: nothing usable is loaded, so leave gSaveContext pointing at NO slot. 0xFF is the "no save"
 // sentinel every dormant writer tests (Combo_MM_GiveDormantResolved, MM_MarkForeignObtained, MMAnchor's
 // PumpDormant), so a stray write lands nowhere instead of persisting the PREVIOUS slot's save — or
-// zeroed vanilla BSS — into the failed slot. Clearing saveType makes IS_RANDO false for the same reason:
-// the peek trackers must not keep drawing the previous slot's save as if it were this one.
-static int SaveManager_LoadFailedForCombo(int code) {
+// zeroed/never-loaded BSS — into the failed slot. Clearing saveType makes IS_RANDO false for the same
+// reason: the peek trackers must not keep drawing the previous slot's save as if it were this one.
+void SaveManager_MarkNoSaveLoaded() {
     gSaveContext.fileNum = 0xFF;
     gSaveContext.save.shipSaveInfo.saveType = SAVETYPE_VANILLA;
+}
+
+static int SaveManager_LoadFailedForCombo(int code) {
+    SaveManager_MarkNoSaveLoaded();
     return code;
 }
 
@@ -320,16 +437,19 @@ static int SaveManager_LoadFailedForCombo(int code) {
 // loudly. Nothing repairs the slot — re-create the file. 0 ok, -1 missing, -2 unreadable, -3 migrate,
 // -4 no usable save page (neither key, or owlSave unparseable with no newCycleSave), -5 parse.
 int SaveManager_LoadSaveFile(int mmFileNum) {
+    ItemGrantAudit::Scope itemGrantAuditScope("MM save-load");
     std::string fileName = SaveManager_GetFileName(mmFileNum);
     nlohmann::json j;
     int result = SaveManager_ReadSaveFile(fileName, j);
 #ifdef COMBO_BUILD
+    ComboBlackMarket_LoadState(result == 0 ? j : nlohmann::json::object(), mmFileNum - 1);
+    Combo_MM_LoadCrossDungeonCheckpoint(result == 0 ? ComboRando::CrossDungeon::ReadCheckpoint(j) : -1);
     // ComboShip: the read routes through the launcher into the .combosav container, not saves/file{N}.json.
     SPDLOG_INFO("[ComboShip] LoadSaveFile slot {} <- .combosav container (read result={})", mmFileNum, result);
 #else
     SPDLOG_INFO("[ComboShip] LoadSaveFile slot {} -> {} (read result={}, savesFolder={})", mmFileNum,
-                std::filesystem::absolute(savesFolderPath / fileName).string(), result,
-                std::filesystem::absolute(savesFolderPath).string());
+                std::filesystem::absolute(SaveManager_GetSavesFolderPath() / fileName).string(), result,
+                std::filesystem::absolute(SaveManager_GetSavesFolderPath()).string());
 #endif
     if (result != 0) {
         SPDLOG_ERROR("[ComboShip] MM save file {} missing or unreadable (read result={})", fileName, result);
@@ -363,6 +483,7 @@ int SaveManager_LoadSaveFile(int mmFileNum) {
             sc.save.saveInfo.checksum = Sram_CalcChecksum(&sc, offsetof(SaveContext, fileNum));
             memcpy(&gSaveContext, &sc, offsetof(SaveContext, fileNum));
             gSaveContext.fileNum = (s16)(mmFileNum - 1);
+            SaveManager_RestorePortalRespawns(j);
             gComboOwlBlobSlot = mmFileNum;
             SPDLOG_INFO("[ComboShip] Loaded owl save for slot {}", mmFileNum);
             return 0;
@@ -401,7 +522,7 @@ void SaveManager_DeleteSaveFile(const std::filesystem::path& fileName) {
 #ifdef COMBO_BUILD
     // ComboShip: clear the container's mm section (write null) instead of removing a nonexistent
     // saves/file{N}.json. Reached e.g. when the flashrom path invalidates a new-cycle save.
-    if (gComboWriteGameSave) {
+    if (Combo_IsCombinedGame() && gComboWriteGameSave) {
         bool isBackup, isGlobal;
         int n = SaveManager_ClassifySaveFile(fileName, isBackup, isGlobal);
         if (n > 0 && !isBackup && !isGlobal) {
@@ -412,7 +533,7 @@ void SaveManager_DeleteSaveFile(const std::filesystem::path& fileName) {
             return; // backups are never written
     }
 #endif
-    const std::filesystem::path filePath = savesFolderPath / fileName;
+    const std::filesystem::path filePath = SaveManager_GetSavesFolderPath() / fileName;
 
     try {
         if (std::filesystem::exists(filePath)) {
@@ -425,7 +546,7 @@ int SaveManager_ReadSaveFile(const std::filesystem::path& fileName, nlohmann::js
 #ifdef COMBO_BUILD
     // ComboShip: read the main per-slot section from the .combosav container; "" -> same code as the
     // file-missing path below, which makes LoadSaveFile refuse the slot (it never creates one).
-    if (gComboReadGameSave) {
+    if (Combo_IsCombinedGame() && gComboReadGameSave) {
         bool isBackup, isGlobal;
         int n = SaveManager_ClassifySaveFile(fileName, isBackup, isGlobal);
         if (n > 0 && !isBackup && !isGlobal) {
@@ -442,7 +563,7 @@ int SaveManager_ReadSaveFile(const std::filesystem::path& fileName, nlohmann::js
         }
     }
 #endif
-    const std::filesystem::path filePath = savesFolderPath / fileName;
+    const std::filesystem::path filePath = SaveManager_GetSavesFolderPath() / fileName;
 
     if (!std::filesystem::exists(filePath)) {
         return -1;
@@ -488,9 +609,10 @@ void SaveManager_PersistSariaHintsAvailable() {
 }
 
 void SaveManager_MoveInvalidSaveFile(const std::filesystem::path& fileName, const std::string& message) {
-    const std::filesystem::path filePath = savesFolderPath / fileName;
+    const std::filesystem::path filePath = SaveManager_GetSavesFolderPath() / fileName;
     const std::filesystem::path backupFilePath =
-        savesFolderPath / (fileName.stem().string() + "_invalid_" + std::to_string(std::time(nullptr)) + ".json");
+        SaveManager_GetSavesFolderPath() /
+        (fileName.stem().string() + "_invalid_" + std::to_string(std::time(nullptr)) + ".json");
 
     try {
         if (std::filesystem::exists(filePath)) {
@@ -506,17 +628,17 @@ void SaveManager_MoveInvalidSaveFile(const std::filesystem::path& fileName, cons
 // created from OOT, never imported), so the on-disk probe below is vestigial under COMBO_BUILD.
 int SaveManager_GetOpenFileSlot() {
     std::string fileName = "file1.json";
-    if (!std::filesystem::exists(savesFolderPath / fileName)) {
+    if (!std::filesystem::exists(SaveManager_GetSavesFolderPath() / fileName)) {
         return 1;
     }
 
     fileName = "file2.json";
-    if (!std::filesystem::exists(savesFolderPath / fileName)) {
+    if (!std::filesystem::exists(SaveManager_GetSavesFolderPath() / fileName)) {
         return 2;
     }
 
     fileName = "file3.json";
-    if (!std::filesystem::exists(savesFolderPath / fileName)) {
+    if (!std::filesystem::exists(SaveManager_GetSavesFolderPath() / fileName)) {
         return 3;
     }
 
@@ -647,12 +769,29 @@ bool SaveManager_HandleFileDropped(char* filePath) {
 #define CVAR_ZTARGET_SETTING "gSettings.ZTargetSetting"
 
 void SaveManager_WriteGlobalOptions(const SaveOptions& saveOptions) {
+#ifdef COMBO_BUILD
+    if (!Combo_IsCombinedGame()) {
+        SaveManager_WriteSaveFile("global.json", saveOptions);
+        return;
+    }
+#endif
     CVarSetInteger(CVAR_AUDIO_SETTING, saveOptions.audioSetting);
     CVarSetInteger(CVAR_ZTARGET_SETTING, saveOptions.zTargetSetting);
     CVarSave();
 }
 
 bool SaveManager_ReadGlobalOptions(SaveOptions& saveOptions) {
+#ifdef COMBO_BUILD
+    if (!Combo_IsCombinedGame()) {
+        nlohmann::json j;
+        if (SaveManager_ReadSaveFile("global.json", j) != 0)
+            return false;
+        try {
+            saveOptions = j;
+            return saveOptions.optionId == SAVE_OPTIONS_VALID_ID;
+        } catch (...) { return false; }
+    }
+#endif
     // If these are nullptr, we might not have migrated yet.
     if (CVarGet(CVAR_AUDIO_SETTING) == nullptr && CVarGet(CVAR_ZTARGET_SETTING) == nullptr) {
         return false;
@@ -704,6 +843,25 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
     std::string fileName = SaveManager_GetFileNameFromFlashSave(flashSave);
 
     bool isBackup = false;
+    // FleetSync: 0-based slot of the file being written (matches gSaveContext.fileNum), for the
+    // OnSaveFile hook fired after a successful full (non-backup) save write.
+    s16 hookFileNum = -1;
+    switch (flashSave) {
+        case FLASH_SAVE_FILE_1_NEW_CYCLE_SAVE:
+        case FLASH_SAVE_FILE_1_OWL_SAVE:
+            hookFileNum = 0;
+            break;
+        case FLASH_SAVE_FILE_2_NEW_CYCLE_SAVE:
+        case FLASH_SAVE_FILE_2_OWL_SAVE:
+            hookFileNum = 1;
+            break;
+        case FLASH_SAVE_FILE_3_NEW_CYCLE_SAVE:
+        case FLASH_SAVE_FILE_3_OWL_SAVE:
+            hookFileNum = 2;
+            break;
+        default:
+            break;
+    }
 
     if (flashSave == FLASH_SAVE_UNAVAILABLE) {
         return;
@@ -763,14 +921,19 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
                 // ComboShip (#182): this branch preserves owlSave, so a blob that predates this write
                 // would shadow it on the next combo load. Drop it unless it is the one we came from.
                 // Reached by a game-over save prompt, or a pause save with Pause Menu Save off.
-                if (j.contains("owlSave") && gComboOwlBlobSlot != (int)gSaveContext.fileNum + 1) {
+                if (Combo_IsCombinedGame() && j.contains("owlSave") &&
+                    gComboOwlBlobSlot != (int)gSaveContext.fileNum + 1) {
                     j.erase("owlSave");
+                    j.erase("comboPortalSession");
                 }
 #endif
                 j["version"] = CURRENT_SAVE_VERSION;
                 j["type"] = "2S2H_SAVE";
 
                 SaveManager_WriteSaveFile(fileName, j);
+                if (hookFileNum >= 0) {
+                    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnSaveFile>(hookFileNum);
+                }
             } else {
                 // If IS_VALID_FILE fails, we should delete the save file, even if there is an owl save in it, because
                 // they just deleted the new cycle save
@@ -807,10 +970,11 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
             if (IS_VALID_FILE(saveContext.save)) {
                 j["owlSave"] = saveContext;
 #ifdef COMBO_BUILD
+                j.erase("comboPortalSession"); // This is a native owl/pause save, not a portal snapshot.
                 // ComboShip: if the pre-read failed, this would write an owlSave-only section, which the
                 // load path can only refuse. Seed newCycleSave from the owl snapshot — resumed a little
                 // late beats a dead slot. Guarded: upstream's file select reads owl-only files legitimately.
-                if (!j.contains("newCycleSave")) {
+                if (Combo_IsCombinedGame() && !j.contains("newCycleSave")) {
                     SPDLOG_ERROR("[ComboShip] owl save for {} had no new cycle save to preserve; seeding one from the "
                                  "owl snapshot",
                                  fileName);
@@ -823,6 +987,9 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
                 gComboOwlBlobSlot = (int)gSaveContext.fileNum + 1; // #182: gSaveContext now matches the blob
 #endif
                 SaveManager_WriteSaveFile(fileName, j);
+                if (hookFileNum >= 0) {
+                    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnSaveFile>(hookFileNum);
+                }
             } else {
 #ifdef COMBO_BUILD
                 gComboOwlBlobSlot = -1; // #182: func_80147314 is deleting the blob
@@ -832,6 +999,7 @@ extern "C" void SaveManager_SysFlashrom_WriteData(u8* saveBuffer, u32 pageNum, u
                 if (j.contains("newCycleSave")) {
                     if (j.contains("owlSave")) {
                         j.erase("owlSave");
+                        j.erase("comboPortalSession");
                     }
                     j["version"] = CURRENT_SAVE_VERSION;
                     j["type"] = "2S2H_SAVE";

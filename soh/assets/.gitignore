@@ -6,3 +6,15 @@
 *.dlist.inc
 !*.png
 custom/shaders
+
+# Rebuilt from the bounded cumulative and native chamber source pools.
+/custom/objects/magic_mirror/forest_seal
+/custom/objects/magic_mirror/forest_wisp
+/custom/textures/icon_item_custom/gItemIconMagicMirrorTex.rgba32.png
+/custom/textures/magic_mirror/gMagicMirrorForestReflectionTex.rgb5a1.png
+/custom/custom/temple_sages/
+/custom/alt/custom/temple_sages/
+/custom/scenes/shared/tokinoma_scene/
+/custom/alt/scenes/shared/tokinoma_scene/
+/custom/textures/comboship/regional/lake_hylia/sand
+/custom/alt/textures/comboship/regional/lake_hylia/sand

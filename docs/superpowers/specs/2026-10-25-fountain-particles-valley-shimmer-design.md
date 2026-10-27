@@ -1,0 +1,11 @@
+# Fountain particle correction and valley-wide shimmer
+
+The supplied screenshot and twelve-second clip show black snow cards and blue-edged mist cards on the Fountain/Snowhead approach. Public candidate `83eed9ff` still contains the opaque particle setup; the earlier two-command correction exists only in source checkpoint `a69ac0da`. Exact installed executable and pack hashes are unknown, so this establishes a publication gap rather than the identity of the running build.
+
+Carry forward that bounded transparency correction and its native render-state regression. Keep snow/mist art, density, placement, fade, resource ownership and bridge behavior intact. Both particle paths must blend their masks, compare depth without writing it, retain fog, and restore the native setup.
+
+cor also requests extending the shimmer behind Darmani horizontally across the whole valley. Fit the existing twenty ice-blue NEI twinkles across the actual approximately 660-unit ground cross-section at the existing depth. The implementation choice is ten columns and two rows, retaining the existing height range, exact twinkle art and particle count. Fit complete billboards above the sloped floor and inside both banks. Keep the portal trigger, Darmani placement, bridge, collision, water, MM endpoints and other routes unchanged.
+
+Use an isolated source candidate from `83eed9ff`. The previously corrected source is an untested dependency whose native checks will be rerun; it is not an accepted game build. No new textures or asset upload parts are needed. Verify native draw/shader behavior, full-width shimmer containment and unchanged twinkle art, plus the existing Snowhead/presentation/material suites. Configured Windows gameplay and user acceptance remain separate gates; no master/develop promotion.
+
+Follow-up: cor requests removing the owl-flight arrival on the 2Ship end and arriving normally like Ikana/Great Bay. Keep the dry native Mountain Village entrance8, its pose/camera and winter/spring selection; for an explicit Snowhead bridge handoff only, copy the selected player spawn into process-owned storage and replace OWL with native start mode F. Consume the exception once and bind it to the captured slot/seed/entrance. Ordinary owl warps, owl-save resumes, other routes, authored scene resources, progression and respawn records retain native behavior.

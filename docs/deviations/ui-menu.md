@@ -4,6 +4,9 @@ Preserved deviations — keep across upstream merges. See [../UPSTREAM_MERGES.md
 
 ## UIWidgets empty-combobox UB + combo-rendered MM rando menu (2026-06-09)
 
+**soh side RETIRED 2026-09-28:** upstream now initializes `longest` in every soh overload; the MM
+fix below stands.
+
 **`mm/2s2h/BenGui/UIWidgets.hpp` (and `soh/soh/SohGui/UIWidgets.hpp`) — fix to a vendored upstream
 bug:** every `UIWidgets::Combobox` template overload declared `const char* longest;` **uninitialized**,
 then assigned it only inside the loop that scans the options for the widest entry. If the options
@@ -128,6 +131,13 @@ byte-intact via the `#else`).
 the locked `MIN_QUEST == MAX_QUEST == QUEST_RANDOMIZER` still resolves to Randomizer on every L/R
 path (incl. the Master-Quest-absent skip loop).
 
+**Hide-quest options (2026-10-09):** soh's six File Select "Hide ..." checkboxes and their
+`HideQuestPreFunc` are compiled out under `COMBO_BUILD` (`SohMenuEnhancements.cpp`); they could not
+change anything with the lock above. `SohFileSelect_IsQuestHidden` (`FileSelectEnhancements.cpp`) hides
+every quest but Randomizer, so `CountVisibleQuests() == 1`: the one-entry carousel is skipped (no dead
+L/R arrows) and stale Hide CVars in an old config can no longer change the flow. B from name entry now
+returns to the main menu, as single-quest soh does.
+
 ## Live-apply settings changed from the combo menu (2026-06-28)
 
 **Why:** the games' native UIWidgets call `ShipInit::Init(cvar)` after a widget change to re-run the
@@ -149,8 +159,8 @@ MM's identically-named dev windows were dropped (OOT boots first). (c) Dev-tool 
 - `mm/2s2h/BenGui/BenGui.cpp` — the 9 MM dev/debug windows whose names collide with OOT's (Save Editor,
   Actor/Collision/Message Viewer, Audio Editor, Mod Menu, Hook Debugger, Input Viewer (+Settings)) now
   register with `COMBO_MM_TRACKER_SUFFIX` (`"##MM"`), same mechanism as the trackers — map-key/ID only,
-  visible title unchanged, empty in standalone. (Cosmetic Editor / Time Splits Window / DL Viewer differ
-  from OOT's strings already, so they don't collide.)
+  visible title unchanged, empty in standalone. (Cosmetic Editor / DL Viewer differ from OOT's strings
+  already, so they don't collide; Time Splits now does collide, see the Time Splits section.)
 - `mm/2s2h/BenGui/BenMenu.cpp` — matching `WindowName(...)` popout refs carry the same suffix
   (`COMBO_MM_WINDOW_SUFFIX`). New `#ifdef COMBO_BUILD` inline `WIDGET_CUSTOM` entries render each dev
   window's `DrawElement()` inline (skipped when popped out, so no double-draw); live-world viewers
@@ -245,6 +255,7 @@ file (the `ofstream` opened before `unflatten`).
   `SetBlock`, `EraseBlock`) route through a `TryUnflatten` helper that logs instead of throwing
   (the exception would unwind across the game-DLL boundary); `Save()` unflattens **before**
   opening/truncating the file; `Nested()` falls back to the last-good nested state on failure.
+  Since 2026-09-28 `Save()` sits on upstream's atomic temp-file write (#1183); only the guard is ours.
 
 **On future merges:** if upstream SoH renames the CVar or grows its own `.Enable`, drop the macro
 seam and re-check the migration. Audited 2026-08-04: this was the only cross-game leaf-vs-subtree
@@ -390,3 +401,62 @@ save's whole state — not just play time — is discarded on a combo resume. No
 deliberately preserves `owlSave`, so a read-priority fix alone would let a stale owl save shadow a
 newer cycle save; the delete-on-continue half is required too.
 
+
+## Cross-game settings sync (2026-09-08)
+
+**Why:** the two DLLs share one `ConsoleVariables` store, so ~110 settings are already literally one
+CVar. The rest are the same player-facing option under two names — `gCheats.InfiniteRupees` vs
+`gCheats.InfiniteMoney`, `gEnhancements.Camera.FreeLook.*` vs `gSettings.FreeLook.*`,
+`gNotifications.*` vs `gSettings.Notifications.*`, and the shuffle options both randomizers read the
+same way. The combo overlay rendered both games' sections side by side, so each of those was two
+visible controls for one concept.
+
+**Combo-owned, no game-source change:** `combo/gui/ComboSettingsSync.{h,cpp}` — an 80-row table in 8
+categories (`gCombo.Sync.*`, all default on), reconciled from a logic-only `GuiWindow` registered in
+`ComboUI_Register`. Panel at Settings -> Sync. Wired the same five ways as the Timers entry
+(`HubEntry::Kind`, the entry push, the dispatch branch, the include, `COMBOUI_SOURCES`).
+
+**A poll, not a hook.** libultraship exposes no CVar change notification of any kind (there is an
+`EventSystem`, but nothing in `ship/config` fires into it), and settings also move outside the combo
+overlay's `ComboWidgetRender` funnel — popout editors, both games' Presets, the console. One per-frame
+reconcile is one dispatch point; hooking every write site is not.
+
+**Change-driven, never a reconcile.** Each pair records the last value it saw on each side and is
+*armed* on its first tick without writing anything. Only a side that MOVED away from its recorded
+value is propagated. **This is deliberate:** an at-boot "make them agree" pass would overwrite the
+config of anyone who starts with the two games set differently. Turning a category off disarms its
+pairs, so re-enabling it does not replay everything that changed meanwhile. MM wins a same-frame tie.
+
+**Rows are only in the table when the value spaces match**, verified against each game's widget
+declaration. Deliberately absent, with the reason at the site: `ClimbSpeed` (MM multiplies 1-5, OOT
+adds 0-12), `DamageMultiplier` and `MirroredWorld` (enum lists overlap only in part), `CrouchStab`
+(inverted polarity, 1:2), `SkipToFileSelect` (bool vs the `BootSequence` enum), `SkipGetItemCutscenes`
+(4 values vs 3), `SkipEnemyCutscenes` (1 MM bool vs 2 OOT bools), `AlternateAssets` (per-game
+archives, split on purpose). On the rando side every OOT `OPT_U8` against a plain MM bool is out —
+pots, crates, grass, freestanding, wonder items, boss souls, tokens, shopsanity, item pool, ice traps —
+as are the Triforce/win-condition keys (the launcher owns them and overwrites both games) and the
+"add the OTHER game's content" options, which are mirrors rather than equals. Only two non-boolean
+rows are in: `ShuffleBombArrows` and `ElementalWandShuffle`, whose three-value enums are identical in
+both trees. `FastText` <-> `TextSpeed` carries an explicit bool <-> 1-6 translation, and the
+first-person sensitivity rows clamp on the way into MM (OOT's slider reaches 5x, MM's stops at 2x).
+
+**Not covered:** the five audio volume sliders keep their existing one-way `ComboAudioBridge`
+(OOT -> MM, different value spaces); a second mechanism writing those keys would fight it. The input
+viewer's renamed `LeftAnalogAngles` subtree is left out — niche, and its colour CVars need a different
+accessor.
+
+**On future merges:** the table is CVar strings, so a rename on either side silently stops syncing that
+row rather than breaking anything. Re-check it when either menu is reworked.
+
+## Time Splits window + CVar clash (2026-09-28)
+
+soh ported 2Ship's Time Splits, so both games registered the same window names and
+`ImGui::Begin("Timesplits")`. MM itself registers both the leaf `gWindows.Timesplits` and
+`gWindows.Timesplits.Settings` (leaf-vs-subtree: config stops saving); soh reusing that settings key
+made the clash reachable from OOT's menu. soh's button CVar also never matched its own window's CVar
+upstream, so the fix repairs that too.
+
+Fix: soh's button uses `CVAR_WINDOW("TimeSplitSettings")` + an inline settings shim; MM's two windows
+get `##MM`, its overlay ID `Timesplits##MM`, its settings CVar `gWindows.TimesplitsSettings` (old key
+cleared on init), and `ComboTrackerVisibility` keeps only the foreground game's overlay in the Gui map
+(same Remove/Re-add as notifications, see tracker.md).

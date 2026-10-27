@@ -1,0 +1,54 @@
+{
+  "source_sha256": "3160899f85770bcd86f664ed73fd7d12277eea2905f42933e79be150e0d2cd3b",
+  "patches": [
+    {
+      "bounds": [
+        870,
+        0,
+        1270,
+        710
+      ],
+      "meshes": [
+        24
+      ],
+      "artwork": "root-edit.png",
+      "min_y": 0.89
+    },
+    {
+      "bounds": [
+        330,
+        2400,
+        750,
+        3510
+      ],
+      "meshes": [
+        1
+      ],
+      "artwork": "scalp-edit.png",
+      "min_y": 0.89
+    },
+    {
+      "bounds": [
+        0,
+        0,
+        4096,
+        4096
+      ],
+      "meshes": [
+        1,
+        11,
+        12,
+        24
+      ],
+      "min_y": 0.89,
+      "chroma": [
+        1.0,
+        0.42201835,
+        0.15246637
+      ],
+      "fill_only": true,
+      "palette_source": "Median chroma of the registered scalp-edit copper pixels replacing source pink/gray; preserves red-channel strand detail and warm gold highlights."
+    }
+  ],
+  "scope": "Registered hair-only root edits; source mesh/height/UV ownership gates consumption."
+}

@@ -8,6 +8,7 @@
 #include "overlays/actors/ovl_Obj_Switch/z_obj_switch.h"
 #include "objects/gameplay_dangeon_keep/gameplay_dangeon_keep.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Enhancements/randomizer/randostatupgrade.h"
 
 #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED
 
@@ -114,6 +115,14 @@ s32 ObjOshihiki_StrongEnough(ObjOshihiki* this) {
     if (this->cantMove) {
         return 0;
     }
+
+    // Four Sword 2x2 grid: four Links on one block clear the size gate without anyone gaining
+    // strength, so nothing here leaks into lifting a silver boulder. Skijer's NEI
+    extern u8 FourSword_GridPushesAnyBlock(void);
+    if (FourSword_GridPushesAnyBlock()) {
+        return 1;
+    }
+
     strength = Player_GetStrength();
     switch (this->dyna.actor.params & 0xF) {
         case PUSHBLOCK_SMALL_START_ON:
@@ -560,9 +569,15 @@ void ObjOshihiki_Push(ObjOshihiki* this, PlayState* play) {
     f32 pushDistSigned;
     s32 stopFlag;
 
-    this->pushSpeed = this->pushSpeed + (CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0) * 0.25) + 0.5f;
+    this->pushSpeed =
+        this->pushSpeed +
+        ((IsPushStatActive() ? GetPushStatValue() : CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0)) * 0.25f) +
+        0.5f;
     this->stateFlags |= PUSHBLOCK_PUSH;
-    this->pushSpeed = CLAMP_MAX(this->pushSpeed, 2.0f + (CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0) * 0.5));
+    this->pushSpeed = CLAMP_MAX(
+        this->pushSpeed,
+        2.0f + ((IsPushStatActive() ? GetPushStatValue() : CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0)) *
+                0.5f));
     stopFlag = Math_StepToF(&this->pushDist, 20.0f, this->pushSpeed);
     pushDistSigned = ((this->direction >= 0.0f) ? 1.0f : -1.0f) * this->pushDist;
     thisx->world.pos.x = thisx->home.pos.x + (pushDistSigned * this->yawSin);
@@ -588,7 +603,8 @@ void ObjOshihiki_Push(ObjOshihiki* this, PlayState* play) {
         this->dyna.unk_150 = 0.0f;
         this->pushDist = 0.0f;
         this->pushSpeed = 0.0f;
-        this->timer = 10 - ((CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0) * 3) / 2);
+        this->timer = IsPushStatActive() ? (10 - ((GetPushStatValue() * 3) / 2))
+                                         : (10 - ((CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0) * 3) / 2));
         if (this->floorBgIds[this->highestFloor] == BGCHECK_SCENE) {
             ObjOshihiki_SetupOnScene(this, play);
         } else {

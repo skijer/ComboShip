@@ -1,0 +1,10 @@
+PASS oot scenario=oot_native forest=oot stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_native forest=oot stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_mods_2ship_visuals forest=oot stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_mods_2ship_visuals forest=oot stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_authored_market forest=oot stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_authored_market forest=oot stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_authored_market forest=authored_oot stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_authored_market forest=authored_oot stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot real-resource failures: every structural path blocks; duplicate marker and pause protected; keeper/material failure stays independent
+BOUNDARY: controller/resource executable passed; configured game loop, resource manager, rendering and collision traversal remain untested

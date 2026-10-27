@@ -1,0 +1,15 @@
+{
+  "variant": "saria-anime",
+  "bounds": [
+    -0.095,
+    0.7799999999999999,
+    0.095,
+    0.9179999999999999
+  ],
+  "source_sha256": "dddeaed512e7b4aaedf960e1ddab13e74c480897e0f44404fb980c0c9ce5d63a",
+  "panels": [
+    "half",
+    "closed"
+  ],
+  "art_method": "Source face projection; imagegen eyelid edits; source pixels preserved outside feathered eye masks"
+}

@@ -1,0 +1,62 @@
+name: Regression groups
+
+on:
+  workflow_call:
+    inputs:
+      suite:
+        description: Required regression group selected by the fail-fast caller
+        required: true
+        type: string
+
+jobs:
+  regression:
+    name: ${{ inputs.suite }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Prepare exact cumulative source assets
+        run: |
+          python3 -B scripts/assets/prepare_cumulative_assets.py
+          python3 -B scripts/assets/prepare_temple_sages.py
+          python3 -B scripts/assets/prepare_lake_tunnel_sand.py
+
+      - name: Install regression dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build nlohmann-json3-dev libspdlog-dev libimgui-dev libsdl2-dev libsdl2-net-dev libogg-dev libvorbis-dev pkg-config python3-numpy python3-pycparser python3-venv
+
+      - name: Install pinned UI rasterizer
+        run: |
+          python3 -m venv --system-site-packages "$RUNNER_TEMP/combo-gate-python"
+          "$RUNNER_TEMP/combo-gate-python/bin/python3" -m pip install --only-binary=:all: -r scripts/assets/sword-element-ui-requirements.txt
+          echo "$RUNNER_TEMP/combo-gate-python/bin" >> "$GITHUB_PATH"
+
+      - name: Restore fixed comparison history and fixture headers
+        run: |
+          # Fixed source fixtures from the accepted SoH history; never substitute current output.
+          git fetch --no-tags --depth=1 https://github.com/marsh6487/Shipwright.git cec63fce86b1f582f6e61ad6a98eca6c3cca784b c77c18587a976f6d6cb5c8f91f27593286469218
+          # HD icon routes compare grant behavior with this fixed ComboShip baseline.
+          # The Great Fairy adapter also compares untouched native actor routines
+          # against the develop baseline; shallow PR checkouts do not contain it.
+          git fetch --no-tags --depth=1 origin 122dd5f68cb37fcf515c3726f8a77043db5dcdf4 a82852a3a02c8cabc541cce7c124da71c5755efb
+          # Gerudo GI UVs, rig and isolated cuff edits compare to this fixed pre-polish baseline.
+          git fetch --no-tags --depth=1 origin c0181856968dd6f3869be0d1aa240743091fd6a8
+          # Mirror serialization compares every prior identity to the public PR66 baseline.
+          git fetch --no-tags --depth=1 origin 0cd35e4d25f853dc68995dd88e8b1c177840e301
+          # Match libultraship's ImGui dependency for the real save-editor draw fixture.
+          git clone --depth=1 --branch v1.91.9b-docking https://github.com/ocornut/imgui.git "$RUNNER_TEMP/combo-nei-imgui"
+          # The direct Ikana editor click test compiles this pinned input engine.
+          echo "IMGUI_DIR=$RUNNER_TEMP/combo-nei-imgui" >> "$GITHUB_ENV"
+          # The real SaveEditor headers also reach ResourceManager and GuiTexture.
+          # Use the same pins as libultraship/cmake/dependencies/common.cmake.
+          git clone --depth=1 --branch v4.1.0 https://github.com/bshoshany/thread-pool.git "$RUNNER_TEMP/combo-nei-thread-pool"
+          mkdir -p "$RUNNER_TEMP/combo-nei-stb"
+          curl --fail --location https://raw.githubusercontent.com/nothings/stb/0bc88af4de5fb022db643c2d8e549a0927749354/stb_image.h --output "$RUNNER_TEMP/combo-nei-stb/stb_image.h"
+          echo "COMBO_NEI_FIXTURE_CPATH=$RUNNER_TEMP/combo-nei-imgui:$RUNNER_TEMP/combo-nei-thread-pool/include:$RUNNER_TEMP/combo-nei-stb${CPATH:+:$CPATH}" >> "$GITHUB_ENV"
+
+      - name: Run timed regression group
+        env:
+          REGRESSION_SUITE: ${{ inputs.suite }}
+        run: python3 -B scripts/ci/run_regressions.py --suite "$REGRESSION_SUITE"

@@ -1,7 +1,8 @@
 // combo/ComboSettingsImport.h
 // ComboShip: ABI for the first-launch settings-import screen (issue 24; mirrors ComboExtract.h).
-// comboui renders the screen + returns chosen paths; the launcher merges (SoH wins) and applies via
-// soh's SOH_ApplyImportedConfig. Pure C ABI — no STL across the boundary; fixed-size path buffers.
+// comboui renders the screen + returns chosen paths; the launcher merges shared settings (SoH wins),
+// keeps each game's mod order, and applies via soh's SOH_ApplyImportedConfig.
+// Pure C ABI — no STL across the boundary; fixed-size path buffers.
 #pragma once
 
 extern "C" {

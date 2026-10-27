@@ -3,6 +3,7 @@
 #include "2s2h/GameInteractor/GameInteractor.h"
 #include "2s2h/ShipInit.hpp"
 #include "2s2h/CustomMessage/CustomMessage.h"
+#include "2s2h/Enhancements/Gameplay/ComboOpeningForest.h"
 
 extern "C" {
 #include <variables.h>
@@ -17,6 +18,28 @@ static int entranceToSave = -1;
 
 static HOOK_ID skipEntranceCutsceneHookId = 0;
 static HOOK_ID gameplayStartHookId = 0;
+
+static bool IsSettingUpZerothDayGlitch() {
+    // On file select
+    if (gPlayState == NULL) {
+        return false;
+    }
+
+    // Playing Song of Time while isOwlSave is set, normally this isn't possible but when the
+    // player is setting up the zeroth day glitch, it is.
+    if (gPlayState->msgCtx.msgMode == MSGMODE_NEW_CYCLE_1 && gSaveContext.save.isOwlSave) {
+        return true;
+    }
+
+    Player* player = GET_PLAYER(gPlayState);
+    bool isFalling = !(player->actor.bgCheckFlags & BGCHECKFLAG_GROUND) && player->actor.velocity.y < 0.0f;
+    // Falling into void while saving at an owl statue
+    if (gPlayState->msgCtx.msgMode == MSGMODE_OWL_SAVE_1 && isFalling) {
+        return true;
+    }
+
+    return false;
+}
 
 // Used for saving through Autosaves and Pause Menu saves.
 extern "C" void SavingEnhancements_PersistSaveEntranceInfo() {
@@ -88,8 +111,12 @@ extern "C" bool SavingEnhancements_CanSave() {
         return false;
     }
 
-    // Hasn't gotten to clock town yet
-    if (gPlayState->sceneId == SCENE_SPOT00 || gPlayState->sceneId == SCENE_LOST_WOODS ||
+    // The original prologue cannot save. A playable ComboShip forest visit can.
+    bool openingForestVisit = false;
+#ifdef COMBO_BUILD
+    openingForestVisit = ComboOpeningForest_IsExploration(gPlayState);
+#endif
+    if (gPlayState->sceneId == SCENE_SPOT00 || (gPlayState->sceneId == SCENE_LOST_WOODS && !openingForestVisit) ||
         gPlayState->sceneId == SCENE_OPENINGDAN) {
         return false;
     }
@@ -225,14 +252,11 @@ static RegisterShipInitFunc registerSavingEnhancements(
         });
         COND_HOOK(BeforeMoonCrash, true, []() { DeleteOwlSave(); });
 
-        // Vanilla has an arbitrary 2 second delay when saving, we can't remove it entirely because
-        // it's used to pull off certain 0th Day glitches (specifically Any Item as Any Form and Goron Missile),
-        // because they required you to change forms before the SaveContext is restored in that window. We can
-        // determine if they are trying to pull this trick off if they are playing song of time and isOwlSave is
-        // set (which normally shouldn't be). Otherwise remove the delay.
+        // Vanilla's 2 second save delay is arbitrary, but we can't remove it entirely because certain 0th Day
+        // glitches are performed during it. Keep the delay whenever the player looks like they're setting one
+        // up, and finish the save immediately for every other attempt
         COND_VB_SHOULD(VB_SAVE_DELAY, true, {
-            if (gPlayState == NULL || gPlayState->msgCtx.msgMode != MSGMODE_NEW_CYCLE_1 ||
-                !gSaveContext.save.isOwlSave) {
+            if (!IsSettingUpZerothDayGlitch()) {
                 *should = true;
             }
         });

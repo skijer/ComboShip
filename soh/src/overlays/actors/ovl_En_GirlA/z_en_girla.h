@@ -34,6 +34,7 @@ typedef struct EnGirlA {
     /* 0x01CC */ s16 giDrawId;
     /* 0x01D0 */ EnGirlA3Func hiliteFunc;
     /* 0x01D4 */ u8 randoSlotIndex; // used by randomizer to determine which slot this item is for id purposes.
+    s16 randoOriginalShopItem; // exact native stock selected before the shuffled shelf replacement
 } EnGirlA; // size = 0x01D4
 
 typedef enum {

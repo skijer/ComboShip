@@ -1,0 +1,30 @@
+{
+  "fire_natural": {
+    "generated_source": "exec-946a3643-216f-4ef2-909a-64799f0b0558.png",
+    "source_sha256": "9f2553e2546bb745db1421535200fea13368440d45409cfb9e9c6ab6a3bd389e",
+    "resource_sha256": "69ecf822beec19257c8714895a5ca1643b01c7b61b3259edb043bf2cc0ad0a11",
+    "pixels": [
+      512,
+      512
+    ],
+    "logical_tile": [
+      32,
+      32
+    ],
+    "conversion": "Lanczos resolution conversion only; generated RGBA and alpha preserved"
+  },
+  "ice_fracture_release": {
+    "generated_source": "exec-31cd0c7d-ff4a-4e5f-b951-c664594f81ca.png",
+    "source_sha256": "50bf077b004ca6d3650cb1e7a38f19393f875c811ff1fdbc24ab40aefb57a24b",
+    "resource_sha256": "4aa7501dc95a49f99f7f788a56456a66c68d2ce352bf057409559b023dcdb982",
+    "pixels": [
+      512,
+      512
+    ],
+    "logical_tile": [
+      32,
+      32
+    ],
+    "conversion": "Lanczos resolution conversion only; generated RGBA and alpha preserved"
+  }
+}

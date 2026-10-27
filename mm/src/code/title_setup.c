@@ -3,9 +3,28 @@
 #ifdef COMBO_BUILD
 #include "global.h"
 #include "BenPort.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "2s2h/Enhancements/Gameplay/BlackMarket.h"
+#include "gameplay/CrossGameTitleCard.h"
+extern int32_t Combo_MM_ConsumeCrossDungeonArrival(void);
+extern int32_t Combo_MM_ConsumeCrossDungeonRecovery(void);
+extern int32_t Combo_MM_ConsumeCrossBossRecoveryResume(void);
+static s32 sComboCrossGameTitleCardPending = false;
+
+int Combo_MM_ConsumeCrossGameTitleCard(void) {
+    const s32 pending = sComboCrossGameTitleCardPending;
+    sComboCrossGameTitleCardPending = false;
+    return pending;
+}
+
+void Combo_MM_RequestCrossGameTitleCard(void) {
+    gSaveContext.showTitleCard = true;
+    sComboCrossGameTitleCardPending = true;
+}
 #endif
 #include "z64save.h"
+#include "gameplay/ComboFaroresWind.h"
 
 void Setup_InitRegs(void) {
     XREG(2) = 0;
@@ -61,15 +80,19 @@ void Setup_InitImpl(SetupState* this) {
 
 #ifdef COMBO_BUILD
     s32 loadedOwlSave;
+    sComboCrossGameTitleCardPending = false;
 
-    if (gComboStartFileNum >= 0) {
+    if (Combo_IsCombinedGame() && gComboStartFileNum >= 0) {
         // Sram_LoadGlobalOptions above found no global.json in combo, so take OOT's settings.
         Combo_AdoptOOTGlobalOptions();
         // Set flashSaveAvailable so Sram_Alloc allocates saveBuf (normally set by the title screen).
         gSaveContext.flashSaveAvailable = true;
         // Load the MM save that matches the OOT slot (OOT slot N → MM file N+1). ComboShip never blocks
-        // entry: a nonzero result is logged inside and leaves the fail-closed sentinel, and play proceeds.
-        Combo_LoadMMSaveFile(gComboStartFileNum + 1);
+        // entry, but it never enters on SaveContext_Init's zeros either — those read as Fierce Deity
+        // with an inventory of Ocarinas of Time (both are id 0), so a failed load is repaired first.
+        if (Combo_LoadMMSaveFile(gComboStartFileNum + 1) != 0) {
+            Combo_RepairMMSaveForSlot(gComboStartFileNum);
+        }
         // ComboShip (#182): an owl save is the newest state whenever it exists, so it wins on both
         // entry kinds — but only a resume follows it to where it was saved.
         loadedOwlSave = (gComboOwlBlobSlot == gComboStartFileNum + 1);
@@ -107,6 +130,34 @@ void Setup_InitImpl(SetupState* this) {
         // and re-runs ShipInit::Init("IS_RANDO"). COND_* macros are unregister-then-register, so it's
         // idempotent. Without it the combo force-spawn loads a rando save whose behaviors never activate.
         GameInteractor_ExecuteOnSaveLoad(gSaveContext.fileNum);
+        MM_ApplyComboPortalArrival();
+        ComboBlackMarket_ApplyResume(gComboEntryIsResume);
+        // These entrances are already composed. Apply after native save/load hooks and never send
+        // them through transition permutation a second time. Preserve the loaded MM day/time.
+        s32 crossDungeonArrival = Combo_MM_ConsumeCrossDungeonArrival();
+        s32 crossBossRecovery = Combo_MM_ConsumeCrossBossRecoveryResume();
+        s32 crossDungeonRecovery = crossDungeonArrival < 0 && crossBossRecovery < 0 && gComboEntryIsResume
+                                       ? Combo_MM_ConsumeCrossDungeonRecovery()
+                                       : -1;
+        if (crossDungeonArrival >= 0 || crossBossRecovery >= 0 || crossDungeonRecovery >= 0) {
+            gSaveContext.save.entrance = crossDungeonArrival >= 0 ? crossDungeonArrival
+                                         : crossBossRecovery >= 0 ? crossBossRecovery
+                                                                  : crossDungeonRecovery;
+            // The consumed arrival owns respawn mode, including a positioned grotto-hole return.
+            // A departure checkpoint may carry a pause-save marker. Player_Init would
+            // turn its grotto jump into a stationary spawn over the hole if retained.
+            gSaveContext.save.shipSaveInfo.pauseSaveEntrance = -1;
+            gSaveContext.save.isOwlSave = false;
+            gSaveContext.save.cutsceneIndex = 0;
+        }
+        s32 crossFwArrival = ComboFw_ApplyArrival(); // Explicit recall wins over ordinary save recovery.
+        // File select normally initializes showTitleCard. A crossing bypasses
+        // it, and may land at a positioned/shuffled entrance without a card bit.
+        // Ordinary save resumes keep the native rules, including saved recovery.
+        sComboCrossGameTitleCardPending =
+            !gComboEntryIsResume || crossDungeonArrival >= 0 || crossBossRecovery >= 0 || crossFwArrival;
+        if (sComboCrossGameTitleCardPending)
+            gSaveContext.showTitleCard = true;
 
         // ComboShip (#182): consume the owl save like Sram_OpenSave does, so it can't shadow the newer
         // state we just continued into. Vetoed for Persistent Owl Saves and for pause/auto saves.

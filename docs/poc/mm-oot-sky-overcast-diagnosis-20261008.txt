@@ -1,0 +1,77 @@
+ComboShip / 2Ship OoT sky overcast diagnosis — 2026-10-08
+
+Finding
+The original OoT sky port interprets MM's native CLOUD texture choice as OoT overcast artwork. In the supplied native MM archive, Termina Field and the four checked Clock Town scene headers use initial skybox configuration 10. Environment_Init resolves that to configuration 25 on First Day. That schedule uses the CLOUD texture throughout 06:00–16:00 and the FINE texture after the 16:00–17:00 transition. Thus noon maps to the Reloaded gray overcast artwork, while 23:00 maps to its clear night artwork.
+
+MM's CLOUD resource describes cloud geometry, not exclusively storm weather. Its normal First Day noon palette in this schedule has primitive RGB 235/250/235 and environment RGB 0/4/199. The native renderer applies this blue coloring. The port deliberately uses neutral coloring for the already-colored OoT artwork, so mapping ordinary MM daytime CLOUD to gray OoT overcast changes the visual meaning.
+
+The MM Audio Editor 'Overcast During Outdoor Rain' checkbox controls only the additional MM rain layer. Disabling it returns the native schedule, which can still select CLOUD. The OoT and MM Audio Editor settings are separate; cor confirmed changing the MM controls. The Rod of Seasons is not the origin: cor reports this behavior predates its integration, and the diagnostic reproduces it with the season Off.
+
+Archive and source evidence
+- Uploaded zzReloaded Sky(2).o2r SHA-256:
+  e349be49b332f8d85a49ae78477154468c1aa6ab0cd469ba3701f57ebdd6d8fd
+  This is byte-identical to the source pack recorded for the original September 22 port, commit 36c40fc8.
+- Pack has 55 entries and all 40 required dawn/day/sunset/night clear and overcast faces.
+- Clear-day faces are blue; overcast-day faces are gray. Resource paths are distinct.
+- Checked native scene resources: Z2_00KEIKOKU, Z2_TOWN, Z2_BACKTOWN, Z2_ICHIBA, Z2_CLOCKTOWER.
+- Related source files are byte-identical between cumulative baseline 35ce5f22, the local summer visibility candidate, and the current PR #39 head 7de5b7fa.
+- GitHub PR #40 head d4e6c36d retains the same Environment_UpdateSkybox selection and binding path.
+
+Verification
+1. run_mm_oot_sky_tests.py --pack <uploaded Reloaded pack>:
+   22 production draws, 0 failures.
+2. run_mm_weather_tests.py with the available nlohmann JSON include:
+   weather state/mixer, real-header syntax, sky binding/restoration, stars/filters, indoor/scene lifecycle, seasonal weather, and audio suites pass.
+3. verify_overcast_selection.py:
+   imports the actual checked scene header settings, extracts the production initialization selection and cloud-weight function, and executes the production Environment_UpdateSkybox and MMWeather bridge.
+   20 cases (five scenes x Off/Summer x noon/night) pass with MM rain Enabled=0 and Overcast=0:
+   noon: added overcast=0, native slots=1/1, OoT cloud weight=255;
+   23:00: added overcast=0, native slots=0/0, OoT cloud weight=0.
+   The existing weather suites also pass after the diagnostic cases.
+
+Rod of Seasons sky policy — requested by cor
+
+Spring: Soft overcast while its rain is active. Cor delegated this choice;
+the chosen direction is a gentle, rain-consistent sky rather than a clear sky
+during persistent rain. Keep the established Spring rain schedule.
+
+Summer: Clear skies on all three days. Use the clear OoT dawn/day/sunset/night
+artwork as appropriate for the clock; retain stars and normal time transitions.
+
+Autumn: Clear skies between showers. Fade to overcast as intermittent rain
+arrives, then fade back to clear as the rain ends. Cloud cover follows the rain.
+
+Winter: Overcast skies throughout the active season.
+
+These are the requested Rod presentation targets, not claims of implemented
+behavior. Preserve the current separate Audio Editor controls and their explicit
+global-weather override priority, plus existing story/cutscene/interior boundaries.
+
+Current implementation versus the targets
+- Spring already adds its own overcast while Spring rain is active; that layer
+  bypasses the Audio Editor rain-overcast checkbox.
+- Summer forces the rendered sky clear only on Day 2. Days 1 and 3 still inherit
+  native cloud selection, which can show the gray OoT overcast sky.
+- Autumn already has intermittent rain and an associated overcast fade, but
+  a native CLOUD baseline stays cloudy during dry intervals. The composition
+  adds cloud cover; it cannot remove native CLOUD to reach the requested clear sky.
+- Winter already contributes a 0.65 overcast layer independent of the Audio
+  Editor checkbox; the final appearance also depends on the native baseline.
+
+Scope and merge status
+Diagnosis and seasonal target notes only. No game source, sacred scene archives,
+Reloaded archive, or integration branches were changed; no patch was pushed or
+merged. Correcting the original daytime mapping and implementing the recorded
+Summer/Autumn targets remain future game-code work. They require distinguishing
+ordinary MM daytime clouds from native/enhanced storms and story gloom, then
+composing the active season's clear/overcast policy instead of treating CLOUD
+alone as a storm signal.
+
+Evidence limit
+This is an asset/source and production-function diagnosis, not an executable in-game run on cor's Windows installation. The supplied original scene headers establish the matching native path; unseen scene replacements and the user's exact current archive load order were not independently runtime-tested.
+
+Relevant source
+https://github.com/marsh6487/ComboShip/blob/7de5b7fac2e7b892f46eabcdcb21639e6f64c304/mm/src/code/z_kankyo.c
+https://github.com/marsh6487/ComboShip/blob/7de5b7fac2e7b892f46eabcdcb21639e6f64c304/mm/src/code/z_vr_box.c
+https://github.com/marsh6487/ComboShip/blob/7de5b7fac2e7b892f46eabcdcb21639e6f64c304/mm/src/code/z_vr_box_draw.c
+https://github.com/marsh6487/ComboShip/blob/7de5b7fac2e7b892f46eabcdcb21639e6f64c304/mm/2s2h/Enhancements/Audio/MMWeather.cpp

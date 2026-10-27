@@ -320,8 +320,10 @@ void KaleidoScope_UpdateWorldMapCursor(PlayState* play);
 // Collect
 void KaleidoScope_DrawQuestStatus(PlayState* play);
 void KaleidoScope_UpdateQuestCursor(PlayState* play);
+void KaleidoScope_DrawOotQuestName(PlayState* play); // Skijer's NEI: OoT quest-page name box (flat view)
 
 // Item
+void KaleidoScope_ResetItemCycling(void);
 void KaleidoScope_SetCursorVtxPos(PauseContext* pauseCtx, u16 vtxIndex, Vtx* vtx);
 void KaleidoScope_DrawItemSelect(PlayState* play);
 void KaleidoScope_UpdateItemCursor(PlayState* play);

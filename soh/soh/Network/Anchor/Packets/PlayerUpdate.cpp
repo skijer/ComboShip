@@ -1,3 +1,6 @@
+#include "../../../../../combo/emotes/EmoteBridge.h"
+#include <cstring>
+#include <array>
 #include "soh/Network/Anchor/Anchor.h"
 #include "soh/Network/Anchor/JsonConversions.hpp"
 #include <nlohmann/json.hpp>
@@ -42,17 +45,20 @@ void Anchor::SendPacket_PlayerUpdate() {
     payload["linkAge"] = gSaveContext.linkAge;
     payload["posRot"]["pos"] = player->actor.world.pos;
     payload["posRot"]["rot"] = player->actor.shape.rot;
+    Vec3s networkJoints[24];
+    std::memcpy(networkJoints, player->skelAnime.jointTable, sizeof(networkJoints));
+    const bool emoting = ComboEmotes_CopyPose(networkJoints, sizeof(networkJoints));
     std::vector<int> jointArray;
     for (size_t i = 0; i < 24; i++) {
-        Vec3s joint = player->skelAnime.jointTable[i];
+        Vec3s joint = networkJoints[i];
         jointArray.push_back(joint.x);
         jointArray.push_back(joint.y);
         jointArray.push_back(joint.z);
     }
     payload["prevTransl"] = player->skelAnime.prevTransl;
-    payload["movementFlags"] = player->skelAnime.movementFlags;
+    payload["movementFlags"] = emoting ? 0 : player->skelAnime.movementFlags;
     payload["jointTable"] = jointArray;
-    payload["upperLimbRot"] = player->upperLimbRot;
+    payload["upperLimbRot"] = emoting ? Vec3s{ 0, 0, 0 } : player->upperLimbRot;
     payload["currentBoots"] = player->currentBoots;
     payload["currentShield"] = player->currentShield;
     payload["currentTunic"] = player->currentTunic;

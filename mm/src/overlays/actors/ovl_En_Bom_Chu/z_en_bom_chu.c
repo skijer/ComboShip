@@ -7,6 +7,7 @@
 #include "z_en_bom_chu.h"
 #include "overlays/actors/ovl_En_Bom/z_en_bom.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "mods/forms/custom_forms.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -245,8 +246,15 @@ void EnBomChu_Move(EnBomChu* this, PlayState* play) {
     this->actor.speed = this->movingSpeed;
     lineLength = 2.0f * this->movingSpeed;
 
-    if ((this->timer == 0) || (this->collider.base.acFlags & AC_HIT) || (this->collider.base.ocFlags1 & OC1_HIT)) {
+    // Skijer's NEI: as Kafei the chu is an SW97 landmine — no fuse, enemy contact or a hit sets it off,
+    // and it settles in place instead of driving.
+    if (KafeiLandmine_Active() ? KafeiLandmine_ShouldDetonate(&this->actor)
+                               : ((this->timer == 0) || (this->collider.base.acFlags & AC_HIT) ||
+                                  (this->collider.base.ocFlags1 & OC1_HIT))) {
         EnBomChu_Explode(this, play);
+        return;
+    }
+    if (KafeiLandmine_Settle(&this->actor, play)) {
         return;
     }
 
@@ -503,7 +511,7 @@ void EnBomChu_Update(Actor* thisx, PlayState* play) {
     this->actor.focus.pos.y = this->actor.world.pos.y + (20.0f * this->axisUp.y);
     this->actor.focus.pos.z = this->actor.world.pos.z + (20.0f * this->axisUp.z);
 
-    if (this->isMoving) {
+    if (this->isMoving && !KafeiLandmine_Active()) {
         this->visualJitter =
             (5.0f + (Rand_ZeroOne() * 3.0f)) * Math_SinS(((s32)(Rand_ZeroOne() * 0x200) + 0x3000) * this->timer);
         EnBomChu_ActorCoordsToWorld(this, &sBlureP1Offset, &blureP1);
@@ -572,9 +580,13 @@ void EnBomChu_Draw(Actor* thisx, PlayState* play) {
     colorIntensity = blinkTime / (f32)blinkHalfPeriod;
     gDPSetEnvColor(POLY_OPA_DISP++, (s32)(colorIntensity * 209.0f) + 9, (s32)(colorIntensity * 34.0f) + 9,
                    (s32)(colorIntensity * -35.0f) + 35, 255);
-    Matrix_Translate(this->visualJitter * (1.0f / BOMBCHU_SCALE), 0.0f, 0.0f, MTXMODE_APPLY);
-    MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx);
-    gSPDisplayList(POLY_OPA_DISP++, gBombchuDL);
+    if (KafeiLandmine_Active()) {
+        KafeiLandmine_Draw(play, &this->actor, colorIntensity);
+    } else {
+        Matrix_Translate(this->visualJitter * (1.0f / BOMBCHU_SCALE), 0.0f, 0.0f, MTXMODE_APPLY);
+        MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx);
+        gSPDisplayList(POLY_OPA_DISP++, gBombchuDL);
+    }
 
     CLOSE_DISPS(play->state.gfxCtx);
 }

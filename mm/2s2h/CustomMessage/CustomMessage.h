@@ -14,6 +14,7 @@ extern "C" {
 }
 
 #include <string>
+#include "ComboItemReceiptPresentation.h"
 
 namespace CustomMessage {
 struct Entry {
@@ -25,6 +26,9 @@ struct Entry {
     uint16_t secondItemCost = 0xFFFF;
     bool autoFormat = true;
     std::string msg = "";
+    CwItemReceiptPresentation receiptPresentation{};
+    bool capeVisibilityChoice = false;
+    uint8_t swordElementTutorial = 0; // First arrow pickup, captured before the existing grant.
 };
 
 void RegisterHooks();

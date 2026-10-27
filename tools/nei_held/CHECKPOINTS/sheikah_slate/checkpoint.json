@@ -1,0 +1,57 @@
+{
+  "resource_count": 9,
+  "vertex_records": 4449,
+  "vertex_loads": 152,
+  "slug": "sheikah_slate",
+  "name": "Sheikah Slate",
+  "entry": "objects/nei_held_redesign/sheikah_slate/gi_dl",
+  "draw_scale": 0.1,
+  "matrix_scale": 0.0625,
+  "triangles": 4316,
+  "bounds_author": [
+    [
+      -28.0,
+      -48.0,
+      -3.5625
+    ],
+    [
+      28.0,
+      48.0,
+      5.0
+    ]
+  ],
+  "markers": {
+    "grip_native": [
+      0,
+      45,
+      0
+    ],
+    "grip_axis_native": [
+      1,
+      0,
+      0
+    ],
+    "native_bounds": [
+      [
+        -28,
+        -48,
+        -5
+      ],
+      [
+        28,
+        48,
+        5
+      ]
+    ],
+    "axial_scale_about_grip": [
+      1.2236842105263157,
+      1.0
+    ]
+  },
+  "notes": [
+    "Same sculpted GI Slate; exact legacy handle center y45 and 96-unit native envelope.",
+    "OoT bone pose and MM forearm/hand pose remain their separately calibrated values.",
+    "Rune pickups are abilities of this same tablet, not additional held objects."
+  ],
+  "runtime_tested": false
+}

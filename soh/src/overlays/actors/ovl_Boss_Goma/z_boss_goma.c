@@ -5,8 +5,9 @@
 #include "overlays/actors/ovl_Door_Shutter/z_door_shutter.h"
 #include "overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
 #include "soh/OTRGlobals.h"
-#include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/transformation_masks/boss_super_damage.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -1114,7 +1115,7 @@ void BossGoma_Defeated(BossGoma* this, PlayState* play) {
             Math_SmoothStepToF(&this->subCameraAt.y, this->actor.focus.pos.y, 0.5f, 100.0f, 0.1f);
             Math_SmoothStepToF(&this->subCameraAt.z, this->firstTailLimbWorldPos.z, 0.2f, 50.0f, 0.1f);
 
-            if (this->timer == 80) {
+            if (GameInteractor_Should(VB_GOHMA_DEATH_SCENE, this->timer == 80, this)) {
                 Audio_QueueSeqCmd(SEQ_PLAYER_BGM_MAIN << 24 | NA_BGM_BOSS_CLEAR);
             }
 
@@ -1183,7 +1184,7 @@ void BossGoma_Defeated(BossGoma* this, PlayState* play) {
                 }
             }
 
-            if (this->timer == 0) {
+            if (GameInteractor_Should(VB_GOHMA_DEATH_SCENE, this->timer == 0, this)) {
                 if (Math_SmoothStepToF(&this->actor.scale.y, 0, 1.0f, 0.00075f, 0.0f) <= 0.001f) {
                     camera = Play_GetCamera(play, 0);
                     camera->eye = this->subCameraEye;
@@ -1827,6 +1828,51 @@ void BossGoma_UpdateHit(BossGoma* this, PlayState* play) {
         ColliderInfo* acHitInfo = this->collider.elements[0].info.acHitInfo;
         s32 damage;
 
+        // FD / Pika Gigantamax super-attack path: ignore eye-closed and
+        // SpawnGohmas invulnerability. First hit ALWAYS forces a stun (paralysis
+        // regardless of current animation). Subsequent hits while in FloorStunned
+        // apply direct damage, so mashing kills her fast. VFX = MM electric
+        // sparks radiating from her limbs (port of ACTOR_DRAW_DMGEFF_ELECTRIC_SPARKS).
+        if ((this->collider.elements[0].info.bumperFlags & BUMP_HIT) && BossSuperDamage_IsActive(play)) {
+            this->collider.elements[0].info.bumperFlags &= ~BUMP_HIT;
+            // Refresh the spark timer on every hit so mashing keeps sparks alive.
+            BossSuperDamage_StartElectricSparks(&this->actor, 90);
+
+            if (this->actionFunc == BossGoma_FloorStunned) {
+                // Already paralyzed → damage. Mirror the original FloorStunned
+                // damage path (sibuki burst, dam1 sfx, FloorDamaged transition).
+                s32 dmg = BossSuperDamage_FormDamage(play);
+                if ((s32)this->actor.colChkInfo.health > dmg) {
+                    this->actor.colChkInfo.health -= dmg;
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_DAM1);
+                    BossGoma_SetupFloorDamaged(this);
+                    EffectSsSibuki_SpawnBurst(play, &this->actor.focus.pos);
+                } else {
+                    this->actor.colChkInfo.health = 0;
+                    BossGoma_SetupDefeated(this, play);
+                    Enemy_StartFinishingBlow(play, &this->actor);
+                    GameInteractor_ExecuteOnBossDefeat(&this->actor);
+                }
+            } else if (this->actionFunc == BossGoma_CeilingMoveToCenter || this->actionFunc == BossGoma_CeilingIdle ||
+                       this->actionFunc == BossGoma_CeilingPrepareSpawnGohmas ||
+                       this->actionFunc == BossGoma_CeilingSpawnGohmas) {
+                // On ceiling → knock her down. FallStruckDown → FloorLandStruckDown
+                // → FloorStunned, so the next hit during stun will damage.
+                BossGoma_SetupFallStruckDown(this);
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_DAM2);
+            } else {
+                // Anywhere else on the floor → force stun immediately.
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_DAM2);
+                Audio_StopSfxById(NA_SE_EN_GOMA_CRY1);
+                BossGoma_SetupFloorStunned(this);
+                this->sfxFaintTimer = 100;
+                this->framesUntilNextAction = 90;
+                this->timer = 4;
+            }
+            this->invincibilityFrames = 10;
+            return;
+        }
+
         if (this->eyeClosedTimer == 0 && this->actionFunc != BossGoma_CeilingSpawnGohmas &&
             (this->collider.elements[0].info.bumperFlags & BUMP_HIT)) {
             this->collider.elements[0].info.bumperFlags &= ~BUMP_HIT;
@@ -2084,6 +2130,21 @@ s32 BossGoma_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f
     return doNotDrawLimb;
 }
 
+// Joint positions sampled during PostLimbDraw, used by the FD/Pika electric
+// sparks VFX so the lightning bolts emerge from real limb junctions. Static
+// because there is only one Gohma alive at a time. Order doesn't matter — we
+// just feed the populated subset into BossSuperDamage_DrawElectricSparks.
+#define BSG_SPARK_LIMB_COUNT 16
+static const s32 sBossGomaSparkLimbIds[BSG_SPARK_LIMB_COUNT] = {
+    BOSSGOMA_LIMB_BODY,           BOSSGOMA_LIMB_BODY_SHELL, BOSSGOMA_LIMB_EYE,
+    BOSSGOMA_LIMB_MANDIBLES_BODY, BOSSGOMA_LIMB_TAIL1,      BOSSGOMA_LIMB_TAIL2,
+    BOSSGOMA_LIMB_TAIL3,          BOSSGOMA_LIMB_TAIL4,      BOSSGOMA_LIMB_R_THIGH,
+    BOSSGOMA_LIMB_R_KNEE,         BOSSGOMA_LIMB_R_FEET,     BOSSGOMA_LIMB_L_THIGH,
+    BOSSGOMA_LIMB_L_KNEE,         BOSSGOMA_LIMB_L_FEET,     BOSSGOMA_LIMB_L_ANTENNA_BODY,
+    BOSSGOMA_LIMB_R_ANTENNA_BODY,
+};
+static Vec3f sBossGomaSparkPos[BSG_SPARK_LIMB_COUNT];
+
 void BossGoma_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot, void* thisx) {
     static Vec3f tailZero = { 0.0f, 0.0f, 0.0f };
     static Vec3f clawBackLocalPos = { 0.0f, 0.0f, 0.0f };
@@ -2095,6 +2156,7 @@ void BossGoma_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* r
     BossGoma* this = (BossGoma*)thisx;
     s32 pad;
     MtxF mtx;
+    s32 sparkSlot;
 
     if (limbIndex == BOSSGOMA_LIMB_TAIL4) { // tail end/last part
         Matrix_MultVec3f(&tailZero, &this->lastTailLimbWorldPos);
@@ -2106,6 +2168,15 @@ void BossGoma_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* r
         Matrix_MultVec3f(&clawBackLocalPos, &this->rightHandBackLimbWorldPos);
     } else if (limbIndex == BOSSGOMA_LIMB_L_FEET_BACK) {
         Matrix_MultVec3f(&clawBackLocalPos, &this->leftHandBackLimbWorldPos);
+    }
+
+    // FD/Pika sparks: snapshot this limb's world position if it's one of the
+    // ~16 spark anchors. Linear scan is fine — table is tiny and cache-hot.
+    for (sparkSlot = 0; sparkSlot < BSG_SPARK_LIMB_COUNT; sparkSlot++) {
+        if (sBossGomaSparkLimbIds[sparkSlot] == limbIndex) {
+            Matrix_MultVec3f(&zero, &sBossGomaSparkPos[sparkSlot]);
+            break;
+        }
     }
 
     if (this->visualState == VISUALSTATE_DEFEATED) {
@@ -2182,6 +2253,13 @@ void BossGoma_Draw(Actor* thisx, PlayState* play) {
     SkelAnime_DrawSkeletonOpa(play, &this->skelanime, BossGoma_OverrideLimbDraw, BossGoma_PostLimbDraw, this);
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    // FD / Pika Gigantamax lightning sparks. The 16-entry sBossGomaSparkPos
+    // array was populated during the just-finished SkelAnime_DrawSkeletonOpa
+    // pass — body, eye, mandibles, four tail segments, both legs (thigh/knee/
+    // feet), and both antennae. Two bolts per joint emerge at random Y rotation,
+    // mirroring MM's pattern of anchoring at limb connections.
+    BossSuperDamage_DrawElectricSparks(&this->actor, play, sBossGomaSparkPos, BSG_SPARK_LIMB_COUNT, 1.0f);
 }
 
 void BossGoma_SpawnChildGohma(BossGoma* this, PlayState* play, s16 i) {

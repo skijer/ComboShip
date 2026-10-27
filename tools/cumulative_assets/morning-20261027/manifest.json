@@ -1,0 +1,43 @@
+{
+  "encoding": "zlib-base64-pool",
+  "files": [
+    {
+      "bytes": 2203,
+      "offset": 0,
+      "path": "mm/assets/custom/textures/icon_item_custom/gItemIconMagicMirrorTex.rgba32.png",
+      "sha256": "4f7eb68271ae35426ca47d373d41d472dce45fcd3ec74bf95f1b2cefcdfa1823"
+    },
+    {
+      "bytes": 4261,
+      "offset": 2203,
+      "path": "mm/assets/custom/textures/magic_mirror/gMagicMirrorForestReflectionTex.rgb5a1.png",
+      "sha256": "8cd93532ef53491f98d0fd163d5be5dd05111fe9677b3e58eff55593633b9012"
+    },
+    {
+      "bytes": 2203,
+      "offset": 0,
+      "path": "soh/assets/custom/textures/icon_item_custom/gItemIconMagicMirrorTex.rgba32.png",
+      "sha256": "4f7eb68271ae35426ca47d373d41d472dce45fcd3ec74bf95f1b2cefcdfa1823"
+    },
+    {
+      "bytes": 4261,
+      "offset": 2203,
+      "path": "soh/assets/custom/textures/magic_mirror/gMagicMirrorForestReflectionTex.rgb5a1.png",
+      "sha256": "8cd93532ef53491f98d0fd163d5be5dd05111fe9677b3e58eff55593633b9012"
+    }
+  ],
+  "packed_bytes": 6475,
+  "packed_sha256": "cbe165a7f1a8d4a6c8e196c2cd392846778405f5d305b2b5b7ef0a6733e1daad",
+  "parts": [
+    {
+      "bytes": 6475,
+      "decoded_sha256": "cbe165a7f1a8d4a6c8e196c2cd392846778405f5d305b2b5b7ef0a6733e1daad",
+      "encoded_bytes": 8636,
+      "name": "pool.zlib.001.b64",
+      "sha256": "67b414e522b14e0aae704901c9a7f7d7fe944279cf0d726682b9b2c44e89f850"
+    }
+  ],
+  "raw_bytes": 6464,
+  "raw_sha256": "56961ebe8a189ed512f78d064a2b1d631b635f74dfc233dc749ff8fc95f4da22",
+  "version": 1
+}

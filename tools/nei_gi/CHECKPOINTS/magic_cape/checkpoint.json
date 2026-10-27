@@ -1,0 +1,25 @@
+{
+  "resource_count": 9,
+  "vertex_records": 10093,
+  "vertex_loads": 327,
+  "slug": "magic_cape",
+  "name": "Magic Cape",
+  "entry": "objects/nei_gi_redesign/magic_cape/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 10992,
+  "bounds_author": [
+    [
+      -36.8125,
+      -50.6875,
+      -7.875
+    ],
+    [
+      36.75,
+      52.6875,
+      20.8125
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

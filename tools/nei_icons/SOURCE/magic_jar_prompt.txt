@@ -1,0 +1,10 @@
+Use case: stylized-concept
+Asset type: high resolution transparent RGBA inventory icon for a Zelda Ocarina-of-Time-style RPG magic stat upgrade.
+Primary request: one large green magic jar, rendered like a polished classic Zelda 3D game item. Match the familiar Ocarina of Time large Magic Jar silhouette: squat, stout cylindrical deep emerald green ceramic bottle with a gently bulging shoulder, short narrow dark neck, broad flat tan-gold cork stopper, gold metallic bands around the neck and bottom, and a simple bright gold triangular emblem centered on the front. The body is opaque rich green ceramic, not transparent glass. No liquid visible. Preserve the iconic uncomplicated geometry and readable green/gold palette.
+Scene/backdrop: actual transparent background; only the isolated jar, no floor, no cast shadow outside the object.
+Composition/framing: square canvas, entire upright jar centered with 8% clear margin, tight consistent framing, front three-quarter view angled very slightly from above and to the right; front emblem fully readable. One jar only.
+Style/medium: clean 3D inventory model render with deliberately simple bevelled geometry and smooth well-defined surfaces; subtle specular highlights and ambient occlusion. Crisp and attractive at 32px display size but native high resolution, no pixel art.
+Lighting/mood: broad soft key light from upper left, modest cool fill, legible edges. No magical glow, aura, sparkles or particles.
+Text: none. Constraints: no letters, no numbers, no ornate extra ornaments, no handle, no spout, no scenery, no border, no watermark. The object should occupy around 82% of the image height.
+
+Source: built-in image_gen, generated 2026-10-04. Native Magic Jar ROM geometry was unavailable. This is a newly authored interpretation, not a native GI capture. Generated source: 1280x1280 RGBA. Original output: exec-8b0e81d2-0f65-43c8-a50c-555205e3b2ac.png.

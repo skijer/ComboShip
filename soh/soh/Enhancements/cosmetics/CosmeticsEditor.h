@@ -1,3 +1,5 @@
+
+#include "soh/ShipInit.hpp"
 #pragma once
 
 // Not to be confused with tabs, groups are 1:1 with the boxes shown in the UI, grouping them allows us to
@@ -45,10 +47,8 @@ Color_RGBA8 CosmeticsEditor_GetDefaultValue(const char* id);
     {                                                                                                                 \
         id, {                                                                                                         \
             CVAR_COSMETIC(id), CVAR_COSMETIC(id ".Value"), CVAR_COSMETIC(id ".Rainbow"), CVAR_COSMETIC(id ".Locked"), \
-                CVAR_COSMETIC(id ".Changed"), label, group,                                                           \
-                ImVec4(defaultColor.r / 255.0f, defaultColor.g / 255.0f, defaultColor.b / 255.0f,                     \
-                       defaultColor.a / 255.0f),                                                                      \
-                defaultColor, supportsAlpha, supportsRainbow, advancedOption                                          \
+                CVAR_COSMETIC(id ".Changed"), label, group, defaultColor, supportsAlpha, supportsRainbow,             \
+                advancedOption                                                                                        \
         }                                                                                                             \
     }
 
@@ -60,7 +60,6 @@ typedef struct {
     const char* changedCvar;
     std::string label;
     CosmeticGroup group;
-    ImVec4 currentColor;
     Color_RGBA8 defaultColor;
     bool supportsAlpha;
     bool supportsRainbow;
@@ -70,13 +69,6 @@ typedef struct {
 extern std::map<std::string, CosmeticOption> cosmeticOptions;
 
 inline void ResetColor(CosmeticOption& cosmeticOption) {
-    Color_RGBA8 defaultColor = { cosmeticOption.defaultColor.r, cosmeticOption.defaultColor.g,
-                                 cosmeticOption.defaultColor.b, cosmeticOption.defaultColor.a };
-    cosmeticOption.currentColor.x = defaultColor.r / 255.0f;
-    cosmeticOption.currentColor.y = defaultColor.g / 255.0f;
-    cosmeticOption.currentColor.z = defaultColor.b / 255.0f;
-    cosmeticOption.currentColor.w = defaultColor.a / 255.0f;
-
     CVarClear(cosmeticOption.changedCvar);
     CVarClear(cosmeticOption.rainbowCvar);
     CVarClear(cosmeticOption.lockedCvar);
@@ -86,6 +78,12 @@ inline void ResetColor(CosmeticOption& cosmeticOption) {
     CVarClear((std::string(cosmeticOption.valuesCvar) + ".B").c_str());
     CVarClear((std::string(cosmeticOption.valuesCvar) + ".A").c_str());
     CVarClear((std::string(cosmeticOption.valuesCvar) + ".Type").c_str());
+
+    // Mod labels are user supplied and can coincide with built-in labels.
+    if (cosmeticOption.group == COSMETICS_GROUP_MAX) {
+        ShipInit::Init(cosmeticOption.valuesCvar);
+        return;
+    }
 
     if (cosmeticOption.label == "Bow Body") {
         ResetColor(cosmeticOptions.at("Equipment.BowTips"));
@@ -134,19 +132,8 @@ inline CosmeticOption MakeCosmeticOption(const char* cvar, const char* valuesCva
                                          const char* lockedCvar, const char* changedCvar, const char* label,
                                          CosmeticGroup group, Color_RGBA8 defaultColor, bool supportsAlpha,
                                          bool supportsRainbow, bool advancedOption) {
-    return CosmeticOption{ cvar,
-                           valuesCvar,
-                           rainbowCvar,
-                           lockedCvar,
-                           changedCvar,
-                           label,
-                           group,
-                           ImVec4(defaultColor.r / 255.0f, defaultColor.g / 255.0f, defaultColor.b / 255.0f,
-                                  defaultColor.a / 255.0f),
-                           defaultColor,
-                           supportsAlpha,
-                           supportsRainbow,
-                           advancedOption };
+    return CosmeticOption{ cvar,  valuesCvar,   rainbowCvar,   lockedCvar,      changedCvar,   label,
+                           group, defaultColor, supportsAlpha, supportsRainbow, advancedOption };
 }
 
 typedef struct {
@@ -175,6 +162,13 @@ void ScanCustomCosmetics();
 bool HasCustomCosmetics();
 void DrawCustomCosmetics();
 void ApplyCustomCosmetics();
+union Gfx;
+void ApplyCustomCosmeticsToDisplayListCopy(const char* materialPath, Gfx* instructions, size_t count);
+void RandomizeColor(CosmeticOption& cosmeticOption, bool manual = true);
+void RandomizeAllCustomCosmetics(bool manual);
+void ResetAllCustomCosmetics();
+void SetAllCustomCosmeticsLocked(bool locked);
+void SetAllCustomCosmeticsRainbow(bool enabled);
 void UpdateCustomCosmeticsRainbow(int hue, float rainbowSpeed, int& index);
 
 class CosmeticsEditorWindow final : public Ship::GuiWindow {

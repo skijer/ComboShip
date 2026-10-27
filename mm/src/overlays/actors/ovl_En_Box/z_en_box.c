@@ -9,6 +9,7 @@
 #include "objects/object_box/object_box.h"
 #include "overlays/actors/ovl_En_Elforg/z_en_elforg.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "2s2h/Enhancements/Graphics/ChestContents.h"
 
 #define FLAGS 0x00000000
 
@@ -633,7 +634,9 @@ void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot,
 
     if (limbIndex == OBJECT_BOX_CHEST_LIMB_01) {
         MATRIX_FINALIZE_AND_LOAD((*gfx)++, play->state.gfxCtx);
-        if (this->type == ENBOX_TYPE_BIG_ORNATE) {
+        if (this->contentsBodyDL != NULL) {
+            gSPDisplayList((*gfx)++, (Gfx*)this->contentsBodyDL);
+        } else if (this->type == ENBOX_TYPE_BIG_ORNATE) {
             gSPDisplayList((*gfx)++, &gBoxChestBaseOrnateDL);
         } else if (Actor_IsSmallChest(this)) {
             if (this->getItemId == GI_KEY_SMALL) {
@@ -646,7 +649,9 @@ void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot,
         }
     } else if (limbIndex == OBJECT_BOX_CHEST_LIMB_03) {
         MATRIX_FINALIZE_AND_LOAD((*gfx)++, play->state.gfxCtx);
-        if (this->type == ENBOX_TYPE_BIG_ORNATE) {
+        if (this->contentsLidDL != NULL) {
+            gSPDisplayList((*gfx)++, (Gfx*)this->contentsLidDL);
+        } else if (this->type == ENBOX_TYPE_BIG_ORNATE) {
             gSPDisplayList((*gfx)++, &gBoxChestLidOrnateDL);
         } else if (Actor_IsSmallChest(this)) {
             if (this->getItemId == GI_KEY_SMALL) {
@@ -694,12 +699,15 @@ Gfx* EnBox_SetRenderMode3(GraphicsContext* gfxCtx) {
 void EnBox_Draw(Actor* thisx, PlayState* play) {
     s32 pad;
     EnBox* this = (EnBox*)thisx;
+    f32 contentsScale = MMChest_PrepareDraw(this, play);
 
     OPEN_DISPS(play->state.gfxCtx);
 
     if (this->unk_1F4.unk_10 != NULL) {
         this->unk_1F4.unk_10(&this->unk_1F4, play);
     }
+    // Preserve native actor/collision scale, chest type and player opening alignment logic.
+    Matrix_Scale(contentsScale, contentsScale, contentsScale, MTXMODE_APPLY);
     if (((this->alpha == 255) && (this->type != ENBOX_TYPE_BIG_INVISIBLE) &&
          (this->type != ENBOX_TYPE_SMALL_INVISIBLE)) ||
         (!CHECK_FLAG_ALL(this->dyna.actor.flags, ACTOR_FLAG_REACT_TO_LENS) &&

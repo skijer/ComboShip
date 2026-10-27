@@ -1,4 +1,6 @@
+#include "../../../combo/ComboGameMode.h"
 #include "global.h"
+#include "soh/Enhancements/game-interactor/vanilla-behavior/GIVanillaBehavior.h"
 #include "vt.h"
 
 #include <string.h>
@@ -7,7 +9,11 @@
 #include "soh/Enhancements/randomizer/savefile.h"
 #include "soh/OTRGlobals.h"
 #include "soh/SaveManager.h"
+#include "soh/Enhancements/speedrun/Speedrun.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/FleetShipCombo/FleetShipCombo.h"
+#include "mods/nei_save.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define NUM_DUNGEONS 8
 #define NUM_COWS 10
@@ -150,16 +156,11 @@ void Sram_OpenSave() {
             break;
     }
 
-    if (!CVarGetInteger(CVAR_ENHANCEMENT("PersistentMasks"), 0)) {
-        gSaveContext.ship.maskMemory = PLAYER_MASK_NONE;
-    }
-
     osSyncPrintf("scene_no = %d\n", gSaveContext.entranceIndex);
     osSyncPrintf(VT_RST);
 
-    if (gSaveContext.health < STARTING_HEALTH) {
-        gSaveContext.health =
-            CVarGetInteger(CVAR_ENHANCEMENT("FullHealthSpawn"), 0) ? gSaveContext.healthCapacity : STARTING_HEALTH;
+    if (GameInteractor_Should(VB_FULL_HEALTH_SPAWN, gSaveContext.health < STARTING_HEALTH)) {
+        gSaveContext.health = STARTING_HEALTH;
     }
 
     if (gSaveContext.scarecrowLongSongSet) {
@@ -208,12 +209,15 @@ void Sram_OpenSave() {
     }
 
     if (LINK_AGE_IN_YEARS == YEARS_ADULT && !CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER)) {
-        if (!IS_RANDO || !Randomizer_GetSettingValue(RSK_SHUFFLE_MASTER_SWORD)) {
+        if (Nei_Save()->timePedestalNoMasterSwordRepair != 1 &&
+            (!IS_RANDO || !Randomizer_GetSettingValue(RSK_SHUFFLE_MASTER_SWORD))) {
             gSaveContext.inventory.equipment |= OWNED_EQUIP_FLAG(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER);
             gSaveContext.equips.buttonItems[0] = ITEM_SWORD_MASTER;
             gSaveContext.equips.equipment &= ~(0xF << (EQUIP_TYPE_SWORD * 4));
             gSaveContext.equips.equipment |= EQUIP_VALUE_SWORD_MASTER << (EQUIP_TYPE_SWORD * 4);
         }
+    } else if (CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER)) {
+        Nei_Save()->timePedestalNoMasterSwordRepair = 0;
     }
 
     if (GameInteractor_Should(VB_REVERT_SPOILING_ITEMS, true)) {
@@ -234,12 +238,19 @@ void Sram_OpenSave() {
 }
 
 void Sram_InitSave(FileChooseContext* fileChooseCtx) {
+#ifdef COMBO_BUILD
+    // Reject a stale paired selection before resetting or writing any native save state.
+    if (!Combo_IsCombinedGame() && fileChooseCtx->questType[fileChooseCtx->buttonIndex] == QUEST_OOTXMM) {
+        return;
+    }
+#endif
     u16 offset;
     u16 j;
     u16* ptr;
     u16 checksum;
 
-    if (fileChooseCtx->buttonIndex != 0 || !CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugEnabled"), 0)) {
+    if (fileChooseCtx->buttonIndex != 0 ||
+        !Ship_QuestDebugEnabled(fileChooseCtx->questType[fileChooseCtx->buttonIndex])) {
         Sram_InitNewSave();
     } else {
         Sram_InitDebugSave();
@@ -256,7 +267,8 @@ void Sram_InitSave(FileChooseContext* fileChooseCtx) {
             (gSaveContext.language == LANGUAGE_JPN) ? NAME_LANGUAGE_NTSC_JPN : NAME_LANGUAGE_NTSC_ENG;
     }
 
-    if ((fileChooseCtx->buttonIndex == 0 && CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugEnabled"), 0))) {
+    if ((fileChooseCtx->buttonIndex == 0 &&
+         Ship_QuestDebugEnabled(fileChooseCtx->questType[fileChooseCtx->buttonIndex]))) {
         gSaveContext.cutsceneIndex = 0;
     }
 
@@ -269,7 +281,9 @@ void Sram_InitSave(FileChooseContext* fileChooseCtx) {
 #ifdef COMBO_BUILD
     // ComboShip: generation is window-driven now; only force the rando quest type here.
     // The combined fill runs on a worker thread before save creation (triggered from the UI).
-    fileChooseCtx->questType[fileChooseCtx->buttonIndex] = QUEST_RANDOMIZER;
+    if (Combo_IsCombinedGame()) {
+        fileChooseCtx->questType[fileChooseCtx->buttonIndex] = QUEST_RANDOMIZER;
+    }
     (void)gComboGenerateCallback; // retained symbol; no longer invoked
 #endif
 
@@ -279,15 +293,27 @@ void Sram_InitSave(FileChooseContext* fileChooseCtx) {
         gSaveContext.ship.quest.id = QUEST_RANDOMIZER;
 
         Randomizer_InitSaveFile();
+    } else if (currentQuest == QUEST_OOTXMM && (Randomizer_IsSeedGenerated() || Randomizer_IsSpoilerLoaded())) {
+        // Fleet Ship Combo: a COMBO save is a randomizer save (IS_RANDO is true for QUEST_OOTXMM) that
+        // carries the combo seed (freshly GENERATED, or LOADED from a .fleet -> IsSpoilerLoaded),
+        // PAIRED with a MM slot. Init the rando save as usual, then tell MM to delete + recreate its
+        // own slot with the prepared seed and bake the start-in flag.
+        gSaveContext.ship.quest.id = QUEST_OOTXMM;
+        Randomizer_InitSaveFile();
+        FleetComboFS_OnCreateSave(fileChooseCtx->buttonIndex);
     } else {
         gSaveContext.ship.quest.id = currentQuest;
+    }
+
+    if (IS_SPEEDRUN) {
+        Speedrun_InitSaveFile(fileChooseCtx->speedrunIndex);
     }
 
     Save_SaveFile();
     SaveManager_ThreadPoolWait();
 
 #ifdef COMBO_BUILD
-    if (gComboSaveInitCallback != NULL) {
+    if (Combo_IsCombinedGame() && gComboSaveInitCallback != NULL) {
         gComboSaveInitCallback((int)gSaveContext.fileNum);
     }
 #endif

@@ -1,0 +1,35 @@
+{
+  "resource_count": 8,
+  "vertex_records": 1638,
+  "vertex_loads": 56,
+  "slug": "storm_rod",
+  "name": "Storm Rod",
+  "entry": "objects/nei_gi_redesign/storm_rod/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 1464,
+  "bounds_author": [
+    [
+      -16.4375,
+      -51.4375,
+      -6.8125
+    ],
+    [
+      29.3125,
+      55.5625,
+      6.8125
+    ]
+  ],
+  "markers": {
+    "tip_author": [
+      9.434953928387042,
+      37.841533324763866,
+      0.0
+    ]
+  },
+  "notes": [
+    "New wand silhouette and material candidate, derived from each elemental theme.",
+    "No Dominion Rod stand-in; GI resources only, held/action behavior preserved."
+  ],
+  "runtime_tested": false
+}

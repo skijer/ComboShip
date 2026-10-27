@@ -36,6 +36,8 @@ class GfxWindowBackendDXGI final : public GfxWindowBackend {
     void SetDimensions(uint32_t width, uint32_t height, int32_t posX, int32_t posY) override;
     Ship::WindowRect GetPrimaryMonitorRect() override;
     void HandleEvents() override;
+    void SetCollectPacingTelemetry(bool enabled) override;
+    nlohmann::json GetPacingTelemetry() override;
     bool IsFrameReady() override;
     void SwapBuffersBegin() override;
     void SwapBuffersEnd() override;
@@ -78,6 +80,9 @@ class GfxWindowBackendDXGI final : public GfxWindowBackend {
     bool mHasMousePosition;
 
   private:
+    bool mCollectPacingTelemetry = false;
+    nlohmann::json mPacingTelemetry;
+    void RecordFrameStatistics(const DXGI_FRAME_STATISTICS& stats, HRESULT result);
     void LoadDxgi();
     void ApplyMaxFrameLatency(bool first);
     void ToggleBorderlessWindowFullScreen(bool enable, bool callCallback);

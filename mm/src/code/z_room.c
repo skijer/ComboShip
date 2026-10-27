@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gameplay/ComboFaroresWind.h"
 #include "PR/gs2dex.h"
 #include "debug.h"
 
@@ -534,6 +535,7 @@ size_t Room_SetupFirstRoom(PlayState* play, RoomContext* roomCtx) {
     roomCtx->activeBufPage = 0;
     roomCtx->status = 0;
 
+    ComboFw_ValidateArrivalRoom(play->roomList.count);
     if ((gSaveContext.respawnFlag != 0) && (gSaveContext.respawnFlag != -2) && (gSaveContext.respawnFlag != -7)) {
         s32 respawnMode;
 
@@ -652,8 +654,20 @@ RoomDrawHandler sRoomDrawHandlers[] = {
 
 void Room_Draw(PlayState* play, Room* room, u32 flags) {
     if (room->segment != NULL) {
+        // Phantom Hourglass: the recall drains the scene to grey along with the actors. Skijer's NEI
+        extern u8 Hourglass_ShouldDrawGray(Actor * actor);
+        extern void Hourglass_PushGray(PlayState * play);
+        extern void Hourglass_PopGray(PlayState * play);
+        u8 recallGray = Hourglass_ShouldDrawGray(NULL);
+
         gSegments[3] = OS_K0_TO_PHYSICAL(room->segment);
+        if (recallGray) {
+            Hourglass_PushGray(play);
+        }
         sRoomDrawHandlers[room->roomShape->base.type](play, room, flags);
+        if (recallGray) {
+            Hourglass_PopGray(play);
+        }
     }
     return;
 }

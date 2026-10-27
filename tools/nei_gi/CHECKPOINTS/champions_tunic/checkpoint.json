@@ -1,0 +1,30 @@
+{
+  "resource_count": 9,
+  "vertex_records": 7349,
+  "vertex_loads": 244,
+  "slug": "champions_tunic",
+  "name": "Champion's Tunic",
+  "entry": "objects/nei_gi_redesign/champions_tunic/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 8382,
+  "bounds_author": [
+    [
+      -47.3125,
+      -47.875,
+      -15.5625
+    ],
+    [
+      47.3125,
+      47.125,
+      16.9375
+    ]
+  ],
+  "markers": {},
+  "notes": [
+    "Canonical Champion's Tunic icon: cyan-blue woven shirt with white chest embroidery and warm belt.",
+    "New short tunic, open collar/cuffs, cloth folds, modeled white sword/flourish stitching, patterned hem and rear leather strap.",
+    "GI author span fitted to 61.75\u201379.95 effective units; final quantization winding checked. Runtime untested."
+  ],
+  "runtime_tested": false
+}

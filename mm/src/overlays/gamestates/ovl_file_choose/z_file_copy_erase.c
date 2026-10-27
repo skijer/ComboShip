@@ -5,6 +5,7 @@
  */
 
 #include "z_file_select.h"
+#include "ComboGameMode.h"
 #include "z64rumble.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 
@@ -984,7 +985,7 @@ void FileSelect_EraseConfirm(GameState* thisx) {
         // choke — Sram_EraseSave only zeroes the flash buffer — so the seam fires from the menu.)
         {
             extern void (*gMMComboDeleteForeignSave)(int fileNum);
-            if (gMMComboDeleteForeignSave) {
+            if (Combo_IsCombinedGame() && gMMComboDeleteForeignSave) {
                 gMMComboDeleteForeignSave(this->selectedFileIndex);
             }
         }

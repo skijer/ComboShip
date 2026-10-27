@@ -1,6 +1,8 @@
 #include "ultra64.h"
 #include "z64light.h"
 #include "z64math.h"
+#include "2s2h/Enhancements/Audio/MMWeather.h"
+#include "2s2h/Enhancements/Graphics/MMSummerAtmosphere.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 
 typedef enum {
@@ -23,6 +25,7 @@ typedef struct {
 // Variables are put before most headers as a hacky way to bypass bss reordering
 #include "z64environment.h"
 #include "global.h"
+#include "mods/extended_inventory.h"
 #include "sys_cfb.h"
 #include "BenPort.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
@@ -45,6 +48,10 @@ f32 D_801F4E74;
 u16 D_801F4E78;
 u16 gSkyboxNumStars;
 LightningBolt sLightningBolts[3];
+static LightningBolt sMMWeatherLightningBolt = { .state = LIGHTNING_BOLT_INACTIVE };
+// Track only native lightning's additive ambient contribution. Other effects
+// share the raw adjustment; masking must not remove their lighting.
+static s16 sNativeLightningAmbient[3];
 LightNode* sNGameOverLightNode;
 LightInfo sNGameOverLightInfo;
 LightNode* sSGameOverLightNode;
@@ -571,6 +578,7 @@ void Environment_Init(PlayState* play2, EnvironmentContext* envCtx, s32 arg2) {
     u8 dayOffset;
     s16 i;
 
+    MMWeather_Reset();
     CREG(1) = 0;
 
     gSaveContext.sunsSongState = SUNSSONG_INACTIVE;
@@ -664,6 +672,7 @@ void Environment_Init(PlayState* play2, EnvironmentContext* envCtx, s32 arg2) {
 
     gSaveContext.cutsceneTransitionControl = 0;
 
+    Environment_ClearNativeLightningAmbient();
     envCtx->adjLightSettings.ambientColor[0] = 0;
     envCtx->adjLightSettings.ambientColor[1] = 0;
     envCtx->adjLightSettings.ambientColor[2] = 0;
@@ -1001,7 +1010,7 @@ Color_RGBA8 sSkyboxEnvColors[] = {
 };
 
 void Environment_UpdateSkybox(u8 skyboxId, EnvironmentContext* envCtx, SkyboxContext* skyboxCtx) {
-    size_t size;
+    s32 texturesChanged = false;
     s32 i;
     u8 skybox1Index = 255;
     u8 skybox2Index = 255;
@@ -1014,7 +1023,10 @@ void Environment_UpdateSkybox(u8 skyboxId, EnvironmentContext* envCtx, SkyboxCon
         envCtx->skyboxConfig = SKYBOX_CONFIG_0;
     }
 
-    if ((skyboxId == SKYBOX_NORMAL_SKY) || ((skyboxId == SKYBOX_3) && (D_801F4E74 < 1.0f))) {
+    // Regional gloom normally hides the sky entirely. Keep the cloudy textures
+    // current when enhanced overcast fades that presentation filter away.
+    if ((skyboxId == SKYBOX_NORMAL_SKY) ||
+        ((skyboxId == SKYBOX_3) && ((D_801F4E74 < 1.0f) || (MMWeather_Overcast() > 0.0f)))) {
         if (envCtx->skyboxDisabled) {
             return;
         }
@@ -1084,57 +1096,43 @@ void Environment_UpdateSkybox(u8 skyboxId, EnvironmentContext* envCtx, SkyboxCon
             }
         }
 
-        if ((envCtx->skybox1Index != skybox1Index) && (envCtx->skyboxDmaState == SKYBOX_DMA_INACTIVE)) {
-            envCtx->skyboxDmaState = SKYBOX_DMA_TEXTURE1_START;
-            // size = sNormalSkyFiles[skybox1Index].file.vromEnd - sNormalSkyFiles[skybox1Index].file.vromStart;
-            // osCreateMesgQueue(&envCtx->loadQueue, envCtx->loadMsg, ARRAY_COUNT(envCtx->loadMsg));
-            // DmaMgr_SendRequestImpl(&envCtx->dmaRequest, skyboxCtx->staticSegments[0],
-            //                        sNormalSkyFiles[skybox1Index].file.vromStart, size, 0, &envCtx->loadQueue,
-            //                        OS_MESG_PTR(NULL));
+        MMWeather_ApplySky(&skybox1Index, &skybox2Index, &skyboxBlend);
 
-            // 2S2h [Port] Bypass DMA request and assign each skybox texture directly to the static segment
+        // The port binds resource names synchronously. Update BOTH slots before
+        // publishing the blend, including the first draw after scene entry.
+        // Retaining the old DMA gate left one slot stale for a rendered frame.
+        if (envCtx->skybox1Index != skybox1Index) {
             for (size_t i = 0; i < ARRAY_COUNTU(skyboxCtx->staticSegments[0]); i++) {
                 skyboxCtx->staticSegments[0][i] = sSkyboxTextures[skybox1Index][i];
             }
-
             envCtx->skybox1Index = skybox1Index;
+            texturesChanged = true;
         }
-
-        if ((envCtx->skybox2Index != skybox2Index) && (envCtx->skyboxDmaState == SKYBOX_DMA_INACTIVE)) {
-            envCtx->skyboxDmaState = SKYBOX_DMA_TEXTURE2_START;
-            // size = sNormalSkyFiles[skybox2Index].file.vromEnd - sNormalSkyFiles[skybox2Index].file.vromStart;
-            // osCreateMesgQueue(&envCtx->loadQueue, envCtx->loadMsg, ARRAY_COUNT(envCtx->loadMsg));
-            // DmaMgr_SendRequestImpl(&envCtx->dmaRequest, skyboxCtx->staticSegments[1],
-            //                        sNormalSkyFiles[skybox2Index].file.vromStart, size, 0, &envCtx->loadQueue,
-            //                        OS_MESG_PTR(NULL));
-
+        if (envCtx->skybox2Index != skybox2Index) {
             for (size_t i = 0; i < ARRAY_COUNTU(skyboxCtx->staticSegments[1]); i++) {
                 skyboxCtx->staticSegments[1][i] = sSkyboxTextures[skybox2Index][i];
             }
-
             envCtx->skybox2Index = skybox2Index;
+            texturesChanged = true;
         }
-
-        if ((envCtx->skyboxDmaState == SKYBOX_DMA_TEXTURE1_START) ||
-            (envCtx->skyboxDmaState == SKYBOX_DMA_TEXTURE2_START)) {
-            // if (osRecvMesg(&envCtx->loadQueue, NULL, 0) == 0) {
-            if (true) {
-                envCtx->skyboxDmaState = SKYBOX_DMA_INACTIVE;
-                // 2S2H [Port] Since the skybox static segments point to OTR strings, we need to re-create the skybox
-                // display lists to have the new textures loaded
-                Skybox_Calculate128(skyboxCtx, 5);
-                // #endregion
-            }
+        if (texturesChanged) {
+            envCtx->skyboxDmaState = SKYBOX_DMA_INACTIVE;
+            Skybox_Calculate128(skyboxCtx, 5);
         }
 
         envCtx->skyboxBlend = skyboxBlend;
-        Skybox_SetColors(skyboxCtx,
-                         LERPIMP_ALT(sSkyboxPrimColors[color1Index].r, sSkyboxPrimColors[color2Index].r, colorWeight),
-                         LERPIMP_ALT(sSkyboxPrimColors[color1Index].g, sSkyboxPrimColors[color2Index].g, colorWeight),
-                         LERPIMP_ALT(sSkyboxPrimColors[color1Index].b, sSkyboxPrimColors[color2Index].b, colorWeight),
-                         LERPIMP_ALT(sSkyboxEnvColors[color1Index].r, sSkyboxEnvColors[color2Index].r, colorWeight),
-                         LERPIMP_ALT(sSkyboxEnvColors[color1Index].g, sSkyboxEnvColors[color2Index].g, colorWeight),
-                         LERPIMP_ALT(sSkyboxEnvColors[color1Index].b, sSkyboxEnvColors[color2Index].b, colorWeight));
+        Skybox_SetColors(
+            skyboxCtx,
+            MMWeather_Shade(
+                LERPIMP_ALT(sSkyboxPrimColors[color1Index].r, sSkyboxPrimColors[color2Index].r, colorWeight)),
+            MMWeather_Shade(
+                LERPIMP_ALT(sSkyboxPrimColors[color1Index].g, sSkyboxPrimColors[color2Index].g, colorWeight)),
+            MMWeather_Shade(
+                LERPIMP_ALT(sSkyboxPrimColors[color1Index].b, sSkyboxPrimColors[color2Index].b, colorWeight)),
+            MMWeather_Shade(LERPIMP_ALT(sSkyboxEnvColors[color1Index].r, sSkyboxEnvColors[color2Index].r, colorWeight)),
+            MMWeather_Shade(LERPIMP_ALT(sSkyboxEnvColors[color1Index].g, sSkyboxEnvColors[color2Index].g, colorWeight)),
+            MMWeather_Shade(
+                LERPIMP_ALT(sSkyboxEnvColors[color1Index].b, sSkyboxEnvColors[color2Index].b, colorWeight)));
     }
 }
 
@@ -1274,7 +1272,7 @@ void func_800F6CEC(PlayState* play, u8 arg1, AdjLightSettings* adjLightSettings,
             lightSettings[temp_v1_2 + temp_v1].blendRateAndFogNear - lightSettings[temp_v1].blendRateAndFogNear;
     }
 
-    if ((arg1 >= 4) && (arg1 < 8) && (gWeatherMode == WEATHER_MODE_RAIN)) {
+    if ((arg1 >= 4) && (arg1 < 8) && (gWeatherMode == WEATHER_MODE_RAIN) && !MMWeather_SeasonClearsRain()) {
         adjLightSettings->ambientColor[0] = -50;
         adjLightSettings->ambientColor[1] = -100;
         adjLightSettings->ambientColor[2] = -100;
@@ -1306,6 +1304,29 @@ s32 Environment_IsSceneUpsideDown(PlayState* play) {
         ret = true;
     }
     return ret;
+}
+
+void Environment_ClearNativeLightningAmbient(void) {
+    sNativeLightningAmbient[0] = sNativeLightningAmbient[1] = sNativeLightningAmbient[2] = 0;
+}
+
+void Environment_GetNativeLightningAmbient(s16 contribution[3]) {
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        contribution[i] = sNativeLightningAmbient[i];
+    }
+}
+
+void Environment_RestoreNativeLightningAmbient(const s16 contribution[3]) {
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        sNativeLightningAmbient[i] = contribution[i];
+    }
+}
+
+static s16 Environment_GetAmbientAdjustment(const EnvironmentContext* envCtx, s32 component) {
+    return envCtx->adjLightSettings.ambientColor[component] -
+           (MMWeather_SeasonClearsRain() ? sNativeLightningAmbient[component] : 0);
 }
 
 void Environment_UpdateLights(PlayState* play, EnvironmentContext* envCtx, LightContext* lightCtx) {
@@ -1548,13 +1569,13 @@ void Environment_UpdateLights(PlayState* play, EnvironmentContext* envCtx, Light
     envCtx->lightBlendEnabled = true;
 
     for (i = 0; i < 3; i++) {
-        if ((s16)(envCtx->lightSettings.ambientColor[i] + envCtx->adjLightSettings.ambientColor[i]) > 255) {
+        adjustment = Environment_GetAmbientAdjustment(envCtx, i);
+        if ((s16)(envCtx->lightSettings.ambientColor[i] + adjustment) > 255) {
             lightCtx->ambientColor[i] = 255;
-        } else if ((s16)(envCtx->lightSettings.ambientColor[i] + envCtx->adjLightSettings.ambientColor[i]) < 0) {
+        } else if ((s16)(envCtx->lightSettings.ambientColor[i] + adjustment) < 0) {
             lightCtx->ambientColor[i] = 0;
         } else {
-            lightCtx->ambientColor[i] =
-                (s16)(envCtx->lightSettings.ambientColor[i] + envCtx->adjLightSettings.ambientColor[i]);
+            lightCtx->ambientColor[i] = (s16)(envCtx->lightSettings.ambientColor[i] + adjustment);
         }
 
         if ((s16)(envCtx->lightSettings.light1Color[i] + envCtx->adjLightSettings.light1Color[i]) > 255) {
@@ -1582,6 +1603,13 @@ void Environment_UpdateLights(PlayState* play, EnvironmentContext* envCtx, Light
         } else {
             lightCtx->fogColor[i] = (s16)(envCtx->lightSettings.fogColor[i] + envCtx->adjLightSettings.fogColor[i]);
         }
+    }
+
+    for (i = 0; i < 3; i++) {
+        lightCtx->ambientColor[i] = MMWeather_Shade(lightCtx->ambientColor[i]);
+        lightCtx->fogColor[i] = MMWeather_Shade(lightCtx->fogColor[i]);
+        envCtx->dirLight1.params.dir.color[i] = MMWeather_Shade(envCtx->dirLight1.params.dir.color[i]);
+        envCtx->dirLight2.params.dir.color[i] = MMWeather_Shade(envCtx->dirLight2.params.dir.color[i]);
     }
 
     // Set both directional light directions
@@ -1626,7 +1654,8 @@ void Environment_UpdateSun(PlayState* play) {
     u16 phi_v0;
 
     if (!play->envCtx.sunDisabled) {
-        if (play->envCtx.precipitation[PRECIP_RAIN_CUR] != 0) {
+        if (((play->envCtx.precipitation[PRECIP_RAIN_CUR] != 0) && !MMWeather_SeasonClearsRain()) ||
+            (MMWeather_Overcast() > 0.0f)) {
             Math_SmoothStepToF(&sSunPrimAlpha, 0.0f, 0.5f, 4.0f, 0.01f);
         } else {
             Math_SmoothStepToF(&sSunPrimAlpha, 255.0f, 0.5f, 4.0f, 0.01f);
@@ -1793,10 +1822,17 @@ void Environment_Update(PlayState* play, EnvironmentContext* envCtx, LightContex
         Environment_UpdateTimeBasedSequence(play);
         Environment_UpdateNextDayTime();
         Environment_UpdateTime(play, envCtx, pauseCtx, msgCtx, gameOverCtx);
+    }
+    // Resolve the wheel selection and current day after native time/ambience
+    // updates, including paused selector frames, before this frame is rendered.
+    MMWeather_Update(play);
+    Seasons_UpdateWeather(play);
+    if (pauseCtx->state == PAUSE_STATE_OFF) {
         Environment_UpdateSun(play);
         Environment_UpdateLights(play, envCtx, lightCtx);
         Environment_UpdatePostmanEvents(play);
     }
+    MMSummerAtmosphere_Update(play);
 }
 
 void Environment_DrawSun(PlayState* play) {
@@ -1849,8 +1885,9 @@ void Environment_DrawSun(PlayState* play) {
 
 void Environment_DrawSunLensFlare(PlayState* play, EnvironmentContext* envCtx, View* view, GraphicsContext* gfxCtx,
                                   Vec3f vec) {
-    if ((play->envCtx.precipitation[PRECIP_RAIN_CUR] == 0) &&
-        !(GET_ACTIVE_CAM(play)->stateFlags & CAM_STATE_UNDERWATER) && (play->skyboxId == SKYBOX_NORMAL_SKY)) {
+    if (((play->envCtx.precipitation[PRECIP_RAIN_CUR] == 0) || MMWeather_SeasonClearsRain()) &&
+        (MMWeather_Overcast() == 0.0f) && !(GET_ACTIVE_CAM(play)->stateFlags & CAM_STATE_UNDERWATER) &&
+        (play->skyboxId == SKYBOX_NORMAL_SKY)) {
         f32 v0 = Math_CosS(CURRENT_TIME - CLOCK_TIME(12, 0));
 
         Environment_DrawLensFlare(play, &play->envCtx, &play->view, play->state.gfxCtx, vec, 370.0f, v0 * 120.0f, 0x190,
@@ -2109,8 +2146,14 @@ void Environment_DrawRainImpl(PlayState* play, View* view, GraphicsContext* gfxC
     s16 pitch;
     s16 yaw;
     f32 scale;
+    f32 (*randomFloat)(void) = MMWeather_RainDensity() > 0 ? MMWeather_RandomFloat : Rand_ZeroOne;
+    u8 rainRed = 150;
+    u8 rainGreen = 255;
+    u8 rainBlue = 255;
 
-    if (play->envCtx.precipitation[PRECIP_SOS_MAX] != 0) {
+    if (MMWeather_RainDensity() > 0) {
+        precip = MMWeather_RainDensity();
+    } else if (play->envCtx.precipitation[PRECIP_SOS_MAX] != 0) {
         precip = play->envCtx.precipitation[PRECIP_RAIN_CUR];
     } else {
         precipScale = func_80173B48(&play->state) / 3e7f;
@@ -2140,7 +2183,8 @@ void Environment_DrawRainImpl(PlayState* play, View* view, GraphicsContext* gfxC
 
     if ((u32)precip != 0) {
         gDPPipeSync(POLY_XLU_DISP++);
-        gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 150, 255, 255, 25);
+        MMWeather_RainColor(&rainRed, &rainGreen, &rainBlue);
+        gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, rainRed, rainGreen, rainBlue, 25);
         POLY_XLU_DISP = Gfx_SetupDL(POLY_XLU_DISP, SETUPDL_20);
     }
 
@@ -2155,8 +2199,8 @@ void Environment_DrawRainImpl(PlayState* play, View* view, GraphicsContext* gfxC
     yaw = Math_Vec3f_Yaw(&gZeroVec3f, &spD4) + 0x8000;
 
     for (i = 0; i < precip; i++) {
-        Matrix_Translate(((Rand_ZeroOne() - 0.7f) * 100.0f) + spF0, ((Rand_ZeroOne() - 0.7f) * 100.0f) + spEC,
-                         ((Rand_ZeroOne() - 0.7f) * 100.0f) + spE8, MTXMODE_NEW);
+        Matrix_Translate(((randomFloat() - 0.7f) * 100.0f) + spF0, ((randomFloat() - 0.7f) * 100.0f) + spEC,
+                         ((randomFloat() - 0.7f) * 100.0f) + spE8, MTXMODE_NEW);
         gSPMatrix(POLY_XLU_DISP++, D_01000000_TO_SEGMENTED, G_MTX_NOPUSH | G_MTX_MUL | G_MTX_MODELVIEW);
         Matrix_RotateYS(yaw + (s16)(i << 5), MTXMODE_APPLY);
         Matrix_RotateXS(pitch + (s16)(i << 5), MTXMODE_APPLY);
@@ -2174,9 +2218,9 @@ void Environment_DrawRainImpl(PlayState* play, View* view, GraphicsContext* gfxC
                 gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, 100);
                 materialApplied++;
             }
-            Matrix_Translate((Environment_RandCentered() * 220.0f) + spE4, player->actor.floorHeight + 2.0f,
-                             (Environment_RandCentered() * 220.0f) + spE0, MTXMODE_NEW);
-            scale = (Rand_ZeroOne() * 0.05f) + 0.05f;
+            Matrix_Translate(((randomFloat() - 0.5f) * 220.0f) + spE4, player->actor.floorHeight + 2.0f,
+                             ((randomFloat() - 0.5f) * 220.0f) + spE0, MTXMODE_NEW);
+            scale = (randomFloat() * 0.05f) + 0.05f;
             Matrix_Scale(scale, scale, scale, MTXMODE_APPLY);
             MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
             gSPDisplayList(POLY_XLU_DISP++, gEffShockwaveDL);
@@ -2187,6 +2231,13 @@ void Environment_DrawRainImpl(PlayState* play, View* view, GraphicsContext* gfxC
 }
 
 void Environment_DrawRain(PlayState* play, View* view, GraphicsContext* gfxCtx) {
+    if (MMWeather_RainDensity() > 0) {
+        Environment_DrawRainImpl(play, view, gfxCtx);
+        return;
+    }
+    if (MMWeather_SeasonClearsRain() || MMWeather_Season() == SEASON_WINTER) {
+        return; // Summer's Day 2 and Winter mask rain; native targets keep progressing
+    }
     if (!(GET_ACTIVE_CAM(play)->stateFlags & CAM_STATE_UNDERWATER) &&
         (play->envCtx.precipitation[PRECIP_SNOW_CUR] == 0)) {
         if (play->envCtx.precipitation[PRECIP_SOS_MAX] != 0) {
@@ -2232,6 +2283,8 @@ void Environment_ChangeLightSetting(PlayState* play, u8 lightSetting) {
 }
 
 void Environment_DrawSkyboxFilters(PlayState* play) {
+    // Compose only the rendered opacity; preserve native fog/story state.
+    f32 weatherAlpha = 1.0f - MMWeather_Overcast();
     if ((((play->skyboxId != SKYBOX_NONE) && (play->lightCtx.fogNear < 980)) || (play->skyboxId >= SKYBOX_2)) &&
         ((play->skyboxId != SKYBOX_3) || (D_801F4E74 != 0.0f))) {
         f32 alpha;
@@ -2252,10 +2305,10 @@ void Environment_DrawSkyboxFilters(PlayState* play) {
 
         if (play->skyboxId != SKYBOX_3) {
             gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, play->lightCtx.fogColor[0], play->lightCtx.fogColor[1],
-                            play->lightCtx.fogColor[2], 255.0f * alpha);
+                            play->lightCtx.fogColor[2], 255.0f * alpha * weatherAlpha);
         } else {
             gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, play->lightCtx.fogColor[0] + 16, play->lightCtx.fogColor[1] + 16,
-                            play->lightCtx.fogColor[2] + 16, 255.0f * D_801F4E74);
+                            play->lightCtx.fogColor[2] + 16, 255.0f * D_801F4E74 * weatherAlpha);
         }
         gSPDisplayList(POLY_OPA_DISP++, D_0E000000_TO_SEGMENTED(clearFillRect));
 
@@ -2267,7 +2320,7 @@ void Environment_DrawSkyboxFilters(PlayState* play) {
 
         Gfx_SetupDL57_Opa(play->state.gfxCtx);
         gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, play->envCtx.skyboxFilterColor[0], play->envCtx.skyboxFilterColor[1],
-                        play->envCtx.skyboxFilterColor[2], play->envCtx.skyboxFilterColor[3]);
+                        play->envCtx.skyboxFilterColor[2], play->envCtx.skyboxFilterColor[3] * weatherAlpha);
         gSPDisplayList(POLY_OPA_DISP++, D_0E000000_TO_SEGMENTED(clearFillRect));
 
         CLOSE_DISPS(play->state.gfxCtx);
@@ -2317,11 +2370,16 @@ void Environment_UpdateLightningStrike(PlayState* play) {
                 play->envCtx.adjLightSettings.ambientColor[0] += 80;
                 play->envCtx.adjLightSettings.ambientColor[1] += 80;
                 play->envCtx.adjLightSettings.ambientColor[2] += 100;
+                sNativeLightningAmbient[0] += 80;
+                sNativeLightningAmbient[1] += 80;
+                sNativeLightningAmbient[2] += 100;
 
                 sLightningFlashAlpha += 100;
 
                 if (sLightningFlashAlpha >= gLightningStrike.flashAlphaTarget) {
-                    Audio_SetAmbienceChannelIO(AMBIENCE_CHANNEL_LIGHTNING, CHANNEL_IO_PORT_0, 0);
+                    if (!MMWeather_SeasonClearsRain()) {
+                        Audio_SetAmbienceChannelIO(AMBIENCE_CHANNEL_LIGHTNING, CHANNEL_IO_PORT_0, 0);
+                    }
                     gLightningStrike.state++;
                     gLightningStrike.flashAlphaTarget = 0;
                 }
@@ -2331,10 +2389,13 @@ void Environment_UpdateLightningStrike(PlayState* play) {
                 if (play->envCtx.adjLightSettings.ambientColor[0] > 0) {
                     play->envCtx.adjLightSettings.ambientColor[0] -= 10;
                     play->envCtx.adjLightSettings.ambientColor[1] -= 10;
+                    sNativeLightningAmbient[0] = MAX(sNativeLightningAmbient[0] - 10, 0);
+                    sNativeLightningAmbient[1] = MAX(sNativeLightningAmbient[1] - 10, 0);
                 }
 
                 if (play->envCtx.adjLightSettings.ambientColor[2] > 0) {
                     play->envCtx.adjLightSettings.ambientColor[2] -= 10;
+                    sNativeLightningAmbient[2] = MAX(sNativeLightningAmbient[2] - 10, 0);
                 }
 
                 sLightningFlashAlpha -= 10;
@@ -2343,6 +2404,7 @@ void Environment_UpdateLightningStrike(PlayState* play) {
                     play->envCtx.adjLightSettings.ambientColor[0] = 0;
                     play->envCtx.adjLightSettings.ambientColor[1] = 0;
                     play->envCtx.adjLightSettings.ambientColor[2] = 0;
+                    Environment_ClearNativeLightningAmbient();
 
                     gLightningStrike.state = LIGHTNING_STRIKE_WAIT;
 
@@ -2357,7 +2419,7 @@ void Environment_UpdateLightningStrike(PlayState* play) {
         }
     }
 
-    if (gLightningStrike.state != LIGHTNING_STRIKE_WAIT) {
+    if ((gLightningStrike.state != LIGHTNING_STRIKE_WAIT) && !MMWeather_SeasonClearsRain()) {
         Environment_DrawLightningFlash(play, gLightningStrike.flashRed, gLightningStrike.flashGreen,
                                        gLightningStrike.flashBlue, sLightningFlashAlpha);
     }
@@ -2379,6 +2441,14 @@ void Environment_AddLightningBolts(PlayState* play, u8 num) {
     }
 }
 
+void MMWeather_StartBolt(void) {
+    sMMWeatherLightningBolt.state = LIGHTNING_BOLT_START;
+}
+
+void MMWeather_ClearBolts(void) {
+    sMMWeatherLightningBolt.state = LIGHTNING_BOLT_INACTIVE;
+}
+
 static TexturePtr sLightningTextures[] = {
     gEffLightning1Tex, gEffLightning2Tex, gEffLightning3Tex, gEffLightning4Tex,
     gEffLightning5Tex, gEffLightning6Tex, gEffLightning7Tex, gEffLightning8Tex,
@@ -2387,7 +2457,8 @@ static TexturePtr sLightningTextures[] = {
 /**
  * Draw any active lightning bolt entries contained in `sLightningBolts`
  */
-void Environment_DrawLightning(PlayState* play, s32 unused) {
+static void Environment_DrawLightningImpl(PlayState* play, LightningBolt* bolts, size_t count, f32 (*randomFloat)(void),
+                                          s32 draw) {
     s16 i;
     f32 dx;
     f32 dz;
@@ -2397,8 +2468,8 @@ void Environment_DrawLightning(PlayState* play, s32 unused) {
 
     OPEN_DISPS(play->state.gfxCtx);
 
-    for (i = 0; i < ARRAY_COUNT(sLightningBolts); i++) {
-        switch (sLightningBolts[i].state) {
+    for (i = 0; i < count; i++) {
+        switch (bolts[i].state) {
             case LIGHTNING_BOLT_START:
                 dx = play->view.at.x - play->view.eye.x;
                 dz = play->view.at.z - play->view.eye.z;
@@ -2406,34 +2477,34 @@ void Environment_DrawLightning(PlayState* play, s32 unused) {
                 x = dx / sqrtf(SQ(dx) + SQ(dz));
                 z = dz / sqrtf(SQ(dx) + SQ(dz));
 
-                sLightningBolts[i].pos.x = play->view.eye.x + x * 9500.0f;
-                sLightningBolts[i].pos.y = Rand_ZeroOne() * 1000.0f + 4000.0f;
-                sLightningBolts[i].pos.z = play->view.eye.z + z * 9500.0f;
+                bolts[i].pos.x = play->view.eye.x + x * 9500.0f;
+                bolts[i].pos.y = randomFloat() * 1000.0f + 4000.0f;
+                bolts[i].pos.z = play->view.eye.z + z * 9500.0f;
 
-                sLightningBolts[i].offset.x = (Rand_ZeroOne() - 0.5f) * 5000.0f;
-                sLightningBolts[i].offset.y = 0.0f;
-                sLightningBolts[i].offset.z = (Rand_ZeroOne() - 0.5f) * 5000.0f;
+                bolts[i].offset.x = (randomFloat() - 0.5f) * 5000.0f;
+                bolts[i].offset.y = 0.0f;
+                bolts[i].offset.z = (randomFloat() - 0.5f) * 5000.0f;
 
-                sLightningBolts[i].textureIndex = 0;
-                sLightningBolts[i].pitch = (Rand_ZeroOne() - 0.5f) * 40.0f;
-                sLightningBolts[i].roll = (Rand_ZeroOne() - 0.5f) * 40.0f;
-                sLightningBolts[i].delayTimer = 3 * (i + 1);
-                sLightningBolts[i].state++;
+                bolts[i].textureIndex = 0;
+                bolts[i].pitch = (randomFloat() - 0.5f) * 40.0f;
+                bolts[i].roll = (randomFloat() - 0.5f) * 40.0f;
+                bolts[i].delayTimer = 3 * (i + 1);
+                bolts[i].state++;
                 break;
 
             case LIGHTNING_BOLT_WAIT:
-                sLightningBolts[i].delayTimer--;
+                bolts[i].delayTimer--;
 
-                if (sLightningBolts[i].delayTimer <= 0) {
-                    sLightningBolts[i].state++;
+                if (bolts[i].delayTimer <= 0) {
+                    bolts[i].state++;
                 }
                 break;
 
             case LIGHTNING_BOLT_DRAW:
-                if (sLightningBolts[i].textureIndex < 7) {
-                    sLightningBolts[i].textureIndex++;
+                if (bolts[i].textureIndex < 7) {
+                    bolts[i].textureIndex++;
                 } else {
-                    sLightningBolts[i].state = LIGHTNING_BOLT_INACTIVE;
+                    bolts[i].state = LIGHTNING_BOLT_INACTIVE;
                 }
                 break;
 
@@ -2441,18 +2512,16 @@ void Environment_DrawLightning(PlayState* play, s32 unused) {
                 break;
         }
 
-        if (sLightningBolts[i].state == LIGHTNING_BOLT_DRAW) {
-            Matrix_Translate(sLightningBolts[i].pos.x + sLightningBolts[i].offset.x,
-                             sLightningBolts[i].pos.y + sLightningBolts[i].offset.y,
-                             sLightningBolts[i].pos.z + sLightningBolts[i].offset.z, MTXMODE_NEW);
-            Matrix_RotateXFApply(DEG_TO_RAD(sLightningBolts[i].pitch));
-            Matrix_RotateZF(DEG_TO_RAD(sLightningBolts[i].roll), MTXMODE_APPLY);
+        if (draw && (bolts[i].state == LIGHTNING_BOLT_DRAW)) {
+            Matrix_Translate(bolts[i].pos.x + bolts[i].offset.x, bolts[i].pos.y + bolts[i].offset.y,
+                             bolts[i].pos.z + bolts[i].offset.z, MTXMODE_NEW);
+            Matrix_RotateXFApply(DEG_TO_RAD(bolts[i].pitch));
+            Matrix_RotateZF(DEG_TO_RAD(bolts[i].roll), MTXMODE_APPLY);
             Matrix_Scale(22.0f, 100.0f, 22.0f, MTXMODE_APPLY);
             gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, 128);
             gDPSetEnvColor(POLY_XLU_DISP++, 0, 255, 255, 128);
             MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
-            gSPSegment(POLY_XLU_DISP++, 0x08,
-                       Lib_SegmentedToVirtual(sLightningTextures[sLightningBolts[i].textureIndex]));
+            gSPSegment(POLY_XLU_DISP++, 0x08, Lib_SegmentedToVirtual(sLightningTextures[bolts[i].textureIndex]));
             Gfx_SetupDL61_Xlu(play->state.gfxCtx);
             gSPMatrix(POLY_XLU_DISP++, D_01000000_TO_SEGMENTED, G_MTX_NOPUSH | G_MTX_MUL | G_MTX_MODELVIEW);
             gSPDisplayList(POLY_XLU_DISP++, gEffLightningDL);
@@ -2460,6 +2529,12 @@ void Environment_DrawLightning(PlayState* play, s32 unused) {
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void Environment_DrawLightning(PlayState* play, s32 unused) {
+    Environment_DrawLightningImpl(play, sLightningBolts, ARRAY_COUNT(sLightningBolts), Rand_ZeroOne,
+                                  !MMWeather_SeasonClearsRain());
+    Environment_DrawLightningImpl(play, &sMMWeatherLightningBolt, 1, MMWeather_RandomFloat, true);
 }
 
 void Environment_PlaySceneSequence(PlayState* play) {
@@ -2908,7 +2983,11 @@ void Environment_DrawSandstorm(PlayState* play, u8 sandstormState) {
         sp98 = 6.0f;
     }
 
-    if (play->envCtx.sandstormPrimA != 0) {
+    // Keep native blizzard alpha/state progressing while clear seasons hide its
+    // rendered fog. Other sandstorms, Autumn and Off retain native presentation.
+    const int season = MMWeather_SeasonForPlay(play);
+    if (play->envCtx.sandstormPrimA != 0 &&
+        !(sandstormState == SANDSTORM_A && (season == SEASON_SPRING || season == SEASON_SUMMER))) {
         index = 0;
         if (sandstormState >= SANDSTORM_B) {
             index = 4 * 3;
@@ -3043,6 +3122,7 @@ s32 Environment_AdjustLights(PlayState* play, f32 arg1, f32 arg2, f32 arg3, f32 
     }
 
     arg1 *= arg4;
+    Environment_ClearNativeLightningAmbient();
 
     for (i = 0; i < 3; i++) {
         play->envCtx.adjLightSettings.ambientColor[i] = -(f32)play->envCtx.lightSettings.ambientColor[i] * arg1;
@@ -3063,6 +3143,7 @@ void Environment_LerpRGB8(u8* from, Color_RGB8* to, f32 lerp, s16* dst) {
 }
 
 void Environment_LerpAmbientColor(PlayState* play, Color_RGB8* to, f32 lerp) {
+    Environment_ClearNativeLightningAmbient();
     Environment_LerpRGB8(play->envCtx.lightSettings.ambientColor, to, lerp, play->envCtx.adjLightSettings.ambientColor);
 }
 
@@ -3150,7 +3231,10 @@ void Environment_WarpSongLeave(PlayState* play) {
 void Environment_SetupSkyboxStars(PlayState* play) {
     f32 phi_f0;
 
-    if ((play->envCtx.skybox1Index == 0) && (play->skyboxId == SKYBOX_NORMAL_SKY)) {
+    // Ported OoT sky artwork already contains stars. Keep the native layer for
+    // fallback skies and frames where the skybox itself is not being drawn.
+    if ((play->envCtx.skybox1Index == 0) && (play->skyboxId == SKYBOX_NORMAL_SKY) &&
+        (play->envCtx.skyboxDisabled || !Skybox_IsOotSkyActive(&play->skyboxCtx, play->skyboxId))) {
         if ((CURRENT_TIME >= CLOCK_TIME(21, 0)) || (CURRENT_TIME < CLOCK_TIME(2, 0))) {
             phi_f0 = 1.0f;
         } else if (CURRENT_TIME > CLOCK_TIME(19, 0)) {
@@ -3163,7 +3247,7 @@ void Environment_SetupSkyboxStars(PlayState* play) {
 
         phi_f0 = (play->envCtx.skyboxConfig == SKYBOX_CONFIG_24) ? 1.0f : phi_f0;
 
-        D_801F4F28 = phi_f0;
+        D_801F4F28 = phi_f0 * (1.0f - MMWeather_Overcast());
         sEnvSkyboxNumStars = gSkyboxNumStars;
     } else {
         D_801F4F28 = 0.0f;
@@ -3447,6 +3531,7 @@ void Environment_Draw(PlayState* play) {
     Environment_SetupSkyboxStars(play);
     Environment_DrawSun(play);
     Environment_UpdateLightningStrike(play);
+    MMWeather_DrawLightning(play);
     Environment_DrawLightning(play, 0);
     Environment_DrawSkyboxFilters(play);
 }

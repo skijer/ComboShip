@@ -24,6 +24,7 @@
 #include "controller.h"
 #include "padutils.h"
 #include <libultraship/bridge/consolevariablebridge.h>
+#include "2s2h/FleetShipCombo/FleetShipCombo.h"
 
 #ifdef COMBO_BUILD
 // ComboShip: MM's own debug CVar so MM debug can't leak into OOT (shared CVar store, issue #67)

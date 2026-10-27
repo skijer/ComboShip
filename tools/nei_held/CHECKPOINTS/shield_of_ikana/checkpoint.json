@@ -1,0 +1,40 @@
+{
+  "resource_count": 13,
+  "vertex_records": 5046,
+  "vertex_loads": 173,
+  "slug": "shield_of_ikana",
+  "name": "Shield of Ikana / gameplay shield_of_ikana",
+  "entry": "objects/nei_held_redesign/shield_of_ikana/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.0530242919921875,
+  "triangles": 3862,
+  "bounds_author": [
+    [
+      -16.0625,
+      -33.5,
+      -28.6875
+    ],
+    [
+      6.875,
+      65.5,
+      39.3125
+    ]
+  ],
+  "markers": {
+    "legacy_frame": "object_nei_divine_shield / object_nei_kite_shield",
+    "normal_native": [
+      -1,
+      0,
+      0
+    ],
+    "up_native": [
+      0,
+      1,
+      0
+    ]
+  },
+  "notes": [
+    "Approved shell/embossing/rear straps in native custom-shield frame. Existing hand/back/surf transforms retained."
+  ],
+  "runtime_tested": false
+}

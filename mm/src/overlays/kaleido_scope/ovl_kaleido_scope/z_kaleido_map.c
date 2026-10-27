@@ -5,6 +5,7 @@
  */
 
 #include "z_kaleido_scope.h"
+#include "2s2h/CustomMessage/PauseItemDescriptions.h"
 #include "interface/parameter_static/parameter_static.h"
 #include "interface/icon_item_field_static/icon_item_field_static.h"
 #include "interface/icon_item_dungeon_static/icon_item_dungeon_static.h"
@@ -490,8 +491,13 @@ void KaleidoScope_UpdateDungeonCursor(PlayState* play) {
                     func_801514B0(play, 0x17AF, 1);
                 } else if (CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_A) && (msgCtx->msgLength == 0) &&
                            CHECK_DUNGEON_ITEM(pauseCtx->cursorPoint[PAUSE_MAP], gSaveContext.dungeonSceneSharedIndex)) {
+                    const char* description =
+                        PauseItemDesc_Get(ITEM_KEY_BOSS + pauseCtx->cursorPoint[PAUSE_MAP], PAUSE_MAP);
                     pauseCtx->itemDescriptionOn = true;
-                    func_801514B0(play, 0x17AC + pauseCtx->cursorPoint[PAUSE_MAP], 1);
+                    if (description != NULL)
+                        PauseItemDesc_Show(play, description, 1);
+                    else
+                        func_801514B0(play, 0x17AC + pauseCtx->cursorPoint[PAUSE_MAP], 1);
                 }
             }
 

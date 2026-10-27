@@ -1,0 +1,83 @@
+name: Windows compile preflight
+
+# Compile shared rendering, the complete UI and launcher source in the real
+# Windows environment, independently of the long Linux regression gate.
+# CMake also verifies the custom texture scrolling patch before configuring LUS.
+
+on:
+  pull_request:
+    paths:
+      - 'CMakeLists.txt'
+      - 'CMake/**'
+      - 'libultraship/**'
+      - 'patches/**'
+      - 'combo/**'
+      - 'upstream-pins.json'
+      - 'tests/solo_games/**'
+      - 'tests/regional_passages/**'
+      - 'tests/rom_setup/**'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/probe-custom-tex-scroll.yml'
+
+jobs:
+  compile-libultraship:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify game picker with Windows SDK before configuring
+        run: python -B tests/solo_games/selection_test.py --msvc --compiler cl
+
+      - name: Verify shared geometry with Windows SDK before configuring
+        run: python -B tests/regional_passages/run_header_portability_tests.py --msvc --compiler cl
+
+      - name: Cache build dir (vcpkg + CMake)
+        uses: actions/cache@v5
+        with:
+          path: build/x64
+          key: probe-custom-scroll-x64-${{ hashFiles('CMakeLists.txt', 'CMake/**', 'libultraship/cmake/**', 'patches/libultraship-custom-tex-scroll-e3cd6591.patch') }}
+          restore-keys: probe-custom-scroll-x64-
+
+      - name: Configure with verified custom scroll feature
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}/build/x64/vcpkg
+        run: cmake -B build/x64 -S . -G "Visual Studio 17 2022" -A x64
+
+      - name: Build libultraship
+        run: cmake --build build/x64 --target libultraship --config Release
+
+      # comboui has no dependency on either game. It used to be compiled only
+      # after both engines in the full build, hiding small Windows errors late.
+      - name: Build complete UI before the game engines
+        run: cmake --build build/x64 --target comboui --config Release -- "/flp:logfile=$env:RUNNER_TEMP/comboui-preflight.log;verbosity=minimal"
+
+      # Compile the actual launcher/validator projects with their generated
+      # include paths and flags, without linking or building game references.
+      # The full build retains normal dependency traversal and final linking.
+      - name: Compile launchers before the game engines
+        shell: pwsh
+        run: |
+          cmake --build build/x64 --target ComboShip --config Release -- /p:BuildProjectReferences=false "/t:PrepareForBuild,_ClCompile,_ResourceCompile" "/flp:logfile=$env:RUNNER_TEMP/launcher-preflight.log;verbosity=minimal"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build build/x64 --target comborando --config Release -- /p:BuildProjectReferences=false "/t:PrepareForBuild,_ClCompile" "/flp:logfile=$env:RUNNER_TEMP/validator-preflight.log;verbosity=minimal"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # Keep these small target logs available even if the full job-log endpoint
+      # cannot download the much larger renderer build log.
+      - name: Upload Windows preflight diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-preflight-diagnostics
+          path: ${{ runner.temp }}/*-preflight.log
+          if-no-files-found: ignore

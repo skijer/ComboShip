@@ -1,0 +1,17 @@
+PASS mm scenario=mm_native forest=combined stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_native forest=combined stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_native forest=mm stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_native forest=mm stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_mods_2ship_visuals forest=combined stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_mods_2ship_visuals forest=combined stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_mods_2ship_visuals forest=mm stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_mods_2ship_visuals forest=mm stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_authored_market forest=combined stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_authored_market forest=combined stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_authored_market forest=mm stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_authored_market forest=mm stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_authored_market forest=authored_mm stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_authored_market forest=authored_mm stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm real-resource failures: every structural path blocks; duplicate marker and pause protected; keeper/material failure stays independent
+PASS mm real-resource failures: every structural path blocks; duplicate marker and pause protected; keeper/material failure stays independent
+BOUNDARY: controller/resource executable passed; configured game loop, resource manager, rendering and collision traversal remain untested

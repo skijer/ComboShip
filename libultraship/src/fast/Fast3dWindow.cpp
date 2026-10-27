@@ -1,4 +1,5 @@
 #include "fast/Fast3dWindow.h"
+#include <chrono>
 
 #include "ship/Context.h"
 #include "ship/config/Config.h"
@@ -197,10 +198,32 @@ bool Fast3dWindow::IsFrameReady() {
 }
 
 bool Fast3dWindow::DrawAndRunGraphicsCommands(Gfx* commands, const std::unordered_map<Mtx*, MtxF>& mtxReplacements) {
+    using Clock = std::chrono::steady_clock;
+    auto boundary = mCollectFrameTimings ? Clock::now() : Clock::time_point{};
+    mLastFrameTimings = {};
+    mWindowManagerApi->SetCollectPacingTelemetry(mCollectFrameTimings);
+    if (mCollectFrameTimings) {
+        mLastFrameTimings.attemptId = ++mDiagnosticAttemptId;
+        mLastFrameTimings.startNs = std::chrono::duration_cast<std::chrono::nanoseconds>(boundary.time_since_epoch()).count();
+    }
+    auto finishStage = [&](uint64_t& duration) {
+        if (mCollectFrameTimings) {
+            const auto now = Clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(now - boundary).count();
+            boundary = now;
+        }
+    };
     std::shared_ptr<Window> wnd = Ship::Context::GetRawInstance()->GetWindow();
 
     // Skip dropped frames
-    if (!wnd->IsFrameReady()) {
+    const bool ready = wnd->IsFrameReady();
+    finishStage(mLastFrameTimings.ready);
+    if (!ready) {
+        if (mCollectFrameTimings) {
+            mLastFrameTimings.endNs = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now().time_since_epoch()).count();
+            mLastFrameTimings.pacing = mWindowManagerApi->GetPacingTelemetry();
+            mLastFrameTimings.gpu = mRenderingApi->GetGpuTimingTelemetry();
+        }
         return false;
     }
 
@@ -211,12 +234,24 @@ bool Fast3dWindow::DrawAndRunGraphicsCommands(Gfx* commands, const std::unordere
     gui->StartDraw();
     // Setup game framebuffers to match available window space
     mInterpreter->StartFrame();
+    finishStage(mLastFrameTimings.setup);
     // Execute the games gfx commands
+    mRenderingApi->BeginGpuTiming(mLastFrameTimings.attemptId, mCollectFrameTimings);
+    mInterpreter->mDiagnosticFrameId = mLastFrameTimings.attemptId;
     mInterpreter->Run(commands, mtxReplacements);
+    finishStage(mLastFrameTimings.commands);
     // Renders the game frame buffer to the final window and finishes the GUI
     gui->EndDraw();
+    mRenderingApi->EndGpuTiming();
+    finishStage(mLastFrameTimings.gui);
     // Finalize swap buffers
     mInterpreter->EndFrame();
+    finishStage(mLastFrameTimings.present);
+    if (mCollectFrameTimings) {
+        mLastFrameTimings.endNs = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now().time_since_epoch()).count();
+        mLastFrameTimings.pacing = mWindowManagerApi->GetPacingTelemetry();
+        mLastFrameTimings.gpu = mRenderingApi->GetGpuTimingTelemetry();
+    }
 
     return true;
 }

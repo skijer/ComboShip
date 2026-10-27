@@ -5,6 +5,7 @@
  */
 
 #include "z_en_tite.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_HOOKSHOT_PULLS_ACTOR)
@@ -945,7 +946,7 @@ void func_80895FF8(EnTite* this, PlayState* play) {
         Actor_SetDropFlag(&this->actor, &this->collider.elem);
 
         if ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-            !(this->collider.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            !(DinFireSword_OriginalDamageFlags(play, this->collider.elem.acHitElem) & 0xDB0B3)) {
             func_80893E54(this, play);
             if (this->actor.shape.yOffset < 0.0f) {
                 func_80895DE8(this);

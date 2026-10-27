@@ -5,6 +5,7 @@
  */
 
 #include "z_en_peehat.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Bom/z_en_bom.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 #include "overlays/effects/ovl_Effect_Ss_Hahen/z_eff_ss_hahen.h"
@@ -688,7 +689,7 @@ void func_8089874C(EnPeehat* this, PlayState* play) {
     if (this->colliderSphere.base.acFlags & AC_HIT) {
         this->colliderSphere.base.acFlags &= ~AC_HIT;
         if ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-            !(this->colliderSphere.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            !(DinFireSword_OriginalDamageFlags(play, this->colliderSphere.elem.acHitElem) & 0xDB0B3)) {
             if (!Actor_ApplyDamage(&this->actor)) {
                 Enemy_StartFinishingBlow(play, &this->actor);
             }
@@ -738,7 +739,7 @@ void func_8089874C(EnPeehat* this, PlayState* play) {
     } else if ((this->drawDmgEffType == ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) &&
                (this->colliderCylinder.base.acFlags & AC_HIT) &&
                ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-                !(this->colliderCylinder.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3))) {
+                !(DinFireSword_OriginalDamageFlags(play, this->colliderCylinder.elem.acHitElem) & 0xDB0B3))) {
         func_808971DC(this, play);
         this->actor.colorFilterTimer = 0;
         func_80897648(this);

@@ -5,6 +5,7 @@
  */
 
 #include "z_en_bigslime.h"
+#include "din_fire_sword.h"
 #include "z64quake.h"
 #include "z64rumble.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
@@ -2619,7 +2620,7 @@ void EnBigslime_ApplyDamageEffectGekko(EnBigslime* this, PlayState* play) {
     if (this->gekkoCollider.base.acFlags & AC_HIT) {
         this->gekkoCollider.base.acFlags &= ~AC_HIT;
         if ((this->gekkoDrawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-            !(this->gekkoCollider.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            !(DinFireSword_OriginalDamageFlags(play, this->gekkoCollider.elem.acHitElem) & 0xDB0B3)) {
             EnBigslime_EndThrowMinislime(this);
             if (this->actor.colChkInfo.damageEffect != BIGSLIME_DMGEFF_HOOKSHOT) {
                 if (Actor_ApplyDamage(&this->actor) == 0) {

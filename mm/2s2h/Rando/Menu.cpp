@@ -1,5 +1,7 @@
 #include "Rando/Rando.h"
+#include "../../../combo/gui/WhatsNew.h"
 #include <fast/Fast3dGui.h>
+#include "2s2h/ShipUtils.h"
 #include "Rando/Spoiler/Spoiler.h"
 #include "2s2h/BenGui/UIWidgets.hpp"
 #include <ship/window/gui/IconsFontAwesome4.h>
@@ -41,6 +43,7 @@ std::unordered_map<int32_t, const char*> accessDungeonOptions = {
 };
 
 std::unordered_map<int32_t, const char*> accessTrialsOptions = {
+    { RO_ACCESS_TRIALS_VANILLA, "Vanilla" },
     { RO_ACCESS_TRIALS_20_MASKS, "2-6-12-20 Masks" },
     { RO_ACCESS_TRIALS_REMAINS, "Requires Associated Remains" },
     { RO_ACCESS_TRIALS_FORMS, "Requires Associated Transformation" },
@@ -61,6 +64,19 @@ std::unordered_map<int32_t, const char*> dungeonItemPlacementOptions = {
     { RO_DUNGEON_ITEM_ANYWHERE, "Anywhere" },
     { RO_DUNGEON_ITEM_OWN_DUNGEON, "Own Dungeon" },
     { RO_DUNGEON_ITEM_START_WITH, "Start With" },
+    { RO_DUNGEON_ITEM_VANILLA, "Vanilla" },
+};
+
+std::unordered_map<int32_t, const char*> remainsShuffleOptions = {
+    { RO_REMAINS_SHUFFLE_ANYWHERE, "Anywhere" },
+    { RO_REMAINS_SHUFFLE_OWN_DUNGEON, "Own Dungeon" },
+    { RO_REMAINS_SHUFFLE_VANILLA, "Vanilla" },
+};
+
+std::unordered_map<int32_t, const char*> songShuffleOptions = {
+    { RO_SONG_SHUFFLE_ANYWHERE, "Anywhere" },
+    { RO_SONG_SHUFFLE_SONG_LOCATIONS, "Song Locations" },
+    { RO_SONG_SHUFFLE_VANILLA, "Vanilla" },
 };
 
 // clang-format off
@@ -322,7 +338,7 @@ static uint32_t checkPoolGeneration = 0;
 void RefreshMetrics() {
     setOfItemsInPool.clear();
     setOfChecksInPool.clear();
-    RandoSaveInfo randoSaveInfo;
+    RandoSaveInfo randoSaveInfo{};
     std::vector<RandoCheckId> checkPool;
     std::vector<RandoItemId> itemPool;
 
@@ -415,6 +431,7 @@ static RegisterShipInitFunc refreshMetricsInit(RefreshMetrics, {
                                                                    "gRando.Options.RO_SHUFFLE_SHOPS",
                                                                    "gRando.Options.RO_SHUFFLE_SKELETON_KEY",
                                                                    "gRando.Options.RO_SHUFFLE_SNOWBALL_DROPS",
+                                                                   "gRando.Options.RO_SHUFFLE_SONGS",
                                                                    "gRando.Options.RO_SHUFFLE_SONG_DOUBLE_TIME",
                                                                    "gRando.Options.RO_SHUFFLE_SONG_INVERTED_TIME",
                                                                    "gRando.Options.RO_SHUFFLE_SONG_SARIA",
@@ -578,34 +595,34 @@ static void DrawGeneralTab() {
         "Explore the menus for various enhancements and time savers; most are not enabled by default in Rando.");
     ImGui::PopStyleColor();
 
-#ifndef COMBO_BUILD // ComboShip: combo drives generation, so hide the per-game Seed Generation section.
-    ImGui::SeparatorText("Seed Generation");
-    UIWidgets::CVarCheckbox("Enable Rando (Randomizes new files upon creation)", "gRando.Enabled");
+    if (!Combo_IsCombinedGame()) {
+        ImGui::SeparatorText("Seed Generation");
+        UIWidgets::CVarCheckbox("Enable Rando (Randomizes new files upon creation)", "gRando.Enabled");
 
-    if (UIWidgets::CVarCombobox("Seed", "gRando.SpoilerFileIndex", Rando::Spoiler::spoilerOptions)) {
-        Rando::Spoiler::SelectSpoiler(CVarGetInteger("gRando.SpoilerFileIndex", 0));
-    }
-
-    if (CVarGetInteger("gRando.SpoilerFileIndex", 0) == 0) {
-        UIWidgets::PushStyleSlider();
-        static char seed[256];
-        std::string stringSeed = CVarGetString("gRando.InputSeed", "");
-        strcpy(seed, stringSeed.c_str());
-        ImGui::InputText("##Seed", seed, sizeof(seed), ImGuiInputTextFlags_CallbackAlways,
-                         [](ImGuiInputTextCallbackData* data) {
-                             CVarSetString("gRando.InputSeed", data->Buf);
-                             return 0;
-                         });
-        if (stringSeed.length() < 1) {
-            ImGui::SameLine(17.0f);
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.4f), "Leave blank for random seed");
+        if (UIWidgets::CVarCombobox("Seed", "gRando.SpoilerFileIndex", Rando::Spoiler::spoilerOptions)) {
+            Rando::Spoiler::SelectSpoiler(CVarGetInteger("gRando.SpoilerFileIndex", 0));
         }
-        UIWidgets::PopStyleSlider();
 
-        UIWidgets::CVarCheckbox("Generate Spoiler File", "gRando.GenerateSpoiler",
-                                CheckboxOptions().DefaultValue(true));
+        if (CVarGetInteger("gRando.SpoilerFileIndex", 0) == 0) {
+            UIWidgets::PushStyleSlider();
+            static char seed[256];
+            std::string stringSeed = CVarGetString("gRando.InputSeed", "");
+            strcpy(seed, stringSeed.c_str());
+            ImGui::InputText("##Seed", seed, sizeof(seed), ImGuiInputTextFlags_CallbackAlways,
+                             [](ImGuiInputTextCallbackData* data) {
+                                 CVarSetString("gRando.InputSeed", data->Buf);
+                                 return 0;
+                             });
+            if (stringSeed.length() < 1) {
+                ImGui::SameLine(17.0f);
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.4f), "Leave blank for random seed");
+            }
+            UIWidgets::PopStyleSlider();
+
+            UIWidgets::CVarCheckbox("Generate Spoiler File", "gRando.GenerateSpoiler",
+                                    CheckboxOptions().DefaultValue(true));
+        }
     }
-#endif
 
     ImGui::SeparatorText("Seed Health");
     DrawSeedHealthStrip();
@@ -616,6 +633,7 @@ static void DrawGeneralTab() {
         "Container Style Matches Contents", "gRando.CSMC",
         UIWidgets::CheckboxOptions().Tooltip("This will make the contents of a container match the container itself. "
                                              "Eg chests, pots, crates, grass, etc."));
+
     UIWidgets::CVarCombobox(
         "Junk Items", "gRando.JunkItems", &junkItemsOptions,
         UIWidgets::ComboboxOptions()
@@ -655,6 +673,13 @@ static void DrawLogicConditionsTab() {
                        "Requires Only Song - Requires only the correct song.\n\n"
                        "Open - Dungeons will be open with no requirements.");
     UIWidgets::CVarCombobox("Trials Access", Rando::StaticData::Options[RO_ACCESS_TRIALS].cvar, &accessTrialsOptions);
+    UIWidgets::Tooltip("Moon trial access requirements:\n\n"
+                       "Vanilla - Masks are handed over as in the original game: 1, 2, 3 and 4 masks to get in.\n\n"
+                       "2-6-12-20 Masks - Each child sequentially requires that many masks in your inventory.\n\n"
+                       "Requires Associated Remains - Each child requires the remains of the boss they represent.\n\n"
+                       "Requires Associated Transformation - Each child requires the form their trial is built "
+                       "around, and the Link Trial is always open.\n\n"
+                       "Open - The trials have no requirements.");
     ImGui::EndChild();
     ImGui::SameLine();
     ImGui::BeginChild("randoLogicColumn2", ImVec2(columnWidth, 0));
@@ -711,11 +736,39 @@ static void DrawCheckPoolTab() {
 
     UIWidgets::BeginCard("checkPoolWorld");
     ImGui::SeparatorText("World & NPCs");
-    CVarCheckbox("Songs", "gPlaceholderBool",
-                 CheckboxOptions({ { .disabled = true,
-                                     .disabledTooltip = "Songs are currently always shuffled. The option to "
-                                                        "disable this is coming soon." } })
-                     .DefaultValue(true));
+    UIWidgets::CVarCombobox(
+        "Songs", Rando::StaticData::Options[RO_SHUFFLE_SONGS].cvar, &songShuffleOptions,
+        UIWidgets::ComboboxOptions()
+            .ComponentAlignment(UIWidgets::ComponentAlignment::Right)
+            .LabelPosition(UIWidgets::LabelPosition::Near)
+            .Tooltip("Where the songs taught in the world may be found. Extra songs have no location of their own, "
+                     "so they are always shuffled into the item pool like any other item.\n\n"
+                     "Anywhere - Song locations are checks, and their songs can be found anywhere in the world.\n\n"
+                     "Song Locations - Song locations are checks, and their songs are shuffled among them.\n\n"
+                     "Vanilla - Every song stays where it is, and song locations are not checks."));
+    if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_SONGS].cvar, RO_SONG_SHUFFLE_ANYWHERE) !=
+        RO_SONG_SHUFFLE_VANILLA) {
+        auto& counts = GetCheckCountsByType();
+        auto it = counts.find(RCTYPE_SONG);
+        PoolCountSuffix(it != counts.end() ? it->second : 0);
+    }
+    UIWidgets::CVarCombobox(
+        "Boss Remains", Rando::StaticData::Options[RO_SHUFFLE_BOSS_REMAINS].cvar, &remainsShuffleOptions,
+        UIWidgets::ComboboxOptions()
+            .ComponentAlignment(UIWidgets::ComponentAlignment::Right)
+            .LabelPosition(UIWidgets::LabelPosition::Near)
+            .Tooltip("Where each temple boss's remains may be found.\n\n"
+                     "Anywhere - Defeating a boss rewards a shuffled item, and its remains can be found anywhere in "
+                     "the world.\n\n"
+                     "Own Dungeon - Defeating a boss rewards a shuffled item, and each boss's remains are somewhere "
+                     "inside that boss's own temple.\n\n"
+                     "Vanilla - Every boss still rewards its own remains, and the boss warps are not checks."));
+    if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_BOSS_REMAINS].cvar, RO_REMAINS_SHUFFLE_VANILLA) !=
+        RO_REMAINS_SHUFFLE_VANILLA) {
+        auto& counts = GetCheckCountsByType();
+        auto it = counts.find(RCTYPE_REMAINS);
+        PoolCountSuffix(it != counts.end() ? it->second : 0);
+    }
     CheckPoolCheckbox("Owl Statues", RO_SHUFFLE_OWL_STATUES, RCTYPE_OWL,
                       "Activating an owl statue is a check. Song of Soaring destinations are unaffected.");
     CheckPoolCheckbox("Shops", RO_SHUFFLE_SHOPS, RCTYPE_SHOP,
@@ -723,8 +776,6 @@ static void DrawCheckPoolTab() {
                       "and the Bomb Shop's bomb bags are always shuffled, even with this off.");
     CheckPoolCheckbox("Tingle Maps", RO_SHUFFLE_TINGLE_SHOPS, RCTYPE_TINGLE_SHOP,
                       "Maps sold by Tingle are checks, with randomized prices.");
-    CheckPoolCheckbox("Boss Remains", RO_SHUFFLE_BOSS_REMAINS, RCTYPE_REMAINS,
-                      "Defeating each temple boss rewards a shuffled item instead of that boss's remains.");
     CheckPoolCheckbox("Cows", RO_SHUFFLE_COWS, RCTYPE_COW, "Playing Epona's Song to a cow is a check.");
     UIWidgets::EndCard();
 
@@ -938,6 +989,57 @@ static bool ItemPoolCheckbox(const char* label, RandoOptionId optionId, const ch
     return changed;
 }
 
+struct NeiRandoOption {
+    RandoOptionId id;
+    int32_t on;
+};
+
+static const NeiRandoOption kNeiRandoOptions[] = {
+    { RO_SHUFFLE_MAGIC_MIRROR, 1 },
+    { RO_SHUFFLE_NEI_ITEMS, 1 },
+    { RO_SHUFFLE_OOT_GEAR, 1 },
+    { RO_SHUFFLE_OOT_EQUIPMENT, 1 },
+    { RO_SHUFFLE_OOT_QUEST, 1 },
+    { RO_SHUFFLE_OOT_MASKS, 1 },
+    { RO_SHUFFLE_BOMB_ARROWS, RO_BOMB_ARROWS_SHUFFLED },
+    { RO_ELEMENTAL_WAND_SHUFFLE, RO_WAND_ELEMENTAL_SHUFFLE },
+    { RO_CROSSOVER_POKEBALL, 1 },
+    { RO_CROSSOVER_MARIO_MASK, 1 },
+};
+
+// Both Crossover items share ONE feature toggle, so this only ever turns it on: mirroring either
+// checkbox's value would let unchecking one switch the selector off while the other is shuffled.
+static void NeiRando_EnableCrossover() {
+    if (CVarGetInteger(Rando::StaticData::Options[RO_CROSSOVER_POKEBALL].cvar, RO_GENERIC_OFF) ||
+        CVarGetInteger(Rando::StaticData::Options[RO_CROSSOVER_MARIO_MASK].cvar, RO_GENERIC_OFF)) {
+        CVarSetInteger("gBrokenItems.Enabled", 1);
+    }
+    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+}
+
+static void NeiRando_SetAll(bool on) {
+    for (const auto& o : kNeiRandoOptions) {
+        CVarSetInteger(Rando::StaticData::Options[o.id].cvar, on ? o.on : 0);
+    }
+    NeiRando_EnableCrossover();
+    CVarSetInteger("gMods.BombArrows.Mode",
+                   CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_BOMB_ARROWS].cvar, RO_BOMB_ARROWS_OFF));
+    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+}
+
+static void NeiRando_DrawSetAllButtons() {
+    if (Button("Add all NEI content",
+               ButtonOptions().Tooltip("Turns on every option in this card at once: NEI custom items, OoT\n"
+                                       "gear, equipment, songs & quest items, masks, bomb arrows and the\n"
+                                       "elemental wand."))) {
+        NeiRando_SetAll(true);
+    }
+    ImGui::SameLine();
+    if (Button("Remove all", ButtonOptions().Tooltip("Turns every option in this card off."))) {
+        NeiRando_SetAll(false);
+    }
+}
+
 static void DrawItemPoolTab() {
     DrawSeedHealthStrip();
 
@@ -1079,35 +1181,36 @@ static void DrawItemPoolTab() {
     }
     UIWidgets::EndCard();
 
-#ifndef COMBO_BUILD // ComboShip (#136): combo owns the hunt toggle plus the combined required/total counts.
-    UIWidgets::BeginCard("itemPoolGoals");
-    ImGui::SeparatorText("Goals & Collectibles");
-    CVarCheckbox("Triforce Hunt", Rando::StaticData::Options[RO_SHUFFLE_TRIFORCE_PIECES].cvar,
-                 CheckboxOptions({ { .tooltip = "Scatters Triforce pieces into the item pool. Collect the required "
-                                                "amount to complete the hunt." } }));
-    if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_TRIFORCE_PIECES].cvar, RO_GENERIC_OFF)) {
-        CVarSliderInt("Required Triforce Pieces", Rando::StaticData::Options[RO_TRIFORCE_PIECES_REQUIRED].cvar,
-                      IntSliderOptions()
-                          .Format("%d Pieces Required")
-                          .LabelPosition(UIWidgets::LabelPosition::None)
-                          .Min(1)
-                          .Max(CVarGetInteger(Rando::StaticData::Options[RO_TRIFORCE_PIECES_MAX].cvar,
-                                              DEFAULT_TRIFORCE_PIECES_MAX))
-                          .DefaultValue(DEFAULT_TRIFORCE_PIECES_MAX));
-        if (CVarSliderInt("Shuffled Triforce Pieces", Rando::StaticData::Options[RO_TRIFORCE_PIECES_MAX].cvar,
+    if (!Combo_IsCombinedGame()) {
+        UIWidgets::BeginCard("itemPoolGoals");
+        ImGui::SeparatorText("Goals & Collectibles");
+        CVarCheckbox("Triforce Hunt", Rando::StaticData::Options[RO_SHUFFLE_TRIFORCE_PIECES].cvar,
+                     CheckboxOptions({ { .tooltip = "Scatters Triforce pieces into the item pool. Collect the required "
+                                                    "amount to complete the hunt." } }));
+        if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_TRIFORCE_PIECES].cvar, RO_GENERIC_OFF)) {
+            CVarSliderInt("Required Triforce Pieces", Rando::StaticData::Options[RO_TRIFORCE_PIECES_REQUIRED].cvar,
                           IntSliderOptions()
-                              .Format("%d Pieces in Pool")
+                              .Format("%d Pieces Required")
                               .LabelPosition(UIWidgets::LabelPosition::None)
                               .Min(1)
-                              .Max(1000)
-                              .DefaultValue(DEFAULT_TRIFORCE_PIECES_MAX)
-                              .Tooltip("If the maximum amount of placeable pieces exceeds what will allow the seed to "
-                                       "generate, the amount will be adjusted automatically."))) {
-            ClampRequiredToMax(RO_TRIFORCE_PIECES_REQUIRED, RO_TRIFORCE_PIECES_MAX, DEFAULT_TRIFORCE_PIECES_MAX);
+                              .Max(CVarGetInteger(Rando::StaticData::Options[RO_TRIFORCE_PIECES_MAX].cvar,
+                                                  DEFAULT_TRIFORCE_PIECES_MAX))
+                              .DefaultValue(DEFAULT_TRIFORCE_PIECES_MAX));
+            if (CVarSliderInt(
+                    "Shuffled Triforce Pieces", Rando::StaticData::Options[RO_TRIFORCE_PIECES_MAX].cvar,
+                    IntSliderOptions()
+                        .Format("%d Pieces in Pool")
+                        .LabelPosition(UIWidgets::LabelPosition::None)
+                        .Min(1)
+                        .Max(1000)
+                        .DefaultValue(DEFAULT_TRIFORCE_PIECES_MAX)
+                        .Tooltip("If the maximum amount of placeable pieces exceeds what will allow the seed to "
+                                 "generate, the amount will be adjusted automatically."))) {
+                ClampRequiredToMax(RO_TRIFORCE_PIECES_REQUIRED, RO_TRIFORCE_PIECES_MAX, DEFAULT_TRIFORCE_PIECES_MAX);
+            }
         }
+        UIWidgets::EndCard();
     }
-    UIWidgets::EndCard();
-#endif
 
     UIWidgets::BeginCard("itemPoolDungeonItems");
     ImGui::SeparatorText("Dungeon Items");
@@ -1117,6 +1220,8 @@ static void DrawItemPoolTab() {
             "Where each dungeon's small keys may be placed.\n\n"
             "Anywhere - Small keys can be found anywhere in the world.\n\n"
             "Own Dungeon - Each dungeon's small keys are only found within that dungeon.\n\n"
+            "Vanilla - Small keys stay on the checks that hold them in the vanilla game, and none are added to "
+            "the item pool.\n\n"
             "Start With - You begin with every dungeon's small keys, and none are added to the item pool."));
     UIWidgets::CVarCombobox(
         "Boss Keys", Rando::StaticData::Options[RO_PLACEMENT_BOSS_KEYS].cvar, &dungeonItemPlacementOptions,
@@ -1124,27 +1229,41 @@ static void DrawItemPoolTab() {
             "Where each dungeon's boss key may be placed.\n\n"
             "Anywhere - Boss keys can be found anywhere in the world.\n\n"
             "Own Dungeon - Each dungeon's boss key is only found within that dungeon.\n\n"
+            "Vanilla - Boss keys stay on the checks that hold them in the vanilla game, and none are added to "
+            "the item pool.\n\n"
             "Start With - You begin with every dungeon's boss key, and none are added to the item pool."));
-    UIWidgets::CVarCombobox(
+    bool strayFairyPlacementChanged = UIWidgets::CVarCombobox(
         "Stray Fairies", Rando::StaticData::Options[RO_PLACEMENT_STRAY_FAIRIES].cvar, &dungeonItemPlacementOptions,
         UIWidgets::ComboboxOptions().Tooltip(
-            "Where each dungeon's Stray Fairies may be placed. The Clock Town Stray Fairy is unaffected.\n\n"
-            "Anywhere - Stray Fairies can be found anywhere in the world.\n\n"
-            "Own Dungeon - Each dungeon's Stray Fairies are only found within that dungeon.\n\n"
-            "Start With - You begin with every dungeon's Stray Fairies, and none are added to the item pool."));
-    if (CVarGetInteger(Rando::StaticData::Options[RO_PLACEMENT_STRAY_FAIRIES].cvar, RO_DUNGEON_ITEM_ANYWHERE) !=
-        RO_DUNGEON_ITEM_START_WITH) {
-        CVarSliderInt(
-            "Required Stray Fairies", Rando::StaticData::Options[RO_STRAY_FAIRIES_REQUIRED].cvar,
-            IntSliderOptions()
-                .Tooltip("Minimum Stray Fairies needed to obtain the corresponding Great Fairy check.\n"
-                         "Does not affect the Clock Town fairy.")
-                .LabelPosition(UIWidgets::LabelPosition::None)
-                .Min(1)
-                .Format("%d Fairies Required")
-                .Max(CVarGetInteger(Rando::StaticData::Options[RO_STRAY_FAIRIES_MAX].cvar, STRAY_FAIRY_SCATTERED_TOTAL))
-                .DefaultValue(STRAY_FAIRY_SCATTERED_TOTAL));
-        if (CVarSliderInt("Stray Fairies in Pool", Rando::StaticData::Options[RO_STRAY_FAIRIES_MAX].cvar,
+            "Where each dungeon's Stray Fairies may be placed.\n\n"
+            "Anywhere - Stray Fairies can be found anywhere in the world. The Clock Town Stray Fairy joins the "
+            "item pool with them.\n\n"
+            "Own Dungeon - Each dungeon's Stray Fairies are only found within that dungeon. The Clock Town Stray "
+            "Fairy is vanilla.\n\n"
+            "Vanilla - Stray Fairies stay on the checks that hold them in the vanilla game, and none are added to "
+            "the item pool.\n\n"
+            "Start With - You begin with every Stray Fairy, and none are added to the item pool."));
+    int32_t strayFairyPlacement =
+        CVarGetInteger(Rando::StaticData::Options[RO_PLACEMENT_STRAY_FAIRIES].cvar, RO_DUNGEON_ITEM_ANYWHERE);
+    if (strayFairyPlacementChanged && strayFairyPlacement != RO_DUNGEON_ITEM_VANILLA) {
+        ClampRequiredToMax(RO_STRAY_FAIRIES_REQUIRED, RO_STRAY_FAIRIES_MAX, STRAY_FAIRY_SCATTERED_TOTAL);
+    }
+    if (strayFairyPlacement != RO_DUNGEON_ITEM_START_WITH) {
+        int32_t strayFairiesAvailable =
+            strayFairyPlacement == RO_DUNGEON_ITEM_VANILLA
+                ? STRAY_FAIRY_SCATTERED_TOTAL
+                : CVarGetInteger(Rando::StaticData::Options[RO_STRAY_FAIRIES_MAX].cvar, STRAY_FAIRY_SCATTERED_TOTAL);
+        CVarSliderInt("Required Stray Fairies", Rando::StaticData::Options[RO_STRAY_FAIRIES_REQUIRED].cvar,
+                      IntSliderOptions()
+                          .Tooltip("Minimum Stray Fairies needed to obtain the corresponding Great Fairy check.\n"
+                                   "Does not affect the Clock Town fairy.")
+                          .LabelPosition(UIWidgets::LabelPosition::None)
+                          .Min(1)
+                          .Format("%d Fairies Required")
+                          .Max(strayFairiesAvailable)
+                          .DefaultValue(STRAY_FAIRY_SCATTERED_TOTAL));
+        if (strayFairyPlacement != RO_DUNGEON_ITEM_VANILLA &&
+            CVarSliderInt("Stray Fairies in Pool", Rando::StaticData::Options[RO_STRAY_FAIRIES_MAX].cvar,
                           IntSliderOptions()
                               .Tooltip("Maximum Stray Fairies that can appear in the item pool, per dungeon.")
                               .LabelPosition(UIWidgets::LabelPosition::None)
@@ -1213,6 +1332,208 @@ static void DrawItemPoolTab() {
     }
     UIWidgets::EndCard();
 
+    // ── Skijer's NEI custom items ────────────────────────────────────────────────────────────────
+    // 5.0.0 replaced the old DrawShufflesTab with the card-based check/item pool tabs, so these
+    // moved here (they add ITEMS to the pool, not checks). Until this gate exists NO RI_OOT_NEI_*
+    // item could be placed by the generator at all — they had give/draw plumbing but nothing ever
+    // pushed them into the pool.
+    UIWidgets::BeginCard("itemPoolNei");
+    ImGui::SeparatorText("NEI & Cross-Game");
+    NeiRando_DrawSetAllButtons();
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_SHUFFLE_NEI_ITEMS].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+        CVarCheckbox(
+            "Shuffle NEI Custom Items", Rando::StaticData::Options[RO_SHUFFLE_NEI_ITEMS].cvar,
+            CheckboxOptions({ { .tooltip = "Adds Skijer's NEI custom items (the page-2 inventory) to the item pool:\n"
+                                           "Whip, Spinner, the three elemental Rods, Deku Leaf, Time Gate, Beetle,\n"
+                                           "Switch Hook, Mogma Mitts, Gust Jar, Ball and Chain, Dominion Rod, the six\n"
+                                           "Dual Cane skills, and more.\n\n"
+                                           "These are not considered by logic yet." } }));
+    }
+    // Cross-game categories: OoT items in a SOLO MM seed, no combo needed. In combo these come
+    // through the combo's own supply, so the checkboxes only affect solo seeds.
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_SHUFFLE_OOT_GEAR].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+        CVarCheckbox(
+            "Add OoT Items", Rando::StaticData::Options[RO_SHUFFLE_OOT_GEAR].cvar,
+            CheckboxOptions({ { .tooltip = "Adds OoT gear to a solo-MM pool: the Master Sword and Biggoron's Sword\n"
+                                           "chains, Stick/Nut Capacity, Open Chests, Progressive Strength and the\n"
+                                           "ship-vanilla Roc's Feather.\n\nNot considered by logic." } }));
+    }
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_SHUFFLE_OOT_EQUIPMENT].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+        CVarCheckbox(
+            "Add OoT Equipment", Rando::StaticData::Options[RO_SHUFFLE_OOT_EQUIPMENT].cvar,
+            CheckboxOptions({ { .tooltip = "Adds the extended-equipment page to a solo-MM pool: Cane of Byrna, Four\n"
+                                           "Sword, Trident, the three shields, the three tunics, the three boots,\n"
+                                           "the Magic Cape and the progressive Roc.\n\nNot considered by logic." } }));
+    }
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_SHUFFLE_OOT_QUEST].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+        CVarCheckbox(
+            "Add OoT Songs & Quest Items", Rando::StaticData::Options[RO_SHUFFLE_OOT_QUEST].cvar,
+            CheckboxOptions({ { .tooltip = "Adds OoT's songs, the six medallions, the three spiritual stones and the\n"
+                                           "Stone of Agony to a solo-MM pool.\n\nNot considered by logic." } }));
+    }
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_SHUFFLE_OOT_MASKS].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+        CVarCheckbox("Add OoT Masks", Rando::StaticData::Options[RO_SHUFFLE_OOT_MASKS].cvar,
+                     CheckboxOptions({ { .tooltip = "Adds the Skull, Spooky and Gerudo masks to a solo-MM pool.\n\n"
+                                                    "Not considered by logic." } }));
+    }
+    // Crossover Items: no inventory cell, so they get their own gates rather than riding
+    // RO_SHUFFLE_NEI_ITEMS. Each one unlocks its form on the equipment page's Crossover sub-page.
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_CROSSOVER_POKEBALL].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+        if (CVarCheckbox(
+                "Include Pikachu Pokeball", Rando::StaticData::Options[RO_CROSSOVER_POKEBALL].cvar,
+                CheckboxOptions({ { .tooltip = "Adds the Pikachu Pokeball to the pool. Finding it unlocks PIKACHU\n"
+                                               "MODE on the equipment page's Crossover Items sub-page.\n"
+                                               "2Ship has no Pikachu transformation yet — the form selects but Link\n"
+                                               "does not change.\n\nNot considered by logic." } }))) {
+            NeiRando_EnableCrossover();
+        }
+    }
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_CROSSOVER_MARIO_MASK].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+        if (CVarCheckbox(
+                "Include Mario Mask", Rando::StaticData::Options[RO_CROSSOVER_MARIO_MASK].cvar,
+                CheckboxOptions({ { .tooltip = "Adds the Mario Mask to the pool. Finding it unlocks MARIO MODE on\n"
+                                               "the equipment page's Crossover Items sub-page.\n\n"
+                                               "Not considered by logic." } }))) {
+            NeiRando_EnableCrossover();
+        }
+    }
+    if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_NEI_ITEMS].cvar, RO_GENERIC_OFF)) {
+        static std::unordered_map<int32_t, const char*> graceOptions = {
+            { RO_GRACE_ON, "On" },
+            { RO_GRACE_OFF, "Off" },
+            { RO_GRACE_GATED, "Gated" },
+        };
+        // Combo's worker can retry both source pools. Hold this shared policy
+        // stable until generation completes, including when general sync is Off.
+        ImGui::BeginDisabled(CVarGetInteger("gGeneral.RandoGenerating", 0) != 0);
+        {
+            WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_HYLIAS_GRACE].cvar, nullptr,
+                                             CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0,
+                                             CVarGetInteger("gGeneral.RandoGenerating", 0) != 0);
+            UIWidgets::CVarCombobox(
+                "Hylia's Grace", Rando::StaticData::Options[RO_HYLIAS_GRACE].cvar, &graceOptions,
+                UIWidgets::ComboboxOptions()
+                    .DefaultIndex(RO_GRACE_OFF)
+                    .Tooltip(
+                        "On: include fairy flight in the seed. Off: exclude it.\n"
+                        "Gated: include it, but require the selected number of collected dungeon rewards to cast.\n"
+                        "Counts OoT stones/medallions and MM boss remains; magic is still required.\n"
+                        "The MM reachability solver does not use fairy flight."));
+        }
+        if (CVarGetInteger(Rando::StaticData::Options[RO_HYLIAS_GRACE].cvar, RO_GRACE_OFF) == RO_GRACE_GATED) {
+            {
+                WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_HYLIAS_GRACE_REWARDS].cvar, nullptr,
+                                                 CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0,
+                                                 CVarGetInteger("gGeneral.RandoGenerating", 0) != 0);
+                UIWidgets::CVarSliderInt("Grace Dungeon Rewards Required",
+                                         Rando::StaticData::Options[RO_HYLIAS_GRACE_REWARDS].cvar,
+                                         UIWidgets::IntSliderOptions().Min(0).Max(13).DefaultValue(4));
+            }
+        }
+        ImGui::EndDisabled();
+        // Bomb Arrows have no inventory slot any more — they are the last entry of the bow's
+        // element wheel, so this is purely about how you come by them. The seed-locked value mirrors
+        // into gMods.BombArrows.Mode because the in-game grant logic runs outside seeds too.
+        static std::unordered_map<int32_t, const char*> bombArrowModeOptions = {
+            { RO_BOMB_ARROWS_OFF, "Off" },
+            { RO_BOMB_ARROWS_BOMB_BAG, "Bomb Bag" },
+            { RO_BOMB_ARROWS_SHUFFLED, "Shuffled" },
+        };
+        {
+            WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_SHUFFLE_BOMB_ARROWS].cvar, nullptr,
+                                             CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+            UIWidgets::CVarCombobox(
+                "Shuffle Bomb Arrows", Rando::StaticData::Options[RO_SHUFFLE_BOMB_ARROWS].cvar, &bombArrowModeOptions,
+                UIWidgets::ComboboxOptions().Tooltip(
+                    "How Bomb Arrows are obtained. They sit at the end of the bow's element wheel,\n"
+                    "next to the medallion arrows — they have no inventory slot of their own.\n\n"
+                    "Off: never granted on their own (the Twilight Upgrade still unlocks them).\n"
+                    "Bomb Bag: granted the moment you own any bomb bag.\n"
+                    "Shuffled: a real randomizer item."));
+        }
+        CVarSetInteger("gMods.BombArrows.Mode",
+                       CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_BOMB_ARROWS].cvar, RO_BOMB_ARROWS_OFF));
+
+        static std::unordered_map<int32_t, const char*> wandModeOptions = {
+            { RO_WAND_MEDALLIONS, "Medallions" },
+            { RO_WAND_SINGLE_ITEM, "Single item" },
+            { RO_WAND_ELEMENTAL_SHUFFLE, "Elemental shuffle" },
+        };
+        {
+            WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_ELEMENTAL_WAND_SHUFFLE].cvar, nullptr,
+                                             CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+            UIWidgets::CVarCombobox(
+                "Elemental Wand", Rando::StaticData::Options[RO_ELEMENTAL_WAND_SHUFFLE].cvar, &wandModeOptions,
+                UIWidgets::ComboboxOptions().Tooltip(
+                    "Six rods - Sand, Tornado, Water, Meteor, Storm and the Shadow Scepter - share ONE\n"
+                    "inventory cell and one wheel (the cell Bomb Arrows vacated).\n\n"
+                    "Medallions: one wand in the pool; a rod works once you own its OoT medallion.\n"
+                    "Single item: one wand in the pool; finding it unlocks all six rods.\n"
+                    "Elemental shuffle: the six rods are separate items; the first found also grants\n"
+                    "the wand itself."));
+        }
+    }
+    // Starting Rod is independent of the NEI pool; its mode must remain selectable
+    // when only the starting item is enabled.
+    ImGui::BeginDisabled(CVarGetInteger("gGeneral.RandoGenerating", 0) != 0);
+    static std::unordered_map<int32_t, const char*> seasonsOptions = {
+        { NEI_SEASONS_INDIVIDUAL, "Individual seasons" },
+        { NEI_SEASONS_ROD, "Rod" },
+        { NEI_SEASONS_GATED, "Gated" },
+    };
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_ROD_OF_SEASONS].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0,
+                                         CVarGetInteger("gGeneral.RandoGenerating", 0) != 0);
+        UIWidgets::CVarCombobox(
+            "Rod of Seasons", Rando::StaticData::Options[RO_ROD_OF_SEASONS].cvar, &seasonsOptions,
+            UIWidgets::ComboboxOptions()
+                .DefaultIndex(NEI_SEASONS_INDIVIDUAL)
+                .Tooltip("Rod: one pickup unlocks all four seasons.\n"
+                         "Individual seasons: four pickups; the first grants the Rod.\n"
+                         "Gated: one Rod; seasons unlock on completed dungeon/event checks in either game.\n"
+                         "Spring: Windmill Song of Storms check OR Jabu OR Water Temple OR Great Bay.\n"
+                         "Summer: Fire Temple OR Stone Tower. Autumn: Forest Temple OR Woodfall.\n"
+                         "Winter: Ice Cavern's final Sheik check OR Snowhead. Gates apply only in Gated mode.\n"
+                         "Seasons are not used by the reachability solver."));
+    }
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_SHUFFLE_MAGIC_MIRROR].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0,
+                                         CVarGetInteger("gGeneral.RandoGenerating", 0) != 0);
+        CVarCheckbox(
+            "Shuffle Magic Mirror", Rando::StaticData::Options[RO_SHUFFLE_MAGIC_MIRROR].cvar,
+            CheckboxOptions(
+                { { .tooltip =
+                        "Adds exactly one Magic Mirror to the pool and randomizes the Lost Woods stump reward.\n"
+                        "Off keeps the fixed Mirror on the stump. Independent of Shuffle NEI Custom Items." } }));
+    }
+    {
+        WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_STARTING_ROD_OF_SEASONS].cvar, nullptr,
+                                         CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0,
+                                         CVarGetInteger("gGeneral.RandoGenerating", 0) != 0);
+        CVarCheckbox("Start with Rod of Seasons", Rando::StaticData::Options[RO_STARTING_ROD_OF_SEASONS].cvar,
+                     CheckboxOptions({ { .tooltip = "Start with the Rod even when the NEI pool is disabled.\n"
+                                                    "Rod mode grants all seasons; Individual and Gated\n"
+                                                    "keep their normal unlock rules." } }));
+    }
+    ImGui::EndDisabled();
+    UIWidgets::EndCard();
+
     UIWidgets::EndCardLayout();
 }
 
@@ -1275,9 +1596,7 @@ static void DrawStartingItemsTab() {
 
         Rando::StaticData::RandoStaticItem randoStaticItem = Rando::StaticData::Items[startingItem];
         const char* texturePath = Rando::StaticData::GetIconTexturePath(startingItem);
-        ImTextureID textureId =
-            std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                ->GetTextureByName(texturePath);
+        ImTextureID textureId = Ship_GetFast3dGui()->GetTextureByName(texturePath);
 
         ImVec4 tintColor =
             Ship_GetItemColorTint(startingItem == RI_PROGRESSIVE_LULLABY ? ITEM_SONG_LULLABY : randoStaticItem.itemId);
@@ -1342,9 +1661,7 @@ static void DrawStartingItemsTab() {
 
                     Rando::StaticData::RandoStaticItem randoStaticItem = Rando::StaticData::Items[item];
                     const char* texturePath = Rando::StaticData::GetIconTexturePath(item);
-                    ImTextureID textureId = std::dynamic_pointer_cast<Fast::Fast3dGui>(
-                                                Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                                                ->GetTextureByName(texturePath);
+                    ImTextureID textureId = Ship_GetFast3dGui()->GetTextureByName(texturePath);
 
                     // Force new row for Song of Time, first frog, and first time item
                     if (item == RI_SONG_TIME || item == RI_FROG_BLUE || item == RI_TIME_DAY_1) {
@@ -1595,6 +1912,19 @@ static void DrawHintsTab() {
     f32 columnWidth = ImGui::GetContentRegionAvail().x / 3 - (ImGui::GetStyle().ItemSpacing.x * 2);
     f32 halfHeight = ImGui::GetContentRegionAvail().y / 2 - (ImGui::GetStyle().ItemSpacing.y * 2);
     ImGui::BeginChild("randoHintsColumn1", ImVec2(columnWidth, 0));
+    if (!Combo_IsCombinedGame()) {
+        {
+            WhatsNew::Scope releaseHighlight(Rando::StaticData::Options[RO_MAPS_COMPASSES_GIVE_INFORMATION].cvar,
+                                             nullptr, CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+            CVarCheckbox(
+                "Maps and Compasses Give Information",
+                Rando::StaticData::Options[RO_MAPS_COMPASSES_GIVE_INFORMATION].cvar,
+                CheckboxOptions(
+                    { { .tooltip = "Compasses reveal the saved boss reward. Maps describe the dungeon entrance. "
+                                   "Read the information on collection or with C-Up on an owned Map or Compass. "
+                                   "This rule is saved with the next generated seed." } }));
+        }
+    }
     CVarCheckbox(
         "Spider House", Rando::StaticData::Options[RO_HINTS_SPIDER_HOUSES].cvar,
         CheckboxOptions(
@@ -1640,6 +1970,9 @@ static void DrawHintsTab() {
         CheckboxOptions({ { .tooltip = "Gossip stones will offer a hint for a scaling rupee cost. This cost ranges "
                                        "from 10-250 rupees depending on how many checks are remaining in your seed. "
                                        "The hint will guaranteed be a check you have not obtained yet." } }));
+    CVarCheckbox("Moon Gossip Stones", Rando::StaticData::Options[RO_HINTS_MOON_GOSSIP_STONES].cvar,
+                 CheckboxOptions({ { .tooltip = "The gossip stones inside the Moon trials each hint the location of "
+                                                "the mask they describe in vanilla" } }));
     CVarCheckbox(
         "Boss Remains", Rando::StaticData::Options[RO_HINTS_BOSS_REMAINS].cvar,
         CheckboxOptions(
@@ -1710,6 +2043,12 @@ void Rando::RegisterMenu() {
     mBenMenu->AddSidebarEntry("Rando", "Hints", 1);
     path.sidebarName = "Hints";
     mBenMenu->AddWidget(path, "Hints", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) { DrawHintsTab(); });
+
+    mBenMenu->AddSidebarEntry("Rando", "Desired Items", 1);
+    path.sidebarName = "Desired Items";
+    mBenMenu->AddWidget(path, "Sheikah Sensor", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        BenGui::DrawSensorDesirePicker();
+    });
 
     mBenMenu->AddSidebarEntry("Rando", "Item Tracker", 1);
     path.sidebarName = "Item Tracker";

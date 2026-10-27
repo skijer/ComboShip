@@ -11,6 +11,8 @@
 #include "objects/object_kusa/object_kusa.h"
 #include "vt.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/Graphics/SeasonFoliageActor.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_THROW_ONLY)
 
@@ -513,6 +515,10 @@ void EnKusa_Draw(Actor* thisx, PlayState* play) {
     if (this->actor.flags & ACTOR_FLAG_GRASS_DESTROYED) {
         Gfx_DrawDListOpa(play, object_kusa_DL_0002E0);
     } else {
+        OPEN_DISPS(play->state.gfxCtx);
+        s32 seasonal = SeasonFoliage_ActorBegin(&POLY_OPA_DISP, play, false);
         Gfx_DrawDListOpa(play, dLists[thisx->params & 3]);
+        SeasonFoliage_ActorEnd(&POLY_OPA_DISP, seasonal);
+        CLOSE_DISPS(play->state.gfxCtx);
     }
 }

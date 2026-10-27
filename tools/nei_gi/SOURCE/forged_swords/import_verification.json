@@ -1,0 +1,305 @@
+{
+  "models": {
+    "fire_rod": {
+      "triangles": 3752,
+      "vertex_loads": 125,
+      "passes": 1
+    },
+    "ice_rod": {
+      "triangles": 3168,
+      "vertex_loads": 107,
+      "passes": 1
+    },
+    "light_rod": {
+      "triangles": 3752,
+      "vertex_loads": 125,
+      "passes": 1
+    },
+    "rocs_feather": {
+      "triangles": 3594,
+      "vertex_loads": 107,
+      "passes": 1
+    },
+    "time_gate": {
+      "triangles": 2972,
+      "vertex_loads": 161,
+      "passes": 1
+    },
+    "whip": {
+      "triangles": 3410,
+      "vertex_loads": 104,
+      "passes": 1
+    },
+    "shovel": {
+      "triangles": 1772,
+      "vertex_loads": 85,
+      "passes": 1
+    },
+    "gust_jar": {
+      "triangles": 4056,
+      "vertex_loads": 126,
+      "passes": 1
+    },
+    "hylia_grace": {
+      "triangles": 776,
+      "vertex_loads": 33,
+      "passes": 2
+    },
+    "zonai_permafrost": {
+      "triangles": 776,
+      "vertex_loads": 33,
+      "passes": 2
+    },
+    "demise_destruction": {
+      "triangles": 776,
+      "vertex_loads": 33,
+      "passes": 2
+    },
+    "ball_and_chain": {
+      "triangles": 8982,
+      "vertex_loads": 429,
+      "passes": 1
+    },
+    "deku_leaf": {
+      "triangles": 1944,
+      "vertex_loads": 49,
+      "passes": 1
+    },
+    "mogma_mitts": {
+      "triangles": 2472,
+      "vertex_loads": 118,
+      "passes": 1
+    },
+    "switch_hook": {
+      "triangles": 3184,
+      "vertex_loads": 128,
+      "passes": 1
+    },
+    "beetle": {
+      "triangles": 3192,
+      "vertex_loads": 164,
+      "passes": 1
+    },
+    "lantern": {
+      "triangles": 4250,
+      "vertex_loads": 141,
+      "passes": 2
+    },
+    "spinner": {
+      "triangles": 7812,
+      "vertex_loads": 374,
+      "passes": 1
+    },
+    "cane_of_somaria": {
+      "triangles": 2708,
+      "vertex_loads": 84,
+      "passes": 1
+    },
+    "minish_cap": {
+      "triangles": 7836,
+      "vertex_loads": 247,
+      "passes": 1
+    },
+    "rocs_cape": {
+      "triangles": 8114,
+      "vertex_loads": 321,
+      "passes": 1
+    },
+    "divine_shield": {
+      "triangles": 2156,
+      "vertex_loads": 134,
+      "passes": 1
+    },
+    "sheikah_shield": {
+      "triangles": 2046,
+      "vertex_loads": 114,
+      "passes": 1
+    },
+    "shield_of_ikana": {
+      "triangles": 3862,
+      "vertex_loads": 173,
+      "passes": 1
+    },
+    "magic_cape": {
+      "triangles": 10992,
+      "vertex_loads": 327,
+      "passes": 1
+    },
+    "spirit_breastplate": {
+      "triangles": 5534,
+      "vertex_loads": 195,
+      "passes": 1
+    },
+    "sages_tunic": {
+      "triangles": 6872,
+      "vertex_loads": 230,
+      "passes": 1
+    },
+    "champions_tunic": {
+      "triangles": 5154,
+      "vertex_loads": 157,
+      "passes": 1
+    },
+    "pegasus_anklet": {
+      "triangles": 3858,
+      "vertex_loads": 180,
+      "passes": 1
+    },
+    "trident": {
+      "triangles": 2626,
+      "vertex_loads": 98,
+      "passes": 1
+    },
+    "climb_boots": {
+      "triangles": 7672,
+      "vertex_loads": 316,
+      "passes": 1
+    },
+    "roc_boots": {
+      "triangles": 7792,
+      "vertex_loads": 358,
+      "passes": 1
+    },
+    "cane_of_byrna": {
+      "triangles": 2878,
+      "vertex_loads": 93,
+      "passes": 1
+    },
+    "four_sword": {
+      "triangles": 8660,
+      "vertex_loads": 432,
+      "passes": 1
+    },
+    "pendant_of_memories": {
+      "triangles": 3512,
+      "vertex_loads": 134,
+      "passes": 1
+    },
+    "elemental_wand": {
+      "triangles": 2056,
+      "vertex_loads": 73,
+      "passes": 1
+    },
+    "sand_rod": {
+      "triangles": 1848,
+      "vertex_loads": 64,
+      "passes": 1
+    },
+    "tornado_rod": {
+      "triangles": 2144,
+      "vertex_loads": 64,
+      "passes": 1
+    },
+    "water_rod": {
+      "triangles": 2200,
+      "vertex_loads": 68,
+      "passes": 1
+    },
+    "meteor_rod": {
+      "triangles": 1976,
+      "vertex_loads": 64,
+      "passes": 1
+    },
+    "storm_rod": {
+      "triangles": 1464,
+      "vertex_loads": 56,
+      "passes": 1
+    },
+    "shadow_scepter": {
+      "triangles": 1508,
+      "vertex_loads": 56,
+      "passes": 1
+    },
+    "sheikah_slate": {
+      "triangles": 4316,
+      "vertex_loads": 152,
+      "passes": 1
+    },
+    "slate_bomb": {
+      "triangles": 4466,
+      "vertex_loads": 157,
+      "passes": 1
+    },
+    "slate_master_cycle": {
+      "triangles": 4676,
+      "vertex_loads": 161,
+      "passes": 1
+    },
+    "slate_stasis": {
+      "triangles": 4372,
+      "vertex_loads": 158,
+      "passes": 1
+    },
+    "slate_cryonis": {
+      "triangles": 4400,
+      "vertex_loads": 161,
+      "passes": 1
+    },
+    "slate_sensor": {
+      "triangles": 4796,
+      "vertex_loads": 164,
+      "passes": 1
+    },
+    "phantom_hourglass": {
+      "triangles": 1880,
+      "vertex_loads": 66,
+      "passes": 2
+    },
+    "shadow_crystal": {
+      "triangles": 288,
+      "vertex_loads": 12,
+      "passes": 2
+    },
+    "rod_of_seasons": {
+      "triangles": 1624,
+      "vertex_loads": 58,
+      "passes": 1
+    },
+    "kokiri_sword": {
+      "triangles": 1538,
+      "vertex_loads": 85,
+      "passes": 1
+    },
+    "mm_kokiri_sword": {
+      "triangles": 2144,
+      "vertex_loads": 84,
+      "passes": 1
+    },
+    "razor_sword": {
+      "triangles": 1336,
+      "vertex_loads": 82,
+      "passes": 1
+    },
+    "gilded_sword": {
+      "triangles": 2646,
+      "vertex_loads": 211,
+      "passes": 1
+    },
+    "master_sword": {
+      "triangles": 3114,
+      "vertex_loads": 138,
+      "passes": 1
+    },
+    "true_master_sword": {
+      "triangles": 3114,
+      "vertex_loads": 138,
+      "passes": 1
+    },
+    "biggoron_sword": {
+      "triangles": 1426,
+      "vertex_loads": 65,
+      "passes": 1
+    },
+    "great_fairy_sword": {
+      "triangles": 4014,
+      "vertex_loads": 213,
+      "passes": 1
+    },
+    "iron_knuckle_axe": {
+      "triangles": 2444,
+      "vertex_loads": 93,
+      "passes": 1
+    }
+  },
+  "runtime_tested": false
+}

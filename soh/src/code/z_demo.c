@@ -1,5 +1,7 @@
+#include "rando/CrossEntranceBoss.h"
 #include "global.h"
 #include "z64camera.h"
+#include "soh/Enhancements/audio/GlobalOutdoorRainBridge.h"
 
 #include <string.h>
 
@@ -35,6 +37,7 @@
 #include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 u16 D_8011E1C0 = 0;
 u16 D_8011E1C4 = 0;
@@ -236,7 +239,7 @@ void func_80064824(PlayState* play, CutsceneContext* csCtx, CsCmdBase* cmd) {
             if (sp3F != 0) {
                 Audio_SetNatureAmbienceChannelIO(NATURE_CHANNEL_RAIN, CHANNEL_IO_PORT_4, 0x3F);
                 Audio_SetNatureAmbienceChannelIO(NATURE_CHANNEL_RAIN, CHANNEL_IO_PORT_1, 1);
-                play->envCtx.unk_EE[0] = 20;
+                GlobalOutdoorRain_SetScriptedRain(play, 20);
             }
             break;
         case 2:
@@ -332,7 +335,7 @@ void func_80064824(PlayState* play, CutsceneContext* csCtx, CsCmdBase* cmd) {
             }
             break;
         case 18:
-            play->envCtx.unk_EE[0] = 0;
+            GlobalOutdoorRain_SetScriptedRain(play, 0);
             play->envCtx.gloomySkyMode = 2;
             if (gSaveContext.dayTime < 0x4AAB) {
                 gSaveContext.dayTime += 30;
@@ -497,18 +500,9 @@ void Cutscene_Command_Terminator(PlayState* play, CutsceneContext* csCtx, CsCmdB
     Player* player = GET_PLAYER(play);
     s32 temp = 0;
 
-    bool shouldSkipCommand = false;
-
-    if (cmd->base == 8 && !GameInteractor_Should(VB_PLAY_PULL_MASTER_SWORD_CS, true)) {
-        shouldSkipCommand = true;
-    }
-
-    if (cmd->base == 24 && !GameInteractor_Should(VB_PLAY_DROP_FISH_FOR_JABU_CS, true)) {
-        shouldSkipCommand = true;
-    }
-
-    bool debugCsSkip = (CHECK_BTN_ALL(play->state.input[0].press.button, BTN_START) &&
-                        (gSaveContext.fileNum != 0xFEDC) && CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugEnabled"), 0));
+    bool shouldSkipCommand = cmd->base == 8 && !GameInteractor_Should(VB_PLAY_PULL_MASTER_SWORD_CS, true);
+    bool debugCsSkip = CHECK_BTN_ALL(play->state.input[0].press.button, BTN_START) &&
+                       (gSaveContext.fileNum != 0xFEDC) && CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugEnabled"), 0);
 
     if ((gSaveContext.gameMode != GAMEMODE_NORMAL) && (gSaveContext.gameMode != GAMEMODE_END_CREDITS) &&
         (play->sceneNum != SCENE_HYRULE_FIELD) && (csCtx->frames > 20) &&
@@ -516,8 +510,8 @@ void Cutscene_Command_Terminator(PlayState* play, CutsceneContext* csCtx, CsCmdB
          CHECK_BTN_ALL(play->state.input[0].press.button, BTN_B) ||
          CHECK_BTN_ALL(play->state.input[0].press.button, BTN_START)) &&
         (gSaveContext.fileNum != 0xFEDC) && (play->transitionTrigger == TRANS_TRIGGER_OFF)) {
-        Audio_PlaySoundGeneral(NA_SE_SY_PIECE_OF_HEART, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_PIECE_OF_HEART, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         temp = 1;
     }
 
@@ -1099,9 +1093,12 @@ void Cutscene_Command_Terminator(PlayState* play, CutsceneContext* csCtx, CsCmdB
                 play->transitionType = TRANS_TYPE_FADE_WHITE;
                 break;
             case 95:
-                if ((Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP)) &&
-                    (Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP)) &&
-                    (Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP))) {
+                if ((Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_PHANTOM_GANON,
+                                                     Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP))) &&
+                    (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_VOLVAGIA,
+                                                     Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP))) &&
+                    (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_MORPHA,
+                                                     Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP)))) {
                     play->nextEntranceIndex = ENTR_TEMPLE_OF_TIME_ENTRANCE;
                     play->transitionTrigger = TRANS_TRIGGER_START;
                     gSaveContext.cutsceneIndex = 0xFFF3;
@@ -1350,14 +1347,14 @@ void Cutscene_Command_TransitionFX(PlayState* play, CutsceneContext* csCtx, CsCm
                 if (cmd->base == 1) {
                     play->envCtx.screenFillColor[3] = 255.0f * temp;
                     if ((temp == 0.0f) && (gSaveContext.entranceIndex == ENTR_CHAMBER_OF_THE_SAGES_0)) {
-                        Audio_PlaySoundGeneral(NA_SE_SY_WHITE_OUT_S, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_WHITE_OUT_S, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     } else if ((temp == 0.0f) &&
                                ((gSaveContext.entranceIndex == ENTR_TEMPLE_OF_TIME_ENTRANCE) ||
                                 (gSaveContext.entranceIndex == ENTR_CASTLE_GROUNDS_SOUTH_EXIT) ||
                                 (gSaveContext.entranceIndex == ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_FARORES_ZF))) {
-                        Audio_PlaySoundGeneral(NA_SE_EV_WHITE_OUT, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_EV_WHITE_OUT, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     } else if ((temp == 0.0f) && (play->sceneNum == SCENE_INSIDE_GANONS_CASTLE)) {
                         Sfx_PlaySfxCentered2(NA_SE_EV_WHITE_OUT);
                     }
@@ -2211,7 +2208,8 @@ void Cutscene_HandleEntranceTriggers(PlayState* play) {
             (gSaveContext.cutsceneIndex < 0xFFF0) && ((u8)gSaveContext.linkAge == requiredAge) &&
             (gSaveContext.respawnFlag <= 0)) {
             Flags_SetEventChkInf(entranceCutscene->flag);
-            if (GameInteractor_Should(VB_PLAY_ENTRANCE_CS, true, entranceCutscene->flag, entranceCutscene->entrance)) {
+            if (GameInteractor_Should(VB_PLAY_ENTRANCE_CS, true, entranceCutscene->flag, entranceCutscene->entrance,
+                                      entranceCutscene->segAddr)) {
                 Cutscene_SetSegment(play, entranceCutscene->segAddr);
                 gSaveContext.cutsceneTrigger = 2;
                 gSaveContext.showTitleCard = false;
@@ -2237,13 +2235,16 @@ void Cutscene_HandleConditionalTriggers(PlayState* play) {
             Flags_SetEventChkInf(EVENTCHKINF_LEARNED_REQUIEM_OF_SPIRIT);
             gSaveContext.entranceIndex = ENTR_DESERT_COLOSSUS_EAST_EXIT;
             gSaveContext.cutsceneIndex = 0xFFF0;
-        } else if (GameInteractor_Should(VB_BE_ELIGIBLE_FOR_NOCTURNE_OF_SHADOW,
-                                         ((gSaveContext.entranceIndex == ENTR_KAKARIKO_VILLAGE_FRONT_GATE) &&
-                                          LINK_IS_ADULT &&
-                                          Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP) &&
-                                          Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP) &&
-                                          Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP) &&
-                                          !Flags_GetEventChkInf(EVENTCHKINF_BONGO_BONGO_ESCAPED_FROM_WELL)))) {
+        } else if (GameInteractor_Should(
+                       VB_BE_ELIGIBLE_FOR_NOCTURNE_OF_SHADOW,
+                       ((gSaveContext.entranceIndex == ENTR_KAKARIKO_VILLAGE_FRONT_GATE) && LINK_IS_ADULT &&
+                        Combo_SOH_CrossBossLogicalClear(
+                            COMBO_BOSS_PHANTOM_GANON, Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP)) &&
+                        Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_VOLVAGIA,
+                                                        Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP)) &&
+                        Combo_SOH_CrossBossLogicalClear(
+                            COMBO_BOSS_MORPHA, Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP)) &&
+                        !Flags_GetEventChkInf(EVENTCHKINF_BONGO_BONGO_ESCAPED_FROM_WELL)))) {
             Flags_SetEventChkInf(EVENTCHKINF_BONGO_BONGO_ESCAPED_FROM_WELL);
             gSaveContext.cutsceneIndex = 0xFFF0;
         } else if ((gSaveContext.entranceIndex == ENTR_LOST_WOODS_BRIDGE_EAST_EXIT) &&

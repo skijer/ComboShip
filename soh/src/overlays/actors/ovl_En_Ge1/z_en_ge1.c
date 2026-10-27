@@ -8,8 +8,8 @@
 #include "vt.h"
 #include "objects/object_ge1/object_ge1.h"
 #include "soh/Enhancements/randomizer/randomizer_entrance.h"
-#include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/transformation_masks/gerudo_form.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY)
 
@@ -186,8 +186,6 @@ void EnGe1_Destroy(Actor* thisx, PlayState* play) {
     EnGe1* this = (EnGe1*)thisx;
 
     Collider_DestroyCylinder(play, &this->collider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 s32 EnGe1_SetTalkAction(EnGe1* this, PlayState* play, u16 textId, f32 arg3, EnGe1ActionFunc actionFunc) {
@@ -223,6 +221,35 @@ s32 EnGe1_CheckCarpentersFreed(void) {
         return 0;
     }
     return 1;
+}
+
+/**
+ * The friendly check normally runs only in Init, so a guard that spawned hostile
+ * stays hostile even if the player becomes a Gerudo (Gerudo Mask transform)
+ * mid-scene. Re-run the Init dispatch from the watch actions so the guard flips
+ * to her friendly behavior instead of capturing the player on approach.
+ * Returns true if the guard switched to a friendly action this frame.
+ */
+s32 EnGe1_TryBecomeFriendly(EnGe1* this) {
+    if (!GameInteractor_Should(VB_GERUDOS_BE_FRIENDLY, EnGe1_CheckCarpentersFreed())) {
+        return false;
+    }
+
+    switch (this->actor.params & 0xFF) {
+        case GE1_TYPE_GATE_OPERATOR:
+            this->actionFunc = EnGe1_CheckGate_GateOp;
+            break;
+        case GE1_TYPE_HORSEBACK_ARCHERY:
+            this->actionFunc = EnGe1_Wait_Archery;
+            break;
+        case GE1_TYPE_TRAINING_GROUND_GUARD:
+            this->actionFunc = EnGe1_CheckForCard_GTGGuard;
+            break;
+        default:
+            this->actionFunc = EnGe1_SetNormalText;
+            break;
+    }
+    return true;
 }
 
 /**
@@ -263,7 +290,13 @@ void EnGe1_SpotPlayer(EnGe1* this, PlayState* play) {
 }
 
 void EnGe1_WatchForPlayerFrontOnly(EnGe1* this, PlayState* play) {
-    s16 angleDiff = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
+    s16 angleDiff;
+
+    if (EnGe1_TryBecomeFriendly(this)) {
+        return;
+    }
+
+    angleDiff = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
 
     if ((ABS(angleDiff) <= 0x4300) && (this->actor.xzDistToPlayer < 100.0f)) {
         EnGe1_SpotPlayer(this, play);
@@ -306,7 +339,13 @@ void EnGe1_SetNormalText(EnGe1* this, PlayState* play) {
 }
 
 void EnGe1_WatchForAndSensePlayer(EnGe1* this, PlayState* play) {
-    s16 angleDiff = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
+    s16 angleDiff;
+
+    if (EnGe1_TryBecomeFriendly(this)) {
+        return;
+    }
+
+    angleDiff = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
 
     if ((this->actor.xzDistToPlayer < 50.0f) || ((ABS(angleDiff) <= 0x4300) && (this->actor.xzDistToPlayer < 400.0f))) {
         EnGe1_SpotPlayer(this, play);
@@ -403,7 +442,9 @@ void EnGe1_RefuseOpenNoCard_GTGGuard(EnGe1* this, PlayState* play) {
 }
 
 void EnGe1_CheckForCard_GTGGuard(EnGe1* this, PlayState* play) {
-    if (CHECK_QUEST_ITEM(QUEST_GERUDO_CARD)) {
+    // Gerudo Mask cheat: wearing the OOT Gerudo Mask grants temporary GTG access
+    // without owning the card (the mask is enough proof of Gerudo identity).
+    if (CHECK_QUEST_ITEM(QUEST_GERUDO_CARD) || GerudoForm_IsActive()) {
         EnGe1_SetTalkAction(this, play, 0x6014, 100.0f, EnGe1_OfferOpen_GTGGuard);
     } else {
         //! @bug This outcome is inaccessible in normal gameplay since this function it is unreachable without

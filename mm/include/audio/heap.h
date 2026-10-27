@@ -28,7 +28,7 @@ typedef struct {
     /* 0x0 */ u8* addr;
     /* 0x4 */ size_t size;
     /* 0x8 */ s16 tableType;
-    /* 0xA */ s16 id;
+    s32 id;
 } AudioCacheEntry; // size = 0xC
 
 /**
@@ -37,7 +37,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ s8 inUse;
     /* 0x01 */ s8 origMedium;
-    /* 0x02 */ u8 sampleBankId;
+    s32 sampleBankId;
     /* 0x03 */ UNK_TYPE1 pad03[0x5];
     /* 0x08 */ u8* allocatedAddr;
     /* 0x0C */ void* sampleAddr;

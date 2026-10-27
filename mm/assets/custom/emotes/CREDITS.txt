@@ -1,0 +1,16 @@
+Bundled ComboShip emotes
+
+Original creator credits from the supplied pack manifests:
+
+Kawaii Wave — Malon Rose; pack license: ISC
+Angry — Malon Rose; pack license: ISC
+Backflip — Malon Rose; pack license: ISC
+Bashful — Malon Rose; pack license: ISC
+Dab — Neirn; pack license: GPL-3
+MalonSing — Unesag; pack license: ISC
+StylishSheath — Author unspecified in supplied pack; pack license: ISC
+Tiny Little Adiantum — MalonRose; pack license: ISC
+
+Malon Rose / MalonRose is credited for her original animations.
+The supplied assets are bundled at the user's direction with creator attribution.
+Original ModLoader64 plugin scripts are not bundled or executed.

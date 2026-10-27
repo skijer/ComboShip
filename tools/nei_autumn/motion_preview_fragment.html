@@ -1,0 +1,101 @@
+<div id="autumn-motion-preview">
+  <div class="viz-row" style="justify-content:space-between;margin-bottom:10px">
+    <div>Autumn leaf fall <span class="text-small text-muted">· motion simulation</span></div>
+    <div class="viz-row">
+      <button type="button" class="btn" data-version="current" aria-pressed="false">Previous preview</button>
+      <button type="button" class="btn" data-version="revised" aria-pressed="true">All 96 in view</button>
+      <button type="button" class="btn" data-pause aria-pressed="false">Pause</button>
+    </div>
+  </div>
+  <canvas width="1280" height="720" style="width:100%;height:auto;display:block" role="img" aria-label="Twelve-second comparison of current and revised leaf trajectories over the supplied Termina Field capture. Simulation does not include terrain occlusion or revised foliage colors.">Animated comparison of autumn leaves.</canvas>
+  <div class="viz-row text-small text-muted" style="justify-content:space-between;margin-top:8px">
+    <span>Scenery from your capture · no depth occlusion</span>
+    <span class="tabular-nums" data-count></span>
+  </div>
+  <span class="sr-only" aria-live="polite" data-status>Revised leaf motion selected.</span>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('autumn-motion-preview');
+  const canvas = root.querySelector('canvas');
+  const context = canvas.getContext('2d');
+  const encoded = {{TRAJECTORIES}};
+  const decode = (text) => {
+    const bytes = Uint8Array.from(atob(text), c => c.charCodeAt(0));
+    const view = new DataView(bytes.buffer);
+    const frames = [];
+    let offset = 0;
+    while (offset < view.byteLength) {
+      const count = view.getUint16(offset, true); offset += 2;
+      const rows = [];
+      for (let i = 0; i < count; i++) {
+        const row = [];
+        for (let j = 0; j < 5; j++) { row.push(view.getFloat32(offset, true)); offset += 4; }
+        for (let j = 0; j < 3; j++) {row.push(view.getUint8(offset)); offset++;}
+        row.push(view.getInt16(offset, true)); offset += 2;
+        rows.push(row);
+      }
+      frames.push(rows);
+    }
+    return frames;
+  };
+  const versions = {current:decode(encoded.current), revised:decode(encoded.revised)};
+  const background = new Image(); background.src = '{{BACKGROUND}}';
+  const sprites = {{SPRITES}}.map(src => {const img = new Image(); img.src = src; return img;});
+  let selected = 'revised', elapsed = 0, last = null, ended = false;
+  let paused = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pause = root.querySelector('[data-pause]');
+  const setPause = () => {
+    pause.textContent = ended ? 'Replay' : paused ? 'Play' : 'Pause';
+    pause.setAttribute('aria-pressed', String(paused));
+  };
+  setPause();
+  root.querySelectorAll('[data-version]').forEach(button => button.addEventListener('click', () => {
+    selected = button.dataset.version;
+    root.querySelectorAll('[data-version]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+    root.querySelector('[data-status]').textContent = button.textContent + ' selected.';
+  }));
+  pause.addEventListener('click', () => {
+    if (ended) {elapsed = 0; last = null; ended = false; paused = false;}
+    else paused = !paused;
+    setPause();
+  });
+  const draw = (now) => {
+    if (last !== null && !paused) elapsed += Math.min((now - last) / 1000, .1);
+    last = now;
+    const frames = versions[selected], position = Math.min(elapsed * 10, frames.length - 1);
+    if (position === frames.length - 1 && !ended) {
+      ended = true; paused = true; setPause();
+      root.querySelector('[data-status]').textContent = 'Preview finished. Replay is available.';
+    }
+    const index = Math.floor(position), fraction = position - index;
+    const rows = frames[index];
+    const next = new Map(frames[Math.min(index + 1, frames.length - 1)].map(row => [row[7] + ':' + row[8], row]));
+    context.clearRect(0, 0, 1280, 720);
+    if (background.complete && background.naturalWidth) context.drawImage(background, 0, 0, 1280, 720);
+    for (const row of rows) {
+      const other = next.get(row[7] + ':' + row[8]);
+      const mix = (n) => other ? row[n] + (other[n] - row[n]) * fraction : row[n];
+      const sprite = sprites[Math.round(row[6])];
+      if (!sprite.complete || !sprite.naturalWidth) continue;
+      let angle = row[4];
+      if (other) {
+        let delta = other[4] - angle;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        angle += delta * fraction;
+      }
+      context.save();
+      context.globalAlpha = Math.max(0, Math.min(1, mix(5) / 255 * (other ? 1 : 1 - fraction)));
+      context.translate(mix(0) * 1280, mix(1) * 720);
+      context.rotate(-angle);
+      const width = mix(2) * 1280, height = mix(3) * 720;
+      context.drawImage(sprite, -width / 2, -height / 2, width, height);
+      context.restore();
+    }
+    root.querySelector('[data-count]').textContent = rows.length + ' leaves in simulated view · 96 total';
+    requestAnimationFrame(draw);
+  };
+  requestAnimationFrame(draw);
+})();
+</script>

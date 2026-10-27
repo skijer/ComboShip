@@ -1,0 +1,636 @@
+{
+  "version": 1,
+  "scope": "Explicit adjacent donor-letter pixels only; retain every other face sample and all native advances. Coordinates are absolute donor-card pixels; values are pre-sweep 8-bit face coverage.",
+  "glyphs": {
+    "P": {
+      "source": "textures/g_pn_46/gFishingPondTitleCardENGTex",
+      "source_sha256": "78f19a2f06c843de326ad93d9386670563a590724b1542c330e969c3b7359701",
+      "source_crop": [
+        82,
+        0,
+        94,
+        24
+      ],
+      "pre_sweep_face_sha256": "b8c45c2bb27a6d576d36e5eb72b165f6cb63bdf85daad9e1b47485edf1211630",
+      "removed_neighbor_pixels": [
+        [
+          93,
+          9,
+          17
+        ],
+        [
+          93,
+          10,
+          153
+        ],
+        [
+          93,
+          11,
+          255
+        ],
+        [
+          92,
+          12,
+          51
+        ],
+        [
+          93,
+          12,
+          255
+        ],
+        [
+          92,
+          13,
+          34
+        ],
+        [
+          93,
+          13,
+          255
+        ],
+        [
+          93,
+          14,
+          238
+        ],
+        [
+          93,
+          15,
+          136
+        ],
+        [
+          93,
+          16,
+          17
+        ]
+      ],
+      "face_sha256": "8b8e09e7ecd49214034b80261074936ca50a612e1a2ad9b4390350caf338824f",
+      "reason": "following o in Fishing Pond"
+    },
+    "R": {
+      "source": "textures/g_pn_44/gRoyalFamilysTombTitleCardENGTex",
+      "source_sha256": "da4aa44c0de0b32300f0203f65cb43e2c11a35ac6becd6c11e826e6aa988655b",
+      "source_crop": [
+        7,
+        0,
+        18,
+        24
+      ],
+      "pre_sweep_face_sha256": "4626c9839f3f039e934061dd665768019d310fe949b2fa496d489922e749ad2e",
+      "removed_neighbor_pixels": [
+        [
+          17,
+          9,
+          51
+        ],
+        [
+          17,
+          10,
+          187
+        ],
+        [
+          16,
+          11,
+          17
+        ],
+        [
+          17,
+          11,
+          255
+        ],
+        [
+          16,
+          12,
+          68
+        ],
+        [
+          17,
+          12,
+          255
+        ],
+        [
+          16,
+          13,
+          68
+        ],
+        [
+          17,
+          13,
+          255
+        ],
+        [
+          16,
+          14,
+          17
+        ],
+        [
+          17,
+          14,
+          255
+        ],
+        [
+          17,
+          15,
+          187
+        ],
+        [
+          17,
+          16,
+          51
+        ]
+      ],
+      "face_sha256": "5018e2e201c7a3efd241faf155bf9ebdca548dfa63cb12be98024a96eec18431",
+      "reason": "following o in Royal Family's Tomb"
+    },
+    "V": {
+      "source": "textures/g_pn_28/gKakarikoVillageTitleCardENGTex",
+      "source_sha256": "6c3a8e323842ddc881db046c6e3b1a7346f4a920234406f0653126c7c0f8465d",
+      "source_crop": [
+        83,
+        0,
+        96,
+        24
+      ],
+      "pre_sweep_face_sha256": "b0ea4a1663bf23a08e1418cb166bb3b62bfc87c18b1c27cfc1087c1f477679d6",
+      "removed_neighbor_pixels": [
+        [
+          94,
+          4,
+          136
+        ],
+        [
+          95,
+          4,
+          153
+        ],
+        [
+          94,
+          5,
+          255
+        ],
+        [
+          95,
+          5,
+          255
+        ],
+        [
+          94,
+          6,
+          238
+        ],
+        [
+          95,
+          6,
+          255
+        ],
+        [
+          94,
+          7,
+          51
+        ],
+        [
+          95,
+          7,
+          68
+        ],
+        [
+          94,
+          8,
+          119
+        ],
+        [
+          95,
+          8,
+          187
+        ],
+        [
+          94,
+          9,
+          255
+        ],
+        [
+          95,
+          9,
+          255
+        ],
+        [
+          94,
+          10,
+          255
+        ],
+        [
+          95,
+          10,
+          255
+        ],
+        [
+          94,
+          11,
+          255
+        ],
+        [
+          95,
+          11,
+          255
+        ],
+        [
+          94,
+          12,
+          255
+        ],
+        [
+          95,
+          12,
+          255
+        ],
+        [
+          94,
+          13,
+          255
+        ],
+        [
+          95,
+          13,
+          255
+        ],
+        [
+          94,
+          14,
+          255
+        ],
+        [
+          95,
+          14,
+          255
+        ],
+        [
+          94,
+          15,
+          255
+        ],
+        [
+          95,
+          15,
+          255
+        ],
+        [
+          94,
+          16,
+          255
+        ],
+        [
+          95,
+          16,
+          255
+        ],
+        [
+          94,
+          17,
+          119
+        ],
+        [
+          95,
+          17,
+          119
+        ]
+      ],
+      "face_sha256": "12aab30b129a829adf287d2ec11ea0b03611627f9e477cd32ff3cc01a7abe391",
+      "reason": "following i, including its dot, in Kakariko Village"
+    },
+    "W": {
+      "source": "textures/g_pn_36/gLostWoodsTitleCardENGTex",
+      "source_sha256": "d90a92d7fc7140eabc92c175ab9d8eea37962f51dd200add7982825f7d765c25",
+      "source_crop": [
+        65,
+        0,
+        83,
+        24
+      ],
+      "pre_sweep_face_sha256": "21c2e73eed961de1a905cf0e8e40d047f0c8d468910ca05692eb08c235238fa9",
+      "removed_neighbor_pixels": [
+        [
+          82,
+          8,
+          17
+        ],
+        [
+          81,
+          9,
+          51
+        ],
+        [
+          82,
+          9,
+          238
+        ],
+        [
+          81,
+          10,
+          187
+        ],
+        [
+          82,
+          10,
+          255
+        ],
+        [
+          80,
+          11,
+          34
+        ],
+        [
+          81,
+          11,
+          255
+        ],
+        [
+          82,
+          11,
+          255
+        ],
+        [
+          80,
+          12,
+          68
+        ],
+        [
+          81,
+          12,
+          255
+        ],
+        [
+          82,
+          12,
+          255
+        ],
+        [
+          80,
+          13,
+          68
+        ],
+        [
+          81,
+          13,
+          255
+        ],
+        [
+          82,
+          13,
+          255
+        ],
+        [
+          80,
+          14,
+          34
+        ],
+        [
+          81,
+          14,
+          255
+        ],
+        [
+          82,
+          14,
+          255
+        ],
+        [
+          81,
+          15,
+          187
+        ],
+        [
+          82,
+          15,
+          255
+        ],
+        [
+          81,
+          16,
+          17
+        ],
+        [
+          82,
+          16,
+          204
+        ]
+      ],
+      "face_sha256": "5300cb2142ca13a2df8caba9e128c4fdae0c2b59ac757280142999a93426379e",
+      "reason": "following o in Lost Woods"
+    },
+    "r": {
+      "source": "textures/g_pn_01/gForestTempleTitleCardENGTex",
+      "source_sha256": "905d6900786393b2833888a5be19cc71851af4f8bd19e04d116d135f9e876663",
+      "source_crop": [
+        35,
+        0,
+        43,
+        24
+      ],
+      "pre_sweep_face_sha256": "e09578547b6990794089b9d819932f65d6e2c44cfc0122b8ae51e641fadd14e3",
+      "removed_neighbor_pixels": [
+        [
+          42,
+          10,
+          68
+        ],
+        [
+          42,
+          11,
+          136
+        ],
+        [
+          42,
+          12,
+          187
+        ],
+        [
+          42,
+          13,
+          187
+        ],
+        [
+          42,
+          14,
+          119
+        ],
+        [
+          42,
+          15,
+          34
+        ]
+      ],
+      "face_sha256": "224ffdfc9cd3d5f03c10ddc2d35c63edd608271a19db01fa305251f2a53e23d0",
+      "reason": "following e in Forest Temple"
+    },
+    "v": {
+      "source": "textures/g_pn_10/gIceCavernTitleCardENGTex",
+      "source_sha256": "f5c13c4861d5e8dd26d2942f2d7295bc2edea8a6c5c9c0ab2ec1b3e58213fafb",
+      "source_crop": [
+        80,
+        0,
+        90,
+        24
+      ],
+      "pre_sweep_face_sha256": "7921e303464fc0d5699d8eda3fff4be35b937e137742a1881d738156dd0d4bae",
+      "removed_neighbor_pixels": [
+        [
+          89,
+          10,
+          51
+        ],
+        [
+          89,
+          11,
+          119
+        ],
+        [
+          89,
+          12,
+          170
+        ],
+        [
+          89,
+          13,
+          153
+        ],
+        [
+          89,
+          14,
+          119
+        ],
+        [
+          89,
+          15,
+          34
+        ]
+      ],
+      "face_sha256": "90d206695cf8e230cca606c2bc3e48289eda3a9e0b580afcf67819be47939aee",
+      "reason": "following e in Ice Cavern"
+    },
+    "x": {
+      "source": "textures/g_pn_51/gTreasureBoxShopTitleCardENGTex",
+      "source_sha256": "fb4517d5f6c45f0fa7e41f12d534a8586babca931562d4520211994b738cc79c",
+      "source_crop": [
+        89,
+        0,
+        98,
+        24
+      ],
+      "pre_sweep_face_sha256": "d6d23cdd6da15b93cb632bc8557c7098c89db75eae9ab7b8686062dfb178431d",
+      "removed_neighbor_pixels": [
+        [
+          89,
+          9,
+          17
+        ],
+        [
+          89,
+          10,
+          119
+        ],
+        [
+          89,
+          11,
+          187
+        ],
+        [
+          89,
+          12,
+          255
+        ],
+        [
+          89,
+          13,
+          238
+        ],
+        [
+          89,
+          14,
+          187
+        ],
+        [
+          89,
+          15,
+          102
+        ]
+      ],
+      "face_sha256": "cb262241df8ea30cfd613309e1896fa112995ebdbe27eeff8e2af4b0e407e21f",
+      "reason": "preceding o in Treasure Box Shop"
+    },
+    "y": {
+      "source": "textures/g_pn_18/gBackAlleyTitleCardENGTex",
+      "source_sha256": "9ef73fd5c26bb562344f9dc96ea41bdaf3d8b6f5f042da8e698cf5abb1d46da8",
+      "source_crop": [
+        102,
+        0,
+        113,
+        24
+      ],
+      "pre_sweep_face_sha256": "7a2405fe8e3a84be6b6695cfdb92710da0dada47da3728ea71ed03003526c638",
+      "removed_neighbor_pixels": [
+        [
+          102,
+          8,
+          34
+        ],
+        [
+          102,
+          9,
+          238
+        ],
+        [
+          103,
+          9,
+          51
+        ],
+        [
+          102,
+          10,
+          255
+        ],
+        [
+          103,
+          10,
+          204
+        ],
+        [
+          104,
+          10,
+          17
+        ],
+        [
+          102,
+          11,
+          255
+        ],
+        [
+          103,
+          11,
+          255
+        ],
+        [
+          104,
+          11,
+          34
+        ],
+        [
+          102,
+          12,
+          255
+        ],
+        [
+          103,
+          12,
+          238
+        ],
+        [
+          104,
+          12,
+          68
+        ]
+      ],
+      "face_sha256": "889a8b35b6d24d603e16f89ca76e0476c61e18d267002aa031baeb428f4d6e14",
+      "reason": "preceding e in Back Alley"
+    }
+  }
+}

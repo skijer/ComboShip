@@ -94,6 +94,9 @@ class GfxRenderingAPIDX11 final : public GfxRenderingAPI {
     void SetScissor(int x, int y, int width, int height) override;
     void SetUseAlpha(bool useAlpha) override;
     void DrawTriangles(float buf_vbo[], size_t buf_vbo_len, size_t buf_vbo_num_tris) override;
+    void BeginGpuTiming(uint64_t frameId, bool enabled) override;
+    void EndGpuTiming() override;
+    nlohmann::json GetGpuTimingTelemetry() override;
     void Init() override;
     void OnResize() override;
     void StartFrame() override;
@@ -126,6 +129,22 @@ class GfxRenderingAPIDX11 final : public GfxRenderingAPI {
     D3D_FEATURE_LEVEL mFeatureLevel;
 
   private:
+    struct GpuTimingSlot {
+        Microsoft::WRL::ComPtr<ID3D11Query> disjoint, start, end;
+        uint64_t frameId = 0;
+        bool pending = false;
+    };
+    GpuTimingSlot mGpuTimingSlots[8];
+    int mActiveGpuTimingSlot = -1;
+    bool mGpuTimingEnabled = false;
+    uint64_t mGpuTimingFrameId = 0;
+    uint64_t mGpuTimingDropped = 0;
+    const char* mGpuTimingStatus = "disabled";
+    nlohmann::json mGpuTimingSamples = nlohmann::json::array();
+    void PollGpuTiming();
+    void ResetGpuTiming();
+    void RecordGpuTiming(uint64_t frameId, const char* status, nlohmann::json ms = nullptr,
+                         nlohmann::json error = nullptr);
     void CreateDepthStencilObjects(uint32_t width, uint32_t height, uint32_t msaa_count, ID3D11DepthStencilView** view,
                                    ID3D11ShaderResourceView** srv);
 

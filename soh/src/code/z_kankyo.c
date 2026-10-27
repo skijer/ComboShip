@@ -1,4 +1,5 @@
 #include "global.h"
+#include "soh/Enhancements/debugger/FrameTimingProbe.h"
 #include <libultraship/libultra.h>
 #include "vt.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
@@ -7,6 +8,12 @@
 #include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/savestate_serialize.h"
+#include "concurrent_weather_audio.h"
+#include "soh/Enhancements/audio/WeatherSamplePlayer.h"
+#include "soh/Enhancements/audio/GlobalOutdoorRainBridge.h"
+#include "soh/Enhancements/audio/SeasonWeather.h"
+#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 typedef enum {
     /* 0 */ LENS_FLARE_CIRCLE0,
@@ -600,7 +607,9 @@ void func_8006FB94(EnvironmentContext* envCtx, u8 unused) {
                     envCtx->unk_20 = 0;
                     D_8011FB34 = 0;
                     envCtx->unk_22 = envCtx->unk_24 = 100;
-                    envCtx->unk_EE[0] = 0;
+                    if (!GlobalOutdoorRain_HasRainIntent()) {
+                        envCtx->unk_EE[0] = 0;
+                    }
                     envCtx->gloomySkyMode = 0;
                     envCtx->unk_DE = 0;
                 }
@@ -906,6 +915,7 @@ void Environment_Update(PlayState* play, EnvironmentContext* envCtx, LightContex
             }
         }
 
+        GlobalOutdoorRain_Resolve(play);
         func_800766C4(play); // increments or decrements unk_EE[1] depending on some condition
         func_80075B44(play); // updates bgm/sfx and other things as the day progresses
 
@@ -1146,30 +1156,35 @@ void Environment_Update(PlayState* play, EnvironmentContext* envCtx, LightContex
 
         // Apply lighting adjustments
         for (i = 0; i < 3; i++) {
-            if ((s16)(envCtx->lightSettings.ambientColor[i] + envCtx->adjAmbientColor[i]) > 255) {
+            // Seasonal shade belongs to the displayed light, not the shared
+            // adjustment fields that native bombs/lightning update and fade.
+            s16 seasonalAmbient = SeasonWeather_LightOffset(play, i, true);
+            s16 seasonalLight = SeasonWeather_LightOffset(play, i, false);
+            s16 ambient = envCtx->lightSettings.ambientColor[i] + envCtx->adjAmbientColor[i] + seasonalAmbient;
+            s16 light1 = envCtx->lightSettings.light1Color[i] + envCtx->adjLight1Color[i] + seasonalLight;
+            s16 light2 = envCtx->lightSettings.light2Color[i] + envCtx->adjLight1Color[i] + seasonalLight;
+            if (ambient > 255) {
                 lightCtx->ambientColor[i] = 255;
-            } else if ((s16)(envCtx->lightSettings.ambientColor[i] + envCtx->adjAmbientColor[i]) < 0) {
+            } else if (ambient < 0) {
                 lightCtx->ambientColor[i] = 0;
             } else {
-                lightCtx->ambientColor[i] = (s16)(envCtx->lightSettings.ambientColor[i] + envCtx->adjAmbientColor[i]);
+                lightCtx->ambientColor[i] = ambient;
             }
 
-            if ((s16)(envCtx->lightSettings.light1Color[i] + envCtx->adjLight1Color[i]) > 255) {
+            if (light1 > 255) {
                 envCtx->dirLight1.params.dir.color[i] = 255;
-            } else if ((s16)(envCtx->lightSettings.light1Color[i] + envCtx->adjLight1Color[i]) < 0) {
+            } else if (light1 < 0) {
                 envCtx->dirLight1.params.dir.color[i] = 0;
             } else {
-                envCtx->dirLight1.params.dir.color[i] =
-                    (s16)(envCtx->lightSettings.light1Color[i] + envCtx->adjLight1Color[i]);
+                envCtx->dirLight1.params.dir.color[i] = light1;
             }
 
-            if ((s16)(envCtx->lightSettings.light2Color[i] + envCtx->adjLight1Color[i]) > 255) {
+            if (light2 > 255) {
                 envCtx->dirLight2.params.dir.color[i] = 255;
-            } else if ((s16)(envCtx->lightSettings.light2Color[i] + envCtx->adjLight1Color[i]) < 0) {
+            } else if (light2 < 0) {
                 envCtx->dirLight2.params.dir.color[i] = 0;
             } else {
-                envCtx->dirLight2.params.dir.color[i] =
-                    (s16)(envCtx->lightSettings.light2Color[i] + envCtx->adjLight1Color[i]);
+                envCtx->dirLight2.params.dir.color[i] = light2;
             }
 
             if ((s16)(envCtx->lightSettings.fogColor[i] + envCtx->adjFogColor[i]) > 255) {
@@ -1629,6 +1644,10 @@ f32 func_800746DC(void) {
 }
 
 void Environment_DrawRain(PlayState* play, View* view, GraphicsContext* gfxCtx) {
+    FrameTimingSpan rainSpan = FrameTiming_BeginSpan();
+    FrameTimingSpan phaseSpan = rainSpan;
+    uint64_t dropsDrawn = 0;
+    uint64_t splashesDrawn = 0;
     s16 i;
     s32 pad;
     Vec3f vec;
@@ -1647,6 +1666,8 @@ void Environment_DrawRain(PlayState* play, View* view, GraphicsContext* gfxCtx) 
     Vec3f windDirection = { 0.0f, 0.0f, 0.0f };
     Player* player = GET_PLAYER(play);
 
+    GlobalOutdoorRain_RecordDraw(play, (play->cameraPtrs[0]->unk_14C & 0x100) != 0, play->envCtx.unk_EE[2],
+                                 play->cameraPtrs[0]->eye.y, play->cameraPtrs[0]->waterYPos, view->eye.y);
     if (!(play->cameraPtrs[0]->unk_14C & 0x100) && (play->envCtx.unk_EE[2] == 0)) {
         OPEN_DISPS(gfxCtx);
 
@@ -1668,13 +1689,21 @@ void Environment_DrawRain(PlayState* play, View* view, GraphicsContext* gfxCtx) 
         z280 = view->eye.z + temp3 * 280.0f;
 
         if (play->envCtx.unk_EE[1]) {
+            u8 rainRed = 150;
+            u8 rainGreen = 255;
+            u8 rainBlue = 255;
+
+            GlobalOutdoorRain_GetRenderColor(&rainRed, &rainGreen, &rainBlue);
             gDPPipeSync(POLY_XLU_DISP++);
-            gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 150, 255, 255, 30);
+            gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, rainRed, rainGreen, rainBlue, 30);
             POLY_XLU_DISP = Gfx_SetupDL(POLY_XLU_DISP, 20);
         }
 
+        FrameTiming_EndNamedSpan("weather", "rain_setup", phaseSpan);
+        phaseSpan = FrameTiming_BeginSpan();
         // draw rain drops
         for (i = 0; i < play->envCtx.unk_EE[1]; i++) {
+            dropsDrawn++;
             FrameInterpolation_RecordOpenChild("Rain Drop", i);
 
             temp2 = Rand_ZeroOne();
@@ -1705,11 +1734,14 @@ void Environment_DrawRain(PlayState* play, View* view, GraphicsContext* gfxCtx) 
             FrameInterpolation_RecordCloseChild();
         }
 
+        FrameTiming_EndNamedSpan("weather", "rain_drops", phaseSpan);
+        phaseSpan = FrameTiming_BeginSpan();
         // draw droplet rings on the ground
         if (player->actor.world.pos.y < view->eye.y) {
             u8 firstDone = false;
 
             for (i = 0; i < play->envCtx.unk_EE[1]; i++) {
+                splashesDrawn++;
                 FrameInterpolation_RecordOpenChild("Droplet Ring", i);
 
                 if (!firstDone) {
@@ -1737,7 +1769,13 @@ void Environment_DrawRain(PlayState* play, View* view, GraphicsContext* gfxCtx) 
         }
 
         CLOSE_DISPS(gfxCtx);
+        FrameTiming_EndNamedSpan("weather", "rain_splashes", phaseSpan);
     }
+    if (rainSpan.epoch != 0) {
+        FrameTiming_Count("rain_drops_drawn", dropsDrawn);
+        FrameTiming_Count("rain_splashes_drawn", splashesDrawn);
+    }
+    FrameTiming_EndNamedSpan("weather", "rain_total", rainSpan);
 }
 
 void func_80074CE8(PlayState* play, u32 arg1) {
@@ -1814,15 +1852,19 @@ void Environment_DrawLightningFlash(PlayState* play, u8 red, u8 green, u8 blue, 
 void Environment_UpdateLightningStrike(PlayState* play) {
     if (play->envCtx.lightningMode != LIGHTNING_MODE_OFF) {
         switch (gLightningStrike.state) {
-            case LIGHTNING_STRIKE_WAIT:
+            case LIGHTNING_STRIKE_WAIT: {
+                f32 thunderFrequencyScale = CVarGetInteger(CVAR_AUDIO("ProximityWeatherThunder"), 1)
+                                                ? ConcurrentWeatherAudio_ThunderFrequencyScale(CVarGetInteger(
+                                                      CVAR_AUDIO("ProximityWeatherThunderFrequency"), 50))
+                                                : 0.0f;
                 // every frame theres a 10% chance of the timer advancing 50 units
-                if (Rand_ZeroOne() < 0.1f) {
-                    gLightningStrike.delayTimer += 50.0f;
+                if (thunderFrequencyScale > 0.0f && Rand_ZeroOne() < 0.1f) {
+                    gLightningStrike.delayTimer += 50.0f * thunderFrequencyScale;
                 }
 
-                gLightningStrike.delayTimer += Rand_ZeroOne();
+                gLightningStrike.delayTimer += Rand_ZeroOne() * thunderFrequencyScale;
 
-                if (gLightningStrike.delayTimer > 500.0f) {
+                if (thunderFrequencyScale > 0.0f && gLightningStrike.delayTimer > 500.0f) {
                     gLightningStrike.flashRed = 200;
                     gLightningStrike.flashGreen = 200;
                     gLightningStrike.flashBlue = 255;
@@ -1832,9 +1874,34 @@ void Environment_UpdateLightningStrike(PlayState* play) {
                     Environment_AddLightningBolts(play,
                                                   (u8)(Rand_ZeroOne() * (ARRAY_COUNT(sLightningBolts) - 0.1f)) + 1);
                     sLightningFlashAlpha = 0;
+                    if (!Audio_IsNatureLightningEnabled() && CVarGetInteger(CVAR_AUDIO("ProximityWeatherThunder"), 1)) {
+                        f32 thunderGain = ConcurrentWeatherAudio_ClampPercent(
+                                              CVarGetInteger(CVAR_AUDIO("ProximityWeatherThunderVolume"), 70)) /
+                                          100.0f;
+                        ConcurrentWeatherThunderStyle thunderStyle = ConcurrentWeatherAudio_ThunderStyle(
+                            CVarGetInteger(CVAR_AUDIO("ProximityWeatherThunderStyle"), CONCURRENT_WEATHER_THUNDER_LOW));
+
+                        s32 lowThunderStarted = -1;
+                        if (thunderStyle != CONCURRENT_WEATHER_THUNDER_LIGHTNING) {
+                            lowThunderStarted = WeatherSamplePlayer_Play(
+                                "audio/samples/Low Thunder_META",
+                                thunderStyle == CONCURRENT_WEATHER_THUNDER_LAYERED ? thunderGain * 0.7f : thunderGain);
+                        }
+                        s32 lightningStarted = -1;
+                        if (thunderStyle != CONCURRENT_WEATHER_THUNDER_LOW) {
+                            lightningStarted = WeatherSamplePlayer_Play(
+                                "audio/samples/Lightning_META",
+                                thunderStyle == CONCURRENT_WEATHER_THUNDER_LAYERED ? thunderGain * 0.7f : thunderGain);
+                        }
+                        if (CVarGetInteger(CVAR_AUDIO("WeatherAudioDiagnostics"), 0)) {
+                            osSyncPrintf("[weather-audio] lightning trigger low=%d layer=%d style=%d gain=%.3f\n",
+                                         lowThunderStarted, lightningStarted, thunderStyle, thunderGain);
+                        }
+                    }
                     gLightningStrike.state++;
                 }
                 break;
+            }
             case LIGHTNING_STRIKE_START:
                 gLightningStrike.flashRed = 200;
                 gLightningStrike.flashGreen = 200;
@@ -1909,6 +1976,8 @@ void Environment_AddLightningBolts(PlayState* play, u8 num) {
  * Draw any active lightning bolt entries contained in `sLightningBolts`
  */
 void Environment_DrawLightning(PlayState* play, s32 unused) {
+    FrameTimingSpan lightningSpan = FrameTiming_BeginSpan();
+    uint64_t boltsDrawn = 0;
     static void* lightningTextures[] = {
         gEffLightning1Tex, gEffLightning2Tex, gEffLightning3Tex,
         gEffLightning4Tex, gEffLightning5Tex, gEffLightning6Tex,
@@ -1967,6 +2036,7 @@ void Environment_DrawLightning(PlayState* play, s32 unused) {
         }
 
         if (sLightningBolts[i].state == LIGHTNING_BOLT_DRAW) {
+            boltsDrawn++;
             Matrix_Translate(sLightningBolts[i].pos.x + sLightningBolts[i].offset.x,
                              sLightningBolts[i].pos.y + sLightningBolts[i].offset.y,
                              sLightningBolts[i].pos.z + sLightningBolts[i].offset.z, MTXMODE_NEW);
@@ -1986,6 +2056,10 @@ void Environment_DrawLightning(PlayState* play, s32 unused) {
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
+    if (lightningSpan.epoch != 0) {
+        FrameTiming_Count("lightning_bolts_drawn", boltsDrawn);
+    }
+    FrameTiming_EndNamedSpan("weather", "lightning_draw", lightningSpan);
 }
 
 void Environment_PlaySceneSequence(PlayState* play) {
@@ -2533,6 +2607,9 @@ void Environment_WarpSongLeave(PlayState* play) {
     play->transitionTrigger = TRANS_TRIGGER_START;
     play->transitionType = TRANS_TYPE_FADE_WHITE;
     gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+
+    // Where entrance rando redirects the warp: every warp song path decides its destination here.
+    GameInteractor_ExecuteOnWarpSongLeave();
 
     switch (play->nextEntranceIndex) {
         case ENTR_DEATH_MOUNTAIN_CRATER_UPPER_EXIT:

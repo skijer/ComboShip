@@ -1,0 +1,31 @@
+{
+  "authoring_pillow_version": "12.3.0",
+  "base64_bytes": 107684,
+  "base64_sha256": "3132f1e022e4f80ebc6d92937070f60f14b11f73193f66bf97aefb1f7e40479f",
+  "decoded_bytes": 156160,
+  "dimensions": [
+    320,
+    122
+  ],
+  "file": "prop-glass.zlib.001.b64",
+  "generated_source_dimensions": [
+    1254,
+    1254
+  ],
+  "generated_source_name": "exec-8c2c01be-7848-403d-ada2-f80c37ed51bb.png",
+  "generated_source_sha256": "d7b693498985fe8424f0363815d359ce64962efcc108c0f79a7727e2aabb214d",
+  "generation": "built-in imagegen; new four-cell glass material atlas, not a gameplay capture",
+  "packed_bytes": 80763,
+  "packed_sha256": "8768d395b8395e82f9148ef0980e171eec4cd2d9180f61b9f8bed208246fde80",
+  "palette_order": [
+    "sea-green",
+    "cobalt",
+    "amber",
+    "plum"
+  ],
+  "parent_commit": "4fff75754ef1578e586312fbf8c68e3adb99b4df",
+  "pixels_sha256": "ab5f028b0a0510046af0ac6e6aed50cdbf9dee5a008f7160b13b9306ee7dbab4",
+  "processing": "Four equal generated quadrants cropped TL,TR,BL,BR; each LANCZOS resampled to80x122; concatenated horizontally into320x122 opaqueRGBA strip; zlib9/base64 lossless thereafter",
+  "prompt_file": "prop-glass-prompt.txt",
+  "version": 1
+}

@@ -8,6 +8,7 @@
 #include "z64shrink_window.h"
 #include "libc/string.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "2s2h/Enhancements/Gameplay/ComboOpeningForest.h"
 
 ActorCutscene sGlobalCutsceneList[] = {
     // CS_ID_GLOBAL_78
@@ -57,6 +58,37 @@ typedef struct {
 CutsceneManager sCutsceneMgr = {
     CS_ID_NONE, 0, CS_ID_NONE, SUB_CAM_ID_DONE, NULL, CS_START_0, NULL, CAM_ID_MAIN, false,
 };
+
+// Stop is deferred until the next manager update. Camera slots can be cleared
+// or reused in that interval, so a slot ID alone does not establish ownership.
+static Camera* sCutsceneOwnedCamera;
+static s16 sCutsceneOwnedCameraUid = -1;
+static Camera* sCutsceneReturnCamera;
+static s16 sCutsceneReturnCameraUid = -1;
+static s32 sProtectCutsceneCameras;
+
+static Camera* CutsceneManager_GetCameraById(s16 camId) {
+    if ((sCutsceneMgr.play == NULL) || (camId < CAM_ID_MAIN) || (camId >= NUM_CAMS)) {
+        return NULL;
+    }
+    return sCutsceneMgr.play->cameraPtrs[camId];
+}
+
+static s32 CutsceneManager_CameraMatches(s16 camId, Camera* expected, s16 uid) {
+    Camera* camera = CutsceneManager_GetCameraById(camId);
+
+    return (expected != NULL) && (camera == expected) && (camera->uid == uid);
+}
+
+static void CutsceneManager_ResetCameraIdentities(void) {
+    sCutsceneOwnedCamera = sCutsceneReturnCamera = NULL;
+    sCutsceneOwnedCameraUid = sCutsceneReturnCameraUid = -1;
+}
+
+static void CutsceneManager_CaptureReturnCamera(void) {
+    sCutsceneReturnCamera = CutsceneManager_GetCameraById(sCutsceneMgr.retCamId);
+    sCutsceneReturnCameraUid = (sCutsceneReturnCamera != NULL) ? sCutsceneReturnCamera->uid : -1;
+}
 
 ActorCutscene* sSceneCutsceneList;
 s16 sSceneCutsceneCount;
@@ -125,6 +157,7 @@ void CutsceneManager_Init(PlayState* play, ActorCutscene* cutsceneList, s16 numE
 
     sSceneCutsceneList = cutsceneList;
     sSceneCutsceneCount = numEntries;
+    sProtectCutsceneCameras = false;
 
     for (i = 0; i < ARRAY_COUNT(sWaitingCutsceneList); i++) {
         sWaitingCutsceneList[i] = 0;
@@ -138,12 +171,23 @@ void CutsceneManager_Init(PlayState* play, ActorCutscene* cutsceneList, s16 numE
     sCutsceneMgr.subCamId = SUB_CAM_ID_DONE;
     sCutsceneMgr.isCameraStored = false;
     sCutsceneMgr.csId = sCutsceneMgr.endCsId;
+    CutsceneManager_ResetCameraIdentities();
+}
+
+void CutsceneManager_SetCameraOwnershipProtection(s32 enabled) {
+    sProtectCutsceneCameras = enabled != false;
 }
 
 /**
  * Store camera into subCam 2, and keep subCam 2 INACTIVE to preserve the struct.
  */
 void CutsceneManager_StoreCamera(Camera* camera) {
+    // The return snapshot shares the final subcamera's storage. An independent
+    // owner may now be using that slot; neither copy over it nor deactivate it.
+    if (sProtectCutsceneCameras && (CutsceneManager_GetCameraById(NUM_CAMS - 1) != NULL)) {
+        sCutsceneMgr.isCameraStored = false;
+        return;
+    }
     if (camera != NULL) {
         memcpy(&sCutsceneMgr.play->subCameras[2], camera, sizeof(Camera));
         sCutsceneMgr.play->subCameras[2].camId = camera->camId;
@@ -208,6 +252,11 @@ void CutsceneManager_End(void) {
     ActorCutscene* csEntry;
     s16 oldCamId;
     s16 oldStateFlags;
+    s32 tracksCamera;
+    s32 ownsCamera;
+    s32 returnCameraValid;
+    Camera* activeCamera;
+    s32 foreignCameraActive;
 
     switch (sCutsceneMgr.startMethod) {
         case CS_START_2:
@@ -237,42 +286,82 @@ void CutsceneManager_End(void) {
             break;
     }
 
-    switch (csEntry->endCam) {
-        case CS_END_CAM_SMOOTH:
-            Play_CopyCamera(sCutsceneMgr.play, sCutsceneMgr.retCamId, sCutsceneMgr.subCamId);
-            RET_CAM->stateFlags =
-                (RET_CAM->stateFlags & ~CAM_STATE_UNDERWATER) | (CUR_CAM->stateFlags & CAM_STATE_UNDERWATER);
-            CutsceneManager_Queue(CS_ID_GLOBAL_RETURN_TO_CAM);
-            break;
+    // Player/audio cleanup can run enhancement callbacks. Validate ownership at
+    // the camera mutation boundary, after those callbacks have completed.
+    tracksCamera = sProtectCutsceneCameras && (sCutsceneOwnedCamera != NULL);
+    ownsCamera = CutsceneManager_CameraMatches(sCutsceneMgr.subCamId, sCutsceneOwnedCamera, sCutsceneOwnedCameraUid);
+    returnCameraValid =
+        CutsceneManager_CameraMatches(sCutsceneMgr.retCamId, sCutsceneReturnCamera, sCutsceneReturnCameraUid);
+    activeCamera = CutsceneManager_GetCameraById(Play_GetActiveCamId(sCutsceneMgr.play));
+    foreignCameraActive = (activeCamera != NULL) && (!ownsCamera || (activeCamera != sCutsceneOwnedCamera));
 
-        case CS_END_CAM_0:
-        default:
-            Play_CopyCamera(sCutsceneMgr.play, sCutsceneMgr.retCamId, sCutsceneMgr.subCamId);
-            RET_CAM->stateFlags =
-                (RET_CAM->stateFlags & ~CAM_STATE_UNDERWATER) | (CUR_CAM->stateFlags & CAM_STATE_UNDERWATER);
-            break;
-
-        case CS_END_CAM_1:
-            oldCamId = RET_CAM->camId;
-            oldStateFlags = RET_CAM->stateFlags;
-
-            if (sCutsceneMgr.isCameraStored) {
-                // Restore the camera that was stored in subCam 2
-                memcpy(RET_CAM, &sCutsceneMgr.play->subCameras[2], sizeof(Camera));
-
+    if (!tracksCamera || (ownsCamera && returnCameraValid && !foreignCameraActive)) {
+        switch (csEntry->endCam) {
+            case CS_END_CAM_SMOOTH:
+                Play_CopyCamera(sCutsceneMgr.play, sCutsceneMgr.retCamId, sCutsceneMgr.subCamId);
                 RET_CAM->stateFlags =
                     (RET_CAM->stateFlags & ~CAM_STATE_UNDERWATER) | (CUR_CAM->stateFlags & CAM_STATE_UNDERWATER);
+                CutsceneManager_Queue(CS_ID_GLOBAL_RETURN_TO_CAM);
+                break;
 
-                RET_CAM->stateFlags = (RET_CAM->stateFlags & ~CAM_STATE_2) | (oldStateFlags & CAM_STATE_2);
-                sCutsceneMgr.isCameraStored = false;
-            }
-            RET_CAM->camId = oldCamId;
-            break;
+            case CS_END_CAM_0:
+            default:
+                Play_CopyCamera(sCutsceneMgr.play, sCutsceneMgr.retCamId, sCutsceneMgr.subCamId);
+                RET_CAM->stateFlags =
+                    (RET_CAM->stateFlags & ~CAM_STATE_UNDERWATER) | (CUR_CAM->stateFlags & CAM_STATE_UNDERWATER);
+                break;
+
+            case CS_END_CAM_1:
+                oldCamId = RET_CAM->camId;
+                oldStateFlags = RET_CAM->stateFlags;
+
+                if (sCutsceneMgr.isCameraStored) {
+                    // Restore the camera that was stored in subCam 2
+                    memcpy(RET_CAM, &sCutsceneMgr.play->subCameras[2], sizeof(Camera));
+                    if (tracksCamera) {
+                        // This validated native restore also restores its UID.
+                        // It remains our return camera for activation below.
+                        sCutsceneReturnCameraUid = RET_CAM->uid;
+                    }
+
+                    RET_CAM->stateFlags =
+                        (RET_CAM->stateFlags & ~CAM_STATE_UNDERWATER) | (CUR_CAM->stateFlags & CAM_STATE_UNDERWATER);
+
+                    RET_CAM->stateFlags = (RET_CAM->stateFlags & ~CAM_STATE_2) | (oldStateFlags & CAM_STATE_2);
+                    sCutsceneMgr.isCameraStored = false;
+                }
+                RET_CAM->camId = oldCamId;
+                break;
+        }
+    } else {
+        // A stale slot or an already active owner cannot accept an old pose or
+        // stored snapshot. Player and actor cutscene cleanup still runs above.
+        sCutsceneMgr.isCameraStored = false;
     }
 
-    if (sCutsceneMgr.subCamId != SUB_CAM_ID_DONE) {
+    if (!tracksCamera && (sCutsceneMgr.subCamId != SUB_CAM_ID_DONE)) {
         Play_ClearCamera(sCutsceneMgr.play, sCutsceneMgr.subCamId);
         Play_ChangeCameraStatus(sCutsceneMgr.play, sCutsceneMgr.retCamId, CAM_STATUS_ACTIVE);
+    } else if (tracksCamera) {
+        if (ownsCamera) {
+            Play_ClearCamera(sCutsceneMgr.play, sCutsceneMgr.subCamId);
+        }
+        // Preserve any surviving active owner. Only select a fallback when the
+        // active slot was cleared; never revive or restore a recycled return ID.
+        if (CutsceneManager_GetCameraById(Play_GetActiveCamId(sCutsceneMgr.play)) == NULL) {
+            if (CutsceneManager_CameraMatches(sCutsceneMgr.retCamId, sCutsceneReturnCamera, sCutsceneReturnCameraUid)) {
+                Play_ChangeCameraStatus(sCutsceneMgr.play, sCutsceneMgr.retCamId, CAM_STATUS_ACTIVE);
+            } else if (CutsceneManager_GetCameraById(CAM_ID_MAIN) != NULL) {
+                Play_ChangeCameraStatus(sCutsceneMgr.play, CAM_ID_MAIN, CAM_STATUS_ACTIVE);
+            }
+        }
+        // Idle Update borrows retCamId again. Do not leave it pointing at a
+        // return slot whose old identity was rejected during this End.
+        if (CutsceneManager_GetCameraById(Play_GetActiveCamId(sCutsceneMgr.play)) != NULL) {
+            sCutsceneMgr.retCamId = Play_GetActiveCamId(sCutsceneMgr.play);
+        } else {
+            sCutsceneMgr.retCamId = CAM_ID_MAIN;
+        }
     }
 
     sCutsceneMgr.csId = CS_ID_NONE;
@@ -280,6 +369,7 @@ void CutsceneManager_End(void) {
     sCutsceneMgr.length = -1;
     sCutsceneMgr.targetActor = NULL;
     sCutsceneMgr.subCamId = SUB_CAM_ID_DONE;
+    CutsceneManager_ResetCameraIdentities();
 }
 
 s16 CutsceneManager_Update(void) {
@@ -379,6 +469,11 @@ s16 CutsceneManager_StartWithPlayerCsAndSetFlag(s16 csId, Actor* actor) {
 }
 
 s16 CutsceneManager_Start(s16 csId, Actor* actor) {
+#ifdef COMBO_BUILD
+    if (ComboOpeningForest_IsExploration(gPlayState) && csId > CS_ID_NONE &&
+        CutsceneManager_GetCutsceneScriptIndex(csId) != CS_SCRIPT_ID_NONE)
+        return CS_ID_NONE; // Includes scene scripts triggered after arrival, not global player actions.
+#endif
     if (!GameInteractor_Should(VB_START_CUTSCENE, true, &csId, actor)) {
         return CS_ID_NONE;
     }
@@ -392,6 +487,7 @@ s16 CutsceneManager_Start(s16 csId, Actor* actor) {
         return csId;
     }
 
+    CutsceneManager_ResetCameraIdentities();
     sCutsceneMgr.startMethod = CS_START_0;
     csEntry = CutsceneManager_GetCutsceneEntryImpl(csId);
 
@@ -425,6 +521,9 @@ s16 CutsceneManager_Start(s16 csId, Actor* actor) {
 
         memcpy(subCam, retCam, sizeof(Camera));
         subCam->camId = sCutsceneMgr.subCamId;
+        sCutsceneOwnedCamera = subCam;
+        sCutsceneOwnedCameraUid = subCam->uid;
+        CutsceneManager_CaptureReturnCamera();
         Camera_UnsetStateFlag(subCam, CAM_STATE_6 | CAM_STATE_0);
 
         Play_ChangeCameraStatus(sCutsceneMgr.play, sCutsceneMgr.retCamId, CAM_STATUS_WAIT);
@@ -478,6 +577,44 @@ s16 CutsceneManager_Stop(s16 csId) {
 
 s16 CutsceneManager_GetCurrentCsId(void) {
     return sCutsceneMgr.csId;
+}
+
+s32 CutsceneManager_IsCurrentActor(Actor* actor) {
+    return (actor != NULL) && (sCutsceneMgr.csId != CS_ID_NONE) && (sCutsceneMgr.targetActor == actor);
+}
+
+s32 CutsceneManager_IsCurrentCamera(PlayState* play) {
+    return (play != NULL) && (sCutsceneMgr.play == play) && (sCutsceneMgr.csId != CS_ID_NONE) &&
+           (Play_GetActiveCamId(play) == sCutsceneMgr.subCamId) &&
+           CutsceneManager_CameraMatches(sCutsceneMgr.subCamId, sCutsceneOwnedCamera, sCutsceneOwnedCameraUid);
+}
+
+s32 CutsceneManager_EndForActor(PlayState* play, Actor* actor) {
+    s32 ended = false;
+    s32 i;
+    Camera* camera;
+
+    if ((play == NULL) || (actor == NULL) || (sCutsceneMgr.play != play)) {
+        return false;
+    }
+    // Actor destruction cannot leave the deferred End borrowing its allocation.
+    // Run the same identity-protected native cleanup while the actor is alive.
+    if (CutsceneManager_IsCurrentActor(actor)) {
+        CutsceneManager_End();
+        ended = true;
+    }
+    // EndCam may copy the shop target into the return camera. Every surviving
+    // reference to this retiring actor must be detached before Actor_Delete frees it.
+    for (i = 0; i < NUM_CAMS; i++) {
+        camera = play->cameraPtrs[i];
+        if ((camera != NULL) && (camera->target == actor)) {
+            camera->target = NULL;
+        }
+    }
+    if (play->subCameras[2].target == actor) {
+        play->subCameras[2].target = NULL;
+    }
+    return ended;
 }
 
 ActorCutscene* CutsceneManager_GetCutsceneEntry(s16 csId) {
@@ -570,4 +707,5 @@ s32 func_800F22C4(s16 csId, Actor* actor) {
 
 void CutsceneManager_SetReturnCamera(s16 camId) {
     sCutsceneMgr.retCamId = camId;
+    CutsceneManager_CaptureReturnCamera();
 }

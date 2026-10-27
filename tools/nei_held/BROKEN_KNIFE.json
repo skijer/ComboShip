@@ -1,0 +1,51 @@
+{
+  "source": "objects/nei_gi_redesign/giants_knife",
+  "source_sha256": {
+    "gi_dl": "d3f71637ad60aa344f66683f2a3ff8c092e1217a267b9a99a8d3a197fabc9805",
+    "mesh_opa_vtx": "aac2027bc348aed3dde6e3c37751dcf5e150047fbc99b7012e656d3d79f31ae9",
+    "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad"
+  },
+  "fracture_quantized_xy": [
+    [
+      -400,
+      782
+    ],
+    [
+      -75,
+      838
+    ],
+    [
+      -18,
+      742
+    ],
+    [
+      40,
+      902
+    ],
+    [
+      90,
+      802
+    ],
+    [
+      400,
+      882
+    ]
+  ],
+  "vertex_count": 6114,
+  "bounds_author": [
+    [
+      -23.0,
+      23.0
+    ],
+    [
+      -49.0,
+      56.375
+    ],
+    [
+      -4.75,
+      4.75
+    ]
+  ],
+  "preserved": "source textures, hilt, uniform grip scale; no gameplay changes",
+  "runtime_tested": false
+}

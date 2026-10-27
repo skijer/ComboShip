@@ -1,13 +1,16 @@
-#include "util.h"
-
 #include <string.h>
 #include <vector>
 #include <algorithm>
 #include <array>
 #include <assert.h>
+
 #include <spdlog/spdlog.h>
-#include "Enhancements/randomizer/randomizerTypes.h"
+
+#include "util.h"
+
+extern "C" {
 #include <variables.h>
+}
 
 std::string invalidString = "";
 
@@ -122,6 +125,10 @@ std::vector<std::string> sceneNames = {
     "Castle Hedge Maze (Early)",
     "Sasa Test",
     "Treasure Chest Room",
+#ifdef COMBO_BUILD
+    "Skiejer's Black Market",
+    "Lost Woods (Shared Forest)",
+#endif
     "Unknown",
 };
 
@@ -282,6 +289,30 @@ std::vector<std::string> itemNamesEng = {
     "Deku Stick Upgrade (30)",
     "Deku Nut Upgrade (30)",
     "Deku Nut Upgrade (40)",
+    "[Removed]", // ITEM_CUSTOM
+    "Roc's Feather",
+    "Beorc's Feather",
+    "Beorc's Cape",
+    "Desire Sensor",
+    "Fairy Spell",
+    "Freeze Spell",
+    "Quake Spell",
+    "Deku Leaf",
+    "Switch Hook",
+    "Climb Mits",
+    "Gust Jar",
+    "Ball and Chain",
+    "Whip",
+    "Spinner",
+    "Cane of Somaria",
+    "Dominion Rod",
+    "Time Gate",
+    "Bow and Bombs",
+    "Fire Rod",
+    "Ice Rod",
+    "Light Rod",
+    "Beetle",
+    "Shovel",
 };
 
 std::vector<std::string> itemNamesFra = {
@@ -441,6 +472,8 @@ std::vector<std::string> itemNamesFra = {
     "Amélioration des Bâtons Mojo (30)",
     "Amélioration des Noix Mojo (30)",
     "Amélioration des Noix Mojo (40)",
+    "[Retiré]", // ITEM_CUSTOM
+    "Plume de Roc",
 };
 
 std::vector<std::string> itemNamesGer = {
@@ -600,6 +633,8 @@ std::vector<std::string> itemNamesGer = {
     "Deku-Stab-Kapazität (30)",
     "Deku-Nuß-Kapazität (30)",
     "Deku-Nuß-Kapazität (40)",
+    "[Entfernt]", // ITEM_CUSTOM
+    "Greifenfeder",
 };
 
 std::vector<std::string> questItemNamesEng = {
@@ -682,7 +717,7 @@ std::array<std::string, RA_MAX> rcareaPrefixes = {
 };
 
 const std::string& SohUtils::GetSceneName(int32_t scene) {
-    if (scene > sceneNames.size()) {
+    if (scene < 0 || static_cast<size_t>(scene) >= sceneNames.size()) {
         SPDLOG_WARN("Passed invalid scene id to SohUtils::GetSceneName: ({})", scene);
         assert(false);
         return invalidString;
@@ -707,7 +742,7 @@ const std::string& SohUtils::GetItemName(int32_t item) {
             break;
     }
 
-    if (item >= currentItemNames->size()) {
+    if (item < 0 || static_cast<size_t>(item) >= currentItemNames->size()) {
         SPDLOG_WARN("Passed invalid item id to SohUtils::GetItemName: ({})", item);
         assert(false);
         return invalidString;
@@ -731,7 +766,7 @@ const std::string& SohUtils::GetQuestItemName(int32_t item) {
             currentQuestItemNames = &questItemNamesEng;
             break;
     }
-    if (item > questItemNamesEng.size()) {
+    if (item < 0 || static_cast<size_t>(item) >= questItemNamesEng.size()) {
         SPDLOG_WARN("Passed invalid quest item id to SohUtils::GetQuestItemName: ({})", item);
         assert(false);
         return invalidString;
@@ -741,7 +776,7 @@ const std::string& SohUtils::GetQuestItemName(int32_t item) {
 }
 
 const std::string& SohUtils::GetRandomizerCheckAreaPrefix(int32_t rcarea) {
-    if (rcarea > rcareaPrefixes.size()) {
+    if (rcarea < 0 || static_cast<size_t>(rcarea) >= rcareaPrefixes.size()) {
         SPDLOG_WARN("Passed invalid rcarea to SohUtils::GetRandomizerCheckAreaPrefix: ({})", rcarea);
         assert(false);
         return invalidString;

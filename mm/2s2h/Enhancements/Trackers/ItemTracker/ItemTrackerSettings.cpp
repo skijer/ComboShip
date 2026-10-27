@@ -39,16 +39,22 @@ std::vector<std::pair<TrackerItemType, u32>> GetItemsFromRange(TrackerItemType i
     return items;
 }
 
+// Some items don't have a 1:1 with rando items (eg ITEM_BOMB != RI_BOMBS_5) so we just handle them manually
+static const std::unordered_map<u32, const char*> sVanillaItemNames = {
+    { ITEM_BOMB, "Bombs" },
+    { ITEM_BOMBCHU, "Bombchus" },
+};
+
 std::string GetItemTrackerItemName(TrackerItemType itemType, u32 itemId) {
     switch (itemType) {
         case TRACKER_ITEM_RANDO: {
             return Rando::StaticData::Items[(RandoItemId)itemId].name;
         } break;
         case TRACKER_ITEM_SLOT: {
-            auto vanillaItemId = gSaveContext.save.saveInfo.inventory.items[itemId];
-            if (vanillaItemId == ITEM_NONE) {
-                const auto& safe = safeItemsForInventorySlot[itemId];
-                vanillaItemId = safe.empty() ? ITEM_NONE : safe[0];
+            u32 vanillaItemId = GetVanillaItemIdForSlot(itemId);
+            auto vanillaItemName = sVanillaItemNames.find(vanillaItemId);
+            if (vanillaItemName != sVanillaItemNames.end()) {
+                return vanillaItemName->second;
             }
             RandoItemId randoItemId = Rando::StaticData::GetItemIdFromVanillaItemId(vanillaItemId);
             return Rando::StaticData::Items[randoItemId].name;
@@ -546,16 +552,16 @@ void LoadItemTrackerConfig() {
 void DrawTrackerOptions() {
     if (ImGui::BeginTable("OptionsTable", 3)) {
         ImGui::TableNextColumn();
-#ifndef COMBO_BUILD
-        // ComboShip: gWindows.ItemTracker is derived from the combo master toggle — hide this button.
-        if (CVarGetInteger("gWindows.ItemTracker", 0)) {
-            UIWidgets::WindowButton("Disable Item Tracker", "gWindows.ItemTracker", BenGui::mItemTrackerWindow,
-                                    { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Red });
-        } else {
-            UIWidgets::WindowButton("Enable Item Tracker", "gWindows.ItemTracker", BenGui::mItemTrackerWindow,
-                                    { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Green });
+        if (!Combo_IsCombinedGame()) {
+            // ComboShip: gWindows.ItemTracker is derived from the combo master toggle — hide this button.
+            if (CVarGetInteger("gWindows.ItemTracker", 0)) {
+                UIWidgets::WindowButton("Disable Item Tracker", "gWindows.ItemTracker", BenGui::mItemTrackerWindow,
+                                        { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Red });
+            } else {
+                UIWidgets::WindowButton("Enable Item Tracker", "gWindows.ItemTracker", BenGui::mItemTrackerWindow,
+                                        { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Green });
+            }
         }
-#endif
 
         UIWidgets::CVarCheckbox("Split Window Groups", "gSettings.ItemTracker.WindowGroup");
         UIWidgets::CVarCheckbox("Show Item Counts", "gSettings.ItemTracker.ItemCounts",
@@ -568,14 +574,14 @@ void DrawTrackerOptions() {
                                 UIWidgets::ComboboxOptions()
                                     .ComponentAlignment(UIWidgets::ComponentAlignment::Right)
                                     .LabelPosition(UIWidgets::LabelPosition::Far));
-#ifndef COMBO_BUILD
-        // ComboShip: visibility is derived from the shared "Only enable while paused" toggle.
-        UIWidgets::CVarCombobox("Visibility", CVAR_NAME_VISIBILITY_MODE, &sItemTrackerVisibilityModes,
-                                UIWidgets::ComboboxOptions()
-                                    .DefaultIndex(ITEM_TRACKER_VISIBILITY_MODE_ALWAYS)
-                                    .ComponentAlignment(UIWidgets::ComponentAlignment::Right)
-                                    .LabelPosition(UIWidgets::LabelPosition::Far));
-#endif
+        if (!Combo_IsCombinedGame()) {
+            // ComboShip: visibility is derived from the shared "Only enable while paused" toggle.
+            UIWidgets::CVarCombobox("Visibility", CVAR_NAME_VISIBILITY_MODE, &sItemTrackerVisibilityModes,
+                                    UIWidgets::ComboboxOptions()
+                                        .DefaultIndex(ITEM_TRACKER_VISIBILITY_MODE_ALWAYS)
+                                        .ComponentAlignment(UIWidgets::ComponentAlignment::Right)
+                                        .LabelPosition(UIWidgets::LabelPosition::Far));
+        }
         if (CVAR_VISIBILITY_MODE == ITEM_TRACKER_VISIBILITY_MODE_BUTTON_TOGGLE ||
             CVAR_VISIBILITY_MODE == ITEM_TRACKER_VISIBILITY_MODE_BUTTON_HOLD) {
             UIWidgets::CVarBtnSelector("Button Combination:", CVAR_NAME_VISIBILITY_BTN,
@@ -589,20 +595,20 @@ void DrawTrackerOptions() {
             SaveItemTrackerLayout();
         }
 
-#ifndef COMBO_BUILD
-        // ComboShip: the global scale is derived from the shared "Icon size" slider — hide this editor.
-        if (!CVarGetInteger("gSettings.ItemTracker.WindowGroup", 0)) {
-            UIWidgets::CVarSliderFloat("Scale", "gSettings.ItemTracker.Scale",
-                                       UIWidgets::FloatSliderOptions()
-                                           .Min(0.2f)
-                                           .Max(3.0f)
-                                           .DefaultValue(1.0f)
-                                           .LabelPosition(UIWidgets::LabelPosition::None)
-                                           .Format("Scale: %.1f")
-                                           .Step(0.5f)
-                                           .Color(WIDGET_COLOR));
+        if (!Combo_IsCombinedGame()) {
+            // ComboShip: the global scale is derived from the shared "Icon size" slider — hide this editor.
+            if (!CVarGetInteger("gSettings.ItemTracker.WindowGroup", 0)) {
+                UIWidgets::CVarSliderFloat("Scale", "gSettings.ItemTracker.Scale",
+                                           UIWidgets::FloatSliderOptions()
+                                               .Min(0.2f)
+                                               .Max(3.0f)
+                                               .DefaultValue(1.0f)
+                                               .LabelPosition(UIWidgets::LabelPosition::None)
+                                               .Format("Scale: %.1f")
+                                               .Step(0.5f)
+                                               .Color(WIDGET_COLOR));
+            }
         }
-#endif
 
         UIWidgets::CVarSliderFloat("Opacity", "gSettings.ItemTracker.Opacity",
                                    UIWidgets::FloatSliderOptions()

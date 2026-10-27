@@ -1,0 +1,91 @@
+{
+  "candidate": "ComboShip_Shared_Bottle_GI_POC4_OoT.o2r",
+  "source": "TP_Bottle_Potions_POC3_Liquid_Sheen_OoT.o2r",
+  "source_sha256": "8b65e366ed90109f6311f1176075f638cb9b1ee334ca2c6c9f17e23b25ec3670",
+  "archive_sha256": "d8bb4b2b5a0b29fc7ef881d9c663611d8c7b645238a93e6fa8b8218a36ee3b5e",
+  "routes": {
+    "alt/objects/object_gi_bottle/gGiBottleStopperDL": "objects/combo_bottle_gi/EmptyOpaque",
+    "alt/objects/object_gi_bottle/gGiBottleDL": "objects/combo_bottle_gi/EmptyXlu",
+    "alt/objects/object_gi_liquid/gGiPotionPotDL": "objects/combo_bottle_gi/PotionMarker",
+    "alt/objects/object_gi_liquid/gGiPotionLiquidDL": "objects/combo_bottle_gi/Liquid",
+    "alt/objects/object_gi_liquid/gGiPotionPatternDL": "objects/combo_bottle_gi/BottleShell"
+  },
+  "checks": {
+    "closed_dependencies": true,
+    "geometry_uv_texture_bytes_preserved": 7,
+    "translucent_liquid": true,
+    "live_palette_not_overridden": true,
+    "mm_red_color_slots_valid": true,
+    "runtime_visual_acceptance": "untested"
+  },
+  "preserved": [
+    {
+      "source": "objects/cor_tp_potion_gi_poc1/LiquidGlossResponse",
+      "candidate": "objects/combo_bottle_gi/LiquidGlossResponse",
+      "sha256": "d30b55a90baca5a12e4ec9401a30f8ace906069552529f4480366dbde3819a50"
+    },
+    {
+      "source": "objects/cor_tp_potion_gi_poc1/LiquidVtx",
+      "candidate": "objects/combo_bottle_gi/LiquidVtx",
+      "sha256": "c2b7b26f581b2ad6715f263279e64e2a926ff8fd28028ae848eefe9ce1e8dde8"
+    },
+    {
+      "source": "objects/cor_tp_potion_gi_poc1/shell/BottleGlass",
+      "candidate": "objects/combo_bottle_gi/shell/BottleGlass",
+      "sha256": "a4a1c6d6ec533ce34ba370f49321b4a188661ba68c31e826fc017cb2402cc93e"
+    },
+    {
+      "source": "objects/cor_tp_potion_gi_poc1/shell/MetalPainted_1TestFromSkilar",
+      "candidate": "objects/combo_bottle_gi/shell/MetalPainted_1TestFromSkilar",
+      "sha256": "cc95216f5916564d5ddb5a83bdb3807a4cf37496c7ce6a5c261770d2434d023d"
+    },
+    {
+      "source": "objects/cor_tp_potion_gi_poc1/shell/gGiBlueFireChamberstickDL_vtx_0",
+      "candidate": "objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_vtx_0",
+      "sha256": "36c75de8c8bfcebdc6038af3948be7941818047bfcc6e552ed2a7cf27511eb64"
+    },
+    {
+      "source": "objects/cor_tp_potion_gi_poc1/shell/gGiBlueFireChamberstickDL_vtx_1",
+      "candidate": "objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_vtx_1",
+      "sha256": "f21ba055e1359d4c612d9aea1e24bd41a26424a312e662ce9067efe65d17266d"
+    },
+    {
+      "source": "objects/cor_tp_potion_gi_poc3/LiquidRimVtx",
+      "candidate": "objects/combo_bottle_gi/LiquidRimVtx",
+      "sha256": "5958462f3883b4a00efcd271a1d50c10457cea3387eb67646a296f423f219419"
+    }
+  ],
+  "resources": {
+    "alt/objects/object_gi_bottle/gGiBottleDL": "02ea86667ae8086984ff1f4bde96e6fa9f247e7791ccf15d97dfc628b9531606",
+    "alt/objects/object_gi_bottle/gGiBottleStopperDL": "90de9d9f43311af4961c57eeb59cae557104d605fa17951dd97e9c697cfa320a",
+    "alt/objects/object_gi_liquid/gGiPotionLiquidDL": "51429aebabbc3d9927a6255715fb29577c20d96be563d82f4f50c9c839951ea4",
+    "alt/objects/object_gi_liquid/gGiPotionPatternDL": "b314571652f95bb61adcf3fe7fd7f875af80618f366b3dd40a840e1fe12dd5d3",
+    "alt/objects/object_gi_liquid/gGiPotionPotDL": "0738e88e7772afe4d9e5197b8dbfe3837261598e9596def3006922b055c91280",
+    "objects/combo_bottle_gi/BottleShell": "f63a543d15b2edded65992fed5f26a28c12cfb2365faf36c15ac0a1da2691c01",
+    "objects/combo_bottle_gi/CleanupOpa": "d7857e3aea17d070dc5c6f1c53690dca2fdcb560fed9ec126f0ef471f70f7293",
+    "objects/combo_bottle_gi/CleanupXlu": "c057b24ee9f178e96e542e3874589e39168e958c421dbea064b28c66374a9419",
+    "objects/combo_bottle_gi/EmptyOpaque": "ad3548a9ebfdd606990b29ef106097b691e355afdca86c048f21b12f2dc65e05",
+    "objects/combo_bottle_gi/EmptyXlu": "b314571652f95bb61adcf3fe7fd7f875af80618f366b3dd40a840e1fe12dd5d3",
+    "objects/combo_bottle_gi/Liquid": "ada8b106304f593a4a0a134302dc60d2f36ab83cffcafc5b732f319f83e51df1",
+    "objects/combo_bottle_gi/LiquidGlossMaterial": "71cef7bcb9c348197489e0b0cfe6c7f7145bbf67681154d42e34eca4ba61fcf0",
+    "objects/combo_bottle_gi/LiquidGlossResponse": "d30b55a90baca5a12e4ec9401a30f8ace906069552529f4480366dbde3819a50",
+    "objects/combo_bottle_gi/LiquidMaterial": "760d1fefa96eb4ce44edac36ef94d5724bae2c913cd2e081060a5a0cdc1e9986",
+    "objects/combo_bottle_gi/LiquidRimMaterial": "319256c34bd822c54597075d1fca562e691a219956d00a7a583c439dd23fcd56",
+    "objects/combo_bottle_gi/LiquidRimTriangles": "549333c55b33d940f58aad0681b420e53d21bbac0dcba9c3b7b19e75cef228ce",
+    "objects/combo_bottle_gi/LiquidRimVtx": "5958462f3883b4a00efcd271a1d50c10457cea3387eb67646a296f423f219419",
+    "objects/combo_bottle_gi/LiquidTriangles": "50e4331454a7a88b095398da9690e2dc8b5073a47549f92fc9f5516f332bac1d",
+    "objects/combo_bottle_gi/LiquidVtx": "c2b7b26f581b2ad6715f263279e64e2a926ff8fd28028ae848eefe9ce1e8dde8",
+    "objects/combo_bottle_gi/PotionMarker": "ad3548a9ebfdd606990b29ef106097b691e355afdca86c048f21b12f2dc65e05",
+    "objects/combo_bottle_gi/RedPotion": "3194934a3a6e2a15cd8aae2b2f9229cfb8693789efb3c5b54ccdca3a71ed6aec",
+    "objects/combo_bottle_gi/shell/BottleGlass": "a4a1c6d6ec533ce34ba370f49321b4a188661ba68c31e826fc017cb2402cc93e",
+    "objects/combo_bottle_gi/shell/MetalPainted_1TestFromSkilar": "cc95216f5916564d5ddb5a83bdb3807a4cf37496c7ce6a5c261770d2434d023d",
+    "objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_tri_0": "85a8110dff7bece996c8d4b5f89ae832dfaeea6d3f3b04b6da8db0d01d6924d8",
+    "objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_tri_1": "4b8dc9881d76feec93be9052f8d025007c27f431f07120c61822b5a775fc171a",
+    "objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_vtx_0": "36c75de8c8bfcebdc6038af3948be7941818047bfcc6e552ed2a7cf27511eb64",
+    "objects/combo_bottle_gi/shell/gGiBlueFireChamberstickDL_vtx_1": "f21ba055e1359d4c612d9aea1e24bd41a26424a312e662ce9067efe65d17266d",
+    "objects/combo_bottle_gi/shell/mat_gGiBlueFireChamberstickDL_BottleGlassOutside": "70fb94e07c3b491abeacd41baed2bbfb0d4c3d08f98555e321570c7f94cb8319",
+    "objects/combo_bottle_gi/shell/mat_gGiBlueFireChamberstickDL_BottleOutside": "217e8ced68646d1033f0fbb2ad5a6257c93bca136af328b1fbde701c58bfb31c",
+    "objects/combo_bottle_gi/shell/mat_revert_gGiBlueFireChamberstickDL_BottleGlassOutside": "ec0282fa8daa843733d910aac03d7f9f9e0ee9d988c3ed72df1c790569dd2376",
+    "objects/combo_bottle_gi/shell/mat_revert_gGiBlueFireChamberstickDL_BottleOutside": "a21f8d4f70fa6092293f5eaee012ae61b2660e8022d8784f8a22357b6931aee6"
+  }
+}

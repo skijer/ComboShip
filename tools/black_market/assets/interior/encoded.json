@@ -1,0 +1,104 @@
+{
+  "authoring_pillow_version": "12.3.0",
+  "encoding": "base64 parts of one zlib stream; ordered 512x512 RGBA8 uploads",
+  "names": [
+    "timber",
+    "slate",
+    "plaster"
+  ],
+  "packed_sha256": "ad26848a029ea6ba3b0ff05683c12762cc246bbf6580f7194711f049fb45d42a",
+  "parts": [
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.001.b64",
+      "sha256": "87bea1d110e6cfe55d2931d4ce540a3c8f47d8beb35b5ae8ca321e2895e3db86"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.002.b64",
+      "sha256": "2a69a219effe79d0be8d2eb3f00d865ed5141f250def18ef1c427e2b4cd8355c"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.003.b64",
+      "sha256": "02314b756136e603c08e007f47b3e30d1b91fa700ab3fb93123be47ec32c50fb"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.004.b64",
+      "sha256": "094765caa4d50f9dd40fd508e3ba56ea6f14d4af36d1a38b8025257cd315027d"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.005.b64",
+      "sha256": "8f737365931bc80dd6be6388edf8b44705d564c6db384daa6585dd010d9b58bd"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.006.b64",
+      "sha256": "27c19bd98f22479a764a3b63ed347e2c34a024fa05b670a2e24ea750e3a559a6"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.007.b64",
+      "sha256": "ba385ff6ec9cdeffb3c036fbbb1108c14b6973c7c979c641d2f9f0bc042e595a"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.008.b64",
+      "sha256": "6cb24a7005fb8c2761944d0e5be35ffcdc3d1a94d97584b6caa75357c170b442"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.009.b64",
+      "sha256": "e729643e4594c86d8113ba5c3040bc120fb0ded7cda302848256a0d4032adaa0"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.010.b64",
+      "sha256": "10f143d067208b9bc772b72a1672e4f044570661df9ed40dfde001e868a7e9e4"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.011.b64",
+      "sha256": "a0d5fdce46814f849514b7468515367dff423c072e017f2483c200a5266a2229"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.012.b64",
+      "sha256": "d1a2f50548aeb1ef54802268945d8aae7cbbe0dc1b5e12946ef6617e8c1b503e"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.013.b64",
+      "sha256": "34900390daef7b2427eef5043e86819e050e0d9a57a76519b41c6a9fdecc758f"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.014.b64",
+      "sha256": "540fc47458f7e22e3a92bf9f6de4c38e0c8203f99ebefadcde045638d48af290"
+    },
+    {
+      "bytes": 98304,
+      "name": "textures.zlib.015.b64",
+      "sha256": "a1b37012adf9e756e6f9f5dc9bc1799b1dff3a0a6730eed403b05d05119dd5aa"
+    },
+    {
+      "bytes": 31035,
+      "name": "textures.zlib.016.b64",
+      "sha256": "09f02486e574f5df8a84fc31832e92595323584fde16703623456b6050a71428"
+    }
+  ],
+  "pixels_sha256": {
+    "plaster": "29cc9c0d38559ed1f973fee05f8a1785b8c67c7350f66324f4b3a94126e8683b",
+    "slate": "86f9fd68412cfc42f078b27614c25fece01cbe749e9f7b26ab6a2b50ac60d661",
+    "timber": "70f67f402ff2bef52a351405413817758c4f054b47ff0982fbcc66b60d997aa4"
+  },
+  "processing": "Lossless RGBA encoding and existing UV atlas packing of the recorded source PNGs",
+  "source_sha256": {
+    "plaster": "aef51704902f9144fb88d3492667fc143ee77c976a192bae2a7cdb0d76688b84",
+    "slate": "e91d3c7ef5d1e78dabaadf138d76db2cd6b74c3ca7e3dca0890fd2b4d4e408db",
+    "timber": "62dc29aef9b2e4b0194a5c2ce25e1bff79139deb2ab3e9a74642555d9207ec7c"
+  },
+  "version": 1
+}

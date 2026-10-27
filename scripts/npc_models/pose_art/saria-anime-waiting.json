@@ -1,0 +1,16 @@
+{
+  "source_sha256": "dddeaed512e7b4aaedf960e1ddab13e74c480897e0f44404fb980c0c9ce5d63a",
+  "hand": "left",
+  "body_offset": [
+    0,
+    -60,
+    -250
+  ],
+  "local_rotation_degrees": [
+    30,
+    0,
+    0
+  ],
+  "fit": "whole left arm IK; hand and sleeve routed clear of opposite hand/arm and torso; fade across native transition",
+  "elbow_swivel_degrees": -110
+}

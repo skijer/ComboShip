@@ -1,0 +1,16 @@
+{
+  "candidate": "ComboShip_Mario_SM64_POC3",
+  "original_archive": "ComboShip_Mario_SM64_POC3.o2r",
+  "archive_sha256": "9980d41450bcaa741d2f86cee3658606eec76f558b4d73c5d26d7eccc6f7e52f",
+  "source_kind": "exact retained serialized runtime resources; original procedural authoring source unavailable",
+  "resources": {
+    "objects/nei_gi_redesign/mario_mask/gi_dl": "b09600ba6ee6eed429b339c80b39b327f06963054cb897da33ba05f714d59e48",
+    "objects/nei_gi_redesign/mario_mask/mesh_opa_vtx": "47850a179edd76f08e245c8ee33e2d20db49c531164968ad0677e354e552ec0e",
+    "objects/nei_gi_redesign/mario_mask/scale_mtx": "9806b5a7c17c1c95ad4036ce4e6cbf5e93fdc09f24c0d9d28a5ea4dabbf1bc5d",
+    "textures/icon_item_custom/gItemIconMarioMaskTex": "ceb99f4bd8eaef1781212c7f43de1182aa250d1bb2114e598aa30e17221a0c67"
+  },
+  "triangles": 13112,
+  "vertex_records": 14436,
+  "vertex_loads": 464,
+  "runtime_tested_in_recovery": false
+}

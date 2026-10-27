@@ -7,6 +7,19 @@
 #include "audio/effects.h"
 #include "audio/load.h"
 
+// SM64 Mario audio: libsm64's generated PCM (produced by sm64_audio_tick on
+// the game thread, queued in a ring buffer, drained here on the audio
+// thread). Stub returns a no-op until phase 2 wires the real implementation
+// in sm64_mario.c — safe to call unconditionally.
+extern void Sm64Audio_MixInto(int16_t* outBuf, uint32_t numSamples);
+
+// Sheikah Slate Stasis rune cue (mods/actors/stasis_sfx.inc.c). One voice, no-op when idle.
+extern void StasisSfx_MixInto(s16* outBuf, u32 numSamples);
+// Phantom Hourglass Recall cues (mods/items/logic/hourglass_sfx.inc.c). Two voices: one-shots plus
+// the looping rewind bed. Silent unless the item's own tick is refreshing it.
+extern void HourglassSfx_MixInto(s16* outBuf, u32 numSamples);
+extern void MM_WolfLinkSfx_MixInto(s16* outBuf, u32 numSamples);
+
 AudioTask* AudioThread_UpdateImpl(void);
 void AudioThread_SetFadeOutTimer(s32 seqPlayerIndex, s32 fadeTimer);
 void AudioThread_SetFadeInTimer(s32 seqPlayerIndex, s32 fadeTimer);
@@ -65,6 +78,14 @@ void AudioMgr_CreateNextAudioBuffer(s16* samples, u32 num_samples) {
     }
     s32 writtenCmds;
     AudioSynth_Update(gAudioCtx.curAbiCmdBuf, &writtenCmds, samples, num_samples);
+    // Mix libsm64 Mario audio (jumps, punches, coins, death, etc.) on top
+    // of the synth output. No-op while gSm64Mario is off.
+    Sm64Audio_MixInto(samples, num_samples);
+    // Mix the Stasis rune cue
+    StasisSfx_MixInto(samples, num_samples);
+    // Mix the Phantom Hourglass Recall cues
+    HourglassSfx_MixInto(samples, num_samples);
+    MM_WolfLinkSfx_MixInto(samples, num_samples);
     gAudioCtx.audioRandom = (gAudioCtx.audioRandom + gAudioCtx.totalTaskCount) * osGetCount();
 }
 
@@ -80,21 +101,21 @@ void AudioThread_ProcessGlobalCmd(AudioCmd* cmd) {
         case AUDIOCMD_OP_GLOBAL_SYNC_LOAD_SEQ_PARTS:
             // 2S2H [Custom Audio] the second argument (seqId) was `cmd->arg1`changed to use the upper half of
             // `cmd->asInt so it can be 16 bit.
-            AudioLoad_SyncLoadSeqParts((cmd->asInt >> 16) & 0x7FF, cmd->arg2, cmd->asInt & 0xFFFF,
+            AudioLoad_SyncLoadSeqParts((cmd->asInt >> 16) & 0xFFFF, cmd->arg2, cmd->asInt & 0xFFFF,
                                        &gAudioCtx.externalLoadQueue);
             break;
 
         case AUDIOCMD_OP_GLOBAL_INIT_SEQPLAYER:
             // 2S2H [Custom Audio] the second argument (seqId) was `cmd->arg1`changed to use the upper half of
             // `cmd->asInt so it can be 16 bit.
-            AudioLoad_SyncInitSeqPlayer(cmd->arg0, (cmd->asInt >> 16) & 0x7FF, cmd->arg2);
+            AudioLoad_SyncInitSeqPlayer(cmd->arg0, (cmd->asInt >> 16) & 0xFFFF, cmd->arg2);
             AudioThread_SetFadeInTimer(cmd->arg0, cmd->asInt & 0xFFFF);
             break;
 
         case AUDIOCMD_OP_GLOBAL_INIT_SEQPLAYER_SKIP_TICKS:
             // 2S2H [Custom Audio] the second argument (seqId) was `cmd->arg1`changed to use the upper half of
             // `cmd->asInt so it can be 16 bit.
-            AudioLoad_SyncInitSeqPlayerSkipTicks(cmd->arg0, (cmd->asInt >> 16) & 0x7FF, cmd->asInt & 0xFFFF);
+            AudioLoad_SyncInitSeqPlayerSkipTicks(cmd->arg0, (cmd->asInt >> 16) & 0xFFFF, cmd->asInt & 0xFFFF);
             AudioThread_SetFadeInTimer(cmd->arg0, 500);
             AudioScript_SkipForwardSequence(&gAudioCtx.seqPlayers[cmd->arg0]);
             break;
@@ -497,8 +518,8 @@ u32 AudioThread_GetExternalLoadQueueMsg(u32* retMsg) {
     return msg >> 0x18;
 }
 
-u8* AudioThread_GetFontsForSequence(s32 seqId, u32* outNumFonts, u8* buff) {
-    return AudioLoad_GetFontsForSequence(seqId, outNumFonts, buff);
+s32* AudioThread_GetFontsForSequence(s32 seqId, u32* outNumFonts) {
+    return AudioLoad_GetFontsForSequence(seqId, outNumFonts);
 }
 
 void AudioThread_GetSampleBankIdsOfFont(s32 fontId, u32* sampleBankId1, u32* sampleBankId2) {

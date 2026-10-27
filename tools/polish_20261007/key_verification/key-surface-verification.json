@@ -1,0 +1,90 @@
+{
+  "sourceSHA256": "2b4948ff7d784dbce5943f264ed8049b1e7e2a57b8744071fcf30b39c06b83c5",
+  "candidateSHA256": "965b797c97d06b2717b46f92a5f8e2b81790753d294dbd470484690a6159b7a5",
+  "status": "offline verified; runtime acceptance pending",
+  "counts": {
+    "resources": 53,
+    "vertices": 17319,
+    "triangles": 5773
+  },
+  "repairs": {
+    "alt/objects/cor_mm_keys_poc2/GreatBayBossKeyEmblemDL_eye_vtx": {
+      "coplanarOverlapsBefore": 1,
+      "duplicateTrianglesRemoved": 1,
+      "coplanarOverlapsAfter": 0,
+      "boundsPreserved": true,
+      "topology": {
+        "boundaryEdges": 0,
+        "nonmanifoldEdges": 6
+      }
+    },
+    "alt/objects/cor_mm_keys_poc2/GreatBaySmallKeyEmblemDL_emblem_vtx": {
+      "coplanarOverlapsBefore": 12,
+      "closedPartDepthShiftNativeUnits": 2,
+      "shiftedTriangles": 62,
+      "coplanarOverlapsAfter": 0,
+      "boundsPreserved": true,
+      "topology": {
+        "boundaryEdges": 0,
+        "nonmanifoldEdges": 0
+      }
+    },
+    "alt/objects/cor_mm_keys_poc2/StoneTowerBossKeyMetalDL_metal_vtx": {
+      "coplanarOverlapsBefore": 4,
+      "capReliefNativeUnits": {
+        "25,41": 1,
+        "29,43": 1,
+        "30,48": 4,
+        "32,46": 1,
+        "39,52": 1
+      },
+      "coplanarOverlapsAfter": 0,
+      "boundsPreserved": true,
+      "topology": {
+        "boundaryEdges": 42,
+        "nonmanifoldEdges": 0
+      }
+    },
+    "alt/objects/cor_mm_keys_poc2/StoneTowerSmallKeyMetalDL_metal_vtx": {
+      "coplanarOverlapsBefore": 6,
+      "capReliefNativeUnits": {
+        "28,45": 1,
+        "32,47": 1,
+        "34,52": 4,
+        "36,51": 1,
+        "38,51": 1,
+        "43,57": 1
+      },
+      "coplanarOverlapsAfter": 0,
+      "boundsPreserved": true,
+      "topology": {
+        "boundaryEdges": 36,
+        "nonmanifoldEdges": 0
+      }
+    },
+    "alt/objects/cor_mm_keys_poc2/WoodfallBossKeyEmblemDL_emblem_vtx": {
+      "coplanarOverlapsBefore": 56,
+      "closedPartDepthShiftNativeUnits": 2,
+      "shiftedTriangles": 68,
+      "coplanarOverlapsAfter": 0,
+      "boundsPreserved": true,
+      "topology": {
+        "boundaryEdges": 0,
+        "nonmanifoldEdges": 0
+      }
+    },
+    "alt/objects/cor_mm_keys_poc2/WoodfallSmallKeyEmblemDL_emblem_vtx": {
+      "coplanarOverlapsBefore": 44,
+      "closedPartDepthShiftNativeUnits": 2,
+      "shiftedTriangles": 68,
+      "coplanarOverlapsAfter": 0,
+      "boundsPreserved": true,
+      "topology": {
+        "boundaryEdges": 0,
+        "nonmanifoldEdges": 0
+      }
+    }
+  },
+  "originalBodiesAndNormalsPreserved": true,
+  "cosmeticBindingsPreserved": true
+}

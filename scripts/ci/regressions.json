@@ -1,0 +1,1523 @@
+[
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Native silver-rupee hooks preserve unregistered scene actors",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/silver_rupee/run_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Native Ikana GI priority, resource availability and pause icon routing",
+    "run": "python3 -B tests/ikana_gi/run_native_priority_tests.py\npython3 -B tests/ikana_gi/run_native_availability_tests.py\npython3 -B tests/oot_equipment_pause/run_ikana_icon_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Fast shared Granny UI and engine header regression",
+    "run": "python3 -B tests/black_market/run_granny_header_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Native forest ocarina cameras in combined and both solo modes",
+    "run": "python3 -B tests/forest_ocarina/run_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Verify October 20 bug-fix entry, decoder and particle paths",
+    "run": "bash scripts/diagnostics/run_oct20_bugfix_regressions.sh"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Fast game-picker Windows header regression",
+    "run": "python3 -B tests/solo_games/selection_test.py --windows"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Fast headless module loader diagnostics",
+    "run": "python3 -B tests/solo_games/headless_module_load_test.py"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Native OoT Magic Mirror pickup message completion",
+    "run": "python3 -B tests/magic_mirror/run_receipt_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Native OoT Black Market button glyph colors",
+    "run": "python3 -B tests/black_market/run_oot_button_glyph_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Fast pickup text and receipt regressions",
+    "run": "python3 -B tests/item_receipts/run_message_replace_tests.py\npython3 -B tests/item_receipts/run_message_replace_tests.py --sanitize\npython3 -B tests/item_receipts/run_chateau_receipt_tests.py\npython3 -B tests/item_receipts/run_chateau_receipt_tests.py --sanitize\npython3 -B scripts/diagnostics/run_mm_item_receipt_tests.py --layout-only --sanitizers"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Fast audio-worker compile and mixer regressions",
+    "run": "python3 -B scripts/diagnostics/run_mm_audio_worker_tests.py\nMM_AUDIO_WORKER_CXXFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie\" python3 -B scripts/diagnostics/run_mm_audio_worker_tests.py\npython3 -B scripts/diagnostics/run_soh_audio_worker_tests.py\npython3 -B scripts/diagnostics/run_soh_audio_worker_tests.py --sanitize"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Native OoT seasonal rain PCM and Song of Storms ownership",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_soh_rain_audio_tests.py --sanitize"
+  },
+  {
+    "suite": "entrances",
+    "origin": "gate",
+    "name": "Fast entrance compile and linkage preflight",
+    "run": "python3 -B tests/cross_dungeon/oot_blue_warp_hook_test.py\npython3 -B tests/cross_dungeon/oot_entrance_metadata_test.py\npython3 -B tests/cross_dungeon/generation_reset_behavior_test.py\npython3 -B tests/lost_woods_entrance/renderer_linkage_test.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "Native OoT Blast Mask tutorial and A-action arbitration",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/blast_mask/run_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "Fast Goron lifetime and Somaria GI regressions",
+    "run": "python3 -B tests/goron_audio/run_tests.py\npython3 -B tests/mm_sfx_render/run_tests.py\npython3 -B scripts/diagnostics/run_oot_native_transformation_tests.py\npython3 -B tests/goron_field_collision/run_tests.py --sanitize\npython3 -B tests/nei_quest_held/mm_cane_gi_test.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "Fast held equipment XML and action regressions",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/nei_held/run_equipment_regression_tests.py --sanitize"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Fast vanilla and Master Quest ROM setup regressions",
+    "run": "python3 -B tests/rom_setup/screen_behavior_test.py --sanitize\npython3 -B tests/rom_setup/launcher_behavior_test.py --sanitize\npython3 -B tests/rom_setup/classifier_behavior_test.py --sanitize\npython3 -B tests/rom_setup/async_progress_test.py --sanitize",
+    "env": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Native MM weather and winter bridge preflight",
+    "run": "python3 -B scripts/diagnostics/run_mm_weather_tests.py\npython3 -B scripts/diagnostics/run_mm_winter_atmosphere_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Complete spin style native rendering and combat, normal and sanitized",
+    "run": "python3 -B scripts/diagnostics/run_spin_style_tests.py\nASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_spin_style_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Native OoT and MM cape visibility during shop camera ownership",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/mm_cape/run_visibility_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Foreign Great Spin GI preflight",
+    "run": "python3 -B scripts/diagnostics/run_spin_gi_tests.py\npython3 -B scripts/diagnostics/run_spin_gi_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "Native elemental sword ice material and frost rendering",
+    "run": "python3 -B scripts/assets/build_sword_finish_ice.py --check\npython3 -B tests/elemental_swords/run_ice_material_tests.py",
+    "env": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "Native regional passage presentation and graphics translation units",
+    "run": "python3 -B tests/regional_passages/run_presentation_tests.py --syntax",
+    "env": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "Drop-in regional material packs and native texture metadata",
+    "run": "python3 -B tests/regional_passages/run_material_tests.py",
+    "env": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Dedicated Lost Woods vertical scrolling and native binding preservation",
+    "run": "python3 -B tests/lost_woods_entrance/run_vertical_scroll_tests.py"
+  },
+  {
+    "suite": "entrances",
+    "origin": "gate",
+    "name": "Native cross-game entrance sequencing and forest arrival",
+    "run": "C_INCLUDE_PATH=/usr/include/SDL2 python3 -B scripts/diagnostics/run_receipt_syntax_tests.py mm/src/code/z_play.c soh/src/code/z_play.c\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/transition_fade_behavior_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/oot_cold_blue_warp_behavior_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/lost_woods_entrance/run_mm_camera_arrival_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/lost_woods_entrance/opening_forest_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/lost_woods_entrance/portal_save_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/lost_woods_entrance/mm3d_pack_test.py --sanitize"
+  },
+  {
+    "suite": "entrances",
+    "origin": "gate",
+    "name": "Conditional Lost Woods Great Fairy return",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/lost_woods_entrance/run_fountain_return_tests.py --sanitize"
+  },
+  {
+    "suite": "entrances",
+    "origin": "nei",
+    "name": "Native regional passage geometry, actor entry and cross-game handoff",
+    "run": "python3 -B tests/regional_passages/run_tests.py --sanitize",
+    "env": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "suite": "entrances",
+    "origin": "nei",
+    "name": "Shared native and alternate Fountain valley geometry and resource lifecycle",
+    "run": "python3 -B tests/regional_passages/run_valley_tests.py",
+    "env": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "suite": "entrances",
+    "origin": "gate",
+    "name": "Retail shops and nonretail interior entrance regressions",
+    "run": "g++ -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -I. tests/cross_dungeon/narrow_pools_test.cpp -o /tmp/narrow-pools\nASAN_OPTIONS=detect_leaks=0 /tmp/narrow-pools\ng++ -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -I. tests/cross_dungeon/shop_pool_test.cpp -o /tmp/shop-pools\nASAN_OPTIONS=detect_leaks=0 /tmp/shop-pools\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/shop_catalogue_behavior_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/shop_native_pool_behavior_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/shop_return_behavior_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/shop_cli_options_behavior_test.py --sanitize\npython3 -B tests/cross_dungeon/interior_settings_behavior_test.py\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/oot_catalogue_behavior_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/mm_catalogue_behavior_test.py --sanitize\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/cross_dungeon/oot_pool_runtime_behavior_test.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "PAK menu visibility and voice discovery",
+    "run": "python3 scripts/diagnostics/run_combo_pak_visibility_tests.py\npython3 scripts/diagnostics/run_voice_pack_discovery_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Settings import and per-game mod load order",
+    "run": "python3 tests/settings_import/run_tests.py --json-include /usr/include"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Shared-item integration regressions",
+    "run": "python3 scripts/diagnostics/run_combo_shared_test.py --json-include /usr/include\npython3 scripts/diagnostics/run_combo_grant_tests.py --json-include /usr/include\npython3 tests/dungeon_rewards/run_tests.py --json-include /usr/include\npython3 tests/item_grant_audit/run_tests.py\npython3 scripts/diagnostics/run_combo_reward_delivery_tests.py\npython3 scripts/diagnostics/run_combo_reward_delivery_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "SoH 9.3 compatibility regressions",
+    "run": "python3 -B scripts/diagnostics/run_actor_db_registration_tests.py\npython3 -B scripts/diagnostics/run_actor_db_registration_tests.py --sanitize\npython3 -B scripts/diagnostics/run_combo_save_compat_tests.py --json-include /usr/include\npython3 -B tests/oot_equipment_pause/run_age_requirement_tests.py\npython3 -B scripts/diagnostics/run_silver_rupee_cosmetic_tests.py\npython3 -B scripts/diagnostics/run_silver_rupee_cosmetic_tests.py --sanitize\npython3 -B scripts/diagnostics/run_mm_fast_transformation_tests.py\npython3 -B scripts/diagnostics/run_hint_item_area_tests.py --sanitize"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/solo_games/run_tests.py",
+    "run": "python3 -B tests/solo_games/run_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/emotes/run_tests.py",
+    "run": "python3 -B tests/emotes/run_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/emotes/run_native_tests.py",
+    "run": "python3 -B tests/emotes/run_native_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/emotes/run_menu_tests.py",
+    "run": "python3 -B tests/emotes/run_menu_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/whats_new/run_tests.py",
+    "run": "python3 -B tests/whats_new/run_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_native_npc_model_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_native_npc_model_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_forest_actor_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_forest_actor_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "Regional Stalchild, Mikau and Darmani presentations and placement lifecycle",
+    "run": "python3 -B tests/regional_actors/run_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_solo_forest_actors_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_solo_forest_actors_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_placed_saria_resources_test.py --sanitize",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_mm_placed_saria_resources_test.py --sanitize"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_solo_forest_tests.py",
+    "run": "python3 -B tests/black_market/run_solo_forest_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_final_forest_scroll_tests.py",
+    "run": "python3 -B tests/black_market/run_final_forest_scroll_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_final_forest_mm_config_test.py",
+    "run": "python3 -B tests/black_market/run_final_forest_mm_config_test.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/lost_woods_entrance/run_arrival_fade_tests.py",
+    "run": "python3 -B tests/lost_woods_entrance/run_arrival_fade_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/lost_woods_entrance/final_scene_segments_test.py",
+    "run": "python3 -B tests/lost_woods_entrance/final_scene_segments_test.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror/run_tests.py",
+    "run": "python3 -B tests/magic_mirror/run_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror/check_scene.py",
+    "run": "python3 -B tests/magic_mirror/check_scene.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror/run_form_tests.py",
+    "run": "python3 -B tests/magic_mirror/run_form_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror/run_integration_tests.py",
+    "run": "python3 -B tests/magic_mirror/run_integration_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror_inventory/run_tests.py",
+    "run": "python3 -B tests/magic_mirror_inventory/run_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror_inventory/run_action_tests.py",
+    "run": "python3 -B tests/magic_mirror_inventory/run_action_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror_inventory/run_sync_tests.py",
+    "run": "python3 -B tests/magic_mirror_inventory/run_sync_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/magic_mirror_inventory/run_save_tests.py",
+    "run": "python3 -B tests/magic_mirror_inventory/run_save_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tools/magic_mirror/test_visuals.py",
+    "run": "python3 -B tools/magic_mirror/test_visuals.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tools/magic_mirror/run_draw_tests.py",
+    "run": "MIRROR_TEST_CXXFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -no-pie\" ASAN_OPTIONS=detect_leaks=0 python3 -B tools/magic_mirror/run_draw_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_native_tests.py",
+    "run": "python3 -B tests/black_market/run_native_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_oot_native_tests.py",
+    "run": "python3 -B tests/black_market/run_oot_native_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "Native Black Market shop actor, scenes and dialogue formatting",
+    "run": "python3 -B tests/black_market/oot_shop_camera_parity_tests.py\npython3 -B tests/black_market/run_counter_barrier_native_tests.py\npython3 -B tests/black_market/test_mm_shop_presentation.py\npython3 -B tests/black_market/native_mm_shop_adapter_tests.py\npython3 -B tests/black_market/native_mm_scene_runtime_tests.py\npython3 -B tests/black_market/test_mm_native_shop_scene.py\npython3 -B tests/black_market/run_keeper_dialogue_oot_formatter_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "Black Market optional room assets and native draw ownership",
+    "run": "python3 -B tests/black_market/test_room_magic_assets.py\npython3 -B tests/black_market/run_room_magic_tests.py\npython3 -B tests/black_market/run_room_magic_loader_tests.py\npython3 -B tests/black_market/run_room_magic_draw_exit_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_shelves_native_tests.py",
+    "run": "python3 -B tests/black_market/run_shelves_native_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_browsing_native_tests.py",
+    "run": "python3 -B tests/black_market/run_browsing_native_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_granny_native_tests.py",
+    "run": "python3 -B tests/black_market/run_granny_native_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_granny_header_tests.py",
+    "run": "python3 -B tests/black_market/run_granny_header_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/chateau_romani_3ds/run_bundling_tests.py",
+    "run": "python3 -B tests/chateau_romani_3ds/run_bundling_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/woods_mystery/run_hex_test.py",
+    "run": "python3 -B tests/woods_mystery/run_hex_test.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/woods_mystery/run_active_pack_test.py",
+    "run": "python3 -B tests/woods_mystery/run_active_pack_test.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/woods_mystery/run_wall_material_test.py",
+    "run": "python3 -B tests/woods_mystery/run_wall_material_test.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/woods_mystery/run_shimmer_placement_test.py",
+    "run": "python3 -B tests/woods_mystery/run_shimmer_placement_test.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_scene_music_tests.py",
+    "run": "python3 -B tests/black_market/run_scene_music_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "nei",
+    "name": "tests/black_market/run_music_shuffle_tests.py",
+    "run": "python3 -B tests/black_market/run_music_shuffle_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_din_fire_shield_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_din_fire_shield_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_hint_item_name_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_hint_item_name_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_combo_crash_owner_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_combo_crash_owner_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tools/nei_gi/test_tunic_clearance.py",
+    "run": "python3 -B tools/nei_gi/test_tunic_clearance.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tools/nei_gi/SOURCE/mario_sm64_poc3.py --verify",
+    "run": "python3 -B tools/nei_gi/SOURCE/mario_sm64_poc3.py --verify"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_nei_gi_tests.py --held --combo",
+    "run": "python3 -B scripts/diagnostics/run_nei_gi_tests.py --held --combo"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/elemental_arrow_gi/run_tests.py",
+    "run": "python3 -B tests/elemental_arrow_gi/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/reward_gi/run_tests.py",
+    "run": "python3 -B tests/reward_gi/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/reward_gi/run_asset_packaging_tests.py",
+    "run": "python3 -B tests/reward_gi/run_asset_packaging_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_gi/run_flame_arena_tests.py",
+    "run": "python3 -B tests/nei_gi/run_flame_arena_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_gi/run_sages_tunic_particle_tests.py",
+    "run": "python3 -B tests/nei_gi/run_sages_tunic_particle_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tools/nei_gi/check_time_gate_solidity.py",
+    "run": "python3 -B tools/nei_gi/check_time_gate_solidity.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_item_presentation_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mm_item_presentation_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_static_gi_bridge_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_mm_static_gi_bridge_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_tunic_material_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_tunic_material_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_item_receipt_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mm_item_receipt_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/item_receipts/run_pickup_catalog_tests.py",
+    "run": "python3 -B tests/item_receipts/run_pickup_catalog_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/item_receipts/run_pickup_catalog_tests.py --sanitize",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/item_receipts/run_pickup_catalog_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/item_receipts/run_key_receipt_tests.py --sanitizers",
+    "run": "python3 -B tests/item_receipts/run_key_receipt_tests.py --sanitizers"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/cape_choice/run_tests.py",
+    "run": "python3 -B tests/cape_choice/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/cape_choice/run_tests.py --sanitize",
+    "run": "python3 -B tests/cape_choice/run_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_anklet_icon_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_anklet_icon_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_native_heart_receipt_icon_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_native_heart_receipt_icon_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/item_receipts/run_seed_settings_tests.py --sanitizers",
+    "run": "python3 -B tests/item_receipts/run_seed_settings_tests.py --sanitizers"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/shared_seed_settings/run_tests.py --sanitize",
+    "run": "python3 -B tests/shared_seed_settings/run_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/item_receipts/run_mm_first_seed_gate_test.py --sanitizers",
+    "run": "python3 -B tests/item_receipts/run_mm_first_seed_gate_test.py --sanitizers"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/item_receipts/run_file_select_sdl_main_tests.py",
+    "run": "python3 -B tests/item_receipts/run_file_select_sdl_main_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_receipt_syntax_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_receipt_syntax_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_song_gi_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_song_gi_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_sword_pose_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_sword_pose_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_sword_mod_gi_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_sword_mod_gi_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_sword_fallback_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_sword_fallback_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_sword_receipt_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_sword_receipt_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_sword_asset_toggle_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_sword_asset_toggle_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_sword_resource_view_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_sword_resource_view_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_fairy_bottle_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_fairy_bottle_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_bottle_polish_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_bottle_polish_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_bottle_contents_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_bottle_contents_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_bottle_gi_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_bottle_gi_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tools/chateau_romani_3ds/run_tests.py",
+    "run": "python3 -B tools/chateau_romani_3ds/run_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_tests.py",
+    "run": "python3 -B tests/seasons/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_zoras_domain_thaw_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_zoras_domain_thaw_tests.py --sanitize"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_mode_tests.py",
+    "run": "python3 -B tests/seasons/run_mode_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_oot_mode_tests.py",
+    "run": "python3 -B tests/seasons/run_oot_mode_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_mode_pool_tests.py",
+    "run": "python3 -B tests/seasons/run_mode_pool_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_mode_save_tests.py",
+    "run": "python3 -B tests/seasons/run_mode_save_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_native_weather_tests.py --sanitize",
+    "run": "python3 -B tests/seasons/run_native_weather_tests.py --sanitize"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_generated_leaf_texture_tests.py",
+    "run": "python3 -B tests/seasons/run_generated_leaf_texture_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_leaf_combiner_tests.py",
+    "run": "python3 -B tests/seasons/run_leaf_combiner_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_autumn_foliage_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mm_autumn_foliage_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_autumn_scene_foliage_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mm_autumn_scene_foliage_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_autumn_surface_texture_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mm_autumn_surface_texture_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_season_selector_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mm_season_selector_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "Native OoT and MM Rod put-away, chooser and lifecycle in solo and Combo",
+    "run": "python3 -B tests/seasons/run_oot_rod_stow_tests.py --sanitize\npython3 -B tests/seasons/run_oot_rod_stow_tests.py --combo --sanitize\npython3 -B tests/seasons/run_rod_lifecycle_tests.py --sanitize\npython3 -B tests/seasons/run_rod_lifecycle_tests.py --combo --sanitize",
+    "env": {
+      "ASAN_OPTIONS": "detect_leaks=0"
+    }
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/seasons/run_oot_shop_tests.py",
+    "run": "python3 -B tests/seasons/run_oot_shop_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_mask_bridge_tests.py --sanitize",
+    "run": "python3 -B scripts/diagnostics/run_mm_mask_bridge_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mask_transformation_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mask_transformation_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_oot_native_transformation_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_oot_native_transformation_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mask_progression_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mask_progression_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_gerudo_mask_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_gerudo_mask_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/great_fairy_facial/run_tests.py",
+    "run": "python3 -B tests/great_fairy_facial/run_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/oot_zora/run_tests.py",
+    "run": "python3 -B tests/oot_zora/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/mm_presentation/run_foreign_scale_tests.py",
+    "run": "python3 -B tests/mm_presentation/run_foreign_scale_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/mm_cape/run_texture_tests.py",
+    "run": "python3 -B tests/mm_cape/run_texture_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_mm_nei_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_mm_nei_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/mm_wallet/run_tests.py",
+    "run": "python3 -B tests/mm_wallet/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/mm_editor/run_tests.py",
+    "run": "python3 -B tests/mm_editor/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/oot_editor/run_tests.py",
+    "run": "python3 -B tests/oot_editor/run_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_grace/run_flight_tests.py",
+    "run": "python3 -B tests/mm_grace/run_flight_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_grace/run_particle_tests.py",
+    "run": "python3 -B tests/mm_grace/run_particle_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_grace/run_orientation_tests.py",
+    "run": "python3 -B tests/mm_grace/run_orientation_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_grace/run_pool_tests.py",
+    "run": "python3 -B tests/mm_grace/run_pool_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_grace/run_save_tests.py",
+    "run": "python3 -B tests/mm_grace/run_save_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_grace/run_settings_tests.py",
+    "run": "python3 -B tests/mm_grace/run_settings_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/nei_shared_slot/run_tests.py",
+    "run": "python3 -B tests/nei_shared_slot/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/nei_shared_slot/run_ui_tests.py",
+    "run": "python3 -B tests/nei_shared_slot/run_ui_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/nei_shared_slot/run_sync_tests.py",
+    "run": "python3 -B tests/nei_shared_slot/run_sync_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/nei_shared_slot/run_save_tests.py",
+    "run": "python3 -B tests/nei_shared_slot/run_save_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/moons_tear/run_tests.py",
+    "run": "python3 -B tests/moons_tear/run_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_skin_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_skin_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_core_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_core_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_material_glow_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_material_glow_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_bundled_asset_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_bundled_asset_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_eye_palette_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_eye_palette_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_real_asset_tests.py soh/assets/custom/objects/forms/wolf_link/gWolfLinkData soh/assets/custom/objects/forms/wolf_link/gWolfLinkHDData",
+    "run": "python3 -B tests/mm_wolf/run_real_asset_tests.py soh/assets/custom/objects/forms/wolf_link/gWolfLinkData soh/assets/custom/objects/forms/wolf_link/gWolfLinkHDData"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_host_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_host_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_audio_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_audio_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_model_owner_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_model_owner_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_asset_packaging_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_asset_packaging_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_wolf/run_syntax_tests.py",
+    "run": "python3 -B tests/mm_wolf/run_syntax_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/wand_modes/run_tests.py",
+    "run": "python3 -B tests/wand_modes/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_air_magic/run_tests.py",
+    "run": "python3 -B tests/nei_air_magic/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_receipt_soul_color_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_receipt_soul_color_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_nei_identity_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_nei_identity_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_held/run_hand_fit_tests.py",
+    "run": "python3 -B tests/nei_held/run_hand_fit_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_held/run_articulated_tests.py",
+    "run": "python3 -B tests/nei_held/run_articulated_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_asset_priority/run_tests.py",
+    "run": "python3 -B tests/nei_asset_priority/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_asset_priority/run_oot_gi_tests.py",
+    "run": "python3 -B tests/nei_asset_priority/run_oot_gi_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_asset_priority/run_tunic_model_tests.py --sanitize",
+    "run": "python3 -B tests/nei_asset_priority/run_tunic_model_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/ikana_gi/run_tests.py --sanitize",
+    "run": "python3 -B tests/ikana_gi/run_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/nei_held/run_equipment_tests.py",
+    "run": "python3 -B tests/nei_held/run_equipment_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/nei_held/run_vanilla_sword_menu_tests.py",
+    "run": "python3 -B tests/nei_held/run_vanilla_sword_menu_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "tests/nei_held/run_four_sword_visibility_tests.py",
+    "run": "python3 -B tests/nei_held/run_four_sword_visibility_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_equipment_pause/run_tests.py --sanitize",
+    "run": "python3 -B tests/mm_equipment_pause/run_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_equipment_pause/run_ownership_tests.py --sanitize",
+    "run": "python3 -B tests/mm_equipment_pause/run_ownership_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/oot_equipment_pause/run_access_tests.py",
+    "run": "python3 -B tests/oot_equipment_pause/run_access_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/oot_equipment_pause/run_access_tests.py --sanitize",
+    "run": "python3 -B tests/oot_equipment_pause/run_access_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_equipment_pause/run_preview_transition_tests.py",
+    "run": "python3 -B tests/mm_equipment_pause/run_preview_transition_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_equipment_pause/run_preview_transition_tests.py --sanitize",
+    "run": "python3 -B tests/mm_equipment_pause/run_preview_transition_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/mm_pause_inventory/run_tests.py --sanitize",
+    "run": "python3 -B tests/mm_pause_inventory/run_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "OoT inventory-page arrow focus and item identity",
+    "run": "python3 -B tests/oot_pause_inventory/run_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/pause_tutorials/run_tests.py",
+    "run": "python3 -B tests/pause_tutorials/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/pause_tutorials/run_tests.py --sanitize",
+    "run": "python3 -B tests/pause_tutorials/run_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/combo_button_transfer/run_tests.py --sanitize",
+    "run": "python3 -B tests/combo_button_transfer/run_tests.py --sanitize\npython3 -B tests/combo_button_transfer/run_age_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/nei_quest_held/run_tests.py",
+    "run": "python3 -B tests/nei_quest_held/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_used_fx/run_tests.py",
+    "run": "python3 -B tests/nei_used_fx/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_leaf/run_tests.py",
+    "run": "python3 -B tests/nei_leaf/run_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "nei",
+    "name": "tests/mm_sfx_lifetime/run_tests.py",
+    "run": "python3 -B tests/mm_sfx_lifetime/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_whip/run_tests.py",
+    "run": "python3 -B tests/nei_whip/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_lantern_grip/run_tests.py",
+    "run": "python3 -B tests/nei_lantern_grip/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_switch_hook_instant_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_switch_hook_instant_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "scripts/diagnostics/run_time_gate_visibility_tests.py",
+    "run": "python3 -B scripts/diagnostics/run_time_gate_visibility_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "nei",
+    "name": "tests/mm_nei/run_timegate_audio_tests.py",
+    "run": "python3 -B tests/mm_nei/run_timegate_audio_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_item_stow/run_ballchain_tests.py",
+    "run": "python3 -B tests/nei_item_stow/run_ballchain_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_item_stow/run_lantern_rod_tests.py",
+    "run": "python3 -B tests/nei_item_stow/run_lantern_rod_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/nei_item_stow/run_stow_tests.py",
+    "run": "python3 -B tests/nei_item_stow/run_stow_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tools/nei_held/verify_assets.py",
+    "run": "python3 -B tools/nei_held/verify_assets.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tools/nei_icons/build.py --verify",
+    "run": "python3 -B tools/nei_icons/build.py --verify"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tools/nei_icons/verify_routes.py",
+    "run": "python3 -B tools/nei_icons/verify_routes.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/optional_assets/run_tests.py",
+    "run": "python3 -B tests/optional_assets/run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/build_inputs/run_mod_discovery_tests.py",
+    "run": "python3 -B tests/build_inputs/run_mod_discovery_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "nei",
+    "name": "tests/lost_woods_entrance/run_tests.py",
+    "run": "python3 -B tests/lost_woods_entrance/run_tests.py"
+  },
+  {
+    "suite": "entrances",
+    "origin": "nei",
+    "name": "tests/cross_dungeon/run_tests.py",
+    "run": "python3 -B tests/cross_dungeon/run_tests.py"
+  },
+  {
+    "suite": "entrances",
+    "origin": "nei",
+    "name": "tests/farores_wind/run_tests.py",
+    "run": "python3 -B tests/farores_wind/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "nei",
+    "name": "bash scripts/diagnostics/run_elemental_sword_regressions.sh",
+    "run": "bash scripts/diagnostics/run_elemental_sword_regressions.sh"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "OoT diagnostic frame timing accounting",
+    "run": "python3 scripts/diagnostics/run_build_metadata_test.py\npython3 scripts/diagnostics/run_frame_timing_probe_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Progressive Din swords and Mario cap sound lifetimes",
+    "run": "python3 -B scripts/diagnostics/run_din_fire_sword_tests.py\npython3 -B scripts/diagnostics/run_din_progressive_hand_tests.py\npython3 -B scripts/diagnostics/run_din_fire_sword_damage_tests.py\npython3 -B scripts/diagnostics/run_mm_din_fire_tests.py\npython3 -B scripts/diagnostics/run_mm_din_fire_damage_tests.py\npython3 -B tests/sm64_caps/run_audio_tests.py\npython3 -B tests/oot_timegate/run_audio_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Contents-based chests and opt-in Midna",
+    "run": "python3 scripts/diagnostics/run_chest_size_tests.py\npython3 scripts/diagnostics/run_mm_chest_contents_tests.py\npython3 scripts/diagnostics/run_midna_navi_draw_test.py\npython3 scripts/diagnostics/run_midna_audio_test.py\npython3 scripts/diagnostics/run_mm_midna_test.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "2Ship weather, item-color, scene-randomization and streamed-audio regressions",
+    "run": "python3 scripts/diagnostics/run_mm_scene_randomization_tests.py\npython3 scripts/diagnostics/run_mm_audio_runtime_test.py \"$RUNNER_TEMP/mm-audio-runtime\"\npython3 scripts/diagnostics/run_mm_audio_decoder_tests.py\npython3 scripts/diagnostics/run_mm_streamed_positional_tests.py --sanitize\npython3 scripts/diagnostics/run_mm_audio_pcm_tests.py\nMM_AUDIO_PCM_CFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie\" python3 scripts/diagnostics/run_mm_audio_pcm_tests.py\npython3 scripts/diagnostics/run_native_audio_mixer_tests.py\npython3 tests/audio_mixer/run_pcm_diagnostics_tests.py\nNATIVE_AUDIO_CFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie\" python3 scripts/diagnostics/run_native_audio_mixer_tests.py\npython3 scripts/diagnostics/run_mm_custom_item_color_tests.py\npython3 scripts/diagnostics/run_mm_hud_cosmetics_tests.py\npython3 scripts/diagnostics/run_mm_drop_lifetime_tests.py\npython3 scripts/diagnostics/run_mm_unrestricted_items_tests.py\npython3 scripts/diagnostics/run_mm_item_visuals_tests.py\npython3 tests/dungeon_keys/run_asset_tests.py\npython3 scripts/diagnostics/run_mm_dungeon_key_tests.py\npython3 scripts/diagnostics/run_mm_dungeon_key_tests.py --sanitize\npython3 scripts/diagnostics/run_mm_gfx_patch_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "ComboShip seasonal weather and winter atmosphere",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/rod_spin/run_tests.py --sanitize\npython3 -B scripts/diagnostics/run_soh_season_weather_tests.py\npython3 -B scripts/diagnostics/run_soh_season_particle_tests.py --sanitize\npython3 -B scripts/diagnostics/run_soh_season_foliage_tests.py \"$RUNNER_TEMP/soh-season-foliage\" --sanitize\npython3 -B scripts/diagnostics/run_soh_season_actor_tests.py --sanitize\nMM_FOLIAGE_TEST_CFLAGS='-fsanitize=address,undefined,bounds -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie' python3 -B scripts/diagnostics/run_mm_autumn_foliage_tests.py\nMM_FOLIAGE_TEST_CFLAGS='-fsanitize=address,undefined,bounds -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie' python3 -B scripts/diagnostics/run_mm_autumn_grass_tests.py\nMM_FOLIAGE_TEST_CXXFLAGS='-O1 -g -fsanitize=address,undefined,bounds -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie' ASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_mm_autumn_scene_foliage_tests.py\nMM_FOLIAGE_TEST_CXXFLAGS='-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie' ASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_mm_autumn_surface_texture_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Foreign soul replacement skeletons and limb matrices",
+    "run": "python3 -B scripts/diagnostics/run_foreign_soul_skeleton_tests.py\npython3 -B scripts/diagnostics/run_foreign_soul_skeleton_tests.py --sanitize\npython3 -B scripts/diagnostics/run_boss_soul_model_tests.py\npython3 -B scripts/diagnostics/run_boss_soul_model_tests.py --sanitize\npython3 -B scripts/diagnostics/run_barinade_syntax_tests.py\npython3 -B scripts/diagnostics/run_twinrova_gi_replacement_tests.py\npython3 -B scripts/diagnostics/run_twinrova_gi_replacement_tests.py --sanitize\npython3 -B scripts/diagnostics/run_mm_oot_boss_import_bridge_tests.py\npython3 -B scripts/diagnostics/run_mm_oot_boss_import_bridge_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "Static OoT equipment GI bridge",
+    "run": "python3 -B scripts/diagnostics/run_mm_static_gi_bridge_tests.py\npython3 -B scripts/diagnostics/run_mm_static_gi_bridge_tests.py --sanitize\npython3 -B scripts/diagnostics/run_tunic_material_tests.py\npython3 -B scripts/diagnostics/run_tunic_material_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Foreign OoT magic jar cosmetic presentation",
+    "run": "python3 -B scripts/diagnostics/run_foreign_magic_jar_tests.py\nASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_foreign_magic_jar_tests.py --sanitize"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Foreign OoT key and heart cosmetics",
+    "run": "python3 -B scripts/diagnostics/run_oot_key_cosmetic_bridge_tests.py\nASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_oot_key_cosmetic_bridge_tests.py --sanitize\npython3 -B scripts/diagnostics/run_foreign_heart_cosmetic_tests.py\nASAN_OPTIONS=detect_leaks=0 python3 -B scripts/diagnostics/run_foreign_heart_cosmetic_tests.py --sanitize"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "Mask and remains shimmer in both engines",
+    "run": "python3 -B scripts/diagnostics/run_mask_shimmer_tests.py\npython3 -B scripts/diagnostics/run_mask_shimmer_tests.py --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "2Ship mod GUI fonts",
+    "run": "python3 scripts/diagnostics/run_mm_mod_font_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Complete render flight recorder coverage",
+    "run": "python3 scripts/diagnostics/run_performance_trace_tests.py\npython3 scripts/diagnostics/run_draw_attribution_tests.py \"$RUNNER_TEMP/draw-attribution\"\npython3 libultraship/tests/gpu_timing_query_test.py /usr/include\npython3 libultraship/tests/dxgi_pacing_test.py /usr/include\npython3 scripts/diagnostics/test_analyze_render_flight.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "OoT triangle submission equivalence",
+    "run": "python3 scripts/diagnostics/run_gfx_triangle_run_tests.py\nGFX_TRIANGLE_TEST_CXXFLAGS='-O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_triangle_run_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Shared renderer texture-address regressions",
+    "run": "git apply --reverse --check --directory=libultraship patches/libultraship-custom-tex-scroll-e3cd6591.patch || git apply --check --directory=libultraship patches/libultraship-custom-tex-scroll-e3cd6591.patch\npython3 scripts/diagnostics/test_custom_scroll_runtime.py\nGFX_TEXTURE_TEST_CXXFLAGS='-fsanitize=address,undefined -fno-sanitize-recover=all -g -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_texture_address_tests.py\npython3 scripts/diagnostics/run_gfx_texture_address_tests.py --low-module\npython3 scripts/diagnostics/run_texture_failure_command_tests.py --sanitize\nGFX_DL_TEST_CXXFLAGS='-fsanitize=address,undefined -fno-sanitize-recover=all -g -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_display_list_address_tests.py\npython3 scripts/diagnostics/run_alt_segment_binding_tests.py\npython3 -B scripts/diagnostics/run_carpet_segment_restore_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Vertex lighting and texture generation equivalence",
+    "run": "git fetch --no-tags --depth=1 origin 9c084d74a7f7d0ae8cf88b18c0ed74abde03a950\npython3 scripts/diagnostics/run_gfx_vertex_batch_tests.py\nGFX_VERTEX_TEST_CXXFLAGS='-O1 -g -fsanitize=address,undefined,float-cast-overflow -fno-sanitize-recover=all -fno-omit-frame-pointer' python3 scripts/diagnostics/run_gfx_vertex_batch_tests.py --skip-null-test"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "2Ship back equipment and OoT sky compatibility",
+    "run": "python3 scripts/diagnostics/run_mm_back_equipment_tests.py\npython3 scripts/diagnostics/run_mm_oot_sky_tests.py\npython3 -B tests/adult_mm_flex/run_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "OoT transformation cosmetics and Zora barrier regressions",
+    "run": "python3 -B tests/oot_zora/run_presentation_tests.py\npython3 scripts/diagnostics/run_oot_custom_cosmetics_tests.py\npython3 scripts/diagnostics/run_zora_barrier_cosmetics_tests.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "Young Epona riding and independent Epona cosmetics",
+    "run": "python3 scripts/diagnostics/run_young_epona_tests.py\npython3 scripts/diagnostics/run_young_epona_actor_tests.py\npython3 scripts/diagnostics/run_young_epona_player_tests.py\npython3 scripts/diagnostics/run_young_epona_save_tests.py\npython3 scripts/diagnostics/test_young_epona_assets.py\npython3 scripts/diagnostics/run_epona_mask_tests.py\npython3 scripts/diagnostics/run_epona_cosmetics_tests.py\npython3 scripts/diagnostics/run_mm_epona_cosmetics_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Shield of Ikana current editor ownership and private icon routing",
+    "run": "python3 -B tests/ikana_editor_icon/run_ui_tests.py\npython3 -B tests/ikana_editor_icon/run_ownership_tests.py\npython3 -B tests/ikana_editor_icon/run_native_syntax_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Black Market native closed doors and quiet fairy interactions",
+    "run": "python3 -B tests/black_market/run_door_collision_native_tests.py\npython3 -B tests/black_market/run_fairy_quiet_native_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Granny vapor accepts real native Array and Vertex resource owners",
+    "run": "python3 -B tests/black_market/run_granny_vapor_resource_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "MM Black Market material context traces are bounded and observation only",
+    "run": "python3 -B tests/black_market/run_room_material_trace_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Seasonal water ownership, quiet Winter emergence and native well targets",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/season_shop/native_regressions.py\nASAN_OPTIONS=detect_leaks=0 python3 -B tests/season_water/lifetime_test.py soh/mods/season_scene.cpp --sanitize"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Cross-scene material binding reuse preserves fallback and cache identity",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/caustic_binding/native_regressions.py --sanitize"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Mirror button deduplication and single native cast chime",
+    "run": "ASAN_OPTIONS=detect_leaks=0 python3 -B tests/magic_mirror_followups/run.py"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Opt-in authored collectible shimmer and owner cosmetic palettes",
+    "run": "python3 -B tests/collectible_shimmer/native_regressions.py\npython3 -B tests/collectible_shimmer/renderer_regressions.py\npython3 -B tests/collectible_shimmer/draw_regressions.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Termina native floor packets and additive seasonal coverage",
+    "run": "ASAN_OPTIONS=detect_leaks=0 MM_FOLIAGE_TEST_CXXFLAGS=\"-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-pie -no-pie\" python3 -B scripts/diagnostics/run_mm_autumn_scene_foliage_tests.py --materials mm/tests/fixtures/termina_season_materials"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Sages Chamber travel policy, registered native adapter and confirmation",
+    "run": "python3 -B tests/temple_sages/run_tests.py\npython3 -B tests/temple_sages/run_confirmation_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Cutscene-only Zelda aura scope and optimized finite-position guards",
+    "run": "python3 -B tests/temple_sages/run_aura_tests.py\npython3 -B tests/temple_sages/run_aura_tests.py --fast-math"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Packaged Sages Chamber resource closure with native and Alt rendering",
+    "run": "python3 -B tests/temple_sages/test_packaged_chamber.py"
+  },
+  {
+    "suite": "entrances",
+    "origin": "gate",
+    "name": "Packaged Lake Hylia dedicated sand, native and Alt resource parity",
+    "run": "python3 -B -m unittest discover -s tests/lake_tunnel_sand -v"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Cutscene actor Zelda dialogue catalogue and native talk lifecycle",
+    "run": "python3 -B tests/custom_messages/run_cutscene_actor_tests.py"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Exact cumulative assets from bounded compressed source parts",
+    "run": "python3 -B -m unittest discover -s tests/cumulative_assets -v"
+  },
+  {
+    "suite": "render",
+    "origin": "gate",
+    "name": "Native-texture chamber and optional visual layer compatibility",
+    "run": "python3 -B tests/temple_sages/test_native_chamber_layers.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Stone chamber footsteps and full walkable surface echo",
+    "run": "python3 -B tests/temple_sages/test_collision_audio.py"
+  },
+  {
+    "suite": "equipment",
+    "origin": "gate",
+    "name": "Shield of Ikana player matrix binding in OoT and MM",
+    "run": "python3 -B tests/ikana_shield_render/run_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Morning Ikana native missing-icon fallback and OoT editor tile",
+    "run": "python3 -B tests/ikana_editor_icon/run_missing_icon_tests.py\npython3 -B tests/ikana_editor_icon/run_oot_ui_icon_tests.py"
+  },
+  {
+    "suite": "items",
+    "origin": "gate",
+    "name": "Magic Mirror native shuffle pool ownership save and foreign rewards",
+    "run": "python3 -B tests/magic_mirror_shuffle/registry_test.py\npython3 -B tests/magic_mirror_shuffle/run_pool_tests.py\npython3 -B tests/magic_mirror_shuffle/run_grant_tests.py\npython3 -B tests/magic_mirror_shuffle/run_save_tests.py\npython3 -B tests/magic_mirror_shuffle/run_foreign_tests.py"
+  },
+  {
+    "suite": "entrances",
+    "origin": "gate",
+    "name": "Magic Mirror combined route logic policy snapshots and queue invalidation",
+    "run": "python3 -B tests/magic_mirror_shuffle/run_route_tests.py\npython3 -B tests/magic_mirror_shuffle/run_option_tests.py\npython3 -B tests/magic_mirror_shuffle/run_cancel_tests.py"
+  },
+  {
+    "suite": "systems",
+    "origin": "gate",
+    "name": "Native Mirror editor grants and forest pickup close-up camera",
+    "run": "python3 -B tests/magic_mirror_editor/run_tests.py\npython3 -B tests/magic_mirror_editor/run_pickup_camera_tests.py"
+  },
+  {
+    "suite": "world",
+    "origin": "gate",
+    "name": "Built-in Black Market materials and Granny interior availability",
+    "run": "python3 -B tests/black_market/run_granny_availability_tests.py"
+  }
+]

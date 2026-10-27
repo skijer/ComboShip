@@ -1,0 +1,125 @@
+{
+  "resource_count": 10,
+  "vertex_records": 2217,
+  "vertex_loads": 74,
+  "slug": "biggoron_sword",
+  "name": "Biggoron's Sword",
+  "entry": "objects/nei_gi_redesign/biggoron_sword/gi_dl",
+  "draw_scale": 1,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 1966,
+  "bounds_author": [
+    [
+      -23.0,
+      -54.0,
+      -4.75
+    ],
+    [
+      23.0,
+      166.0,
+      4.75
+    ]
+  ],
+  "markers": {
+    "guard_baseline_y": 0,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "held_grip_y": -25.75,
+    "held_tip_y": 166.0,
+    "source": "supplied TP Ordon sword blade; separately authored heavy guard/grip",
+    "source_blade_width_factor": 2.15,
+    "texture_upscale": 4,
+    "adult_two_handed_proportions": true,
+    "blade_seat_y": 0,
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "Ordon-inspired heavy fullered blade",
+        "factor": 1.5
+      },
+      {
+        "part": "Bronze sculpted Goron guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Machined guard lip",
+        "factor": 1.2
+      },
+      {
+        "part": "Inset Goron diamond",
+        "factor": 1.2
+      },
+      {
+        "part": "Raised Goron forge seal",
+        "factor": 1.2
+      },
+      {
+        "part": "Machined guard lip",
+        "factor": 1.2
+      },
+      {
+        "part": "Inset Goron diamond",
+        "factor": 1.2
+      },
+      {
+        "part": "Raised Goron forge seal",
+        "factor": 1.2
+      },
+      {
+        "part": "Shaped oval leather grip",
+        "factor": 1.0
+      },
+      {
+        "part": "Raised diagonal leather wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Heavy blade seat collar",
+        "factor": 1.0
+      },
+      {
+        "part": "Heavy capped pommel",
+        "factor": 1.0
+      },
+      {
+        "part": "Pommel machined ring",
+        "factor": 1.0
+      },
+      {
+        "part": "Four Sword sheen over Ordon-inspired heavy fullered blade",
+        "factor": 1.5
+      }
+    ],
+    "imported_approved_model": false
+  },
+  "notes": [
+    "Straight Ordon blade/fullers retained with wider two-handed proportions and a separately closed, beveled guard.",
+    "Polished steel, bronze Goron seal, blue grip and longer blade.",
+    "Scimitar ornament informed machined fittings only; its curved silhouette is preserved as a separate reference.",
+    "Opaque metal plus normal-generated reflection decal; no collision, damage or progression edits.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "fittings_tex": "6d08a2936484a2bcf7fee31d4eeaecad06d7fc25e4e7e6fe16de12536de363b3",
+      "four_sword_sheen_tex": "545ba6fcf1522bb098b2943c83653162f43f8ef59cf6d4589d692e9833cf2bd9",
+      "gi_dl": "5b6af91e206a53d836712510e1955aed64678c909078194eb7e48f456c0c4136",
+      "groove_tex": "3757c2bcec537bdba761d20a53f1e8f44d4f89827c8600ee014effb0f40c6622",
+      "leather_tex": "a8380112884acec3e5a539cc4412f975ae00f5b412822a2e49770c0b8862e750",
+      "mesh_opa_vtx": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "ordon_steel_tex": "e182a2bcec09676417975ccf3d65c82764093902eb91d64885d74ea7b18932fa",
+      "rim_tex": "695258c394ce1ae31b2237e03990339406b7008bd71c619fd2e47131b65a55d2",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "wrap_tex": "72a2ecc60cb08a8082c5ead056b2ffe0dca7495cb64db33fbacfb74431308e9f"
+    },
+    "glb_sha256": "d00ad584a2010c37035ab8f5daf51ff30479ce3b11d54bb3125437295ab28d90",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  }
+}

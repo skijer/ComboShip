@@ -1,0 +1,38 @@
+{
+  "encoding": "zlib-base64-pool",
+  "files": [
+    {
+      "bytes": 262236,
+      "offset": 0,
+      "path": "alt/textures/comboship/regional/lake_hylia/sand",
+      "sha256": "a4bed76544f7d6e397e2a8341f2a849502b34b40127a939901c20d3f266f30eb"
+    },
+    {
+      "bytes": 262236,
+      "offset": 0,
+      "path": "textures/comboship/regional/lake_hylia/sand",
+      "sha256": "a4bed76544f7d6e397e2a8341f2a849502b34b40127a939901c20d3f266f30eb"
+    }
+  ],
+  "packed_bytes": 173602,
+  "packed_sha256": "b5b9c78aecb7e208ebd2ec651642ea17355c8103c1fa65513184d07a46da6641",
+  "parts": [
+    {
+      "bytes": 98304,
+      "decoded_sha256": "8e51b390de322766908a243610a9445693455fb0da03a7b0c07e310fab7ea7ef",
+      "encoded_bytes": 131072,
+      "name": "pool.zlib.001.b64",
+      "sha256": "566b87345c82634821f0f8727852d7f4f7dcd4c37118c1915aadc45ff82c5217"
+    },
+    {
+      "bytes": 75298,
+      "decoded_sha256": "6c841eb57642ed2df5f90badd5628cbb337af0a3c8b6d13a4c2d445d911c8487",
+      "encoded_bytes": 100400,
+      "name": "pool.zlib.002.b64",
+      "sha256": "5fc83011aabb6fca0e39c64c44d9e24e7f13155c7acb7090bed0cbeedeb5182d"
+    }
+  ],
+  "raw_bytes": 262236,
+  "raw_sha256": "a4bed76544f7d6e397e2a8341f2a849502b34b40127a939901c20d3f266f30eb",
+  "version": 1
+}

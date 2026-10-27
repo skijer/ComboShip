@@ -1,10 +1,15 @@
-#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include <libultraship/bridge/consolevariablebridge.h>
+
+#include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/randomizer/SeedContext.h"
 #include "soh/ShipInit.hpp"
+#include "expansions/sw97/sw97_config.h"
 
 extern "C" {
 #include "overlays/actors/ovl_Bg_Breakwall/z_bg_breakwall.h"
 #include "overlays/actors/ovl_Bg_Ice_Shelter/z_bg_ice_shelter.h"
+#include "overlays/actors/ovl_En_Arrow/z_en_arrow.h"
+#include "mods/items/custom_items.h"
 
 extern PlayState* gPlayState;
 }
@@ -22,13 +27,30 @@ static void UpdateBlueFireCollidersBgIceShelter(void* actorPtr) {
     thisx->cylinder2.info.bumper.dmgFlags |= DMG_ARROW_ICE;
 }
 
-static bool CheckAC(Actor* ac) {
-    return ac != NULL && ac->id == ACTOR_EN_ARROW && ac->child != NULL && ac->child->id == ACTOR_ARROW_ICE;
+static bool HitByIceArrow(ColliderCylinder* cylinder) {
+    return cylinder->info.acHitInfo != NULL && (cylinder->info.acHitInfo->toucher.dmgFlags & DMG_ARROW_ICE);
+}
+
+static bool IsSw97IceArrow(Actor* ac) {
+    if (ac == NULL || ac->id != ACTOR_EN_ARROW)
+        return false;
+    s16 p = (s16)ac->params;
+    return p == ARROW_SW97_ICE || p == ARROW_SEED_ICE;
+}
+
+// The Gust Jar's BLOW collider is owned by the Player, so it must also be
+// accepted as the Water medallion's ice attack when melting red ice.
+static bool IsGustJarIceBlow(Actor* ac) {
+    if (ac == NULL || ac->id != ACTOR_PLAYER)
+        return false;
+    return gCustomItemState.gustJarEquipped && gCustomItemState.gustJarMode == 3 /* GUST_MODE_BLOW */ &&
+           gCustomItemState.gustJarElement == 2 /* GUST_ELEMENT_ICE */;
 }
 
 void RegisterBlueFireArrowsHooks() {
-    bool shouldRegister =
+    bool cheatOn =
         CVarGetInteger(CVAR_ENHANCEMENT("BlueFireArrows"), 0) || (IS_RANDO && RAND_GET_OPTION(RSK_BLUE_FIRE_ARROWS));
+    bool shouldRegister = cheatOn || SW97_MEDALLIONS_ENABLED();
 
     COND_ID_HOOK(OnActorInit, ACTOR_BG_BREAKWALL, shouldRegister, UpdateBlueFireCollidersBgBreakwall);
     COND_ID_HOOK(OnActorInit, ACTOR_BG_ICE_SHELTER, shouldRegister, UpdateBlueFireCollidersBgIceShelter);
@@ -45,11 +67,20 @@ void RegisterBlueFireArrowsHooks() {
 
     COND_VB_SHOULD(VB_BG_ICE_SHELTER_MELT, shouldRegister, {
         BgIceShelter* thisx = va_arg(args, BgIceShelter*);
+        bool meltCheatOn = CVarGetInteger(CVAR_ENHANCEMENT("BlueFireArrows"), 0) ||
+                           (IS_RANDO && RAND_GET_OPTION(RSK_BLUE_FIRE_ARROWS));
 
-        if (CheckAC(thisx->cylinder1.base.ac) || CheckAC(thisx->cylinder2.base.ac)) {
+        Actor* ac1 = thisx->cylinder1.base.ac;
+        Actor* ac2 = thisx->cylinder2.base.ac;
+
+        if (IsSw97IceArrow(ac1) || IsSw97IceArrow(ac2) || IsGustJarIceBlow(ac1) || IsGustJarIceBlow(ac2)) {
+            // SW97 ice and Water-medallion gustjar BLOW melt red ice without the cheat.
+            *should = true;
+        } else if (meltCheatOn && (HitByIceArrow(&thisx->cylinder1) || HitByIceArrow(&thisx->cylinder2))) {
             *should = true;
         }
     });
 }
 
-static RegisterShipInitFunc initFunc(RegisterBlueFireArrowsHooks, { "IS_RANDO", CVAR_ENHANCEMENT("BlueFireArrows") });
+static RegisterShipInitFunc initFunc(RegisterBlueFireArrowsHooks,
+                                     { "IS_RANDO", CVAR_ENHANCEMENT("BlueFireArrows"), SW97_MEDALLIONS_CVAR });

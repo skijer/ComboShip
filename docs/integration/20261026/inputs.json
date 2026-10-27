@@ -1,0 +1,122 @@
+{
+  "scope": "October26 cumulative source input inventory",
+  "recorded_parent": "9f23b84859ac545a283c155b6642aea302aad414",
+  "latest_verified_public_baseline": "fa81f7926038f2aa85c7f3e73c96fec043168b66",
+  "new_deltas": [
+    "62431bf507bf3284baa0988e969984189e40a37e",
+    "176ae8ef6d4a7a8a7ca24d7b4b85578e0ae1b1b9",
+    "67dad00a465990103730dea34945d275653a20ca",
+    "eae07d49ec30b7e40f6b492b6b0cb041d1e59f8b"
+  ],
+  "inputs": [
+    {
+      "name": "ComboShip_2Ship_Tycoon_HUD_999_Source_POC1_20261026.zip",
+      "version_id": null,
+      "size_bytes": 36985,
+      "sha256": "e33246f5c14544464d612a509f13a8a125c9c2f5cc1f39849aef5f3ba786b186",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "repository": "marsh6487/ComboShip",
+        "baseline": "fa81f7926038f2aa85c7f3e73c96fec043168b66",
+        "candidate": "67dad00a465990103730dea34945d275653a20ca",
+        "baseline_tree": "40658cee090ddf0b55e234aa7bbc7e436723377e",
+        "candidate_tree": "9251d845bcd08533cdca5de1ac7522e80fef0bc6"
+      }
+    },
+    {
+      "name": "ComboShip_Bridge_Atmosphere_Followups_Source_20261026.zip",
+      "version_id": "3",
+      "size_bytes": 496872,
+      "sha256": "eb0bc63d01738c864dbf23793ae72294afd5a1f7a74fe99504ad6bfe055b7751",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "baseline": "eb3c7cadd6419afd4a68015358880b8d27d0601e",
+        "candidate": "2e8ca7986648b7e88f0e119f9f5e9b4bdd51f318",
+        "tree": "8db2510ef32d8b5f4e4efdf6744c811ae6086475"
+      }
+    },
+    {
+      "name": "ComboShip_Confirmed_Season_Palettes_Source_POC1_20261027.zip",
+      "version_id": "2",
+      "size_bytes": 411218,
+      "sha256": "583d6580f540005f1b538486d657746bd06d03059cb256efb7588dbfc73f7232",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "baseline_tree": "40658cee090ddf0b55e234aa7bbc7e436723377e",
+        "candidate_tree": "62e8931f5f5c0a801c1da2225b320e330909e36b"
+      }
+    },
+    {
+      "name": "ComboShip_Cumulative_Overnight_Source_20261026.zip",
+      "version_id": "12",
+      "size_bytes": 1378075,
+      "sha256": "6ba567617cf871a3a2b3e9a9cffbb0cb6174e9e0c559a44579335a9d571963c8",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "baseline": "eb3c7cadd6419afd4a68015358880b8d27d0601e",
+        "tree": "c80fbc6b9dd0082f924a12ed00266ea879314038"
+      }
+    },
+    {
+      "name": "ComboShip_Material_Bindings_Shimmer_Mirror_Source_20261026.zip",
+      "version_id": null,
+      "size_bytes": 1761208,
+      "sha256": "0ec241dfa5411138b4892ace9404c98406676596772f61a088769b8082946822",
+      "zip_crc_ok": true,
+      "source_refs": {}
+    },
+    {
+      "name": "ComboShip_OoT_Tint_Cumulative_Source_20261026.zip",
+      "version_id": "2",
+      "size_bytes": 1798760,
+      "sha256": "509fe1c7ca87283e35b68700b23dc10b06f2a67ebab7870dcc02cf3d42f14e12",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "baseline": "9f23b84859ac545a283c155b6642aea302aad414",
+        "tree": "40658cee090ddf0b55e234aa7bbc7e436723377e"
+      }
+    },
+    {
+      "name": "ComboShip_Season_Shop_Bugfix_Source_20261026.zip",
+      "version_id": null,
+      "size_bytes": 540680,
+      "sha256": "6fbf3dfadb53676325f27e564f691717c8184006007769282e7ad056bc3051dc",
+      "zip_crc_ok": true,
+      "source_refs": {}
+    },
+    {
+      "name": "Magic_Mirror_Forest_POC1_Source.zip",
+      "version_id": "2",
+      "size_bytes": 25376524,
+      "sha256": "41aac0803487f4f9d57bf46be00e4c93608f63474882f2d88fa943b67534cc5d",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "repository": "marsh6487/ComboShip",
+        "parent": "fa81f7926038f2aa85c7f3e73c96fec043168b66",
+        "head": "176ae8ef6d4a7a8a7ca24d7b4b85578e0ae1b1b9",
+        "tree": "4cef5053e87a395fff3423ab805cd2885de170c8"
+      }
+    },
+    {
+      "name": "Temple_Sages_POC3_Source_Recovery_20261026.zip",
+      "version_id": null,
+      "size_bytes": 35944922,
+      "sha256": "1c2ecf509c7a615ccfc040917a9d5028880ef79693d9935ae124bf125b0cab0a",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "parent": "f5600608f721c41a20dd07adac80b0c78606d9cc",
+        "tree": "7a871d0fa7ff75da7361ecd5f01db67c95ce9b06"
+      }
+    },
+    {
+      "name": "Temple_Sages_Zelda_Glow_Dialogue_Source_20261026.zip",
+      "version_id": null,
+      "size_bytes": 21034423,
+      "sha256": "5c504a43dfa4a30f81d54291df980fd404fec853888ab2e9bb508f101e2a249d",
+      "zip_crc_ok": true,
+      "source_refs": {
+        "candidate_tree": "215159c0e741c517cc824edea10bd2e6e7804c0a"
+      }
+    }
+  ]
+}

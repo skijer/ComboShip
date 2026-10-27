@@ -9,6 +9,7 @@
 #include "objects/gameplay_field_keep/gameplay_field_keep.h"
 #include "soh/OTRGlobals.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/items/logic/weapon_upgrades.h" // Skijer's NEI: Iron Knuckle's Axe prop-smash
 #include "soh/Enhancements/savestate_serialize.h"
 
 #include "vt.h"
@@ -489,6 +490,21 @@ void EnIshi_Fly(EnIshi* this, PlayState* play) {
 
 void EnIshi_Update(Actor* thisx, PlayState* play) {
     EnIshi* this = (EnIshi*)thisx;
+    s16 type = this->actor.params & 1;
+
+    // NEI: the Iron Knuckle's Axe smashes large (silver-gauntlet) rocks after 3 hits, dropping a
+    // reward. Only while resting (EnIshi_Wait) so it doesn't trigger mid-lift/flight.
+    if (type == ROCK_LARGE && this->actionFunc == EnIshi_Wait &&
+        WeaponUpgrade_IKAxeStrike(&this->actor, play, 3, 90.0f)) {
+        Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0);
+        SoundSource_PlaySfxAtFixedWorldPos(play, &this->actor.world.pos, sBreakSoundDurations[type],
+                                           sBreakSounds[type]);
+        sFragmentSpawnFuncs[type](this, play);
+        sDustSpawnFuncs[type](this, play);
+        Flags_SetSwitch(play, ((this->actor.params >> 0xA) & 0x3C) | ((this->actor.params >> 6) & 3));
+        Actor_Kill(&this->actor);
+        return;
+    }
 
     this->actionFunc(this, play);
 }

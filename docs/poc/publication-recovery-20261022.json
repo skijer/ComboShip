@@ -1,0 +1,1508 @@
+{
+  "status": "Publication complete: reconstructed source textures and packed data present. Candidate; configured gameplay acceptance pending.",
+  "destination": "marsh6487/ComboShip",
+  "branch": "poc/market-forest-followup-20261022",
+  "original_candidate": "f205bbffa5762a69d70d1f0a8ff2e8d6726976d7",
+  "original_tree": "05ec4824d8fcc31b1a5316c6fe86c1611c147ec6",
+  "parent": "1836a296ff92e6bb374df8ea492d6d6374b44bdc",
+  "source_blobs_applied_unchanged": 108,
+  "preserved_formatting": [
+    {
+      "path": "soh/soh/Enhancements/Graphics/SeasonFoliage.cpp",
+      "sha": "9d3a27fbfab7bf6b1f31149dbacca4a9a972061e",
+      "from_commit": "1836a296ff92e6bb374df8ea492d6d6374b44bdc"
+    },
+    {
+      "path": "soh/tests/season_foliage_binding_test.cpp",
+      "sha": "451b349027dab9b07aa93597e0a1041d5bd2428f",
+      "from_commit": "1836a296ff92e6bb374df8ea492d6d6374b44bdc"
+    }
+  ],
+  "missing_assets": [],
+  "verification": "28 native-market asset tests pass, including the real CMake preparation target and both ports' 141-resource preparation. All 11 reconstructed PNGs and 91 compressed parts were uploaded sequentially and verified by Git blob SHA. Full executable linking and configured gameplay remain untested.",
+  "recovery": "Clone the candidate branch for the complete checked-in source set. With Pillow installed, market_interior.rebake() deterministically rebuilds both bundles from the 512px source PNGs. The original missing artwork was reconstructed with new identities; its historical hashes are retained for provenance, not as current upload requirements.",
+  "original_unrecoverable_assets": [
+    {
+      "path": "tools/black_market/assets/interior/bronze.png",
+      "sha": "eb42d23e72700a5c3a8fd9d7373aa3381b0a8e3a",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3602737
+    },
+    {
+      "path": "tools/black_market/assets/interior/celestial.png",
+      "sha": "ab412b33c07d1fe02565f5c9b2039c576c31973d",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3425334
+    },
+    {
+      "path": "tools/black_market/assets/interior/ceramic.png",
+      "sha": "6f6237d2f51bb922286e306c700ec47c4651d6be",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3458896
+    },
+    {
+      "path": "tools/black_market/assets/interior/cloth.png",
+      "sha": "ffab3c27d703e1150f88861c2438752862199770",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3543529
+    },
+    {
+      "path": "tools/black_market/assets/interior/curios.png",
+      "sha": "ec465a31ebb84ee9f298ffdc0b3a89f828e3e9c0",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3314422
+    },
+    {
+      "path": "tools/black_market/assets/interior/herbs.png",
+      "sha": "2715ebc00b0777d3c62be3428840fc1dd4fc5450",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4585484
+    },
+    {
+      "path": "tools/black_market/assets/interior/liquid.png",
+      "sha": "923e711d981be4587edb3dcf95c63085e77adbf8",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2401054
+    },
+    {
+      "path": "tools/black_market/assets/interior/plaster.png",
+      "sha": "900959edb9afc5f5be22de6131735bb7c3a4892c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3605051
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.001.b64",
+      "sha": "098dba8201f5ef81180edc1e234153ff6fc4b907",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6990508
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.002.b64",
+      "sha": "9ddb2a7bbbb3e7cefe864f019d3de84fd7143a21",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2849400
+    },
+    {
+      "path": "tools/black_market/assets/interior/slate.png",
+      "sha": "256763615847d739b1232a6484b7a3068eac1d06",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3308642
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.b64",
+      "sha": "75b1f014b337e8b3f34c154154c697c67f537a90",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2065428
+    },
+    {
+      "path": "tools/black_market/assets/interior/timber.png",
+      "sha": "42e4e317e9acbb5e862f5c469b53a6e0df026f1c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2600504
+    },
+    {
+      "path": "tools/black_market/assets/interior/wicker.png",
+      "sha": "eddcf44ab49c7a1bd9e3a523e8d2b1c49c8387d2",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2805165
+    }
+  ],
+  "manifest_role": "The historical original manifest describes the unavailable pre-stall candidate. Use current_asset_manifest and the current source/encoded provenance identities.",
+  "reconstruction_record": "docs/poc/market-asset-reconstruction-20261022.json",
+  "historical_original_manifest": [
+    {
+      "path": "CMake/NativeMarketAssets.cmake",
+      "sha": "fa5204e7f5075930b03d0bfc2ca4d3e9426cd19c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3127
+    },
+    {
+      "path": "combo/BlackMarketBrowsing.h",
+      "sha": "1556dc7d2395bb0010666196d96c1a994f93e104",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3275
+    },
+    {
+      "path": "combo/BlackMarketBrowsingNative.h",
+      "sha": "7d54bab8e468b418c2c8bb0f9a474a5bbb7bc275",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 10587
+    },
+    {
+      "path": "combo/BlackMarketExitDoor.h",
+      "sha": "709ad1626c68fcf9c1e28f88e0b18061f6251ba7",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3287
+    },
+    {
+      "path": "combo/BlackMarketGraphicsArena.h",
+      "sha": "238f0aafac1fdc3197c8b3e63a25ef709069be25",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1372
+    },
+    {
+      "path": "combo/BlackMarketInteriorEffects.h",
+      "sha": "801c05bcd04f3fafba48f01a3fe51524a66b79bb",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 8834
+    },
+    {
+      "path": "combo/BlackMarketNativeResources.h",
+      "sha": "c2f8a69ceacbcb10d3c8010bd3c8c2ad6860a9fc",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 18393
+    },
+    {
+      "path": "combo/BlackMarketText.h",
+      "sha": "fd580b7427e732a1ee71dac3d6551a39b3f12da7",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6420
+    },
+    {
+      "path": "combo/entrances/ForestActorPlacements.h",
+      "sha": "afd3b737abafe535cfab5c0b7525cca53be8827b",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1037
+    },
+    {
+      "path": "combo/gameplay/CrossGameTitleCard.h",
+      "sha": "e939a999299bd55da11b9a643f869dd29a413eaf",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1324
+    },
+    {
+      "path": "combo/gameplay/MagicMirrorRuntime.inc.h",
+      "sha": "17ef29dbb8aa88945e7273276c00164662b37a27",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 25397
+    },
+    {
+      "path": "docs/poc/black-market-default-title-20261022.md",
+      "sha": "32415c7019d5954f5dfafcf12307d1cc645a6057",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6113
+    },
+    {
+      "path": "docs/poc/black-market-graphics-arena-20261022.md",
+      "sha": "15268306fd305088f0fca7dd0b4737ab7d39ea37",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3925
+    },
+    {
+      "path": "docs/poc/black-market-native-exit-door-20261022.md",
+      "sha": "4b779abe723f9de691969ddd6e3b1e1575d9bb04",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5091
+    },
+    {
+      "path": "docs/poc/black-market-native-merchandise-text-20261022.md",
+      "sha": "9f9f60a0b8c77f56231533e9cd541f11108d4dea",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5282
+    },
+    {
+      "path": "docs/poc/black-market-prop-materials-20261022.md",
+      "sha": "2e2d5329e9649023f3d6f024ced2e0eb5ec8d5aa",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 10085
+    },
+    {
+      "path": "docs/poc/default-market-pot-vapor-torches-20261022.md",
+      "sha": "b5b074e01455612dd1b5b3372247e0a0f11b20c4",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 7389
+    },
+    {
+      "path": "docs/poc/market-forest-followup-20261022.md",
+      "sha": "5dc2aac6e49b562e826e4e649f633195a1a94d3a",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 14509
+    },
+    {
+      "path": "docs/poc/market-seasonal-integration-20261022.md",
+      "sha": "d7b11cdcd93009a66a55eb0481f7477ab2759f14",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4520
+    },
+    {
+      "path": "docs/poc/native-custom-entrance-title-cards-20261022.md",
+      "sha": "a9a50bb71318f74fd88bf08775a0d6d5a90e5642",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 7424
+    },
+    {
+      "path": "docs/poc/native-forest-materials-followup-20261022.md",
+      "sha": "0c80a1850f164591065377371e4631d26a93a73d",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5332
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-22-market-seasonal-integration.md",
+      "sha": "bec7eb8b3d4a6b8fa9e28942fc1b85a00ebac5b2",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3418
+    },
+    {
+      "path": "mm/2s2h/Enhancements/Gameplay/BlackMarket.cpp",
+      "sha": "ebe4a561af73769fe81b8a0efb286b6f2a5667c0",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 48561
+    },
+    {
+      "path": "mm/2s2h/Enhancements/Gameplay/ComboSaria.cpp",
+      "sha": "5b143a0925eae30d39624a69eceffee957a62479",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 19512
+    },
+    {
+      "path": "mm/2s2h/Enhancements/Gameplay/ComboSoloForest.cpp",
+      "sha": "8b75c02e82337c0512d273fa83be354760bb49ff",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 13209
+    },
+    {
+      "path": "mm/src/code/title_setup.c",
+      "sha": "77992fe56e07342c49f5d7ce38f5d0428ed779bd",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 8980
+    },
+    {
+      "path": "mm/src/code/z_demo.c",
+      "sha": "b0b545c4e075998adadc6ae40182b1df994f3ade",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 65127
+    },
+    {
+      "path": "mm/tests/placed_saria_lifecycle_test.cpp",
+      "sha": "00dbdf7cca9b46c1eb06f56c6ab85ed2fe6b3a6c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 33784
+    },
+    {
+      "path": "scripts/assets/prepare_native_forest.py",
+      "sha": "4f657750c93481d41fceafe30df59200e057b255",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5185
+    },
+    {
+      "path": "scripts/assets/prepare_native_market.py",
+      "sha": "8aac97857bd2d0434d461651fa90115eaef6c556",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1955
+    },
+    {
+      "path": "scripts/diagnostics/compile_solo_forest_core.py",
+      "sha": "a82c019e3f8d5726dbdad2e5d0936ece6b1b8d0a",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4713
+    },
+    {
+      "path": "scripts/diagnostics/run_oct20_bugfix_regressions.sh",
+      "sha": "f66f3d0acefd00af0590500f3649c1fec918e0d4",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1632
+    },
+    {
+      "path": "soh/soh/Enhancements/Gameplay/ComboBlackMarketNative.cpp",
+      "sha": "b24810138870e09f21c687b9412162af49ea285d",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 45925
+    },
+    {
+      "path": "soh/soh/Enhancements/Gameplay/ComboForestActors.cpp",
+      "sha": "254ab94b009a8b90dbc9c9e9c119da80a4abcff8",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5865
+    },
+    {
+      "path": "soh/soh/Enhancements/Gameplay/ComboLostWoodsFountain.cpp",
+      "sha": "1b8ec6c025760579f56608239976917cc5704daa",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 12101
+    },
+    {
+      "path": "soh/soh/Enhancements/Gameplay/ComboSoloForest.cpp",
+      "sha": "b4976b2f443e67027d08e6cc010d0dfaa07ab8b1",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 17278
+    },
+    {
+      "path": "soh/soh/Enhancements/Graphics/SeasonFoliage.cpp",
+      "sha": "440ef949d5889cce47e000fa07dee09ddcb7b5a2",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4778
+    },
+    {
+      "path": "soh/soh/Enhancements/Graphics/SeasonFoliageMaterials.inc",
+      "sha": "dcba52e3823698ee752810593569fcd7673dea97",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 12611
+    },
+    {
+      "path": "soh/soh/Enhancements/Graphics/SeasonFoliageTint.h",
+      "sha": "35ec33c1007457ce20e2a8713a01eb80cb09ad58",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5249
+    },
+    {
+      "path": "soh/soh/Enhancements/TimeSavers/timesaver_hook_handlers.cpp",
+      "sha": "c38ad13c2a4ad999f5ded3015b634cb5b74c0b8f",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 71181
+    },
+    {
+      "path": "soh/src/code/title_setup.c",
+      "sha": "10c938cb92bc35b57dcc998b9b2b6bdb93c1dafb",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4962
+    },
+    {
+      "path": "soh/tests/native_npc_draw_scale_test.c",
+      "sha": "67ec04df7fafed65a09a9c5f7b5f2ecce39a614e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5673
+    },
+    {
+      "path": "soh/tests/season_foliage_binding_test.cpp",
+      "sha": "64abc1b15d5d8639a3ccadc345f7f03fd22d0e61",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 20568
+    },
+    {
+      "path": "tests/black_market/browsing_native_test.cpp",
+      "sha": "dd68847655a06b5aac3263cdade4850a4281ba64",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 28442
+    },
+    {
+      "path": "tests/black_market/check_exit_door_resources.py",
+      "sha": "5a7c669c58d27259f3045053562e00f2f1ffeb79",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4503
+    },
+    {
+      "path": "tests/black_market/exit_door_actor_test.cpp",
+      "sha": "8db94aead792bb7eb2f79260c4a0d0f350c95ec3",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 8443
+    },
+    {
+      "path": "tests/black_market/interior_effects_native_test.cpp",
+      "sha": "5aac3e85a29bc65973e33d19d86ffb8d454f9179",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 15319
+    },
+    {
+      "path": "tests/black_market/interior_exit_cases.inc",
+      "sha": "d6b634939dbe1a3f3ffe650691677d32c99b7be0",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4958
+    },
+    {
+      "path": "tests/black_market/lock_draw_test.cpp",
+      "sha": "f17d6efde3b89cda8e0fc77fc0469e622d6da206",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 14121
+    },
+    {
+      "path": "tests/black_market/market_mm_text_codec_test.cpp",
+      "sha": "0887b5562b3951c19208401f805dc9585f94a97c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 10765
+    },
+    {
+      "path": "tests/black_market/market_oot_text_codec_test.cpp",
+      "sha": "ccabcee61f5882c0281645bee57d192dc2bcee69",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 10352
+    },
+    {
+      "path": "tests/black_market/native_test.cpp",
+      "sha": "342584d7e06416d01b72ffa0f7d1928174844cee",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 23162
+    },
+    {
+      "path": "tests/black_market/oot_native_test.cpp",
+      "sha": "d1122b2a047256aa537e46c937401f4cdc824202",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 23960
+    },
+    {
+      "path": "tests/black_market/run_browsing_native_tests.py",
+      "sha": "7a4d8398c33cf316c693da64fc3120fc8a2f00df",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5386
+    },
+    {
+      "path": "tests/black_market/run_entry_access_tests.py",
+      "sha": "b06318fd3a8e30787225a78be04640048b513391",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 9878
+    },
+    {
+      "path": "tests/black_market/run_exit_door_actor_tests.py",
+      "sha": "f270c59f386171b7cb1be806829d937b2ef98a90",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2208
+    },
+    {
+      "path": "tests/black_market/run_interior_effects_native_tests.py",
+      "sha": "ec546a785318ec9dba57456e0192b4422815408f",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1854
+    },
+    {
+      "path": "tests/black_market/run_lock_draw_tests.py",
+      "sha": "ea537901b7697df12e927037a9d3a1c712c14e4a",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3551
+    },
+    {
+      "path": "tests/black_market/run_native_tests.py",
+      "sha": "71462813a1e00b99e3de9fa006fd27b0f121b15e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4397
+    },
+    {
+      "path": "tests/black_market/run_oot_native_tests.py",
+      "sha": "f1d1d1b6c981b5459b96afc26f163ccd1bfdee20",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3348
+    },
+    {
+      "path": "tests/black_market/run_resource_entry_tests.py",
+      "sha": "c7ba2201b1b962d51fe64fddcc3e5ae38b150e78",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 20589
+    },
+    {
+      "path": "tests/black_market/run_text_codec_tests.py",
+      "sha": "3a539035f791192a6c7329733ff62752c5f2591e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 13352
+    },
+    {
+      "path": "tests/black_market/solo_forest_native_test.cpp",
+      "sha": "4533f3845a5089e63696a3a909b6f05dc0bb7ea7",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 13926
+    },
+    {
+      "path": "tests/lost_woods_entrance/fountain_return_test.cpp",
+      "sha": "eedbabaf10c28d8bd6ff7a0c751f667458243590",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 18366
+    },
+    {
+      "path": "tests/lost_woods_entrance/mm_arrival_test.cpp",
+      "sha": "cc47ce5f854c29b87925646fd3a38556d188622e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 7488
+    },
+    {
+      "path": "tests/lost_woods_entrance/mm_title_card_test.cpp",
+      "sha": "53e1ff60717b32091c47ef95a1408b40db3201da",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 13425
+    },
+    {
+      "path": "tests/lost_woods_entrance/oot_arrival_test.cpp",
+      "sha": "8a445db1b94ef6144fe674d145de6865695f3af5",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5143
+    },
+    {
+      "path": "tests/lost_woods_entrance/oot_title_card_test.cpp",
+      "sha": "34fbe10c2ffdab09d8a13f7fe9e184410171b7d9",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 12004
+    },
+    {
+      "path": "tests/lost_woods_entrance/opening_forest_test.py",
+      "sha": "0feb2abbef1810096a5432cd846a7f6f4da023b1",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 20937
+    },
+    {
+      "path": "tests/lost_woods_entrance/renderer_linkage_test.py",
+      "sha": "5c7a5b7f73377716c67bdd528084d590f6448454",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3653
+    },
+    {
+      "path": "tests/lost_woods_entrance/run_arrival_fade_tests.py",
+      "sha": "c4464cf508a3f3ebbf021efa17f8d75982bcbb73",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 11879
+    },
+    {
+      "path": "tests/lost_woods_entrance/run_fountain_return_tests.py",
+      "sha": "160f71c22f5edc74745ab967ed7b7b1350a2cc5b",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3618
+    },
+    {
+      "path": "tests/lost_woods_entrance/run_mm_title_card_tests.py",
+      "sha": "c9af5cecfbbe41c276bdeb638b29e7dc85bab368",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3828
+    },
+    {
+      "path": "tests/lost_woods_entrance/run_oot_title_card_tests.py",
+      "sha": "ce09fcaa5536fec73e700325abeda8598a9d38e2",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5113
+    },
+    {
+      "path": "tests/lost_woods_entrance/run_tests.py",
+      "sha": "0875432d48aad7bc286d5449a8d447fa96da6b98",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 8075
+    },
+    {
+      "path": "tests/magic_mirror/native_test.cpp",
+      "sha": "ec8df494a7712a8952c27ad89f2138b3494baa33",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 45186
+    },
+    {
+      "path": "tests/native_forest/material_loader_test.cpp",
+      "sha": "193e050a037ee901fee382e56c798107abc6f19c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6266
+    },
+    {
+      "path": "tests/native_forest/run_material_loader_tests.py",
+      "sha": "11f4d6bf86ab637a140fd84be3797962b79d5a9b",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2880
+    },
+    {
+      "path": "tests/native_forest/test_placements.py",
+      "sha": "9a25021db3ae78ed70fb0f535d654d74db76d84c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6093
+    },
+    {
+      "path": "tests/native_forest/test_polish.py",
+      "sha": "48911bec3ca77dffb74f32ab8b9b59349bd0dcaf",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 8929
+    },
+    {
+      "path": "tests/native_market/run_runtime_readiness_tests.py",
+      "sha": "7f221a215f890bac7bd789165b8e71fe8b4d2a48",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 5573
+    },
+    {
+      "path": "tests/native_market/run_title_draw_tests.py",
+      "sha": "c957f26bfdafa5f0b263719784cb082afda40242",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3457
+    },
+    {
+      "path": "tests/native_market/run_title_tests.py",
+      "sha": "edd493f56f35055a5176a7cb7ab87617cd40452e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 10159
+    },
+    {
+      "path": "tests/native_market/test_assets.py",
+      "sha": "fac92684837d615035b431403719c5a7c564364d",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 10199
+    },
+    {
+      "path": "tests/native_market/test_interior.py",
+      "sha": "4daff5fffc94a1c8ccb8386d1bff798e8e26454e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 11548
+    },
+    {
+      "path": "tests/native_market/test_title_asset.py",
+      "sha": "988312025682c0544e9a58ec43742cec385ccdd7",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 13792
+    },
+    {
+      "path": "tests/native_market/title_draw_test.cpp",
+      "sha": "4b14600d3610146fae59e6e9ccc9e547dbcd156c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 7779
+    },
+    {
+      "path": "tools/black_market/README.md",
+      "sha": "fd059ad98565364f21da84b8b2531ac608290a3e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6814
+    },
+    {
+      "path": "tools/black_market/assets/interior/bronze.png",
+      "sha": "eb42d23e72700a5c3a8fd9d7373aa3381b0a8e3a",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3602737
+    },
+    {
+      "path": "tools/black_market/assets/interior/celestial.png",
+      "sha": "ab412b33c07d1fe02565f5c9b2039c576c31973d",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3425334
+    },
+    {
+      "path": "tools/black_market/assets/interior/ceramic.png",
+      "sha": "6f6237d2f51bb922286e306c700ec47c4651d6be",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3458896
+    },
+    {
+      "path": "tools/black_market/assets/interior/cloth.png",
+      "sha": "ffab3c27d703e1150f88861c2438752862199770",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3543529
+    },
+    {
+      "path": "tools/black_market/assets/interior/curios.png",
+      "sha": "ec465a31ebb84ee9f298ffdc0b3a89f828e3e9c0",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3314422
+    },
+    {
+      "path": "tools/black_market/assets/interior/encoded.json",
+      "sha": "2811be4180f833544d6743a3d39e2e84b60f8e74",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 860
+    },
+    {
+      "path": "tools/black_market/assets/interior/herbs.png",
+      "sha": "2715ebc00b0777d3c62be3428840fc1dd4fc5450",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4585484
+    },
+    {
+      "path": "tools/black_market/assets/interior/liquid.png",
+      "sha": "923e711d981be4587edb3dcf95c63085e77adbf8",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2401054
+    },
+    {
+      "path": "tools/black_market/assets/interior/material-audit.json",
+      "sha": "cbdebdb8335d4c39c817ffa5b9efd4a6f1aabc7f",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 24077
+    },
+    {
+      "path": "tools/black_market/assets/interior/plaster.png",
+      "sha": "900959edb9afc5f5be22de6131735bb7c3a4892c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3605051
+    },
+    {
+      "path": "tools/black_market/assets/interior/props-encoded.json",
+      "sha": "988351aef86276f3aa287f136e1682bb7a0d6181",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3602
+    },
+    {
+      "path": "tools/black_market/assets/interior/props-provenance.json",
+      "sha": "d772c49f080307d4609a66118afe17621ae18059",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 11191
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.001.b64",
+      "sha": "098dba8201f5ef81180edc1e234153ff6fc4b907",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6990508
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.002.b64",
+      "sha": "9ddb2a7bbbb3e7cefe864f019d3de84fd7143a21",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2849400
+    },
+    {
+      "path": "tools/black_market/assets/interior/provenance.json",
+      "sha": "80f68362928eacc976bb15dd06b102d4349190a3",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6410
+    },
+    {
+      "path": "tools/black_market/assets/interior/slate.png",
+      "sha": "256763615847d739b1232a6484b7a3068eac1d06",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 3308642
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.b64",
+      "sha": "75b1f014b337e8b3f34c154154c697c67f537a90",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2065428
+    },
+    {
+      "path": "tools/black_market/assets/interior/timber.png",
+      "sha": "42e4e317e9acbb5e862f5c469b53a6e0df026f1c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2600504
+    },
+    {
+      "path": "tools/black_market/assets/interior/wicker.png",
+      "sha": "eddcf44ab49c7a1bd9e3a523e8d2b1c49c8387d2",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2805165
+    },
+    {
+      "path": "tools/black_market/assets/title/black-market-title.ia8",
+      "sha": "3e68c5ef1d91f8eeff0733465dec039a54206205",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4608
+    },
+    {
+      "path": "tools/black_market/assets/title/black-market-wordmark-original.png",
+      "sha": "10761623246dbbb64d1f3f934c79da6ce4cc9d9c",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 410017
+    },
+    {
+      "path": "tools/black_market/assets/title/black-market-wordmark.png",
+      "sha": "f1d0b34603955b74870cdd7b887b688f749b2ae7",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 2354
+    },
+    {
+      "path": "tools/black_market/assets/title/provenance.json",
+      "sha": "3aa3162db7a246536589064a01b71a56478b3587",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4079
+    },
+    {
+      "path": "tools/black_market/encode_title.py",
+      "sha": "5fd3d5c4aaab80d1af54e6f503b693f8b4021b94",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4884
+    },
+    {
+      "path": "tools/black_market/exit_door.py",
+      "sha": "48c8f1f4013c75ef8f38be09ea39fdf1d99c4773",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1990
+    },
+    {
+      "path": "tools/black_market/forest_presentation.py",
+      "sha": "a4bca8131efd06529799a3170be526889c44a288",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 6642
+    },
+    {
+      "path": "tools/black_market/interior_effects_preview.cpp",
+      "sha": "27b732a6dd7cb3b0a1ccf9d01dd89d647edbf932",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 1091
+    },
+    {
+      "path": "tools/black_market/interior_effects_preview.py",
+      "sha": "b64c0c019d95ea00cb7d5294987c0d466bc0821b",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4449
+    },
+    {
+      "path": "tools/black_market/market_interior.py",
+      "sha": "9af0794a4b565c34d114d08c59cd741e73fa61cd",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 21664
+    },
+    {
+      "path": "tools/black_market/market_title.py",
+      "sha": "e2151a63d2eadaa208d0c7145810fd359717024e",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 7829
+    },
+    {
+      "path": "tools/black_market/native_market.py",
+      "sha": "5756b7c104ef6813cb676c9f7b12f60322b8bb2d",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 12249
+    },
+    {
+      "path": "tools/black_market/preview.py",
+      "sha": "f9614d9134ec75e82f135887dec1543fc4506fd9",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 19772
+    },
+    {
+      "path": "tools/black_market/preview_interior_materials.py",
+      "sha": "1a0ff134f1aa5f643b4e39f129a5d849b605dbb3",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 7121
+    },
+    {
+      "path": "tools/native_forest/README.md",
+      "sha": "7d4959bf9b1fc9cc9e9ba2828d41d9326f87ea30",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 9939
+    },
+    {
+      "path": "tools/native_forest/manifest.json",
+      "sha": "f4cd7c780d4fab7bc1a1f0499fc3f5da7d51e928",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 36473
+    },
+    {
+      "path": "tools/native_market/README.md",
+      "sha": "9648cd6c33cacfb1c4ffe4698a25460185d91381",
+      "mode": "100644",
+      "type": "blob",
+      "bytes": 4354
+    }
+  ],
+  "current_asset_manifest": [
+    {
+      "path": "tools/black_market/assets/interior/bronze.png",
+      "sha": "56ba6d036110f7a86823bafddc0ccd471f57ec85",
+      "bytes": 482566
+    },
+    {
+      "path": "tools/black_market/assets/interior/timber.png",
+      "sha": "2425e9fbb5c3a7e563f6b1f145c8fe945f3c107d",
+      "bytes": 364669
+    },
+    {
+      "path": "tools/black_market/assets/interior/slate.png",
+      "sha": "46a36b78364d03735673ef77c100e047ca52725e",
+      "bytes": 452068
+    },
+    {
+      "path": "tools/black_market/assets/interior/plaster.png",
+      "sha": "6c2b7e8cc521b4a0396f1bec728dbfa4927cf7d2",
+      "bytes": 413592
+    },
+    {
+      "path": "tools/black_market/assets/interior/ceramic.png",
+      "sha": "15597c72dc851e2e3db1ab1963c345e5e57f0e1c",
+      "bytes": 516208
+    },
+    {
+      "path": "tools/black_market/assets/interior/wicker.png",
+      "sha": "cffc3febdd98464da4952e4f0dee7c2cb2cffcc7",
+      "bytes": 446168
+    },
+    {
+      "path": "tools/black_market/assets/interior/celestial.png",
+      "sha": "e7043d0cd9ff49dfc61d7bfc4e44d1ed9dc725a0",
+      "bytes": 523563
+    },
+    {
+      "path": "tools/black_market/assets/interior/herbs.png",
+      "sha": "a6fad616790a4244213f19cb6199f6687a75f1f1",
+      "bytes": 628417
+    },
+    {
+      "path": "tools/black_market/assets/interior/curios.png",
+      "sha": "bcf1219a13fb6ce693237f48e391fa25c2f524d7",
+      "bytes": 513861
+    },
+    {
+      "path": "tools/black_market/assets/interior/liquid.png",
+      "sha": "1ea1ababffcb1a11b089d0e10549ec6c570717e2",
+      "bytes": 457982
+    },
+    {
+      "path": "tools/black_market/assets/interior/cloth.png",
+      "sha": "f13ae028fcd2f899b531880083011185d22530dc",
+      "bytes": 532268
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.001.b64",
+      "sha": "df9bbad1c833a0efb60d8a8cdf6713d40b892169",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.002.b64",
+      "sha": "4e5125ae15b07caf5a97a7816adf85db197234b8",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.003.b64",
+      "sha": "b047327d82d88b93ec226964ff4860d54dea5c02",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.004.b64",
+      "sha": "3d17db734f912e1349ac78c0b71081814c54bc80",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.005.b64",
+      "sha": "5688f0278041c4632efeddac880f10f80fb381ea",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.006.b64",
+      "sha": "65c0b3c0ed2de31c9f4f71efd142c10292cdca32",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.007.b64",
+      "sha": "0baa86e84fcaab56ee0ff0d49a9f18f7fe3ac2fd",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.008.b64",
+      "sha": "e8ea18e45c230e7cff53fe79e13fafdca86bf9f7",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.009.b64",
+      "sha": "b451ff6a465626521e2e6dbdf0a0f5118aac3e54",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.010.b64",
+      "sha": "71b3bea43b0ac87269598b8c0b20d5a9d0a09f12",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.011.b64",
+      "sha": "62c08a23bf42c39667b63d610823df3399873778",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.012.b64",
+      "sha": "9c085b62d0bee54e19ce39c07fe0c14cfa9e4528",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.013.b64",
+      "sha": "14741917fa0bc66dbd8573c456c1eb651ecc5bb9",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.014.b64",
+      "sha": "b6d56a4124df3128cb1b8595ef214ae1f5304cb7",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.015.b64",
+      "sha": "663d9419a6181e7f586f002ab80555758d714a06",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.016.b64",
+      "sha": "934524f31732f84ab484ecfee2034380858d570c",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.017.b64",
+      "sha": "2e62dfb63d2aba4cc8738fd7d5cbc1d73984a36c",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.018.b64",
+      "sha": "0b9fab54a8789ebc7677530d51e745dbdf6d6f17",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.019.b64",
+      "sha": "dbf5c6ce863c85128dda29e6689145d4ccdedfd7",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.020.b64",
+      "sha": "b59172f3405e6a84fbb3aa960bc0222628009cba",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.021.b64",
+      "sha": "f51c33f872e28fdcb2757af4e3ce7f44c7209b4e",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.022.b64",
+      "sha": "491dfa678adaec010632cafa59337de72bb8200b",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.023.b64",
+      "sha": "4f55e02f0b9e0ca9a847c6a934e022992d3de724",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.024.b64",
+      "sha": "3c57431a5bc1784770a7f0ed56c09a69a29d6845",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.025.b64",
+      "sha": "dace66daf46fedabc69941731b4eece6ab52defc",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.026.b64",
+      "sha": "704e77482b5295b72256ef9230772bd21a5e74f8",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.027.b64",
+      "sha": "e8485a2fba482376225e60782ce0aed113bf5415",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.028.b64",
+      "sha": "cc72f21c919bef68cbd8c2fd564d8e8ee7eea1b3",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.029.b64",
+      "sha": "148b6c327715e68a1f2b8f39259ae2e929c95fa7",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.030.b64",
+      "sha": "be8049b64268dbeced5e03b5352266aa11cc8e6b",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.031.b64",
+      "sha": "6317d0bba6dfbd5401f1a3ded0a1f6716a8d6af6",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.032.b64",
+      "sha": "ec173f3ba9215031aebc6f770183f9bf8296c318",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.033.b64",
+      "sha": "674ea712fb579b6a543ff2f68e1c2049cd8d6e7a",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.034.b64",
+      "sha": "6c23dfe2863bf2b3f38501fef8f5a1759baed647",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.035.b64",
+      "sha": "4b3615ac2daea3d6f3d90d1bb8be2849f7997ec4",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.036.b64",
+      "sha": "9d337db9eb47c5d121477b8abef47bf0769a44ed",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.037.b64",
+      "sha": "ea6ab7efbc8430394a29a50c4a76825f0abfb609",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.038.b64",
+      "sha": "82f5a6542d1ff2153177e03a7240c3ef12fc0eed",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.039.b64",
+      "sha": "4d339c63b7a66eb69f1dcd5560d8c4ec52b83ee0",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.040.b64",
+      "sha": "84bd1255315eaf117bccf866c28a015250f460fa",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.041.b64",
+      "sha": "d434edd4b7b02464fc500c97d20d8c508e3004f9",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.042.b64",
+      "sha": "3cc4fcdd4a468d4ccf06e97a392bc60c4599d245",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.043.b64",
+      "sha": "7b77803b9b4d0d8302affca03416eb75b38328fa",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.044.b64",
+      "sha": "e6ab38c0bcdb95da30516323f7c9a1700c485b3c",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.045.b64",
+      "sha": "96ee6dc9ddde7decf25721b7390358abdc514085",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.046.b64",
+      "sha": "3d9ea450207a07c3945be87eca723e1556be07dd",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.047.b64",
+      "sha": "f6096873608662c40880a7c68a50e15a97085391",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.048.b64",
+      "sha": "6b17141a98ec29fbe210b80da9ca0924d1578fe0",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.049.b64",
+      "sha": "0d4799db66047fd9a325c6986570eba464269554",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.050.b64",
+      "sha": "0bdd262ee601335add32105287dccf974a1031b6",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.051.b64",
+      "sha": "7137f0a1ce457ed60d5e8e0c3d9bf7e8f769ecfc",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.052.b64",
+      "sha": "4a943bb5a46a8a8cd8b983101ade0c912c081288",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.053.b64",
+      "sha": "b5d70d993920071fdff86f60230a7686be4c8def",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.054.b64",
+      "sha": "c5a831829416cbabd6fe8084a8209949e357eae7",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.055.b64",
+      "sha": "80230e4d6d04180c695ad11dced0046c61db6642",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.056.b64",
+      "sha": "efae7f4ebe118d6616d28b82311ff880329d36b0",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.057.b64",
+      "sha": "e4d2301def3d50d9969eb593ff0463306529b4c5",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.058.b64",
+      "sha": "ff32cdff86f6cf5ddfd6bf6edf148725f912cfed",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.059.b64",
+      "sha": "889d1bece5520a4f2a61502fee95cae53640ff0e",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.060.b64",
+      "sha": "ec6ffbedab821a7002e3adb3d10ba5cbba3eeb1c",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.061.b64",
+      "sha": "ccabc73167e344b7a12550a4df249f3b20509857",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.062.b64",
+      "sha": "0f69ab62efbb26f4295bae226ea440ffdcf39fe6",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.063.b64",
+      "sha": "20319e041aa9670c37d71c43cb920022f15cf04b",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.064.b64",
+      "sha": "77de5647692ae7e114b35cbae0cceab37b54b67a",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.065.b64",
+      "sha": "5d61c703037ef82af753847f0bcaeff1612cb2d1",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.066.b64",
+      "sha": "72e687dc098bbcf58ec0be8f84ea82baae3df3b2",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.067.b64",
+      "sha": "37c7377d46cbae5c12b73350339a990fc7e2ae4d",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.068.b64",
+      "sha": "1140840685e917a968ab045a5bcfbc67ce6d1b0e",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.069.b64",
+      "sha": "d5b44c432cc9f360cf2f9f684f4c23a236efeb72",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.070.b64",
+      "sha": "32b09518398a64134f01d1fc72dd0596acabdc3d",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.071.b64",
+      "sha": "1f216fe0ca4f2f35d9b2dea22c7ffe38927db64b",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.072.b64",
+      "sha": "cfe7f7e33bce4626d7c91ade99c78b6c2f24811f",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.073.b64",
+      "sha": "1b246c67168a84e8fc7702f271b4f9bb98fb4695",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.074.b64",
+      "sha": "789956e4271dfcbe013eb43e2fc2965c1ef514ea",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.075.b64",
+      "sha": "0f973f7a794ad35038e3a53f7eee0d560801f57c",
+      "bytes": 4296
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.001.b64",
+      "sha": "7a31b1f831df0977961a78050c8c9619bf647819",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.002.b64",
+      "sha": "64e22f3a36bafa4a799e29f5276e9fa4b3aef02d",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.003.b64",
+      "sha": "6842e3d0aa397e8886bbb683345147e5e7957bd1",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.004.b64",
+      "sha": "fc8c55afcbb60860ddf815655a791126b1469e96",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.005.b64",
+      "sha": "27b239ff22607bdb3d09c37bff786ae8e5d21ba0",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.006.b64",
+      "sha": "7ad4dbe943c929c4af0646bec9b1153a451473f7",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.007.b64",
+      "sha": "0ff1954be48feb05e9ea16d59bb3700ebb056139",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.008.b64",
+      "sha": "92e1c44cda742e340985409ba1ee3002a1ee7c65",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.009.b64",
+      "sha": "b7aed8754738e5febb26724fe6f5daf8dc4040ef",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.010.b64",
+      "sha": "93de09eaceff4e7e55a4cffb8db0d35240619cc9",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.011.b64",
+      "sha": "fdaf8162e3ee57accbb285725d9a0c635910216b",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.012.b64",
+      "sha": "3f5f14d2e4306de7353d2af2ca9146f581ee97c8",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.013.b64",
+      "sha": "3d126dedfed0bf1381ae95b05cf50fa3236fcce5",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.014.b64",
+      "sha": "36d2564cbdf28c7dcb6b323e33d0c06476b40969",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.015.b64",
+      "sha": "a7cb2dd3949e66b0591b0d16a52a6f767d74364d",
+      "bytes": 131072
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.016.b64",
+      "sha": "c861548b8b8216f2db32fe3e22c60040c98267ae",
+      "bytes": 41380
+    }
+  ]
+}

@@ -1,9 +1,14 @@
+#include "../../../../combo/ComboGameMode.h"
 #include <soh/OTRGlobals.h>
+#include <spdlog/spdlog.h>
+#include <libultraship/bridge/consolevariablebridge.h>
+#include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/ObjectExtension/ObjectExtension.h"
 #include "item_category_adj.h"
 #include "particle_cmc.h"
 #include "soh/Enhancements/randomizer/randomizer.h"
 #include "soh/Enhancements/randomizer/RCToRandInf.h"
+#include "soh/ShipInit.hpp"
 
 extern "C" {
 extern PlayState* gPlayState;
@@ -94,20 +99,34 @@ static CheckIdentity IdentifySign(s32 sceneNum, s32 posX, s32 posZ, s32 id) {
     uint32_t signSceneNum = sceneNum;
     Rando::Location* location = nullptr;
 
-    // align child/adult signs
+    // align child/adult and day/night signs
     if (sceneNum == SCENE_KAKARIKO_VILLAGE && LINK_IS_ADULT && posX == 1165 && posZ == 1545) {
         posZ = 1550;
     } else if (sceneNum == SCENE_GRAVEYARD && LINK_IS_ADULT) {
-        if (id == ACTOR_EN_WONDER_TALK2 && posX == -807 && posZ == 266) {
+        if (id == ACTOR_EN_WONDER_TALK2 && ((posX == -807 && posZ == 266) || (posX == -806 && posZ == 266))) {
             posX = -805;
         } else if (id == ACTOR_EN_WONDER_TALK) {
-            if (posX == 634 && posZ == 260) {
+            if ((posX == 634 && posZ == 260) || (posX == 638 && posZ == 260)) {
                 posX = 654;
                 posZ = 258;
-            } else if (posX == 634 && posZ == -100) {
+            } else if ((posX == 634 && posZ == -100) || (posX == 638 && posZ == -100)) {
                 posX = 654;
                 posZ = -102;
-            } else if (posX == 753 && posZ == 85) {
+            } else if ((posX == 753 && posZ == 85) || (posX == 758 && posZ == 85)) {
+                posX = 752;
+            }
+        }
+    } else if (sceneNum == SCENE_GRAVEYARD && LINK_IS_CHILD) {
+        if (id == ACTOR_EN_WONDER_TALK2 && posX == -805 && posZ == 264) {
+            posZ = 266;
+        } else if (id == ACTOR_EN_WONDER_TALK) {
+            if (posX == 630 && posZ == 260) {
+                posX = 654;
+                posZ = 258;
+            } else if (posX == 630 && posZ == -100) {
+                posX = 654;
+                posZ = -102;
+            } else if (posX == 758 && posZ == 85) {
                 posX = 752;
             }
         }
@@ -142,12 +161,7 @@ static CheckIdentity IdentifySign(s32 sceneNum, s32 posX, s32 posZ, s32 id) {
             return signIdentity;
     }
 
-    if (location == nullptr || location->GetRandomizerCheck() == RC_UNKNOWN_CHECK) {
-        LUSLOG_WARN("IdentifySign did not receive a valid RC value (%d).", location->GetRandomizerCheck());
-    } else {
-        signIdentity.randomizerInf = rcToRandomizerInf[location->GetRandomizerCheck()];
-        signIdentity.randomizerCheck = location->GetRandomizerCheck();
-    }
+    IdentifyCheck(&signIdentity, location);
 
     return signIdentity;
 }
@@ -260,9 +274,9 @@ locationTable[RC_HF_STAIRS_EXIT_ARROW_SIGN]                             = Locati
 locationTable[RC_MK_SHOOTING_GALLERY_RECTANGLE_SIGN]                    = Location::Sign(RC_MK_SHOOTING_GALLERY_RECTANGLE_SIGN,                     RCQUEST_BOTH,       RCAREA_MARKET,                  SCENE_SHOOTING_GALLERY,         TWO_ACTOR_PARAMS(59, 365),          "Shooting Gallery Rectangle Sign",                  RHT_SIGN_MK_SHOOTING_GALLERY,   ACTOR_EN_KANBAN,            SpoilerCollectionCheck::RandomizerInf(RAND_INF_MK_SHOOTING_GALLERY_RECTANGLE_SIGN));
 // ComboShip: the Happy Mask Shop scene is the OOT->MM portal and never runs, so this check is
 // uncollectable. Unregistered => in neither the item pool nor the check tracker.
-#ifndef COMBO_BUILD
+if (!Combo_IsCombinedGame()) {
 locationTable[RC_MK_MASK_SHOP_SIGN]                                     = Location::Sign(RC_MK_MASK_SHOP_SIGN,                                      RCQUEST_BOTH,       RCAREA_MARKET,                  SCENE_HAPPY_MASK_SHOP,          TWO_ACTOR_PARAMS(-112, 31),         "Mask Shop Sign",                                   RHT_SIGN_HAPPY_MASK_SHOP,       ACTOR_EN_WONDER_TALK2,      SpoilerCollectionCheck::RandomizerInf(RAND_INF_MK_MASK_SHOP_SIGN));
-#endif
+}
 locationTable[RC_TOT_ALTAR]                                             = Location::Sign(RC_TOT_ALTAR,                                              RCQUEST_BOTH,       RCAREA_MARKET,                  SCENE_TEMPLE_OF_TIME,           TWO_ACTOR_PARAMS(0, 1330),          "Altar",                                            RHT_SIGN_TEMPLE_OF_TIME,        ACTOR_EN_WONDER_TALK,       SpoilerCollectionCheck::RandomizerInf(RAND_INF_TOT_ALTAR));
 locationTable[RC_HC_DEAD_END_RECTANGLE_SIGN]                            = Location::Sign(RC_HC_DEAD_END_RECTANGLE_SIGN,                             RCQUEST_BOTH,       RCAREA_HYRULE_CASTLE,           SCENE_HYRULE_CASTLE,            TWO_ACTOR_PARAMS(2351, 2634),       "Dead End Rectangle Sign",                          RHT_SIGN_HYRULE_CASTLE,         ACTOR_EN_KANBAN,            SpoilerCollectionCheck::RandomizerInf(RAND_INF_HC_DEAD_END_RECTANGLE_SIGN));
 locationTable[RC_KAK_GUARD_GATE_RECTANGLE_SIGN]                         = Location::Sign(RC_KAK_GUARD_GATE_RECTANGLE_SIGN,                          RCQUEST_BOTH,       RCAREA_KAKARIKO_VILLAGE,        SCENE_KAKARIKO_VILLAGE,         TWO_ACTOR_PARAMS(210, -1275),       "Guard Gate Rectangle Sign",                        RHT_SIGN_KAKARIKO_VILLAGE,      ACTOR_EN_KANBAN,            SpoilerCollectionCheck::RandomizerInf(RAND_INF_KAK_GUARD_GATE_RECTANGLE_SIGN));

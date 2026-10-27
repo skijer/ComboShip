@@ -3,6 +3,8 @@
 #include "2s2h/CustomMessage/CustomMessage.h"
 #include "2s2h/CustomItem/CustomItem.h"
 #include "2s2h/Rando/Rando.h"
+#include "2s2h/Rando/ItemReceiptText.h"
+#include "2s2h/Rando/StaticData/StaticData.h"
 #include "2s2h/ShipInit.hpp"
 
 extern "C" {
@@ -25,12 +27,15 @@ void RegisterSkipLearningSongOfStorms() {
                     .showGetItemCutscene = !CVarGetInteger("gEnhancements.Cutscenes.SkipGetItemCutscenes", 0),
                     .giveItem =
                         [](Actor* actor, PlayState* play) {
+                            CustomMessage::Entry receipt{ .textboxType = 2,
+                                                          .icon =
+                                                              Rando::StaticData::GetIconForZMessage(RI_SONG_STORMS) };
+                            Rando::ApplyItemReceiptText(RI_SONG_STORMS, receipt);
+                            Rando::AppendReceiptSource(receipt, "");
                             if (CUSTOM_ITEM_FLAGS & CustomItem::GIVE_ITEM_CUTSCENE) {
-                                CustomMessage::SetActiveCustomMessage("You learned the Song of Storms!",
-                                                                      { .textboxType = 2 });
+                                CustomMessage::SetActiveCustomMessage(receipt.msg, receipt);
                             } else {
-                                CustomMessage::StartTextbox("You learned the Song of Storms!\x1C\x02\x10",
-                                                            { .textboxType = 2 });
+                                CustomMessage::StartTextbox(receipt.msg, receipt);
                             }
                             Item_Give(gPlayState, ITEM_SONG_STORMS);
                         },

@@ -1,3 +1,4 @@
+#include "../../../combo/ComboGameMode.h"
 #include "Network.h"
 #include <spdlog/spdlog.h>
 
@@ -19,12 +20,15 @@ void Network::Enable(const char* host, uint16_t port) {
     }
 
 #ifdef COMBO_BUILD
-    // ComboShip: ask the launcher to open/keep the shared connection; no local socket or thread.
-    isEnabled = true;
-    if (gComboAnchorConnect) {
-        gComboAnchorConnect(host, port);
+    if (Combo_IsCombinedGame()) {
+        // ComboShip: ask the launcher to open/keep the shared connection; no local socket or thread.
+        isEnabled = true;
+        if (gComboAnchorConnect) {
+            gComboAnchorConnect(host, port);
+        }
+        return;
     }
-#else
+#endif
     if (SDLNet_ResolveHost(&networkAddress, host, port) == -1) {
         SPDLOG_ERROR("[Network] SDLNet_ResolveHost: {}", SDLNet_GetError());
     }
@@ -37,7 +41,6 @@ void Network::Enable(const char* host, uint16_t port) {
     }
 
     receiveThread = std::thread(&Network::ReceiveFromServer, this);
-#endif
 }
 
 void Network::Disable() {
@@ -46,16 +49,18 @@ void Network::Disable() {
     }
 
 #ifdef COMBO_BUILD
-    // ComboShip: ask the launcher to drop the shared connection.
-    isEnabled = false;
-    isConnected = false;
-    if (gComboAnchorDisconnect) {
-        gComboAnchorDisconnect();
+    if (Combo_IsCombinedGame()) {
+        // ComboShip: ask the launcher to drop the shared connection.
+        isEnabled = false;
+        isConnected = false;
+        if (gComboAnchorDisconnect) {
+            gComboAnchorDisconnect();
+        }
+        return;
     }
-#else
+#endif
     isEnabled = false;
     receiveThread.join();
-#endif
 }
 
 void Network::OnIncomingData(char payload[512]) {
@@ -75,14 +80,16 @@ void Network::ProcessOutgoingPackets() {
 
 void Network::SendDataToRemote(const char* payload) {
 #ifdef COMBO_BUILD
-    // ComboShip: hand the payload to the launcher's outgoing queue; it owns the socket + framing.
-    if (gComboAnchorSend) {
-        gComboAnchorSend(payload);
+    if (Combo_IsCombinedGame()) {
+        // ComboShip: hand the payload to the launcher's outgoing queue; it owns the socket + framing.
+        if (gComboAnchorSend) {
+            gComboAnchorSend(payload);
+        }
+        return;
     }
-#else
+#endif
     SPDLOG_DEBUG("[Network] Sending data: {}", payload);
     SDLNet_TCP_Send(networkSocket, payload, static_cast<int>(strlen(payload) + 1));
-#endif
 }
 
 void Network::SendJsonToRemote(nlohmann::json payload) {

@@ -1,3 +1,5 @@
+#include "../../../../combo/ComboGameMode.h"
+#include "rando/CrossEntranceBoss.h"
 /*
  * Much of the code here was borrowed from https://github.com/gamestabled/OoT3D_Randomizer/blob/main/code/src/entrance.c
  * It's been adapted for SoH to use our gPlayState vs their gGlobalContext with slightly different named properties, and
@@ -14,11 +16,17 @@
 #include "soh/SaveManager.h"
 #include <string.h>
 
-#include "global.h"
+#include "functions.h"
+#include "macros.h"
+#include "variables.h"
 #include "entrance.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 extern PlayState* gPlayState;
+#ifdef COMBO_BUILD
+extern int32_t Combo_SOH_CrossDungeonRoute(int32_t index, int beforeNative);
+#endif
 
 // Overwrite the dynamic exit for the OGC Fairy Fountain to be 0x3E8 instead
 // of 0x340 (0x340 will stay as the exit for the HC Fairy Fountain -> Castle Grounds)
@@ -126,6 +134,14 @@ static void Entrance_ReplaceChildTempleWarps() {
         gEntranceTable[ENTR_DESERT_COLOSSUS_8_1] = gEntranceTable[ENTR_DESERT_COLOSSUS_5_1];
     }
 }
+
+#ifdef COMBO_BUILD
+// A newly bound slot may install its runtime map during an unordered OnLoadGame callback.
+// Reapply only the age-safe bluewarp table copies after the complete native load dispatch.
+void Entrance_ApplyCrossDungeonSafety(void) {
+    Entrance_ReplaceChildTempleWarps();
+}
+#endif
 
 void Entrance_CopyOriginalEntranceTable(void) {
     if (!hasCopiedEntranceTable) {
@@ -292,13 +308,36 @@ s16 Entrance_OverrideNextIndex(s16 nextEntranceIndex) {
 
     Entrance_SetEntranceDiscovered(nextEntranceIndex, false);
     EntranceTracker_SetLastEntranceOverride(nextEntranceIndex);
-    return Grotto_OverrideSpecialEntrance(Entrance_GetOverride(nextEntranceIndex));
+#ifdef COMBO_BUILD
+    int32_t composed = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonRoute(nextEntranceIndex, true) : -1;
+    if (composed >= 0)
+        return Grotto_OverrideSpecialEntrance(composed);
+#endif
+    s16 resolved = Entrance_GetOverride(nextEntranceIndex);
+#ifdef COMBO_BUILD
+    composed = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonRoute(resolved, false) : -1;
+    if (composed >= 0)
+        resolved = composed;
+#endif
+    return Grotto_OverrideSpecialEntrance(resolved);
 }
 
 s16 Entrance_OverrideDynamicExit(s16 dynamicExitIndex) {
     Entrance_SetEntranceDiscovered(dynamicExitList[dynamicExitIndex], false);
     EntranceTracker_SetLastEntranceOverride(dynamicExitList[dynamicExitIndex]);
-    return Grotto_OverrideSpecialEntrance(Entrance_GetOverride(dynamicExitList[dynamicExitIndex]));
+#ifdef COMBO_BUILD
+    int32_t composed =
+        Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonRoute(dynamicExitList[dynamicExitIndex], true) : -1;
+    if (composed >= 0)
+        return Grotto_OverrideSpecialEntrance(composed);
+#endif
+    s16 resolved = Entrance_GetOverride(dynamicExitList[dynamicExitIndex]);
+#ifdef COMBO_BUILD
+    composed = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonRoute(resolved, false) : -1;
+    if (composed >= 0)
+        resolved = composed;
+#endif
+    return Grotto_OverrideSpecialEntrance(resolved);
 }
 
 u32 Entrance_SceneAndSpawnAre(u8 scene, u8 spawn) {
@@ -326,6 +365,17 @@ u32 Entrance_SceneAndSpawnAre(u8 scene, u8 spawn) {
 // Properly respawn the player after a game over, accounting for dungeon entrance randomizer
 void Entrance_SetGameOverEntrance(void) {
     s16 scene = gPlayState->sceneNum;
+
+#ifdef COMBO_BUILD
+    if (Combo_IsCombinedGame() && Combo_SOH_CrossBossEnabled() && scene >= SCENE_DEKU_TREE_BOSS &&
+        scene <= SCENE_SHADOW_TEMPLE_BOSS) {
+        const int32_t checkpoint = Combo_SOH_CrossDungeonDeathCheckpoint();
+        if (checkpoint >= 0) {
+            gSaveContext.entranceIndex = Grotto_OverrideSpecialEntrance(checkpoint);
+            return;
+        }
+    }
+#endif
 
     // When in a boss room and boss shuffle is on, use the boss scene to find the death warp entrance
     if (Randomizer_GetSettingValue(RSK_SHUFFLE_BOSS_ENTRANCES) != RO_BOSS_ROOM_ENTRANCE_SHUFFLE_OFF &&
@@ -464,9 +514,6 @@ void Entrance_SetWarpSongEntrance(void) {
     if (gSaveContext.gameMode != GAMEMODE_NORMAL) {
         // During DHWW the cutscene must play at the destination
         gSaveContext.respawnFlag = -3;
-    } else if (gSaveContext.respawnFlag == -3) {
-        // Unset Zoneout Type -3 to avoid cutscene at destination (technically it's not needed)
-        gSaveContext.respawnFlag = 0;
     }
 }
 
@@ -495,32 +542,6 @@ void Entrance_OverrideBlueWarp(void) {
         case ENTR_GRAVEYARD_SHADOW_TEMPLE_BLUE_WARP:            // Twinrova blue warp
             gSaveContext.entranceIndex = Entrance_OverrideNextIndex(gSaveContext.entranceIndex);
             return;
-    }
-}
-
-void Entrance_EnableFW(void) {
-    Player* player = GET_PLAYER(gPlayState);
-    // Leave restriction in Tower Collapse Interior, Castle Collapse, Treasure Box Shop, Tower Collapse Exterior,
-    // Grottos area, Fishing Pond, Ganon Battle and for states that disable buttons.
-    if (!false /* farores wind anywhere */ || gPlayState->sceneNum == SCENE_GANONS_TOWER_COLLAPSE_INTERIOR ||
-        gPlayState->sceneNum == SCENE_INSIDE_GANONS_CASTLE_COLLAPSE ||
-        (gPlayState->sceneNum == SCENE_TREASURE_BOX_SHOP && !false /* shuffled chest mini game */) ||
-        gPlayState->sceneNum == SCENE_GANONS_TOWER_COLLAPSE_EXTERIOR || gPlayState->sceneNum == SCENE_GROTTOS ||
-        gPlayState->sceneNum == SCENE_FISHING_POND || gPlayState->sceneNum == SCENE_GANON_BOSS ||
-        gSaveContext.eventInf[0] & 0x1 || // Ingo's Minigame state
-        player->stateFlags1 &
-            (PLAYER_STATE1_HANGING_OFF_LEDGE | PLAYER_STATE1_CLIMBING_LADDER | PLAYER_STATE1_ON_HORSE |
-             PLAYER_STATE1_IN_WATER) ||              // Swimming, riding horse, Down A, hanging from a ledge
-        player->stateFlags2 & PLAYER_STATE2_CRAWLING // Blank A
-        // Shielding, spinning and getting skull tokens still disable buttons automatically
-    ) {
-        return;
-    }
-
-    for (size_t i = 1; i < ARRAY_COUNT(gSaveContext.equips.buttonItems); i++) {
-        if (gSaveContext.equips.buttonItems[i] == ITEM_FARORES_WIND) {
-            gSaveContext.buttonStatus[i] = BTN_ENABLED;
-        }
     }
 }
 
@@ -609,7 +630,9 @@ void Entrance_OverrideWeatherState() {
         }
     }
     // Water Temple
-    if (!Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP)) { // have not beaten Water Temple
+    if (!Combo_SOH_CrossBossLogicalClear(
+            COMBO_BOSS_MORPHA,
+            Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP))) { // have not beaten Water Temple
         switch (gSaveContext.entranceIndex) {
             case ENTR_ZORAS_RIVER_WATERFALL_EXIT:      // Zora River from behind waterfall
             case ENTR_ZORAS_RIVER_UNDERWATER_SHORTCUT: // Zora River from LW water shortcut
@@ -643,7 +666,9 @@ void Entrance_OverrideWeatherState() {
         }
     }
     // Death Mountain Cloudy
-    if (!Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP)) {        // have not beaten Fire Temple
+    if (!Combo_SOH_CrossBossLogicalClear(
+            COMBO_BOSS_VOLVAGIA,
+            Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP))) {    // have not beaten Fire Temple
         if (gPlayState->nextEntranceIndex == ENTR_LOST_WOODS_TUNNEL_SHORTCUT) { // Lost Woods Goron City Shortcut
             gWeatherMode = 2;
             return;
@@ -713,7 +738,8 @@ void Entrance_OverrideSpawnScene(s32 sceneNum, s32 spawn) {
         gPlayState->linkActorEntry = &modifiedLinkActorEntry;
     }
 
-    if (Randomizer_GetSettingValue(RSK_SHUFFLE_BOSS_ENTRANCES) != RO_BOSS_ROOM_ENTRANCE_SHUFFLE_OFF) {
+    if (Randomizer_GetSettingValue(RSK_SHUFFLE_BOSS_ENTRANCES) != RO_BOSS_ROOM_ENTRANCE_SHUFFLE_OFF ||
+        Combo_SOH_CrossBossEnabled()) {
         // Repair the authentically bugged entrance when leaving Barinade's boss room -> Jabu Jabu's belly
         // Link's position needs to be adjusted to prevent him from falling through the floor
         if (sceneNum == SCENE_JABU_JABU && spawn == 1) {
@@ -744,7 +770,8 @@ void Entrance_OverrideSpawnScene(s32 sceneNum, s32 spawn) {
 }
 
 s32 Entrance_OverrideSpawnSceneRoom(s32 sceneNum, s32 spawn, s32 roomNum) {
-    if (Randomizer_GetSettingValue(RSK_SHUFFLE_BOSS_ENTRANCES) != RO_BOSS_ROOM_ENTRANCE_SHUFFLE_OFF) {
+    if (Randomizer_GetSettingValue(RSK_SHUFFLE_BOSS_ENTRANCES) != RO_BOSS_ROOM_ENTRANCE_SHUFFLE_OFF ||
+        Combo_SOH_CrossBossEnabled()) {
         // Repair the authentically bugged scene/spawn info for leaving Barinade's boss room -> Jabu Jabu's belly
         // to load the correct room outside Barniade's boss room
         if (sceneNum == SCENE_JABU_JABU && spawn == 1) {

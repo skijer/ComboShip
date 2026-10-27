@@ -10,6 +10,7 @@
 #include <libultraship/bridge/windowbridge.h>
 #include "soh/Enhancements/gameconsole.h"
 #include "soh/OTRGlobals.h"
+#include "soh/Enhancements/debugger/FrameTimingProbe.h"
 
 #define GFXPOOL_HEAD_MAGIC 0x1234
 #define GFXPOOL_TAIL_MAGIC 0x5678
@@ -467,6 +468,10 @@ static void RunFrame() {
         }
         GameState_Init(gGameState, runFrameContext.ovl->init, &runFrameContext.gfxCtx);
 
+        // Finish after the replacement state is initialized and before its
+        // first Graph_StartFrame, including transitions to non-Play states.
+        PreludeLoadProbe_EndStateReload();
+
         uint64_t freq = GetFrequency();
 
         while (GameState_IsRunning(gGameState)) {
@@ -475,9 +480,11 @@ static void RunFrame() {
 
             Graph_StartFrame();
 
+            FrameTimingSpan tickTiming = FrameTiming_BeginSpan();
             PadMgr_ThreadEntry(&gPadMgr);
 
             Graph_Update(&runFrameContext.gfxCtx, gGameState);
+            FrameTiming_EndSpan(FRAME_TIMING_TICK_BUILD, tickTiming);
             // ticksB = GetPerfCounter();
 
             if (GfxDebuggerIsDebuggingRequested()) {
@@ -495,6 +502,8 @@ static void RunFrame() {
         }
 
         runFrameContext.nextOvl = Graph_GetNextGameState(gGameState);
+        // Capture source tags while the departing PlayState is still valid.
+        PreludeLoadProbe_BeginStateReload();
         GameState_Destroy(gGameState);
         SYSTEM_ARENA_FREE_DEBUG(gGameState);
         Overlay_FreeGameState(runFrameContext.ovl);

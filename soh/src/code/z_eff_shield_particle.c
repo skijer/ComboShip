@@ -65,11 +65,10 @@ void EffectShieldParticle_Init(void* thisx, void* initParamsx) {
 void EffectShieldParticle_Destroy(void* thisx) {
     EffectShieldParticle* this = (EffectShieldParticle*)thisx;
 
-    if ((this != NULL) && (this->lightDecay == true)) {
-        if (this->lightNode == Effect_GetPlayState()->lightCtx.listHead) {
-            Effect_GetPlayState()->lightCtx.listHead = this->lightNode->next;
-        }
+    if ((this != NULL) && (this->lightDecay == true) && (this->lightNode != NULL)) {
         LightContext_RemoveLight(Effect_GetPlayState(), &Effect_GetPlayState()->lightCtx, this->lightNode);
+        // Effect_DeleteAll also destroys inactive slots during later scene teardown.
+        this->lightNode = NULL;
     }
 }
 

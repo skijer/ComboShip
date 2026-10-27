@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "actors": [
+    {
+      "name": "Child Zelda",
+      "catalog_id": 28,
+      "oot_actor_id": "0x002A",
+      "model_resource": "objects/object_zl4/gChildZeldaSkel",
+      "model_source": "Public ResourceMgr replacement/Alt path",
+      "talk": true,
+      "poses": [
+        {
+          "pose_id": 0,
+          "name": "Standing idle",
+          "params": "0x7D03"
+        },
+        {
+          "pose_id": 1,
+          "name": "Hands clasped",
+          "params": "0x7D13"
+        },
+        {
+          "pose_id": 2,
+          "name": "Hands clasped, blue Chamber aura",
+          "params": "0x7D23",
+          "dialogue": "Chamber echo"
+        }
+      ]
+    },
+    {
+      "name": "Adult Zelda",
+      "catalog_id": 4,
+      "oot_actor_id": "0x002A",
+      "model_resource": "objects/object_zl2/gZelda2Skel",
+      "poses": [
+        {
+          "pose_id": 0,
+          "name": "Standing idle",
+          "params": "0x7F04"
+        },
+        {
+          "pose_id": 1,
+          "name": "Standing idle alias (preserved)",
+          "params": "0x7F14"
+        },
+        {
+          "pose_id": 2,
+          "name": "Hands clasped",
+          "params": "0x7F24"
+        },
+        {
+          "pose_id": 3,
+          "name": "Hands clasped, blue Chamber aura",
+          "params": "0x7F34",
+          "dialogue": "Chamber echo"
+        }
+      ]
+    }
+  ]
+}

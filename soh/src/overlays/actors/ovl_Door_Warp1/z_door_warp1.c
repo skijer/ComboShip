@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 #include "z_door_warp1.h"
 #include "objects/object_warp1/object_warp1.h"
 #include "soh/Enhancements/randomizer/randomizer_entrance.h"
@@ -99,16 +100,6 @@ void DoorWarp1_Destroy(Actor* thisx, PlayState* play) {
 
     for (i = 0; i < 3; i++) {
         play->envCtx.adjAmbientColor[i] = play->envCtx.adjFogColor[i] = play->envCtx.adjLight1Color[i] = 0;
-    }
-
-    switch (this->actor.params) {
-        case WARP_DUNGEON_ADULT:
-        case WARP_BLUE_CRYSTAL:
-        case WARP_PURPLE_CRYSTAL:
-            SkelAnime_Free(&this->skelAnime, play);
-            break;
-        default:
-            break;
     }
 }
 
@@ -498,8 +489,8 @@ void DoorWarp1_ChildWarpIdle(DoorWarp1* this, PlayState* play) {
     if (DoorWarp1_PlayerInRange(this, play)) {
         player = GET_PLAYER(play);
 
-        Audio_PlaySoundGeneral(NA_SE_EV_LINK_WARP, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_LINK_WARP, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         OnePointCutscene_Init(play, 0x25E7, 999, &this->actor, CAM_ID_MAIN);
         Player_SetCsActionWithHaltedActors(play, &this->actor, 10);
 
@@ -527,6 +518,7 @@ void DoorWarp1_ChildWarpOut(DoorWarp1* this, PlayState* play) {
     this->warpTimer++;
 
     if (sWarpTimerTarget < this->warpTimer && gSaveContext.nextCutsceneIndex == 0xFFEF) {
+        const int crossBoss = Combo_SOH_CrossBossWarp(play->sceneNum);
         osSyncPrintf("\n\n\nじかんがきたからおーしまい fade_direction=[%d]", play->transitionTrigger,
                      TRANS_TRIGGER_START);
 
@@ -546,9 +538,12 @@ void DoorWarp1_ChildWarpOut(DoorWarp1* this, PlayState* play) {
             }
         } else if (play->sceneNum == SCENE_DEKU_TREE_BOSS) {
             if (GameInteractor_Should(VB_PLAY_BLUE_WARP_CS,
-                                      !Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD),
+                                      !Flags_GetEventChkInf(crossBoss
+                                                                ? EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP
+                                                                : EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD),
                                       EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD)) {
-                Flags_SetEventChkInf(EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD);
+                if (!crossBoss)
+                    Flags_SetEventChkInf(EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD);
                 Flags_SetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP);
                 if (GameInteractor_Should(VB_GIVE_ITEM_FROM_BLUE_WARP, true, ITEM_KOKIRI_EMERALD)) {
                     Item_Give(play, ITEM_KOKIRI_EMERALD);
@@ -623,8 +618,8 @@ void func_80999EE0(DoorWarp1* this, PlayState* play) {
 
 void func_80999FE4(DoorWarp1* this, PlayState* play) {
     if (Message_GetState(&play->msgCtx) == TEXT_STATE_NONE) {
-        Audio_PlaySoundGeneral(NA_SE_EV_LINK_WARP, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_LINK_WARP, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         OnePointCutscene_Init(play, 0x25E9, 999, &this->actor, CAM_ID_MAIN);
         Play_CopyCamera(play, -1, sRutoWarpSubCamId);
         Play_ChangeCameraStatus(play, sRutoWarpSubCamId, CAM_STAT_WAIT);
@@ -649,6 +644,7 @@ void DoorWarp1_RutoWarpOut(DoorWarp1* this, PlayState* play) {
     this->warpTimer++;
 
     if (this->warpTimer > sWarpTimerTarget && gSaveContext.nextCutsceneIndex == 0xFFEF) {
+        Combo_SOH_CrossBossWarp(play->sceneNum);
         if (GameInteractor_Should(VB_PLAY_BLUE_WARP_CS, true, EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
             Flags_SetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP);
             if (GameInteractor_Should(VB_GIVE_ITEM_FROM_BLUE_WARP, true, ITEM_ZORA_SAPPHIRE)) {
@@ -715,8 +711,8 @@ void func_8099A508(DoorWarp1* this, PlayState* play) {
         this->unk_1B2--;
         return;
     }
-    Audio_PlaySoundGeneral(NA_SE_EV_LINK_WARP, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(NA_SE_EV_LINK_WARP, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     Animation_ChangeImpl(&this->skelAnime, &gWarpCrystalAnim, 1.0f, Animation_GetLastFrame(&gWarpCrystalAnim),
                          Animation_GetLastFrame(&gWarpCrystalAnim), ANIMMODE_ONCE, 40.0f, 1);
 
@@ -754,6 +750,7 @@ void DoorWarp1_AdultWarpOut(DoorWarp1* this, PlayState* play) {
     this->warpTimer++;
 
     if (this->warpTimer > sWarpTimerTarget && gSaveContext.nextCutsceneIndex == 0xFFEF) {
+        Combo_SOH_CrossBossWarp(play->sceneNum);
         if (play->sceneNum == SCENE_FOREST_TEMPLE_BOSS) {
             if (GameInteractor_Should(VB_PLAY_BLUE_WARP_CS,
                                       !Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP),

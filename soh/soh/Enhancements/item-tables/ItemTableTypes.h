@@ -76,5 +76,8 @@ typedef struct GetItemEntry {
     // one sentinel entry; Randomizer_DrawComboForeign needs the check to resolve the real MM model.
     // Trailing so every existing brace initializer zero-fills it; stamped in Context::GetFinalGIEntry.
     int32_t comboForeignCheck;
+    // Nonzero only for an explicitly issued fixed Black Market receipt. Kept
+    // separate from randomizer checks so cancelled offers cannot grant freely.
+    int32_t comboMarketReceipt;
 #endif
 } GetItemEntry; // size = 0x11

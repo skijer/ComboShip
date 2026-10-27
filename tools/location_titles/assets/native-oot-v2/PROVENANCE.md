@@ -1,0 +1,13 @@
+# Native source provenance
+
+Baseline: `marsh6487/ComboShip` commit `4fff75754ef1578e586312fbf8c68e3adb99b4df`.
+
+The pack derives its letterforms from native English OoT place-title artwork. Private input archive filenames and whole-archive fingerprints are omitted from this publication. Native title resources are `textures/g_pn_01` through `textures/g_pn_57`, English title resources, 144x24 IA8. Extraction files in the pinned repository independently declare the native dimensions/type; e.g. `soh/assets/yml/pal_mq/textures/g_pn_01.yml`. `ComboOpeningForestTitleCard.cpp` independently routes the native Lost Woods card from the OoT archive into the MM presenter. This pack does not include the input archive or unrelated native assets.
+
+Each glyph's exact source card, half-open crop columns, original advance, source face-coverage hash and native tile hash are recorded in `native-title-pack.json`. Thirty-seven explicitly audited detached neighbor pixels across H/J/K/L/T/h/v/y are removed during glyph isolation, with exact original coordinates and alpha values recorded in the manifest; other pixels, including i dots and native antialias coverage, are retained. Raw crop hashes and isolated-face hashes are both recorded. White-face alpha is the source IA8 intensity multiplied by source alpha, rounded to the nearest byte; black baked-outline pixels are excluded from face coverage. The C renderer supplies the existing cardinal-offset keyline. Original wordmark kerning is not reconstructed; actual unscaled crop advances and a five-pixel space form the native profile. No horizontal warping, generic font substitution or glyph completion occurs.
+
+Native MM English text in `text/message_data_static/message_data_static` supplied the title strings. The 4,588 records parsed to exactly the declared resource length. The pinned MM scene table yields 67 unique nonzero title IDs; their real native strings establish 61 covered names and six documented fallbacks. No message resource is redistributed.
+
+The previous generated italic-serif ordinary-title font is superseded and excluded from this pack. The separately accepted original Black Market wordmark remains exactly the earlier runtime resource, without edits. Its original imagegen provenance remains in the preceding task10 report; no new image generation or repaint occurred for this revision.
+
+A primary Fontworks interview discusses Chiaro use in OoT, but does not establish the place-title family. Native dialogue/font comparisons did not prove exact title-font identity. Consequently no dialogue/font or external desktop font was substituted for missing native place-card characters.

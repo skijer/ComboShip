@@ -1,0 +1,106 @@
+{
+  "resource": "objects/combo_chateau_romani_3ds/AtlasTex",
+  "encoding": "zlib",
+  "resource_bytes": 67108956,
+  "resource_sha256": "8dd894e2100f91ac20067303f6c642a32358097b9e3cf3654a85568b31662a13",
+  "packed_bytes": 33435692,
+  "packed_sha256": "34e7b222b366e4857f040de2b6187f1faf84a9786b59387581ec4567ae649678",
+  "parts": [
+    {
+      "file": "AtlasTex.zlib.000.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "0e7e285b78c18cb33ef8d477121494d27ce9103fa23cecbd1de18ddf0d125f18"
+    },
+    {
+      "file": "AtlasTex.zlib.001.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "7c5d1d23c50088b94db6973fa34200536073ad453e642bcc4632f01144ef75c9"
+    },
+    {
+      "file": "AtlasTex.zlib.002.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "e090f02241b22e07f8608c36b77b5e6f789830ecf081b759483a775e2f8220e4"
+    },
+    {
+      "file": "AtlasTex.zlib.003.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "970acffb33eb604858827728778d07d4253a978da6fd4c1625cf1b1de13cb0fc"
+    },
+    {
+      "file": "AtlasTex.zlib.004.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "4657d9efb8dee73d90b18998447bf8ccb2f62e893326303e6db9264924333d4c"
+    },
+    {
+      "file": "AtlasTex.zlib.005.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "93e378428f1ab3bc3f62098c271dc67cc0a5e4f27887f47ba601b80b73b4f7ce"
+    },
+    {
+      "file": "AtlasTex.zlib.006.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "4c07b1413bf6ece344501d0257d6eae87d646a07391338b45074212d01bd7727"
+    },
+    {
+      "file": "AtlasTex.zlib.007.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "b85b0588cb201e44a77345c480929e29d2a97e1ae7ddf125a87222274c7188b0"
+    },
+    {
+      "file": "AtlasTex.zlib.008.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "ffd89ee4a764eadd196196b74d00494d871fde418344dd8e2d0a75c716c7b2ee"
+    },
+    {
+      "file": "AtlasTex.zlib.009.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "bd657791051c9808715af45552ab9277e95fcb40644ebc6b0a19d0e7e4bae908"
+    },
+    {
+      "file": "AtlasTex.zlib.010.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "59b71ed2945adeb8de43dde97437dab56960e3bf1f496773b3d42b347ef1596b"
+    },
+    {
+      "file": "AtlasTex.zlib.011.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "81e42d49aeab636165f9f5b0f1a3520ce6a5bc0b17b5dfeacc7a1f4e2de8a502"
+    },
+    {
+      "file": "AtlasTex.zlib.012.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "d4a126915afc9a374f0c49b530593a7175183dd5750d94aca6c00247d30c3943"
+    },
+    {
+      "file": "AtlasTex.zlib.013.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "e4e34bad4bcc389de7d37c29fdebc018d9ff987c6549d7e71dc737084bef5f37"
+    },
+    {
+      "file": "AtlasTex.zlib.014.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "e31a2166beb7f1fffecb38c72f5924d2e5de1736eb385eb827f39f6498dd183e"
+    },
+    {
+      "file": "AtlasTex.zlib.015.b64",
+      "encoding": "base64",
+      "bytes": 1978412,
+      "sha256": "afa7908b3b715c435a2acadead11e65b8e28116385d912738668af312520e8ac"
+    }
+  ]
+}

@@ -15,6 +15,9 @@ void AudioHeap_InitReverb(s32 reverbIndex, ReverbSettings* settings, s32 isFirst
 
 extern size_t gSequenceMapSize;
 extern size_t gFontMapSize;
+extern char** gFontMap;
+
+SoundFont* ResourceMgr_LoadAudioSoundFontByName(const char* path);
 
 #define gTatumsPerBeat (gAudioTatumInit[1])
 
@@ -275,6 +278,15 @@ void AudioHeap_ResetPool(AudioAllocPool* pool) {
     pool->curAddr = pool->startAddr;
 }
 
+static bool AudioHeap_IsSequenceInUse(s32 id) {
+    for (s32 i = 0; i < gAudioCtx.audioBufferParameters.numSequencePlayers; ++i) {
+        if (gAudioCtx.seqPlayers[i].enabled && gAudioCtx.seqPlayers[i].seqId == id) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void AudioHeap_PopPersistentCache(s32 tableType) {
     AudioCache* loadedCache;
     AudioAllocPool* persistentHeap;
@@ -303,6 +315,9 @@ void AudioHeap_PopPersistentCache(s32 tableType) {
     persistentHeap = &persistent->pool;
 
     if (persistent->numEntries == 0) {
+        return;
+    }
+    if (tableType == SEQUENCE_TABLE && AudioHeap_IsSequenceInUse(persistent->entries[persistent->numEntries - 1].id)) {
         return;
     }
 
@@ -549,6 +564,26 @@ void* AudioHeap_AllocCached(s32 tableType, size_t size, s32 cache, s32 id) {
 
         side = temporaryCache->nextSide;
 
+        if (tableType == SEQUENCE_TABLE) {
+            if (AudioHeap_IsSequenceInUse(temporaryCache->entries[side].id)) {
+                side ^= 1;
+                if ((temporaryCache->entries[side].id >= 0 &&
+                     loadStatus[temporaryCache->entries[side].id] == LOAD_STATUS_IN_PROGRESS) ||
+                    AudioHeap_IsSequenceInUse(temporaryCache->entries[side].id)) {
+                    return NULL;
+                }
+            }
+            if ((side == 0 && temporaryPool->startAddr + size > temporaryCache->entries[1].addr &&
+                 AudioHeap_IsSequenceInUse(temporaryCache->entries[1].id)) ||
+                (side == 1 &&
+                 (u8*)((uintptr_t)(temporaryPool->startAddr + temporaryPool->size - size) & ~0xF) <
+                     temporaryPool->curAddr &&
+                 AudioHeap_IsSequenceInUse(temporaryCache->entries[0].id))) {
+                return NULL;
+            }
+            temporaryCache->nextSide = side;
+        }
+
         if (temporaryCache->entries[side].id != -1) {
             if (tableType == SAMPLE_TABLE) {
                 AudioHeap_DiscardSampleBank(temporaryCache->entries[side].id);
@@ -629,6 +664,10 @@ void* AudioHeap_AllocCached(s32 tableType, size_t size, s32 cache, s32 id) {
 
         temporaryCache->nextSide ^= 1;
         return temporaryAddr;
+    }
+
+    if (loadedCache->persistent.numEntries >= ARRAY_COUNT(loadedCache->persistent.entries)) {
+        return cache == CACHE_EITHER ? AudioHeap_AllocCached(tableType, size, CACHE_TEMPORARY, id) : NULL;
     }
 
     persistentAddr = AudioHeap_Alloc(&loadedCache->persistent.pool, size);
@@ -1092,6 +1131,11 @@ void AudioHeap_Init(void) {
 void* AudioHeap_SearchPermanentCache(s32 tableType, s32 id) {
     s32 i;
 
+    if (tableType == FONT_TABLE && id >= 0 && (size_t)id < gFontMapSize && gFontMap[id] != NULL &&
+        gAudioCtx.fontLoadStatus[id] == LOAD_STATUS_PERMANENT) {
+        return ResourceMgr_LoadAudioSoundFontByName(gFontMap[id]);
+    }
+
     for (i = 0; i < gAudioCtx.permanentPool.count; i++) {
         if (gAudioCtx.permanentEntries[i].tableType == tableType && gAudioCtx.permanentEntries[i].id == id) {
             return gAudioCtx.permanentEntries[i].addr;
@@ -1104,12 +1148,17 @@ void* AudioHeap_AllocPermanent(s32 tableType, s32 id, size_t size) {
     void* addr;
     s32 index = gAudioCtx.permanentPool.count;
 
-    addr = AudioHeap_Alloc(&gAudioCtx.permanentPool, size);
-    gAudioCtx.permanentEntries[index].addr = addr;
+    // The host cache grows with the loaded sequence/font maps.
+    if (index < 0 || index >= gAudioCtx.permanentEntriesCapacity || gAudioCtx.permanentEntries == NULL) {
+        return NULL;
+    }
 
+    addr = AudioHeap_Alloc(&gAudioCtx.permanentPool, size);
     if (addr == NULL) {
         return NULL;
     }
+
+    gAudioCtx.permanentEntries[index].addr = addr;
 
     gAudioCtx.permanentEntries[index].tableType = tableType;
     gAudioCtx.permanentEntries[index].id = id;

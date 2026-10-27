@@ -7,8 +7,9 @@
 #include "z_en_am.h"
 #include "objects/object_am/object_am.h"
 #include "overlays/actors/ovl_En_Bom/z_en_bom.h"
+#include "soh/Enhancements/randomizer/randostatupgrade.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -252,8 +253,6 @@ void EnAm_Destroy(Actor* thisx, PlayState* play) {
     Collider_DestroyCylinder(play, &this->hurtCollider);
     Collider_DestroyCylinder(play, &this->blockCollider);
     //! @bug Quad collider is not destroyed (though destroy doesnt really do anything anyway)
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void EnAm_SpawnEffects(EnAm* this, PlayState* play) {
@@ -672,7 +671,8 @@ void EnAm_Statue(EnAm* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
     f32 temp158f = this->dyna.unk_158;
     s16 moveDir = 0;
-    s32 blockSpeed = CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0);
+    s32 blockSpeed =
+        (s32)(IsPushStatActive() ? GetPushStatValue() : CVarGetInteger(CVAR_ENHANCEMENT("FasterBlockPush"), 0));
 
     if (this->unk_258 == 0) {
         if (this->dyna.unk_150 != 0.0f) {

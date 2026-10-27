@@ -5,6 +5,7 @@
  */
 
 #include "z_en_pametfrog.h"
+#include "din_fire_sword.h"
 #include "z64quake.h"
 #include "z64rumble.h"
 #include "overlays/actors/ovl_En_Bigpamet/z_en_bigpamet.h"
@@ -1274,7 +1275,7 @@ void EnPametfrog_ApplyDamageEffect(EnPametfrog* this, PlayState* play) {
     if (this->collider.base.acFlags & AC_HIT) {
         this->collider.base.acFlags &= ~AC_HIT;
         if ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-            !(this->collider.elements[0].base.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            !(DinFireSword_OriginalDamageFlags(play, this->collider.elements[0].base.acHitElem) & 0xDB0B3)) {
             if (this->actor.params == GEKKO_PRE_SNAPPER) {
                 if (Actor_ApplyDamage(&this->actor) == 0) {
                     Audio_RestorePrevBgm();

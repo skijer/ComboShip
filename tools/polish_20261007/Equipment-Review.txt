@@ -1,0 +1,102 @@
+ComboShip complete equipment GI test — 2026-10-07
+
+LOAD THIS FILE FIRST:
+Randomizer/01-MM-All-Equipment-Progressive-20261007.json
+Target build: develop 13901c67, PR #36, Windows Actions run 37561010298.
+
+Copy the JSON into the Randomizer folder beside ComboShip.exe. Drag that exact
+file onto file select, then create a FRESH Start Randomizer save in MM. Do not
+generate another seed afterward. Existing saves keep their previous placements.
+
+The main file contains 90 test pickups, all in MM. The first 44 cover every
+obtainable equipment row, every extended equipment item, all sword upgrades,
+boots, tunics, shields, cape, pendant, hammer/axe, and strength/scale accessories.
+43 equipment pickups explicitly use the foreign OoT renderer in MM. The MM-only
+Hero's Shield is included as a native pickup at check 44. They appear in the
+actual placements, not just in the review notes or starting inventory.
+
+FIRST SEVEN PICKUPS — ALL PROGRESSIVE SWORD TIERS:
+1. Trading Post pot: Progressive Kokiri Sword -> Kokiri Sword.
+2. Swordsman School pot 01: Progressive Kokiri Sword -> Razor Sword.
+3. Swordsman School pot 02: Progressive Kokiri Sword -> Gilded Sword.
+4. Swordsman School pot 03: Progressive Master Sword -> Master Sword.
+5. Swordsman School pot 04: Progressive Master Sword -> True Master Sword.
+6. Swordsman School pot 05: Progressive Biggoron's Sword -> Biggoron's Sword.
+7. Observatory passage pot 01: Progressive Biggoron's Sword -> Great Fairy's Sword.
+
+8–10: Observatory passage pots 02–04 contain Four Sword, Trident, Cane of Byrna.
+11–13: Observatory pots 01–03 contain Champion's Tunic, Sage's Tunic, Magic Tunic.
+14: Observatory passage chest contains Magic Cape.
+15–44: Remaining tunics, boots, pendant, shields, weapons and accessories.
+Pickup-Checklist.csv gives every exact check, placed item and expected GI/tier.
+The numbered pot names are source check IDs; physical pot numbering is untested.
+Collect one at a time and wait for its receipt to finish.
+
+The original focused foreign entries omitted the equipment tests because those
+were assigned to native MM placements. This replacement explicitly includes
+all donor equipment, plus three/two/two repeated copies for the sword chains.
+
+THE PREVIOUS REGRESSION CASES ARE RETAINED AFTER EQUIPMENT:
+45–60: OoT maps and compasses, all eight boss dungeons.
+61–76: Small key, boss key, map and compass for all four MM dungeons.
+77–81: Odolwa, Goht, Gyorg, Twinmold and Majora souls.
+82–87: All six Tingle maps.
+88–90: Gold Dust, Magic Mushroom and Fairy bottles.
+
+The main route uses Clock Town/Observatory checks and nearby Termina Field
+checks first. Later cases include the Deku Playground on Days 1–3, Guay drops,
+nearby grottos, Deku Palace pots and Southern Swamp pots. Guay checks are the
+rupees dropped along its flight, not its death drop. Pot, crate, tree and
+freestanding-item shuffle flags are enabled for the assigned check types.
+This is a visual test plando; accessibility and beatability are not guaranteed.
+
+ALT/VANILLA TEST:
+Turn Skip Get Item Cutscenes OFF, including any minor-item cutscene skipping.
+Keep NEI shimmer/particle effects enabled. Use your current custom sword pack
+and load order. Compare each receipt with MM's Alt Assets ON and OFF; also check
+ON -> OFF -> ON while the sword rotates. Record clipping, stretching, chosen
+model, shimmer and particles in the checklist.
+
+Use a save from before the pickup or repeat on a fresh save to compare the same
+tier. Do not Grant All or grant swords/equipment before testing. A progressive
+item selects its tier from ownership state; already owned tiers can be skipped
+or resolve to junk. Finish each pickup before collecting the next. The travel
+kit contains no target equipment, sword, bottle, map or compass.
+
+OPTIONAL CONTROL FILES — EACH REQUIRES A SEPARATE FRESH SAVE:
+02-MM-Direct-Equipment-Control.json
+  44 fixed equipment checks at the same locations, including individually named
+  Kokiri, Razor, Gilded, Master, True Master, Biggoron and Great Fairy swords.
+  This separates direct equipment presentation from progressive tier selection.
+03-MM-Native-Progressive-Control.json
+  15 early native MM cases: all seven sword tiers, hammer -> axe, Champion/Sage/
+  Magic tunics, cape, pendant and Hero's Shield. Native True Master is named
+  Real Master Sword in MM's catalog. Use this if the donor route differs.
+04-MM-Legacy-Goron-Sword-Control.json
+  The older donor entry named Progressive Goron Sword is at the Trading Post
+  pot. Current source resolves it to Biggoron's Sword. It is kept separate so
+  collecting it does not advance the new Biggoron -> Great Fairy chain.
+
+MAP/COMPASS HINT SETTINGS:
+Maps and Compasses Give Information remains ON. OoT dungeon entrance shuffle
+and full boss shuffle remain ON, with coupled returns and separate pools.
+The main master seed and all nine explicit OoT boss reward assignments match
+the previous focused file. The importer derives the actual layout from that
+seed. MM entrances and bosses remain native. Bottom of the Well, Ice Cavern
+and Gerudo Training Ground have no new boss-reward compass cases.
+Four swapped MM remains and nine OoT reward placements support hint lookup;
+those support records are not extra equipment trips.
+
+VERIFICATION:
+332 compiled production check/item/sentinel lookup assertions passed.
+19 compiled production sword/hammer tier-selection assertions passed, using
+explicit ownership inputs. Every donor equipment row and extended equipment
+item, native sword/shield row, placement, shuffle flag and checklist row was
+audited against current source. The 46 previous regression items are retained.
+
+These checks do not execute the complete importer, fresh-save hydration,
+cross-game grants, entrance generation or graphical runtime. Alt/vanilla GI
+fallback, fit and effects still need in-game acceptance. Validation.json records
+the tested boundaries. Source-Coverage.json and Recovery retain the inputs and
+generation/verification scripts. The previous package and game source are
+unchanged; this is a separately named test candidate.

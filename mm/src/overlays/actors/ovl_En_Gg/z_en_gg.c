@@ -5,6 +5,7 @@
  */
 
 #include "z_en_gg.h"
+#include "2s2h/Enhancements/Gameplay/ComboRegionalActorPresentation.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
 
@@ -667,6 +668,10 @@ void func_80B364D4(EnGgStruct* ptr, PlayState* play) {
 }
 
 void EnGg_Init(Actor* thisx, PlayState* play) {
+#ifdef COMBO_BUILD
+    if (ComboRegionalActor_TryInit(thisx, play))
+        return;
+#endif
     s32 pad;
     EnGg* this = (EnGg*)thisx;
 

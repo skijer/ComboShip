@@ -1,4 +1,5 @@
 #include "ActorBehavior.h"
+#include "Rando/Spoiler/Spoiler.h" // GetOotAreaForItem (combo cross-game hints)
 #include "2s2h/CustomMessage/CustomMessage.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
 
@@ -108,7 +109,10 @@ void ApplyTransformationHints(u16* textId, bool* loadFromMessageTable) {
             }
             for (auto& location : itemPlacements) {
                 if (location == RC_UNKNOWN) {
-                    locationStr = "%gLink's pocket%w";
+                    // Combo: before assuming you carry it, check whether the mask stayed in OoT.
+                    std::string ootArea =
+                        Rando::Spoiler::GetOotAreaForItem(Rando::StaticData::Items[randoItemId].spoilerName);
+                    locationStr = ootArea.empty() ? "%gLink's pocket%w" : ootArea;
                     break;
                 }
 

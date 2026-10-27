@@ -5,6 +5,9 @@
 #include "textures/icon_item_static/icon_item_static.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/OTRGlobals.h"
+#include <libultraship/bridge/consolevariablebridge.h>
+
+#include "ComboCollectibleShimmerHost.h"
 
 #define FLAGS 0
 
@@ -333,12 +336,7 @@ void EnItem00_SetupAction(EnItem00* this, EnItem00ActionFunc actionFunc) {
 }
 
 void EnItem00_SetObjectDependency(EnItem00* this, PlayState* play, s16 objectIndex) {
-    // Remove object dependency for Enemy Randomizer and Crowd Control to allow Like-likes to
-    // drop equipment correctly in rooms where Like-likes normally don't spawn.
-    if (CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0) ||
-        (CVarGetInteger(CVAR_REMOTE_CROWD_CONTROL("Enabled"), 0))) {
-        this->actor.objBankIndex = 0;
-    } else {
+    if (GameInteractor_Should(VB_ITEM00_REQUIRE_OBJECT, true, this)) {
         this->actor.objBankIndex = Object_GetIndex(&play->objectCtx, objectIndex);
         Actor_SetObjectDependency(play, &this->actor);
     }
@@ -843,10 +841,27 @@ void EnItem00_Update(Actor* thisx, PlayState* play) {
         return;
     }
 
-    if (!((this->actor.xzDistToPlayer <= 30.0f) && (this->actor.yDistToPlayer >= -50.0f) &&
-          (this->actor.yDistToPlayer <= 50.0f))) {
-        if (!Actor_HasParent(&this->actor, play)) {
-            return;
+    // Transformation masks (Skijer's NEI): widen the collect/offer window while the Zora
+    // swim owns the body. This gate runs BEFORE Actor_OfferGetItemNearby below, so
+    // without it a swimming Zora never even gets the offer for heart pieces / small keys
+    // / rando checks — the 30/±50 box assumes a player standing on the same floor as the
+    // drop. MM does exactly this, with these exact numbers, for its own wide case (the
+    // curled Goron ball): see 2Ship z_en_item00.c:537-542, PLAYER_STATE3_1000 -> 60/±100.
+    {
+        extern u8 MmForm_IsZoraSwimming(Player * player);
+        f32 collectXZ = 30.0f;
+        f32 collectY = 50.0f;
+
+        if (MmForm_IsZoraSwimming(GET_PLAYER(play))) {
+            collectXZ = 60.0f;
+            collectY = 100.0f;
+        }
+
+        if (!((this->actor.xzDistToPlayer <= collectXZ) && (this->actor.yDistToPlayer >= -collectY) &&
+              (this->actor.yDistToPlayer <= collectY))) {
+            if (!Actor_HasParent(&this->actor, play)) {
+                return;
+            }
         }
     }
 
@@ -961,8 +976,8 @@ void EnItem00_Update(Actor* thisx, PlayState* play) {
     }
 
     if ((*params <= ITEM00_RUPEE_RED) || (*params == ITEM00_RUPEE_ORANGE)) {
-        Audio_PlaySoundGeneral(NA_SE_SY_GET_RUPY, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_GET_RUPY, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     } else if (getItemId != GI_NONE) {
         if (Actor_HasParent(&this->actor, play)) {
             Flags_SetCollectible(play, this->collectibleFlag);
@@ -970,8 +985,8 @@ void EnItem00_Update(Actor* thisx, PlayState* play) {
         }
         return;
     } else {
-        Audio_PlaySoundGeneral(NA_SE_SY_GET_ITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_GET_ITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 
     Flags_SetCollectible(play, this->collectibleFlag);
@@ -1391,6 +1406,26 @@ void EnItem00_DrawRupee(EnItem00* this, PlayState* play) {
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    int profile = -1;
+    switch (this->actor.params) {
+        case ITEM00_RUPEE_GREEN:
+            profile = CW_COLLECTIBLE_GREEN;
+            break;
+        case ITEM00_RUPEE_BLUE:
+            profile = CW_COLLECTIBLE_BLUE;
+            break;
+        case ITEM00_RUPEE_RED:
+            profile = CW_COLLECTIBLE_RED;
+            break;
+        case ITEM00_RUPEE_PURPLE:
+            profile = CW_COLLECTIBLE_PURPLE;
+            break;
+        case ITEM00_RUPEE_ORANGE:
+            profile = CW_COLLECTIBLE_LARGE;
+            break;
+    }
+    ComboCollectibleShimmer_DrawDrop(play, profile, profile <= CW_COLLECTIBLE_RED ? 25.0f : 17.5f);
 }
 
 static const Vtx customDropVtx[] = {
@@ -1471,9 +1506,11 @@ void EnItem00_DrawHeartContainer(EnItem00* this, PlayState* play) {
     Gfx_SetupDL_25Xlu(play->state.gfxCtx);
     func_8002ED80(&this->actor, play, 0);
     gSPMatrix(POLY_XLU_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
-    gSPDisplayList(POLY_XLU_DISP++, gHeartContainerInteriorDL);
+    POLY_XLU_DISP = GetItem_DrawDListWithCosmetics(POLY_XLU_DISP, gHeartContainerInteriorDL, GID_HEART_CONTAINER);
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    ComboCollectibleShimmer_DrawDrop(play, CW_COLLECTIBLE_HEART, 20.0f);
 }
 
 /**
@@ -1487,9 +1524,11 @@ void EnItem00_DrawHeartPiece(EnItem00* this, PlayState* play) {
     Gfx_SetupDL_25Xlu(play->state.gfxCtx);
     func_8002ED80(&this->actor, play, 0);
     gSPMatrix(POLY_XLU_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
-    gSPDisplayList(POLY_XLU_DISP++, gHeartPieceInteriorDL);
+    POLY_XLU_DISP = GetItem_DrawDListWithCosmetics(POLY_XLU_DISP, gHeartPieceInteriorDL, GID_HEART_PIECE);
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    ComboCollectibleShimmer_DrawDrop(play, CW_COLLECTIBLE_HEART, 21.0f);
 }
 
 // #region [Randomizer] [Enchancment]

@@ -1,0 +1,157 @@
+{
+  "scope": "Elemental sword source candidate; no configured gameplay or full application acceptance",
+  "baseline": "613802447cf8a4fbc3e058ba084f9e3dd7b9f7ae",
+  "production_test_ref": "d4ef4df9f789f2790e4d1eee96ed0c11b65d15aa",
+  "focused_test_ref": "8fce4165086e5ad81495405277026a7f4ea92048",
+  "harness_followup_ref": "acf595f28700c67fdd535bec21576bb4a1f7ed8d",
+  "production_changes_after_focused_test": [],
+  "focused_gate": {
+    "command": "bash scripts/diagnostics/run_elemental_sword_regressions.sh",
+    "exit_code": 0,
+    "command_count": 16,
+    "evidence": {
+      "file": "focused-final-regressions.log",
+      "bytes": 924032,
+      "sha256": "908a050c118fdbfa0c20b1420fd2ff872270f4df0ff3794bd01d2d36d4edb953"
+    }
+  },
+  "optional_native_ice_bridge": {
+    "command": "python3 -B scripts/diagnostics/run_mm_ice_arrows_tests.py --include <nlohmann_json/include> --sanitize",
+    "exit_code": 0,
+    "modes": [
+      "solo",
+      "Combo"
+    ],
+    "evidence": {
+      "file": "ice-native-bridge-final.log",
+      "bytes": 170,
+      "sha256": "dcce9c0649830827cc3a0b660e9bd48488921d0757a166177904cd4fd273ea05"
+    }
+  },
+  "finish_matrix": {
+    "exit_code": 0,
+    "modes": [
+      "OoT solo",
+      "OoT Combo",
+      "MM solo",
+      "MM Combo"
+    ],
+    "full_native_objects": 38,
+    "evidence": {
+      "file": "sword-finish-teardown-final.log",
+      "bytes": 1965,
+      "sha256": "2721eda8b289c1b112b92137d08d2115126b3e3378ed141567efe3d8019b6c90"
+    }
+  },
+  "biggoron_matrix": {
+    "exit_code": 0,
+    "modes": [
+      "OoT solo",
+      "OoT Combo",
+      "MM solo",
+      "MM Combo"
+    ],
+    "depth_control": {
+      "rigs": 3,
+      "roll_angles": 8,
+      "length_sections": 4,
+      "minimum_sampled_visible_frost_fraction": 0.9855,
+      "orthographic_only": true
+    },
+    "evidence": {
+      "file": "biggoron-final-formatted-green.log",
+      "bytes": 270435,
+      "sha256": "463cb071fcd539417865ce21cf3736e35963692520bc8695d3d46e872d2af4ed"
+    }
+  },
+  "native_menus": {
+    "status": "four complete source objects compiled",
+    "modes": [
+      "SoH solo",
+      "SoH Combo",
+      "MM solo",
+      "MM Combo"
+    ],
+    "limitation": "GCC native objects, not MSVC or full executable linking"
+  },
+  "formatting": {
+    "version": "clang-format 14.0.6",
+    "changed_ci_eligible_files": 44,
+    "exit_code": 0,
+    "evidence": {
+      "file": "formatting-final.log",
+      "bytes": 116,
+      "sha256": "524095f06d630f9352a7a8abfc931d817dd5bf63d839baaac05e8836e8ebd8ea"
+    }
+  },
+  "determinism": {
+    "commands": [
+      "python3 -B scripts/assets/build_sword_element_ui.py --check",
+      "python3 -B scripts/assets/build_elemental_sword_aura.py --check"
+    ],
+    "exit_code": 0
+  },
+  "asset_collisions": {
+    "command": "python3 -B scripts/check-asset-collisions.py",
+    "exit_code": 0,
+    "evidence": {
+      "file": "asset-collisions-final.log",
+      "bytes": 102,
+      "sha256": "7283fb554a4f9b2d12fc1f15029572b31c2a2505eb2e28038f74a4f2a85fcf23"
+    }
+  },
+  "broad_project_gate": {
+    "status": "blocked; not a clean full-project pass",
+    "command": "bash scripts/diagnostics/run_combo_nei_regressions.sh",
+    "passed_prefix_commands": 37,
+    "repaired_crash_harness": {
+      "exit_code": 0,
+      "evidence": {
+        "file": "crash-owner-final.log",
+        "bytes": 5956,
+        "sha256": "f1aa6e34c4ef6bde0e1b6526cb97a10dcc02543ca559f95b84f42d1b62138dbe"
+      }
+    },
+    "passed_continuation_commands": 5,
+    "blocker": {
+      "command": "python3 -B tests/reward_gi/run_asset_packaging_tests.py",
+      "reason": "FileNotFoundError: cmake unavailable on PATH",
+      "production_related": false
+    },
+    "remaining_commands_not_verified": true,
+    "evidence": [
+      {
+        "file": "project-final-with-deps.log",
+        "bytes": 229557,
+        "sha256": "e05fdee903940d606800ffa7a3ca8a577a0865db5dcb7d13e2013eac381de1bf"
+      },
+      {
+        "file": "project-final-continuation.log",
+        "bytes": 209120,
+        "sha256": "b0485e65de068e9de7e542302705cf26d57db4f381400dbde02b7a472788e82f"
+      }
+    ],
+    "environment_repair": "IMGUI_DIR points to the cached pinned ImGui source; CPLUS_INCLUDE_PATH supplies existing public dependency headers"
+  },
+  "reported_biggoron_alt_off": {
+    "status": "unreproduced in retained source; open configured runtime issue",
+    "fixed_claim": false,
+    "expected_diagnostic": "[SwordAura:MM] logical=6 fit=6 rig=2 element=2 matched=1 final=<composed>",
+    "expected_route": "__OTR__@oot-gi-base:objects/nei_held_swords/biggoron_sword/mm_human/held_dl",
+    "source_identities_are_not_installed_resource_hashes": true
+  },
+  "sanitizers": {
+    "core": "ASan/UBSan",
+    "host_exception": "-fno-sanitize=shift-base for unchanged native signed-bit damage flags",
+    "leaks": "detect_leaks=0 under tracing restriction"
+  },
+  "not_verified": [
+    "Configured in-game UI/full pause overlay",
+    "Configured enemy visual/audio presentation",
+    "User acceptance",
+    "Full application link/Windows build",
+    "Clarified authored Biggoron screenshot case"
+  ],
+  "recovery": "Binary-safe patch from baseline, exact local/remote refs and trees, preserved original art/recipes, logs and independent temporary-index restoration in delivery archive",
+  "promotion": "No accepted master modification or develop merge"
+}

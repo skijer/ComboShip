@@ -1,0 +1,75 @@
+{
+  "resource_count": 10,
+  "vertex_records": 1657,
+  "vertex_loads": 58,
+  "slug": "rod_of_seasons",
+  "name": "Rod of Seasons / physical held model",
+  "entry": "objects/nei_held_redesign/rod_of_seasons/gi_dl",
+  "draw_scale": 0.4,
+  "matrix_scale": 0.0576934814453125,
+  "triangles": 1624,
+  "bounds_author": [
+    [
+      -20.5,
+      -52.0,
+      -17.5
+    ],
+    [
+      20.5,
+      52.0,
+      17.5
+    ]
+  ],
+  "markers": {
+    "model_origin_native": [
+      0,
+      0,
+      0
+    ],
+    "canonical_shaft_axis": [
+      0,
+      1,
+      0
+    ],
+    "native_bounds": [
+      [
+        -18.9234619140625,
+        -48.0009765625,
+        -16.1541748046875
+      ],
+      [
+        18.9234619140625,
+        48.0009765625,
+        16.1541748046875
+      ]
+    ],
+    "native_height": 96.0,
+    "source_height_author": 104.0625,
+    "removed_gi_lean_degrees": -12.0,
+    "source_center_y_author": 5.96875,
+    "native_factor": 0.923095703125,
+    "world_factor": 0.36923828125,
+    "hand_pose_offsets": [
+      0.0,
+      5.977,
+      -3.218
+    ],
+    "hand_pose_rotations_degrees": [
+      109.655,
+      72.414,
+      0.0
+    ],
+    "hand_pose_scale": 0.4,
+    "hand_pose_change_required": false,
+    "wrist_in_model_native": [
+      -0.0,
+      -14.9425,
+      8.045
+    ],
+    "source_recipe_sha256": "9ad2af50e54565ec0d0146534b52c24878141680ceccc60a8b7afb9d5ff42894",
+    "presentation_only": false,
+    "weather_vfx": false,
+    "gameplay_changes": false
+  },
+  "runtime_tested": false
+}

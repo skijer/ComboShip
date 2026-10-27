@@ -1,0 +1,53 @@
+{
+  "repository": "marsh6487/Shipwright",
+  "sources": {
+    "c77c18587a976f6d6cb5c8f91f27593286469218:soh/soh/Enhancements/randomizer/NeiUsedMagicPolicy.h": {
+      "file": "c77c185/NeiUsedMagicPolicy.h",
+      "git_blob_sha": "abbaeb809c01db6684b021db46c8a5e0095dd3db"
+    },
+    "c77c18587a976f6d6cb5c8f91f27593286469218:soh/soh/Enhancements/randomizer/NeiUsedMagicPresentation.cpp": {
+      "file": "c77c185/NeiUsedMagicPresentation.cpp",
+      "git_blob_sha": "82c6861e873d36bb97d2bd1931e34d00d88d686c"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/mods/items/logic/item_rod_fire.c": {
+      "file": "cec63fc/soh/mods/items/logic/item_rod_fire.c",
+      "git_blob_sha": "866aca4843924142d00b8024a3b29731ad39b93a"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/mods/items/logic/item_rod_ice.c": {
+      "file": "cec63fc/soh/mods/items/logic/item_rod_ice.c",
+      "git_blob_sha": "bd49b5d4f5b14b44cfe3dbe98559bcbc2fd9fc7b"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/mods/items/logic/item_rod_light.c": {
+      "file": "cec63fc/soh/mods/items/logic/item_rod_light.c",
+      "git_blob_sha": "81071342401a44e607c663be936a61a4cf5c50a1"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/src/overlays/effects/ovl_Effect_Ss_G_Spk/z_eff_ss_g_spk.c": {
+      "file": "cec63fc/soh/src/overlays/effects/ovl_Effect_Ss_G_Spk/z_eff_ss_g_spk.c",
+      "git_blob_sha": "94468dc5a791934cdc4de69360c95ec9d227fd8c"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/src/overlays/effects/ovl_Effect_Ss_En_Ice/z_eff_ss_en_ice.c": {
+      "file": "cec63fc/soh/src/overlays/effects/ovl_Effect_Ss_En_Ice/z_eff_ss_en_ice.c",
+      "git_blob_sha": "f301a5d22890e7ad20909f870751d4588491837b"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/src/overlays/effects/ovl_Effect_Ss_KiraKira/z_eff_ss_kirakira.c": {
+      "file": "cec63fc/soh/src/overlays/effects/ovl_Effect_Ss_KiraKira/z_eff_ss_kirakira.c",
+      "git_blob_sha": "83b412a0710d8d01af2c2a0a2836decadc47515a"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/mods/items/logic/item_time_gate.c": {
+      "file": "cec63fc/soh/mods/items/logic/item_time_gate.c",
+      "git_blob_sha": "362b1952555ce21ef0c580b404b1b9d06bd4a0f0"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/mods/items/objects/object_lightrod.c": {
+      "file": "cec63fc/soh/mods/items/objects/object_lightrod.c",
+      "git_blob_sha": "de9e1fc43b56d182ee3cb54a9ef702025a973fc5"
+    },
+    "cec63fce86b1f582f6e61ad6a98eca6c3cca784b:soh/soh/Enhancements/randomizer/NeiGiPresentation.cpp": {
+      "file": "cec63fc/soh/soh/Enhancements/randomizer/NeiGiPresentation.cpp",
+      "git_blob_sha": "d52d6fea100fc6bd59ed6ae44b9d19fb2470c336"
+    },
+    "c77c18587a976f6d6cb5c8f91f27593286469218:soh/mods/items/objects/object_icerod.c": {
+      "file": "c77c185/soh/mods/items/objects/object_icerod.c",
+      "git_blob_sha": "1f86acdbc12f8810c50644a23ee57da7a8bd4f1b"
+    }
+  }
+}

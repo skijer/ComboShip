@@ -1,0 +1,40 @@
+{
+  "resource_count": 14,
+  "vertex_records": 3805,
+  "vertex_loads": 134,
+  "slug": "divine_shield",
+  "name": "Divine Shield / gameplay divine_shield",
+  "entry": "objects/nei_held_redesign/divine_shield/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.0424957275390625,
+  "triangles": 2156,
+  "bounds_author": [
+    [
+      -17.25,
+      -28.4375,
+      -27.375
+    ],
+    [
+      5.125,
+      71.5625,
+      40.625
+    ]
+  ],
+  "markers": {
+    "legacy_frame": "object_nei_divine_shield / object_nei_kite_shield",
+    "normal_native": [
+      -1,
+      0,
+      0
+    ],
+    "up_native": [
+      0,
+      1,
+      0
+    ]
+  },
+  "notes": [
+    "Approved shell/embossing/rear straps in native custom-shield frame. Existing hand/back/surf transforms retained."
+  ],
+  "runtime_tested": false
+}

@@ -5,6 +5,9 @@
 #include <set>
 #include <stdint.h>
 
+// Editor key only; the selected physical bank is resolved before playback.
+inline constexpr uint16_t HYRULE_FIELD_NIGHT_MUSIC_ENTRY = 0xFF02;
+
 enum SeqType {
     SEQ_NOSHUFFLE = 0,
     SEQ_BGM_WORLD = 1 << 0,

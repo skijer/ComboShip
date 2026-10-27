@@ -1,0 +1,5 @@
+<DisplayList Version="0">
+  <CallDisplayList Path="objects/combo_dungeon_keys/GreatBaySmallKeyEmblemDL_emblem" />
+  <CallDisplayList Path="objects/combo_dungeon_keys/GreatBaySmallKeyEmblemDL_eye" />
+  <EndDisplayList />
+</DisplayList>

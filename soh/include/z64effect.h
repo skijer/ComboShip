@@ -23,7 +23,8 @@ typedef enum {
     TRAIL_TYPE_MASTER_SWORD,
     TRAIL_TYPE_BIGGORON_SWORD,
     TRAIL_TYPE_STICK,
-    TRAIL_TYPE_HAMMER
+    TRAIL_TYPE_HAMMER,
+    TRAIL_TYPE_ZORA_FIN
 } TrailType; //SOH [Enhancements]
 
 typedef struct {
@@ -123,7 +124,9 @@ typedef struct {
     /* 0x1A2 */ Color_RGBA8 altPrimColor; // used with drawMode 1
     /* 0x1A6 */ Color_RGBA8 altEnvColor; // used with drawMode 1
     /* 0x1A0 */ TrailType trailType; //SOH [Enhancements]
-} EffectBlure; // size = 0x1AC
+    Color_RGBA8 cosmeticOriginalColors[4];
+    u8 cosmeticChanged;
+} EffectBlure;
 
 typedef struct {
     /* 0x00 */ f32 initialSpeed;

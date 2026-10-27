@@ -1,0 +1,216 @@
+{
+  "font": {
+    "path": "soh/assets/custom/fonts/Montserrat-Regular.ttf",
+    "sha256": "c3fb0280e4339f6c70cea42b8b432c6fb17fde130fbb12e9209c7cdfa79d976f"
+  },
+  "physical_icon_size": [
+    64,
+    64
+  ],
+  "logical_icon_size": [
+    32,
+    32
+  ],
+  "native_tile_size": [
+    32,
+    32
+  ],
+  "maximum_texture_load_bytes": 4096,
+  "font_physical_to_logical_scale": 2,
+  "sources": {
+    "fire": {
+      "path": "combo/render/sword_element_ui_assets/fire-source.png",
+      "sha256": "f62f1486f9ad791e957a306cc3362c2f802990d5990326ec492afb9ab04fdacc",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    "ice": {
+      "path": "combo/render/sword_element_ui_assets/ice-source.png",
+      "sha256": "661d2b48007b16e1590ed2f033c03cd202e0eda291a87d150f4a6c0554ec6ae4",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    "light": {
+      "path": "combo/render/sword_element_ui_assets/light-source.png",
+      "sha256": "b34a07082d4babb149c102e0e57357226d85df43a30402bf7a2ab2c288ccef2f",
+      "size": [
+        1254,
+        1254
+      ]
+    }
+  },
+  "labels": {
+    "Title": {
+      "text": "Sword element",
+      "physical_size": [
+        160,
+        19
+      ],
+      "logical_size": [
+        80.0,
+        9.5
+      ],
+      "format": "IA8"
+    },
+    "Subtitle": {
+      "text": "Choose an affinity",
+      "physical_size": [
+        112,
+        14
+      ],
+      "logical_size": [
+        56.0,
+        7.0
+      ],
+      "format": "IA8"
+    },
+    "None": {
+      "text": "None",
+      "physical_size": [
+        56,
+        17
+      ],
+      "logical_size": [
+        28.0,
+        8.5
+      ],
+      "format": "IA8"
+    },
+    "Fire": {
+      "text": "Fire",
+      "physical_size": [
+        40,
+        18
+      ],
+      "logical_size": [
+        20.0,
+        9.0
+      ],
+      "format": "IA8"
+    },
+    "Ice": {
+      "text": "Ice",
+      "physical_size": [
+        32,
+        17
+      ],
+      "logical_size": [
+        16.0,
+        8.5
+      ],
+      "format": "IA8"
+    },
+    "Light": {
+      "text": "Light",
+      "physical_size": [
+        56,
+        22
+      ],
+      "logical_size": [
+        28.0,
+        11.0
+      ],
+      "format": "IA8"
+    },
+    "Active": {
+      "text": "ACTIVE",
+      "physical_size": [
+        40,
+        11
+      ],
+      "logical_size": [
+        20.0,
+        5.5
+      ],
+      "format": "IA8"
+    },
+    "Locked": {
+      "text": "LOCKED",
+      "physical_size": [
+        48,
+        11
+      ],
+      "logical_size": [
+        24.0,
+        5.5
+      ],
+      "format": "IA8"
+    },
+    "Select": {
+      "text": "Select",
+      "physical_size": [
+        40,
+        12
+      ],
+      "logical_size": [
+        20.0,
+        6.0
+      ],
+      "format": "IA8"
+    },
+    "Arrows": {
+      "text": "\u2039 \u203a",
+      "physical_size": [
+        24,
+        14
+      ],
+      "logical_size": [
+        12.0,
+        7.0
+      ],
+      "format": "IA8"
+    },
+    "A": {
+      "text": "A",
+      "physical_size": [
+        16,
+        12
+      ],
+      "logical_size": [
+        8.0,
+        6.0
+      ],
+      "format": "IA8"
+    },
+    "B": {
+      "text": "B",
+      "physical_size": [
+        16,
+        12
+      ],
+      "logical_size": [
+        8.0,
+        6.0
+      ],
+      "format": "IA8"
+    },
+    "Apply": {
+      "text": "Apply",
+      "physical_size": [
+        40,
+        14
+      ],
+      "logical_size": [
+        20.0,
+        7.0
+      ],
+      "format": "IA8"
+    },
+    "Back": {
+      "text": "Back",
+      "physical_size": [
+        32,
+        12
+      ],
+      "logical_size": [
+        16.0,
+        6.0
+      ],
+      "format": "IA8"
+    }
+  }
+}

@@ -1,3 +1,4 @@
+#include <nlohmann/json.hpp>
 #include "2s2h/CustomMessage/CustomMessage.h"
 #include "MiscBehavior.h"
 #include "2s2h/ShipUtils.h"
@@ -5,7 +6,8 @@
 #include <set>
 #include "2s2h/Rando/Logic/Logic.h"
 #include "2s2h/SaveManager/SaveManager.h"
-#include <libultraship/libultraship.h>
+#include <ship/Context.h>
+#include <ship/config/Config.h>
 #include <libultraship/bridge/consolevariablebridge.h>
 
 extern "C" {
@@ -191,10 +193,15 @@ RandoCheckId GetProgressiveCheckInLogic() {
 }
 
 void Rando::MiscBehavior::SariasSongHint() {
-    bool shouldRegister = IS_RANDO && RANDO_SAVE_OPTIONS[RO_SHUFFLE_SONG_SARIA];
+    bool taughtBySaria = false;
+#ifdef COMBO_BUILD
+    taughtBySaria = (gComboGameMode == COMBO_GAME_BOTH || gComboGameMode == COMBO_GAME_MM) &&
+                    gSaveContext.save.shipSaveInfo.nei.comboSariaSongClaimed;
+#endif
+    bool shouldRegister = IS_RANDO && (RANDO_SAVE_OPTIONS[RO_SHUFFLE_SONG_SARIA] || taughtBySaria);
 
     // Fix vanilla issue where saria's song plays the majoras lair fanfare
-    if (shouldRegister) {
+    if (shouldRegister || taughtBySaria) {
         sOcarinaSongFanfares[OCARINA_SONG_SARIAS] = NA_BGM_SARIAS_SONG;
     } else {
         sOcarinaSongFanfares[OCARINA_SONG_SARIAS] = NA_BGM_MAJORAS_LAIR;

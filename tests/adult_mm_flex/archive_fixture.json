@@ -1,0 +1,530 @@
+{
+  "limb_count": 21,
+  "matrix_count": 18,
+  "limbs": [
+    {
+      "path": "objects/object_link_boy/gLinkAdultRootLimb",
+      "position": [
+        -57,
+        3377,
+        0
+      ],
+      "child": 1,
+      "sibling": 255,
+      "near": "",
+      "far": ""
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultWaistLimb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "child": 2,
+      "sibling": 9,
+      "near": "objects/object_link_boy/gLinkAdultWaistNearDL",
+      "far": "objects/object_link_boy/gLinkAdultWaistFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLowerControlLimb",
+      "position": [
+        945,
+        0,
+        0
+      ],
+      "child": 3,
+      "sibling": 255,
+      "near": "",
+      "far": ""
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightThighLimb",
+      "position": [
+        -399,
+        69,
+        -249
+      ],
+      "child": 4,
+      "sibling": 6,
+      "near": "objects/object_link_boy/gLinkAdultRightThighNearDL",
+      "far": "objects/object_link_boy/gLinkAdultRightThighFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightLegLimb",
+      "position": [
+        1306,
+        0,
+        0
+      ],
+      "child": 5,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultRightLegNearDL",
+      "far": "objects/object_link_boy/gLinkAdultRightLegFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightFootLimb",
+      "position": [
+        1256,
+        5,
+        11
+      ],
+      "child": 255,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultRightFootNearDL",
+      "far": "objects/object_link_boy/gLinkAdultRightFootFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftThighLimb",
+      "position": [
+        -396,
+        76,
+        264
+      ],
+      "child": 7,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultLeftThighNearDL",
+      "far": "objects/object_link_boy/gLinkAdultLeftThighFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftLegLimb",
+      "position": [
+        1304,
+        0,
+        0
+      ],
+      "child": 8,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultLeftLegNearDL",
+      "far": "objects/object_link_boy/gLinkAdultLeftLegFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftFootLimb",
+      "position": [
+        1257,
+        6,
+        3
+      ],
+      "child": 255,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultLeftFootNearDL",
+      "far": "objects/object_link_boy/gLinkAdultLeftFootFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultUpperControlLimb",
+      "position": [
+        0,
+        21,
+        -7
+      ],
+      "child": 10,
+      "sibling": 255,
+      "near": "",
+      "far": ""
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultHeadLimb",
+      "position": [
+        1392,
+        -259,
+        0
+      ],
+      "child": 11,
+      "sibling": 12,
+      "near": "objects/object_link_boy/gLinkAdultHeadNearDL",
+      "far": "objects/object_link_boy/gLinkAdultHeadFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultHatLimb",
+      "position": [
+        -298,
+        -700,
+        0
+      ],
+      "child": 255,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultHatNearDL",
+      "far": "objects/object_link_boy/gLinkAdultHatFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultCollarLimb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "child": 255,
+      "sibling": 13,
+      "near": "objects/object_link_boy/gLinkAdultCollarNearDL",
+      "far": "objects/object_link_boy/gLinkAdultCollarFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftShoulderLimb",
+      "position": [
+        1039,
+        -172,
+        680
+      ],
+      "child": 14,
+      "sibling": 16,
+      "near": "objects/object_link_boy/gLinkAdultLeftShoulderNearDL",
+      "far": "objects/object_link_boy/gLinkAdultLeftShoulderFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftArmLimb",
+      "position": [
+        919,
+        0,
+        0
+      ],
+      "child": 15,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultLeftArmNearDL",
+      "far": "objects/object_link_boy/gLinkAdultLeftArmFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftHandLimb",
+      "position": [
+        754,
+        0,
+        0
+      ],
+      "child": 255,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultLeftHandNearDL",
+      "far": "objects/object_link_boy/gLinkAdultLeftHandFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightShoulderLimb",
+      "position": [
+        1039,
+        -173,
+        -680
+      ],
+      "child": 17,
+      "sibling": 19,
+      "near": "objects/object_link_boy/gLinkAdultRightShoulderNearDL",
+      "far": "objects/object_link_boy/gLinkAdultRightShoulderFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightArmLimb",
+      "position": [
+        919,
+        0,
+        0
+      ],
+      "child": 18,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultRightArmNearDL",
+      "far": "objects/object_link_boy/gLinkAdultRightArmFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightHandLimb",
+      "position": [
+        754,
+        0,
+        0
+      ],
+      "child": 255,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultRightHandNearDL",
+      "far": "objects/object_link_boy/gLinkAdultRightHandFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultSwordAndSheathLimb",
+      "position": [
+        978,
+        -692,
+        342
+      ],
+      "child": 255,
+      "sibling": 20,
+      "near": "objects/object_link_boy/gLinkAdultMasterSwordAndSheathNearDL",
+      "far": "objects/object_link_boy/gLinkAdultMasterSwordAndSheathFarDL"
+    },
+    {
+      "path": "objects/object_link_boy/gLinkTorsoLimb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "child": 255,
+      "sibling": 255,
+      "near": "objects/object_link_boy/gLinkAdultTorsoNearDL",
+      "far": "objects/object_link_boy/gLinkAdultTorsoFarDL"
+    }
+  ],
+  "consumers": [
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightThighNearDL",
+      "command": 88,
+      "address": 218103809,
+      "matrix_offset": 0
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightThighNearDL",
+      "command": 136,
+      "address": 218103873,
+      "matrix_offset": 64
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightLegNearDL",
+      "command": 88,
+      "address": 218103873,
+      "matrix_offset": 64
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightLegNearDL",
+      "command": 136,
+      "address": 218103937,
+      "matrix_offset": 128
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightFootNearDL",
+      "command": 88,
+      "address": 218103937,
+      "matrix_offset": 128
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightFootNearDL",
+      "command": 136,
+      "address": 218104001,
+      "matrix_offset": 192
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftThighNearDL",
+      "command": 88,
+      "address": 218103809,
+      "matrix_offset": 0
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftThighNearDL",
+      "command": 136,
+      "address": 218104065,
+      "matrix_offset": 256
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftLegNearDL",
+      "command": 88,
+      "address": 218104065,
+      "matrix_offset": 256
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftLegNearDL",
+      "command": 136,
+      "address": 218104129,
+      "matrix_offset": 320
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftFootNearDL",
+      "command": 88,
+      "address": 218104129,
+      "matrix_offset": 320
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftFootNearDL",
+      "command": 136,
+      "address": 218104193,
+      "matrix_offset": 384
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultHeadNearDL",
+      "command": 88,
+      "address": 218104897,
+      "matrix_offset": 1088
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultHeadNearDL",
+      "command": 136,
+      "address": 218104257,
+      "matrix_offset": 448
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultHatNearDL",
+      "command": 88,
+      "address": 218104257,
+      "matrix_offset": 448
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultHatNearDL",
+      "command": 136,
+      "address": 218104321,
+      "matrix_offset": 512
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftShoulderNearDL",
+      "command": 88,
+      "address": 218104897,
+      "matrix_offset": 1088
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftShoulderNearDL",
+      "command": 136,
+      "address": 218104449,
+      "matrix_offset": 640
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftArmNearDL",
+      "command": 88,
+      "address": 218104449,
+      "matrix_offset": 640
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultLeftArmNearDL",
+      "command": 136,
+      "address": 218104513,
+      "matrix_offset": 704
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightShoulderNearDL",
+      "command": 88,
+      "address": 218104897,
+      "matrix_offset": 1088
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightShoulderNearDL",
+      "command": 136,
+      "address": 218104641,
+      "matrix_offset": 832
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightArmNearDL",
+      "command": 88,
+      "address": 218104641,
+      "matrix_offset": 832
+    },
+    {
+      "path": "objects/object_link_boy/gLinkAdultRightArmNearDL",
+      "command": 136,
+      "address": 218104705,
+      "matrix_offset": 896
+    }
+  ],
+  "display_list_paths": [
+    "objects/object_link_boy/gLinkAdultCollarFarDL",
+    "objects/object_link_boy/gLinkAdultCollarNearDL",
+    "objects/object_link_boy/gLinkAdultHatFarDL",
+    "objects/object_link_boy/gLinkAdultHatNearDL",
+    "objects/object_link_boy/gLinkAdultHeadFarDL",
+    "objects/object_link_boy/gLinkAdultHeadNearDL",
+    "objects/object_link_boy/gLinkAdultHylianShieldAndSheathNearDL",
+    "objects/object_link_boy/gLinkAdultHylianShieldSwordAndSheathNearDL",
+    "objects/object_link_boy/gLinkAdultLeftArmFarDL",
+    "objects/object_link_boy/gLinkAdultLeftArmNearDL",
+    "objects/object_link_boy/gLinkAdultLeftFootFarDL",
+    "objects/object_link_boy/gLinkAdultLeftFootNearDL",
+    "objects/object_link_boy/gLinkAdultLeftHandClosedNearDL",
+    "objects/object_link_boy/gLinkAdultLeftHandFarDL",
+    "objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL",
+    "objects/object_link_boy/gLinkAdultLeftHandHoldingMasterSwordNearDL",
+    "objects/object_link_boy/gLinkAdultLeftHandNearDL",
+    "objects/object_link_boy/gLinkAdultLeftLegFarDL",
+    "objects/object_link_boy/gLinkAdultLeftLegNearDL",
+    "objects/object_link_boy/gLinkAdultLeftShoulderFarDL",
+    "objects/object_link_boy/gLinkAdultLeftShoulderNearDL",
+    "objects/object_link_boy/gLinkAdultLeftThighFarDL",
+    "objects/object_link_boy/gLinkAdultLeftThighNearDL",
+    "objects/object_link_boy/gLinkAdultMasterSwordAndSheathFarDL",
+    "objects/object_link_boy/gLinkAdultMasterSwordAndSheathNearDL",
+    "objects/object_link_boy/gLinkAdultMirrorShieldAndSheathNearDL",
+    "objects/object_link_boy/gLinkAdultMirrorShieldSwordAndSheathNearDL",
+    "objects/object_link_boy/gLinkAdultRightArmFarDL",
+    "objects/object_link_boy/gLinkAdultRightArmNearDL",
+    "objects/object_link_boy/gLinkAdultRightFootFarDL",
+    "objects/object_link_boy/gLinkAdultRightFootNearDL",
+    "objects/object_link_boy/gLinkAdultRightHandClosedNearDL",
+    "objects/object_link_boy/gLinkAdultRightHandFarDL",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingBowNearDL",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingHookshotNearDL",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingHylianShieldNearDL",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingMirrorShieldNearDL",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingOotNearDL",
+    "objects/object_link_boy/gLinkAdultRightHandNearDL",
+    "objects/object_link_boy/gLinkAdultRightLegFarDL",
+    "objects/object_link_boy/gLinkAdultRightLegNearDL",
+    "objects/object_link_boy/gLinkAdultRightShoulderFarDL",
+    "objects/object_link_boy/gLinkAdultRightShoulderNearDL",
+    "objects/object_link_boy/gLinkAdultRightThighFarDL",
+    "objects/object_link_boy/gLinkAdultRightThighNearDL",
+    "objects/object_link_boy/gLinkAdultSheathNearDL",
+    "objects/object_link_boy/gLinkAdultTorsoFarDL",
+    "objects/object_link_boy/gLinkAdultTorsoNearDL",
+    "objects/object_link_boy/gLinkAdultWaistFarDL",
+    "objects/object_link_boy/gLinkAdultWaistNearDL"
+  ],
+  "resource_sha256": {
+    "objects/object_link_boy/gLinkAdultRootLimb": "fb6f704144830ad5105531d369a25d363c9b84c5ea221bb409ba5220dc117228",
+    "objects/object_link_boy/gLinkAdultWaistLimb": "cfc8c975afcfabbdcc1ec9c14f68d2b76382d8da928b99377f30168bd5e9f501",
+    "objects/object_link_boy/gLinkAdultWaistFarDL": "7bdabc6423007ea3c97d929c5fa1807865fbc52e7b704974c6d82cd2438d48c9",
+    "objects/object_link_boy/gLinkAdultWaistNearDL": "9ccf565089c725abed7e58b7686a7eb51dd5d2d88101ea37983e04c6a3cfb727",
+    "objects/object_link_boy/gLinkAdultLowerControlLimb": "f9dd8588ba84eac4226e57d89f554579eb8b6ec0ffd99abd2139c86a1563e015",
+    "objects/object_link_boy/gLinkAdultRightThighLimb": "5b9e79dad0179818a72b2e189431ac526eff87aa3560396ace49e07a5d501f18",
+    "objects/object_link_boy/gLinkAdultRightThighFarDL": "59f4c2c6a64778ae87a9fffcc6c73598632f26443d4de0ac51918bf3bf1a0cbe",
+    "objects/object_link_boy/gLinkAdultRightThighNearDL": "86f854167df4a808593673ce13388b601d1fbd366a3206f255eca63eb33e6584",
+    "objects/object_link_boy/gLinkAdultRightLegLimb": "a626e0b444f2f26f80ab33a5efb6781dc71048bb59866b5c695ad88237982468",
+    "objects/object_link_boy/gLinkAdultRightLegFarDL": "6578f6bee517fde12b41820d7547330c1ac4db84131b88617d563beb2aa78829",
+    "objects/object_link_boy/gLinkAdultRightLegNearDL": "8c154409ef7b8ac421978619336998bbeb2c268073df0f27b11f9a53412e4fd8",
+    "objects/object_link_boy/gLinkAdultRightFootLimb": "cd78d93ac614ce41eabd0a522d05ec39321da2e88a8d4aaeb99f3406221328fc",
+    "objects/object_link_boy/gLinkAdultRightFootFarDL": "945f914ab2eafc921a11a0e3d6f9fd8746a578dcd4fbea94aadc3fdb8d099593",
+    "objects/object_link_boy/gLinkAdultRightFootNearDL": "e1aab89e8f2f7124192fef09785bc0d8915470eaaef95e66c3f3f7d81368c9c9",
+    "objects/object_link_boy/gLinkAdultLeftThighLimb": "a67c48f09077d5a5ebe3232d3a2fbe03a4bd603c595e0a75b656cf0318ef10e0",
+    "objects/object_link_boy/gLinkAdultLeftThighFarDL": "70c37e919431b66960a63a680b191a8fad1c71f2143ee2c065ae204c78652da1",
+    "objects/object_link_boy/gLinkAdultLeftThighNearDL": "553c3cde00db5ae4c0115bff50179fc94bf3e6ed036aff2750b9b973510141c8",
+    "objects/object_link_boy/gLinkAdultLeftLegLimb": "dbd010b5aa5ed2b6649f23e0678d4d7c1a7b81e48c0b8e963cf3880fa8144b36",
+    "objects/object_link_boy/gLinkAdultLeftLegFarDL": "91e6fe8c8c7ed6ca6072ff316e509e4fc166be36c25b4eaf3476c904de5a128e",
+    "objects/object_link_boy/gLinkAdultLeftLegNearDL": "d8b1eda2dfcd1eadb0c5bc1de5626b35437f4818e2948bf6dc316b255fb74453",
+    "objects/object_link_boy/gLinkAdultLeftFootLimb": "de2e52cb81f849a9ed71238915696ce8a3d900ab5f99073cb67e81239713ba37",
+    "objects/object_link_boy/gLinkAdultLeftFootFarDL": "b6e6b376b74332b59932cf1045f2d51f9aaf82b4f095985553e7a4a94fdad5c1",
+    "objects/object_link_boy/gLinkAdultLeftFootNearDL": "f769f5706a84422743b665cfc4d86dade2219641fc2c18b8b43886a3d3d966b6",
+    "objects/object_link_boy/gLinkAdultUpperControlLimb": "8fbe920e56c7ff0f4eea333972bf7260764c90eba8c11120f93857e4404cb615",
+    "objects/object_link_boy/gLinkAdultHeadLimb": "00d65e16ec395b06716d8827320a7678505ce40dede8d2877384c0ca06dead76",
+    "objects/object_link_boy/gLinkAdultHeadFarDL": "e3f36b0cd1786f33ce37a4ce5b46fdb6d2983da29e1dbcebb00b0c961cb14e9a",
+    "objects/object_link_boy/gLinkAdultHeadNearDL": "df3e29226be3f455df38f353c329de52d5efbec2c1f1b6bc48f978b1c59682f2",
+    "objects/object_link_boy/gLinkAdultHatLimb": "4fe13460b8ef60788199352ad8bb024c804f0ad0bbaa72249305dab4eea87e81",
+    "objects/object_link_boy/gLinkAdultHatFarDL": "a8f534b81f6cbd112fb4950698f9b92e3ee407327c5936f4377597f8ed4486a7",
+    "objects/object_link_boy/gLinkAdultHatNearDL": "3b407e1f0cb494a7f2a10ca64ec961a79c0dbbe90ad42cc9a7783181c3821869",
+    "objects/object_link_boy/gLinkAdultCollarLimb": "4818b7ebec3af7908c617366a22ce8f539880a4c756c5f502d8bd8538978aef3",
+    "objects/object_link_boy/gLinkAdultCollarFarDL": "ce284ee14a27f6e0748908f44aa7829ae06a1761d437b478e23367739d4e18ed",
+    "objects/object_link_boy/gLinkAdultCollarNearDL": "ec24032de4a28bbff21dde6de22fdbb3b6fca6765531c6799fb434aa0c60614f",
+    "objects/object_link_boy/gLinkAdultLeftShoulderLimb": "0592f6e1ae80019abd28799556d814e16022335448acfe836f58ccd2c42a0416",
+    "objects/object_link_boy/gLinkAdultLeftShoulderFarDL": "5ecbb1e6226619be8f1364fce8d80ed33d4d42d29da534d072374999caf98f1a",
+    "objects/object_link_boy/gLinkAdultLeftShoulderNearDL": "8a1c81127a024eade7155611153399afde7cb6c425e3a5d3d372671911263e33",
+    "objects/object_link_boy/gLinkAdultLeftArmLimb": "9bc02f00dbb07e6b4c61ef72a968c83c604b214cb60977a897a5cb9b9c5a8bbe",
+    "objects/object_link_boy/gLinkAdultLeftArmFarDL": "37c59a107dab2bd4f31fa206e53a583449ea4ab00ab535ed5c9687deeb6dd2f6",
+    "objects/object_link_boy/gLinkAdultLeftArmNearDL": "0d0599566ce78775d785e81bb8f511dcbf1e4fa67b08aed084f2dca85ba34ff1",
+    "objects/object_link_boy/gLinkAdultLeftHandLimb": "aa51b45e75dc1eec0dd0e74cb600a5248026d9573ca2a3def015a5f49d625c2c",
+    "objects/object_link_boy/gLinkAdultLeftHandFarDL": "04dc0e47ec54aa329e8cce0e538325a473dc5b99353519f8e5cda4b5a248af91",
+    "objects/object_link_boy/gLinkAdultLeftHandNearDL": "f558622dc748c88e5e993b611c20d1bb45f871c9bab7e590c1df241ab5d87cf5",
+    "objects/object_link_boy/gLinkAdultRightShoulderLimb": "f9f65d04c32a3a8e21a339107b5aa89e1be55bcad2629c130a4ddc242d2eaa3d",
+    "objects/object_link_boy/gLinkAdultRightShoulderFarDL": "07f922c426952e80c7e0f9142ee7b2004d881b450b2ef4affb742993fcc8466e",
+    "objects/object_link_boy/gLinkAdultRightShoulderNearDL": "5652d909b9452cba0e40933696f95f572e406a40352e2d12d972d264a2716434",
+    "objects/object_link_boy/gLinkAdultRightArmLimb": "1788ecf25ab7257d3ec781e3eb7bed92697f1b3b744cb5cfe7ff7ccc7c8cc462",
+    "objects/object_link_boy/gLinkAdultRightArmFarDL": "dbac8cbc9e4108a8a3161f20a9cea3e2be6b97ed1f4733390a86aabf6fdc0045",
+    "objects/object_link_boy/gLinkAdultRightArmNearDL": "857201e43e551bcaaaeacf4e2343d95ed4174da7d1e8226be3f10f697913aeff",
+    "objects/object_link_boy/gLinkAdultRightHandLimb": "7b4db0f524655ac6f438937ac083a2b5af3abc02b0f53959ba41ff7e0630f786",
+    "objects/object_link_boy/gLinkAdultRightHandFarDL": "201f386d241a29e47c0569f5cb2f59a6b90f994fc329d18e80c8e0bb035ab2eb",
+    "objects/object_link_boy/gLinkAdultRightHandNearDL": "6d1a6a716b867101e33ea6ff811c6a3f496bc01411c408afa8190590cc1d9ceb",
+    "objects/object_link_boy/gLinkAdultSwordAndSheathLimb": "1824ec5306e28fc96e6705f52efcbba529569ff6b59471f4898f85363c25533f",
+    "objects/object_link_boy/gLinkAdultMasterSwordAndSheathFarDL": "90ae963b6724276fd76bcc40a59a4ed1e66f5259d164727596d892dcd4baa770",
+    "objects/object_link_boy/gLinkAdultMasterSwordAndSheathNearDL": "49a4d2e82c7f0a35e58541663909abb1a6e63ddee4759bbd9996138353397f61",
+    "objects/object_link_boy/gLinkTorsoLimb": "7c256f815b5c8b2ea794b5058317d7cd13fd1cce0ab3752c13007dbf937e0662",
+    "objects/object_link_boy/gLinkAdultTorsoFarDL": "deea37b44cb876503a1b48f7d14b5d3596db6bec8b3d1699576e031d1180ded2",
+    "objects/object_link_boy/gLinkAdultTorsoNearDL": "7a633d3a688795f9864ec56dfa370fef0e22a5a34a0a8c2d531723ff04833096",
+    "objects/object_link_boy/gLinkAdultLeftHandClosedNearDL": "c669eca2833451997dca9df89f6131bfd3e24daab488d66b925fa01569f1676d",
+    "objects/object_link_boy/gLinkAdultLeftHandHoldingMasterSwordNearDL": "e370a0eb81184275d1d08102b27430ca4ecf01faa8c826e65afa843ec99a7d45",
+    "objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL": "9c5b38802d346f9fa12d20bf47723abe880b799ae93209e9cc6d0fe45ade6869",
+    "objects/object_link_boy/gLinkAdultRightHandClosedNearDL": "273cef4c8e2349d82c6991392001a640674d36b7a79509b30f0df8ce59bf1ef0",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingHylianShieldNearDL": "a070a7b2df38b24401207ca60fb35e4d02b75289b3cc0c9855304dd798d25f78",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingBowNearDL": "6cde6622ded5ed6e10a38f43757eebb2702c77cfa15a9a7cfb8f2aa8a4d992a2",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingOotNearDL": "6a43560c26fc4ba80245ff8a0d333bf26f7a3ccfd8909856eb6b58f64fe37a1f",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingHookshotNearDL": "ca62a994f1b9f7b96b60eac89f999502d5224e4561f3eabe75a9add3e16104d2",
+    "objects/object_link_boy/gLinkAdultSheathNearDL": "6efa4dd1db107c5822d68f2b0d4a45d28409df83f44a7a00f0b9e6a585506ae4",
+    "objects/object_link_boy/gLinkAdultHylianShieldAndSheathNearDL": "ca68acc879048b00f168940e53ab5fa43758e7130d03d9bd337b593bfe907eaf",
+    "objects/object_link_boy/gLinkAdultHylianShieldSwordAndSheathNearDL": "fd33edf83528d0e449f0a15c5a38e1cdbfcff1927e6fae811050e553b083cb02",
+    "objects/object_link_boy/gLinkAdultRightHandHoldingMirrorShieldNearDL": "45b93b510feaea888ed4e47c6b1dd8dd2c292962608fee8a46edd963ba0eab8a",
+    "objects/object_link_boy/gLinkAdultMirrorShieldAndSheathNearDL": "3414b742a4b01887305f0476ec01f56d9fe2a09b35c96954948a1efcf304c77d",
+    "objects/object_link_boy/gLinkAdultMirrorShieldSwordAndSheathNearDL": "2ba785a072e51b1e81e3a89c7751179a3f5a3d51ba7e366f7d218f1bf69c2477",
+    "objects/object_link_boy/gLinkAdultSkel": "2891fa910384efc8a2bc86992d1df00bc207d47c00bf3e68dbc14fe7371f155d"
+  }
+}

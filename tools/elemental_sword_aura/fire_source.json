@@ -1,0 +1,160 @@
+{
+  "archive_sha256": "5f7972b03e494aa3c309860dc2e91d85ab3bbe18c61244c06d063f8205e27306",
+  "texture_size": [
+    64,
+    32
+  ],
+  "resample": "Pillow LANCZOS, existing I8 red channel",
+  "protected_artwork_regenerated": false,
+  "resources": {
+    "objects/din_fire_sword/poc1/CoreTex": {
+      "sha256": "144ad466daa6f9d649778c618b143b44ac4ede77999af5f775440e6c2d651cea",
+      "fallback_sha256": "8436490d7ab5d0b0e25cb4caf118178cbc02d07dbb58870c8fff32bb07400e7d"
+    },
+    "objects/din_fire_sword/poc1/FlameTex": {
+      "sha256": "b867ebf55488a3397ead8a604c2add7bfef16a7132674fa597d362a008498fac",
+      "fallback_sha256": "da3c134d7836ad4ad7603ae586de8394c64860cca4e1cf19c696be61bbbbf634"
+    },
+    "objects/din_fire_sword/poc1/adult/CoreVertices": {
+      "sha256": "1749f1ced001630d4346abe7aeec96368ace56deb5ff4d57afe2311abb683e72"
+    },
+    "objects/din_fire_sword/poc1/adult/FlameVertices": {
+      "sha256": "094eba98eac0a3b81282f84e28d4f2384dbe9967a9a08b05fee2a3ca697cf20c"
+    },
+    "objects/din_fire_sword/poc1/child/CoreVertices": {
+      "sha256": "782503d2421728b43b5c445d71211c27df4ad20eef3e86b93ea3bf785d9449be"
+    },
+    "objects/din_fire_sword/poc1/child/FlameVertices": {
+      "sha256": "dbc1b15acf6c0f3e02568071a6157ce7849f1c7c089882053b7e6fd5f0ba3b2d"
+    },
+    "objects/din_fire_sword/poc1/bgs/CoreVertices": {
+      "sha256": "14bcd573d8f3f7ee728522471f73d73ede5cdf2270ded67c4a27ebdbd4ec6255"
+    },
+    "objects/din_fire_sword/poc1/bgs/FlameVertices": {
+      "sha256": "ba10ed010082cb651a1bd197a28277c0f96084237edddac4f6a61cbefe1cf2eb"
+    },
+    "objects/din_fire_sword/poc1/broken/CoreVertices": {
+      "sha256": "3de268ba84071cdbe677c220bbe02a6f19e048b843ff6cfee69bc13d33729eda"
+    },
+    "objects/din_fire_sword/poc1/broken/FlameVertices": {
+      "sha256": "fc1bb6096bb4eed0bc5180496a1c1228aa7f1d724dcfa874c806822ee009fb9e"
+    }
+  },
+  "original_artwork": {
+    "core": {
+      "file": "Core_Source.png",
+      "sha256": "86b3f2176971051a5cad1a3ccf66f45bd1b4d1d3491b25374cc73453cfec2eed"
+    },
+    "flame": {
+      "file": "Rim_Source.png",
+      "sha256": "c9a189d8998de36e57af0299b83027a03cbf8606e4ebc79e4c5cd1e961da44a2"
+    }
+  },
+  "layer_records_sha256": "73d41a984841f69bf118a931105dda3ccc4b1010efc76bf3e6461d3d6935483c",
+  "equipment_aliases": {
+    "adult": {
+      "resource": "alt/objects/object_custom_equip/gCustomMasterSwordDL",
+      "sha256": "b451edc184a657b6229ccb684a0c6abbda6c2ac1184c68c53b10b01b3f5b79f7",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          1085583804,
+          4016665320
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          3105501194,
+          4116633154
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "child": {
+      "resource": "alt/objects/object_custom_equip/gCustomKokiriSwordDL",
+      "sha256": "bfa77022419dd1aad4f88ca678d2bab1a97f77d5f65426864f04b94db478969b",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          2871616777,
+          4255860468
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          351367670,
+          2771146875
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "bgs": {
+      "resource": "alt/objects/object_custom_equip/gCustomLongswordDL",
+      "sha256": "cbc9b9d956bb77bd4cb1b7549278717ea59e39eadeeba685fec5f48d31279e0b",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          1312474620,
+          3518880364
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          1927456901,
+          283004960
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "broken": {
+      "resource": "alt/objects/object_custom_equip/gCustomBrokenLongswordDL",
+      "sha256": "9b385ae639a6d4189e0ce3e213a51629bccc51e0f0b0323cfd09306eac25467a",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          3636732725,
+          3568784822
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          1033839945,
+          3982328716
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    }
+  }
+}

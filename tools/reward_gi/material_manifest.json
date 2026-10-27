@@ -1,0 +1,481 @@
+{
+  "candidate": "Reward GI Energy 4K POC1",
+  "base_commit": "56c83a878562052ca873b7d414f7d0e1175b6325",
+  "generator": "tools/reward_gi/build_textures.py",
+  "generator_sha256": "de06105f2ed1f705159d364944e16f17ebacd265258bad7479a69caad44f871a",
+  "generator_dependencies": {
+    "numpy": "2.3.5",
+    "Pillow": "12.3.0"
+  },
+  "construction": "Deterministic analytic periodic fields; no random noise, baked emblems, or geometry.",
+  "physical_dimensions": [
+    4096,
+    4096
+  ],
+  "logical_tile_dimensions": [
+    32,
+    32
+  ],
+  "scroll_step_logical_texels": 0.25,
+  "scroll_step_physical_texels": 32.0,
+  "resource_format": "64-byte OTR header, V1 <4I2fI> texture metadata, row-major RGBA bytes",
+  "resource_scope": [
+    "objects/nei_reward_gi/forest",
+    "objects/nei_reward_gi/fire",
+    "objects/nei_reward_gi/water",
+    "objects/nei_reward_gi/spirit",
+    "objects/nei_reward_gi/shadow",
+    "objects/nei_reward_gi/light",
+    "objects/nei_reward_gi/metal"
+  ],
+  "verification_scope": "Texture art, binary format, archive contents and periodicity only; runtime is untested.",
+  "entries": {
+    "forest": {
+      "target": "objects/nei_reward_gi/forest",
+      "description": "Soft flowing currents; shared with Kokiri Emerald.",
+      "pixels": [
+        4096,
+        4096
+      ],
+      "logical_tile": [
+        32,
+        32
+      ],
+      "texture_type": "RGBA32bpp",
+      "type_value": 1,
+      "flags": 3,
+      "flags_names": [
+        "LOAD_AS_RAW",
+        "LOAD_AS_IMG"
+      ],
+      "h_byte_scale": 1.0,
+      "v_pixel_scale": 1.0,
+      "header_bytes": 64,
+      "metadata_bytes": 28,
+      "payload_bytes": 67108864,
+      "resource_bytes": 67108956,
+      "pixel_sha256": "2f7d1fcf4470d3d8dd9f089c9bd96de7b1011741154212077573221230d0c455",
+      "resource_sha256": "4a38a7e3c9b06b29dcb710447410438458f452a8be0a9c2c8fa9017ecdfe6722",
+      "tint_hex": "#54D85B",
+      "channel_min": 0,
+      "channel_max": 163,
+      "channel_mean": 27.91241353750229,
+      "periodicity": {
+        "analytic_x_translation_max_error": 3.9968028886505635e-15,
+        "analytic_y_translation_max_error": 4.274358644806853e-15,
+        "first_derivative_translation_max_error": 3.7192471324942744e-10,
+        "period_texels_physical": [
+          4096,
+          4096
+        ],
+        "period_texels_logical": [
+          32,
+          32
+        ]
+      },
+      "wrap_adjacent_max_difference": [
+        1,
+        1
+      ],
+      "interior_adjacent_max_difference": [
+        1,
+        2
+      ],
+      "alpha_zero_fraction": 0.15253514051437378,
+      "alpha_below_24_fraction": 0.5901194214820862,
+      "alpha_at_least_192_fraction": 0.0,
+      "rgb": "constant white; exact tint supplied at draw"
+    },
+    "fire": {
+      "target": "objects/nei_reward_gi/fire",
+      "description": "Rising flame and ember filaments; shared with Goron Ruby.",
+      "pixels": [
+        4096,
+        4096
+      ],
+      "logical_tile": [
+        32,
+        32
+      ],
+      "texture_type": "RGBA32bpp",
+      "type_value": 1,
+      "flags": 3,
+      "flags_names": [
+        "LOAD_AS_RAW",
+        "LOAD_AS_IMG"
+      ],
+      "h_byte_scale": 1.0,
+      "v_pixel_scale": 1.0,
+      "header_bytes": 64,
+      "metadata_bytes": 28,
+      "payload_bytes": 67108864,
+      "resource_bytes": 67108956,
+      "pixel_sha256": "7f16097d99cb8f0f25ae7c04851d9d282a86023cf061ea1c903c0d137b7f0370",
+      "resource_sha256": "fcd4fc5949e4d679e8db89c7043bf1ce514e7e089557552dd3255e970c56a611",
+      "tint_hex": "#FF593C",
+      "channel_min": 0,
+      "channel_max": 159,
+      "channel_mean": 20.798406898975372,
+      "periodicity": {
+        "analytic_x_translation_max_error": 6.8833827526759706e-15,
+        "analytic_y_translation_max_error": 3.6637359812630166e-15,
+        "first_derivative_translation_max_error": 1.0103029524088925e-09,
+        "period_texels_physical": [
+          4096,
+          4096
+        ],
+        "period_texels_logical": [
+          32,
+          32
+        ]
+      },
+      "wrap_adjacent_max_difference": [
+        1,
+        1
+      ],
+      "interior_adjacent_max_difference": [
+        2,
+        2
+      ],
+      "alpha_zero_fraction": 0.26964735984802246,
+      "alpha_below_24_fraction": 0.6808772087097168,
+      "alpha_at_least_192_fraction": 0.0,
+      "rgb": "constant white; exact tint supplied at draw"
+    },
+    "water": {
+      "target": "objects/nei_reward_gi/water",
+      "description": "Soft caustic network; shared with Zora Sapphire.",
+      "pixels": [
+        4096,
+        4096
+      ],
+      "logical_tile": [
+        32,
+        32
+      ],
+      "texture_type": "RGBA32bpp",
+      "type_value": 1,
+      "flags": 3,
+      "flags_names": [
+        "LOAD_AS_RAW",
+        "LOAD_AS_IMG"
+      ],
+      "h_byte_scale": 1.0,
+      "v_pixel_scale": 1.0,
+      "header_bytes": 64,
+      "metadata_bytes": 28,
+      "payload_bytes": 67108864,
+      "resource_bytes": 67108956,
+      "pixel_sha256": "b719ed651f649e45d6ab218f19d6dbfea6ccb2378124cf91479133016e370974",
+      "resource_sha256": "59e744ef808e5d66481a4a66cd3c500609a3befafbb04672b8c7a9f00acbe097",
+      "tint_hex": "#459DFF",
+      "channel_min": 0,
+      "channel_max": 157,
+      "channel_mean": 18.561435282230377,
+      "periodicity": {
+        "analytic_x_translation_max_error": 2.248201624865942e-14,
+        "analytic_y_translation_max_error": 2.0483614804334138e-14,
+        "first_derivative_translation_max_error": 2.0122783439546765e-09,
+        "period_texels_physical": [
+          4096,
+          4096
+        ],
+        "period_texels_logical": [
+          32,
+          32
+        ]
+      },
+      "wrap_adjacent_max_difference": [
+        4,
+        3
+      ],
+      "interior_adjacent_max_difference": [
+        4,
+        4
+      ],
+      "alpha_zero_fraction": 0.3422781825065613,
+      "alpha_below_24_fraction": 0.7843433022499084,
+      "alpha_at_least_192_fraction": 0.0,
+      "rgb": "constant white; exact tint supplied at draw"
+    },
+    "spirit": {
+      "target": "objects/nei_reward_gi/spirit",
+      "description": "Spiraling flowing wisps.",
+      "pixels": [
+        4096,
+        4096
+      ],
+      "logical_tile": [
+        32,
+        32
+      ],
+      "texture_type": "RGBA32bpp",
+      "type_value": 1,
+      "flags": 3,
+      "flags_names": [
+        "LOAD_AS_RAW",
+        "LOAD_AS_IMG"
+      ],
+      "h_byte_scale": 1.0,
+      "v_pixel_scale": 1.0,
+      "header_bytes": 64,
+      "metadata_bytes": 28,
+      "payload_bytes": 67108864,
+      "resource_bytes": 67108956,
+      "pixel_sha256": "6b7c2c70f48853246c9e32c235f02846cc94e2b7bd4aac16992709448306acf5",
+      "resource_sha256": "c779091f8f0bb384867726319162cffcdb4072ddeac374c1537739ace8cfb9fe",
+      "tint_hex": "#FFA64D",
+      "channel_min": 0,
+      "channel_max": 167,
+      "channel_mean": 27.8072389960289,
+      "periodicity": {
+        "analytic_x_translation_max_error": 6.994405055138486e-15,
+        "analytic_y_translation_max_error": 4.773959005888173e-15,
+        "first_derivative_translation_max_error": 5.190301521906804e-10,
+        "period_texels_physical": [
+          4096,
+          4096
+        ],
+        "period_texels_logical": [
+          32,
+          32
+        ]
+      },
+      "wrap_adjacent_max_difference": [
+        1,
+        2
+      ],
+      "interior_adjacent_max_difference": [
+        2,
+        2
+      ],
+      "alpha_zero_fraction": 0.12897533178329468,
+      "alpha_below_24_fraction": 0.6062334179878235,
+      "alpha_at_least_192_fraction": 0.0,
+      "rgb": "constant white; exact tint supplied at draw"
+    },
+    "shadow": {
+      "target": "objects/nei_reward_gi/shadow",
+      "description": "Diffuse smoky wisps.",
+      "pixels": [
+        4096,
+        4096
+      ],
+      "logical_tile": [
+        32,
+        32
+      ],
+      "texture_type": "RGBA32bpp",
+      "type_value": 1,
+      "flags": 3,
+      "flags_names": [
+        "LOAD_AS_RAW",
+        "LOAD_AS_IMG"
+      ],
+      "h_byte_scale": 1.0,
+      "v_pixel_scale": 1.0,
+      "header_bytes": 64,
+      "metadata_bytes": 28,
+      "payload_bytes": 67108864,
+      "resource_bytes": 67108956,
+      "pixel_sha256": "bd43d70457dc257bc96bbed6867c3cf4c2ebba8d0c11480355384e3c8f0183d7",
+      "resource_sha256": "1c2fb7b31fd01c94be14f5b644a45677c98b19eb1f8e1e9c31ed1f0ba87f3691",
+      "tint_hex": "#A675EB",
+      "channel_min": 0,
+      "channel_max": 151,
+      "channel_mean": 21.166232407093048,
+      "periodicity": {
+        "analytic_x_translation_max_error": 5.329070518200751e-15,
+        "analytic_y_translation_max_error": 4.884981308350689e-15,
+        "first_derivative_translation_max_error": 3.608224830031759e-10,
+        "period_texels_physical": [
+          4096,
+          4096
+        ],
+        "period_texels_logical": [
+          32,
+          32
+        ]
+      },
+      "wrap_adjacent_max_difference": [
+        1,
+        1
+      ],
+      "interior_adjacent_max_difference": [
+        1,
+        1
+      ],
+      "alpha_zero_fraction": 0.24991852045059204,
+      "alpha_below_24_fraction": 0.7233227491378784,
+      "alpha_at_least_192_fraction": 0.0,
+      "rgb": "constant white; exact tint supplied at draw"
+    },
+    "light": {
+      "target": "objects/nei_reward_gi/light",
+      "description": "Luminous radial and ripple currents.",
+      "pixels": [
+        4096,
+        4096
+      ],
+      "logical_tile": [
+        32,
+        32
+      ],
+      "texture_type": "RGBA32bpp",
+      "type_value": 1,
+      "flags": 3,
+      "flags_names": [
+        "LOAD_AS_RAW",
+        "LOAD_AS_IMG"
+      ],
+      "h_byte_scale": 1.0,
+      "v_pixel_scale": 1.0,
+      "header_bytes": 64,
+      "metadata_bytes": 28,
+      "payload_bytes": 67108864,
+      "resource_bytes": 67108956,
+      "pixel_sha256": "bf0b2b57d782078acc7013ab301ef82aee4ac3e75e5d0e228a49d1f52ef7ec1a",
+      "resource_sha256": "9163114c8f3f74a67ea670b513fea2ed93ae3b87d1b0fd628a20524c33ceaa81",
+      "tint_hex": "#FFE58A",
+      "channel_min": 0,
+      "channel_max": 154,
+      "channel_mean": 19.390671491622925,
+      "periodicity": {
+        "analytic_x_translation_max_error": 5.329070518200751e-15,
+        "analytic_y_translation_max_error": 3.469446951953614e-15,
+        "first_derivative_translation_max_error": 3.830287198525184e-10,
+        "period_texels_physical": [
+          4096,
+          4096
+        ],
+        "period_texels_logical": [
+          32,
+          32
+        ]
+      },
+      "wrap_adjacent_max_difference": [
+        1,
+        1
+      ],
+      "interior_adjacent_max_difference": [
+        2,
+        2
+      ],
+      "alpha_zero_fraction": 0.15072482824325562,
+      "alpha_below_24_fraction": 0.7433717250823975,
+      "alpha_at_least_192_fraction": 0.0,
+      "rgb": "constant white; exact tint supplied at draw"
+    },
+    "metal": {
+      "target": "objects/nei_reward_gi/metal",
+      "description": "Restrained neutral directional brushing; no baked symbols.",
+      "pixels": [
+        4096,
+        4096
+      ],
+      "logical_tile": [
+        32,
+        32
+      ],
+      "texture_type": "RGBA32bpp",
+      "type_value": 1,
+      "flags": 3,
+      "flags_names": [
+        "LOAD_AS_RAW",
+        "LOAD_AS_IMG"
+      ],
+      "h_byte_scale": 1.0,
+      "v_pixel_scale": 1.0,
+      "header_bytes": 64,
+      "metadata_bytes": 28,
+      "payload_bytes": 67108864,
+      "resource_bytes": 67108956,
+      "pixel_sha256": "11d211f455b8c7cb7ebf0ae21555ed55f635a33e57dd87614ff3e7d5a614bb09",
+      "resource_sha256": "45ff38ed4481224a594870029645c616aa71319725e36888e60900e39fa1f78f",
+      "tint_hex": null,
+      "channel_min": 210,
+      "channel_max": 232,
+      "channel_mean": 220.99989366531372,
+      "periodicity": {
+        "analytic_x_translation_max_error": 1.7053025658242404e-13,
+        "analytic_y_translation_max_error": 9.947598300641403e-13,
+        "first_derivative_translation_max_error": 7.247535904753022e-08,
+        "period_texels_physical": [
+          4096,
+          4096
+        ],
+        "period_texels_logical": [
+          32,
+          32
+        ]
+      },
+      "wrap_adjacent_max_difference": [
+        1,
+        2
+      ],
+      "interior_adjacent_max_difference": [
+        1,
+        2
+      ],
+      "alpha": "constant opaque 255",
+      "rgb": "neutral equal-channel brushed metal"
+    }
+  },
+  "pack": {
+    "filename": "Reward_GI_Energy_4K_POC1_Assets.o2r",
+    "sha256": "152e4edb9f6c66f4397dfbec62e02f0c698f4db21f1d96edf0584799f67eed56",
+    "bytes": 13645773,
+    "entry_count": 7,
+    "compression": "ZIP DEFLATE",
+    "closed_scope_verified": true
+  },
+  "previews": {
+    "reward_gi_4k_contact_sheet.png": {
+      "sha256": "5e5b0dff13a9b2ca329ab9d946043004ddc9b550af1cd0cbf108b3e011cc2306",
+      "bytes": 467114
+    },
+    "reward_gi_4k_periodic_wrap.png": {
+      "sha256": "be4a92e2d153b5bdce70270cd17524fcd5ded3b7595b43927bfe403b829cf037",
+      "bytes": 324469
+    },
+    "reward_gi_4k_scrolling_poster.png": {
+      "sha256": "8a733a62f4bf04139ef074238c04cdeba28ccfe4358ee22c4088bf6a87ff3f32",
+      "bytes": 234750
+    },
+    "reward_gi_4k_scrolling_preview.gif": {
+      "sha256": "a3c58045bff2174a64f2b88bdf8374def4838776b5af516a5b4b09a498a4b5a9",
+      "bytes": 8021923
+    },
+    "reward_gi_4k_scrolling_preview.mp4": {
+      "sha256": "365781888876e174da125f8b957fd0e2a8b01d2ddf0cb0066d9cb45e44d48c5f",
+      "bytes": 176793
+    }
+  },
+  "preview_scroll": {
+    "frame_count": 64,
+    "gif_loop": "infinite",
+    "sample_every_quarter_steps": 2,
+    "quarter_steps_per_cycle": 128,
+    "cycle_translation_logical_texels": [
+      32,
+      -32
+    ],
+    "end_to_start_periodic": true,
+    "proof": "texture preview only"
+  },
+  "tint_status": "candidate",
+  "stone_materials": {
+    "emerald": {
+      "mask": "objects/nei_reward_gi/forest",
+      "tint_hex": "#46E879"
+    },
+    "ruby": {
+      "mask": "objects/nei_reward_gi/fire",
+      "tint_hex": "#FF4564"
+    },
+    "sapphire": {
+      "mask": "objects/nei_reward_gi/water",
+      "tint_hex": "#459DFF"
+    }
+  }
+}

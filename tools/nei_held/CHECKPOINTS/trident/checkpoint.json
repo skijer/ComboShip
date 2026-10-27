@@ -1,0 +1,43 @@
+{
+  "resource_count": 11,
+  "vertex_records": 2747,
+  "vertex_loads": 98,
+  "slug": "trident",
+  "name": "Trident / gameplay trident",
+  "entry": "objects/nei_held_redesign/trident/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 4.8723602294921875,
+  "triangles": 2626,
+  "bounds_author": [
+    [
+      -22.0,
+      -5.5,
+      -16.6875
+    ],
+    [
+      22.0,
+      5.5,
+      109.3125
+    ]
+  ],
+  "markers": {
+    "grip_native": [
+      0,
+      0,
+      2049.5
+    ],
+    "tip_native": [
+      0,
+      0,
+      8520
+    ],
+    "legacy_envelope_z": [
+      -5550,
+      8520
+    ]
+  },
+  "notes": [
+    "GI lean removed; authored grip is seated at original lance hand Z=2049.5, spear tips at legacy Z=8520. Original hand, trail and collision matrices retained."
+  ],
+  "runtime_tested": false
+}

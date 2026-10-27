@@ -5,6 +5,7 @@
  */
 
 #include "z_en_slime.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 
 #include "2s2h/Enhancements/FrameInterpolation/FrameInterpolation.h"
@@ -1032,7 +1033,7 @@ void EnSlime_UpdateDamage(EnSlime* this, PlayState* play) {
         this->collider.base.acFlags &= ~AC_HIT;
 
         if ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-            !(this->collider.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            !(DinFireSword_OriginalDamageFlags(play, this->collider.elem.acHitElem) & 0xDB0B3)) {
 
             EnSlime_Thaw(this, play);
             if ((this->actor.params == EN_SLIME_TYPE_BLUE) &&

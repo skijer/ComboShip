@@ -2,7 +2,8 @@
 #include "objects/object_okuta/object_okuta.h"
 #include "objects/gameplay_field_keep/gameplay_field_keep.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
+#include "soh/Enhancements/Items/MmIceArrows.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE)
 
@@ -20,6 +21,7 @@ void EnOkuta_Shoot(EnOkuta* this, PlayState* play);
 void EnOkuta_WaitToDie(EnOkuta* this, PlayState* play);
 void EnOkuta_Die(EnOkuta* this, PlayState* play);
 void EnOkuta_Freeze(EnOkuta* this, PlayState* play);
+void EnOkuta_FrozenInIceBlock(EnOkuta* this, PlayState* play);
 void EnOkuta_ProjectileFly(EnOkuta* this, PlayState* play);
 
 const ActorInit En_Okuta_InitVars = {
@@ -164,11 +166,12 @@ void EnOkuta_Init(Actor* thisx, PlayState* play) {
 void EnOkuta_Destroy(Actor* thisx, PlayState* play) {
     EnOkuta* this = (EnOkuta*)thisx;
 
-    Collider_DestroyCylinder(play, &this->collider);
-
-    if (thisx->params == 0) {
-        ResourceMgr_UnregisterSkeleton(&this->skelAnime);
+    if ((this->actionFunc == EnOkuta_FrozenInIceBlock) && (thisx->child != NULL) && (thisx->child->parent == thisx)) {
+        Actor_Kill(thisx->child);
+        thisx->child->parent = NULL;
+        thisx->child = NULL;
     }
+    Collider_DestroyCylinder(play, &this->collider);
 }
 
 void EnOkuta_SpawnBubbles(EnOkuta* this, PlayState* play) {
@@ -475,6 +478,27 @@ void EnOkuta_Freeze(EnOkuta* this, PlayState* play) {
     Math_ApproachF(&this->actor.world.pos.y, this->actor.home.pos.y, 0.5f, 5.0f);
 }
 
+void EnOkuta_FrozenInIceBlock(EnOkuta* this, PlayState* play) {
+    Actor* child = this->actor.child;
+
+    this->actor.colorFilterTimer = 10;
+    if ((child != NULL) && (child->parent == &this->actor)) {
+        if ((child->update != NULL) && CVarGetInteger(CVAR_ENHANCEMENT("MmIceArrows"), 0)) {
+            return;
+        }
+        Actor_Kill(child);
+        child->parent = NULL;
+        this->actor.child = NULL;
+    }
+    if (Math_StepToF(&this->actor.world.pos.y, this->actor.home.pos.y, 10.0f)) {
+        const u32 restoredFlags = ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_ATTENTION_ENABLED;
+        this->actor.flags = (this->actor.flags & ~restoredFlags) | (u16)this->timer;
+        this->actor.colorFilterTimer = 0;
+        this->collider.base.acFlags = (this->collider.base.acFlags & ~AC_HIT) | AC_ON;
+        EnOkuta_SetupWaitToShoot(this);
+    }
+}
+
 void EnOkuta_ProjectileFly(EnOkuta* this, PlayState* play) {
     Vec3f pos;
     Player* player = GET_PLAYER(play);
@@ -610,6 +634,16 @@ void EnOkuta_ColliderCheck(EnOkuta* this, PlayState* play) {
         this->collider.base.acFlags &= ~AC_HIT;
         Actor_SetDropFlag(&this->actor, &this->collider.info, 1);
         if ((this->actor.colChkInfo.damageEffect != 0) || (this->actor.colChkInfo.damage != 0)) {
+            if (MmIceArrows_TryFreezeOctorok(play, this)) {
+                // timer is unused while encased; retain the two flags this state temporarily changes.
+                this->timer = this->actor.flags & (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_ATTENTION_ENABLED);
+                this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
+                this->actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
+                this->collider.base.acFlags &= ~(AC_ON | AC_HIT);
+                Actor_SetColorFilter(&this->actor, 0, 0xFF, 0, 10);
+                this->actionFunc = EnOkuta_FrozenInIceBlock;
+                return;
+            }
             Enemy_StartFinishingBlow(play, &this->actor);
             this->actor.colChkInfo.health = 0;
             this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
@@ -648,7 +682,9 @@ void EnOkuta_Update(Actor* thisx, PlayState* play2) {
         }
         this->actionFunc(this, play);
         if (this->actor.params == 0) {
-            EnOkuta_UpdateHeadScale(this);
+            if (this->actionFunc != EnOkuta_FrozenInIceBlock) {
+                EnOkuta_UpdateHeadScale(this);
+            }
             this->collider.dim.height =
                 (((sOctorockColliderInit.dim.height * this->headScale.y) - this->collider.dim.yShift) *
                  this->actor.scale.y * 100.0f);
@@ -682,7 +718,7 @@ void EnOkuta_Update(Actor* thisx, PlayState* play2) {
         }
         if (this->actionFunc != EnOkuta_WaitToAppear) {
             if ((this->actionFunc != EnOkuta_Die) && (this->actionFunc != EnOkuta_WaitToDie) &&
-                (this->actionFunc != EnOkuta_Freeze)) {
+                (this->actionFunc != EnOkuta_Freeze) && (this->actionFunc != EnOkuta_FrozenInIceBlock)) {
                 CollisionCheck_SetAC(play, &play->colChkCtx, &this->collider.base);
             }
             CollisionCheck_SetOC(play, &play->colChkCtx, &this->collider.base);

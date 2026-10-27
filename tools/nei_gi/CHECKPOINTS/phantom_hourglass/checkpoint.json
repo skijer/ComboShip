@@ -1,0 +1,26 @@
+{
+  "resource_count": 8,
+  "vertex_records": 1946,
+  "vertex_loads": 66,
+  "xlu_entry": "objects/nei_gi_redesign/phantom_hourglass/gi_xlu_dl",
+  "slug": "phantom_hourglass",
+  "name": "Phantom Hourglass",
+  "entry": "objects/nei_gi_redesign/phantom_hourglass/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 1880,
+  "bounds_author": [
+    [
+      -18.0,
+      -31.0,
+      -18.0
+    ],
+    [
+      18.0,
+      31.0,
+      18.0
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

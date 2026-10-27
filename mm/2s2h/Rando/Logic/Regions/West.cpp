@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
 #include "2s2h/ShipInit.hpp"
 
@@ -183,7 +184,7 @@ static RegisterShipInitFunc initFunc([]() {
     };
     Regions[RR_GREAT_BAY_COAST_MINIGAME_PLATFORMS] = RandoRegion{ .sceneId = SCENE_30GYOSON,
         .checks = {
-            CHECK(RC_GREAT_BAY_COAST_FISHERMAN_MINIGAME, RANDO_EVENTS[RE_CLEARED_GREAT_BAY_TEMPLE] && (HAS_ITEM(ITEM_HOOKSHOT)) && (BETWEEN(TIME_DAY1_AM_07_00, TIME_NIGHT1_AM_04_00) || BETWEEN(TIME_DAY2_AM_07_00, TIME_NIGHT2_AM_04_00) || BETWEEN(TIME_DAY3_AM_07_00, TIME_NIGHT3_AM_04_00))),
+            CHECK(RC_GREAT_BAY_COAST_FISHERMAN_MINIGAME, Combo_MM_CrossBossLogicalClear(10, RANDO_EVENTS[RE_CLEARED_GREAT_BAY_TEMPLE]) && (HAS_ITEM(ITEM_HOOKSHOT)) && (BETWEEN(TIME_DAY1_AM_07_00, TIME_NIGHT1_AM_04_00) || BETWEEN(TIME_DAY2_AM_07_00, TIME_NIGHT2_AM_04_00) || BETWEEN(TIME_DAY3_AM_07_00, TIME_NIGHT3_AM_04_00))),
             CHECK(RC_GREAT_BAY_COAST_TREE_01, true),
         },
         .connections = {
@@ -206,7 +207,7 @@ static RegisterShipInitFunc initFunc([]() {
         },
         .connections = {
             CONNECTION(RR_GREAT_BAY_COAST, CAN_USE_ABILITY(SWIM)),
-            CONNECTION(RR_GREAT_BAY_COAST_MINIGAME_PLATFORMS, RANDO_EVENTS[RE_CLEARED_GREAT_BAY_TEMPLE] && (HAS_ITEM(ITEM_HOOKSHOT))),
+            CONNECTION(RR_GREAT_BAY_COAST_MINIGAME_PLATFORMS, Combo_MM_CrossBossLogicalClear(10, RANDO_EVENTS[RE_CLEARED_GREAT_BAY_TEMPLE]) && (HAS_ITEM(ITEM_HOOKSHOT))),
         },
     };
     Regions[RR_GREAT_BAY_GREAT_FAIRY_FOUNTAIN] = RandoRegion{ .sceneId = SCENE_YOUSEI_IZUMI,
@@ -296,7 +297,7 @@ static RegisterShipInitFunc initFunc([]() {
             EXIT(ENTRANCE(GREAT_BAY_TEMPLE, 0),             ENTRANCE(ZORA_CAPE, 7), HAS_ITEM(ITEM_HOOKSHOT) && CanAccessDungeon(DUNGEON_SCENE_INDEX_GREAT_BAY_TEMPLE)),
         },
         .connections = {
-            CONNECTION(RR_ZORA_CAPE, CAN_BE_ZORA),
+            CONNECTION(RR_ZORA_CAPE, CAN_BE_ZORA && CAN_USE_ABILITY(SWIM)),
         },
         .oneWayEntrances = {
             ENTRANCE(ZORA_CAPE, 6), // From Song of Soaring
@@ -360,7 +361,7 @@ static RegisterShipInitFunc initFunc([]() {
             EXIT(ENTRANCE(WATERFALL_RAPIDS, 0),             ENTRANCE(ZORA_CAPE, 4), HAS_ITEM(ITEM_HOOKSHOT)),
         },
         .connections = {
-            CONNECTION(RR_ZORA_CAPE_BEFORE_GREAT_BAY_TEMPLE, CAN_BE_ZORA),
+            CONNECTION(RR_ZORA_CAPE_BEFORE_GREAT_BAY_TEMPLE, CAN_BE_ZORA && CAN_USE_ABILITY(SWIM)),
             CONNECTION(RR_ZORA_CAPE_OUTSIDE_FAIRY_FOUNTAIN, HAS_ITEM(ITEM_HOOKSHOT)),
         }
     };
@@ -410,7 +411,8 @@ static RegisterShipInitFunc initFunc([]() {
             CHECK(RC_ZORA_HALL_SCENE_LIGHTS, CAN_USE_MAGIC_ARROW(FIRE)),
         },
         .exits = { //     TO                                         FROM
-            EXIT(ENTRANCE(ZORA_CAPE, 1),                    ENTRANCE(ZORA_HALL, 0), true),           
+            EXIT(ENTRANCE(ZORA_CAPE, 1),                    ENTRANCE(ZORA_HALL, 0), true), // Front entrance
+            EXIT(ENTRANCE(ZORA_CAPE, 2),                    ENTRANCE(ZORA_HALL, 1), true), // Back entrance
             EXIT(ENTRANCE(ZORA_HALL_ROOMS, 5),              ENTRANCE(ZORA_HALL, 2), true), // To Shop
             EXIT(ENTRANCE(ZORA_HALL_ROOMS, 2),              ENTRANCE(ZORA_HALL, 3), CAN_BE_ZORA), // To Lulu's Room
             EXIT(ENTRANCE(ZORA_HALL_ROOMS, 3),              ENTRANCE(ZORA_HALL, 4), CAN_BE_ZORA), // To Evan's Room

@@ -199,9 +199,9 @@ void SkelAnime_DrawFlexLimbLod(PlayState* play, s32 limbIndex, void** skeleton, 
  * Limbs in a flexible skeleton have meshes that can stretch to line up with other limbs.
  * An array of matrices is dynamically allocated so each limb can access any transform to ensure its meshes line up.
  */
-void SkelAnime_DrawFlexLod(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
-                           OverrideLimbDrawFlex overrideLimbDraw, PostLimbDrawFlex postLimbDraw, Actor* actor,
-                           s32 lod) {
+static void SkelAnime_DrawFlexLodImpl(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                                      OverrideLimbDrawFlex overrideLimbDraw, PostLimbDrawFlex postLimbDraw,
+                                      Actor* actor, s32 lod, s32 bindXlu) {
     LodLimb* rootLimb;
     s32 pad;
     Gfx* newDList;
@@ -217,6 +217,11 @@ void SkelAnime_DrawFlexLod(PlayState* play, void** skeleton, Vec3s* jointTable, 
     OPEN_DISPS(play->state.gfxCtx);
 
     gSPSegment(POLY_OPA_DISP++, 0x0D, mtx);
+    if (bindXlu) {
+        // Deferred player equipment must use this skeleton's matrices, rather
+        // than inheriting the final actor's binding from the opaque pass.
+        gSPSegment(POLY_XLU_DISP++, 0x0D, mtx);
+    }
     Matrix_Push();
 
     rootLimb = Lib_SegmentedToVirtual(skeleton[0]);
@@ -255,6 +260,19 @@ void SkelAnime_DrawFlexLod(PlayState* play, void** skeleton, Vec3s* jointTable, 
     Matrix_Pop();
 
     CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void SkelAnime_DrawFlexLod(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                           OverrideLimbDrawFlex overrideLimbDraw, PostLimbDrawFlex postLimbDraw, Actor* actor,
+                           s32 lod) {
+    SkelAnime_DrawFlexLodImpl(play, skeleton, jointTable, dListCount, overrideLimbDraw, postLimbDraw, actor, lod,
+                              false);
+}
+
+void SkelAnime_DrawFlexLodWithXlu(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                                  OverrideLimbDrawFlex overrideLimbDraw, PostLimbDrawFlex postLimbDraw, Actor* actor,
+                                  s32 lod) {
+    SkelAnime_DrawFlexLodImpl(play, skeleton, jointTable, dListCount, overrideLimbDraw, postLimbDraw, actor, lod, true);
 }
 
 /*
@@ -418,8 +436,9 @@ void SkelAnime_DrawFlexLimbOpa(PlayState* play, s32 limbIndex, void** skeleton, 
  * Limbs in a flexible skeleton have meshes that can stretch to line up with other limbs.
  * An array of matrices is dynamically allocated so each limb can access any transform to ensure its meshes line up.
  */
-void SkelAnime_DrawFlexOpa(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
-                           OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, Actor* actor) {
+static void SkelAnime_DrawFlexOpaImpl(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                                      OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, Actor* actor,
+                                      s32 bindXlu) {
     StandardLimb* rootLimb;
     s32 pad;
     Gfx* newDList;
@@ -435,6 +454,9 @@ void SkelAnime_DrawFlexOpa(PlayState* play, void** skeleton, Vec3s* jointTable, 
     OPEN_DISPS(play->state.gfxCtx);
 
     gSPSegment(POLY_OPA_DISP++, 0x0D, mtx);
+    if (bindXlu) {
+        gSPSegment(POLY_XLU_DISP++, 0x0D, mtx);
+    }
 
     Matrix_Push();
 
@@ -477,6 +499,18 @@ void SkelAnime_DrawFlexOpa(PlayState* play, void** skeleton, Vec3s* jointTable, 
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
+
+void SkelAnime_DrawFlexOpa(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                           OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, Actor* actor) {
+    SkelAnime_DrawFlexOpaImpl(play, skeleton, jointTable, dListCount, overrideLimbDraw, postLimbDraw, actor, false);
+}
+
+#ifdef COMBO_BUILD
+void SkelAnime_DrawFlexOpaWithXlu(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                                  OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, Actor* actor) {
+    SkelAnime_DrawFlexOpaImpl(play, skeleton, jointTable, dListCount, overrideLimbDraw, postLimbDraw, actor, true);
+}
+#endif
 
 void SkelAnime_DrawTransformFlexLimbOpa(PlayState* play, s32 limbIndex, void** skeleton, Vec3s* jointTable,
                                         OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw,

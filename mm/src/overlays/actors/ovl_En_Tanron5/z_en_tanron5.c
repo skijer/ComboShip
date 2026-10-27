@@ -24,6 +24,7 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "objects/object_boss02/object_boss02.h"
 #include "overlays/actors/ovl_Boss_02/z_boss_02.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
@@ -528,7 +529,11 @@ void EnTanron5_RuinFragmentItemDrop_Update(Actor* thisx, PlayState* play2) {
         return;
     }
 
-    if (DECR(this->timer) == 0) {
+    if (CVarGetInteger("gCheats.DropsDontDie", 0) &&
+        (TWINMOLD_PROP_GET_TYPE(&this->actor) >= TWINMOLD_PROP_TYPE_ITEM_DROP_1)) {
+        // Both sprite and 3D draws blink below this threshold. Debris keeps its timer.
+        this->timer = MAX(this->timer, 51);
+    } else if (DECR(this->timer) == 0) {
         Actor_Kill(&this->actor);
     }
 

@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_en_rat.c
  * Overlay: ovl_En_Rat
@@ -812,6 +813,8 @@ void EnRat_Update(Actor* thisx, PlayState* play) {
                 this->damageReaction.stunTimer = 40;
             }
         } else {
+            DinFireSword_FinishConfirmedHit(play, &this->collider.base, this->collider.elem.acHitElem,
+                                            this->collider.elem.acDmgInfo.dmgFlags);
             EnRat_Explode(this, play);
             return;
         }

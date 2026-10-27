@@ -5,6 +5,8 @@
  */
 
 #include "z_en_floormas.h"
+#include "din_fire_sword.h"
+#include "2s2h/GameInteractor/GameInteractor.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_HOOKSHOT_PULLS_PLAYER)
@@ -692,8 +694,8 @@ void func_808D2040(EnFloormas* this, PlayState* play) {
         this->actor.speed = 0.0f;
         Actor_PlaySfx(&this->actor, NA_SE_EN_FLOORMASTER_SM_LAND);
         func_808D1740(this);
-    } else if ((this->actor.playerHeightRel < -10.0f) && (this->collider.base.ocFlags1 & OC1_HIT) &&
-               (&player->actor == this->collider.base.oc)) {
+    } else if (GameInteractor_Should(VB_ENEMY_GRAB_PLAYER, true, this) && (this->actor.playerHeightRel < -10.0f) &&
+               (this->collider.base.ocFlags1 & OC1_HIT) && (&player->actor == this->collider.base.oc)) {
         play->grabPlayer(play, player);
         func_808D217C(this, player);
     }
@@ -1003,7 +1005,7 @@ void func_808D2E34(EnFloormas* this, PlayState* play) {
         this->collider.base.acFlags &= ~AC_HIT;
         Actor_SetDropFlag(&this->actor, &this->collider.elem);
         if ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-            !(this->collider.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            !(DinFireSword_OriginalDamageFlags(play, this->collider.elem.acHitElem) & 0xDB0B3)) {
             if (this->actor.colChkInfo.damageEffect == 0xE) {
                 func_808D0908(this);
                 this->actor.colorFilterTimer = 0;

@@ -99,6 +99,10 @@ BEFORE `SOH_Deinit` (BenGui::Destroy dereferences the live Context), so soh's `D
 the LAST reference and `~Context` runs on the main thread. This is what fixed window-resize
 persistence.
 
+2Ship 5.0.1 added `Ship::Context::DestroyInstance()` to MM's `DeinitOTR`. It is skipped under
+`COMBO_BUILD`: MM must not destroy the shared Context, or soh's teardown runs on a dead one. After
+`MM_Deinit()` the Context is still alive; `SOH_Deinit()` is the only place that destroys it.
+
 **`soh/soh/OTRGlobals.cpp` + `mm/2s2h/BenPort.cpp` (`DeinitOTR`), `libultraship`
 (`CrossRMRegistry::Unregister`, new):** both resident ResourceManagers were pinned by the
 `sOOT/sMMResourceManager` statics and the `CrossRMRegistry` map, deferring their destruction to
@@ -372,6 +376,9 @@ play state at all, and it also fixes the pre-existing frozen-tracker complaint w
 It now returns `bool` so the caller only clears `recalculateAvailable` when the recalc really ran,
 instead of consuming and dropping the request.
 
+A reset or owl-save quit from MM now also fires OOT's `OnExitGame` in `SOH_ResumeGame`; see
+[tracker.md](tracker.md#tracker-teardown-on-reset--quit-to-title-2026-10-10).
+
 ## ComboShip-owned unified ROM extraction (OoT + MM) (2026-06-21)
 
 **Why:** ComboShip needs BOTH an OoT and an MM ROM. The old launcher extracted them headlessly
@@ -411,6 +418,11 @@ Verified: fast path (archives present) boots straight to title unchanged; first-
 extraction screen (`OoT=1 MM=1`). The old `SOH_Extract`/`MM_Extract` exports remain for non-combo use
 but the launcher no longer calls them.
 
+**RETIRED for soh 2026-09-28:** upstream's `CallTorch` returns real success (archive produced AND
+copied) and no longer stages assets in a tempdir or `chdir`s, so Extract.cpp is upstream's. Kept:
+`SOH_StartExtraction` writes `soh_extract_error.log` on failure, and a failed copy removes the partial
+archive. MM's `CallZapd` note below still applies.
+
 **`CallZapd` must return `true` on success (re-survive on every re-vendor).** Upstream `CallZapd`
 returns `false` unconditionally (native flow gates on exceptions, not the return value), but
 `SOH_/MM_StartExtraction` use it as the combo screen's success flag — so a `false` return makes a
@@ -425,6 +437,11 @@ keeps `shipofharkinian.json` for standalone soh) to make the combined nature exp
 first-launch settings import (absent file = fresh install). New combo-owned export `SOH_ApplyImportedConfig`
 installs a launcher-merged config into the live `Config` (`SetBlock` + `Save` + `CVarLoad` + controller
 reload). MM's `2ship2harkinian.json` literals are untouched (standalone-only, off the combo path).
+
+The Context name in the same guarded call is `"ComboShip"` (2026-10-08): LUS builds the window title
+(`ComboShip (DirectX 11)`), the logger name and `logs/ComboShip.log` from it, plus the crash dialog
+title and `logs/ComboShip-crash.dmp`. Ask players for those two files. The headless `comborando`
+Context uses the same name. Per-game boot banners and log prefixes keep their upstream names.
 
 ## MM resume: reset magicLevel like Sram_OpenSave (magic meter outline, 2026-07-03)
 
@@ -453,18 +470,12 @@ compounding defects in `PrintStack`:
    export, and 2ship.dll exports only its handful of `MM_*` combo entry points — so an entire MM call
    chain reports as ~3 names, each wildly far from the real function.
 
-**`libultraship/src/ship/debug/CrashHandler.cpp` (COMBO_BUILD-guarded; upstream preserved verbatim
-under `#else` so future lus merges stay mechanical):**
-- `SymSetOptions` gains `SYMOPT_LOAD_LINES | SYMOPT_UNDNAME`. Without `LOAD_LINES`,
-  `SymGetLineFromAddr` can fail even when PDBs are present, silently degrading Debug builds too.
-- Per frame: reset `displacement` and `symbol->Name[0]`, keep `SymFromAddr`'s result, and print
-  `<unresolved>` when it fails — never a stale name.
-- `symbol->Flags & SYMFLAG_EXPORT` is surfaced as a `~export(approx)` marker. That flag is set exactly
-  when dbghelp invented the name from the export table, i.e. on every Release frame. Defect 3 is
-  unfixable without shipping PDBs, so the fix is to make it *visible* rather than silently trusted.
-- The module lookup is hoisted so **both** print branches carry the real PC, the module path and an
-  RVA. The file/line branch had the same stale-name hazard (it printed `symbol->Name` too), which was
-  the most misleading output of the three: this frame's file and line beside the previous frame's name.
+**RETIRED 2026-09-28 (PrintStack parts):** upstream #1190 fixed defects 1 and 2 the same way (checks
+`SymFromAddr`, clears the name, loads line info, prints `[pc base rva]` on every frame, searches the
+exe dir for PDBs). We took upstream's `PrintStack` as-is and dropped our `~export(approx)` flag, so
+defect 3 (export-table guesses in PDB-less builds) is no longer marked. Only the buffer guards remain.
+
+**`libultraship/src/ship/debug/CrashHandler.cpp` (COMBO_BUILD-guarded, still active):**
 - `AppendStrTrunc` no longer reads past the source string's terminator, and `AppendLine` no longer
   writes its newline unchecked. The latter was a genuine 1-byte heap overflow: `AppendStr` caps the
   index at `gMaxBufferSize - 1`, so `AppendLine` could push it to `gMaxBufferSize` and the next
@@ -568,7 +579,8 @@ slot whose owl blob `gSaveContext` descends from.
   Presence of the key is the discriminator; `save.isOwlSave` is **not** reliable, every owl writer
   restores it in RAM afterwards. Stays a pure read — the dormant tracker peek shares this function.
   Its owl branches return the load-failure codes like every other page: a slot with neither key, or an
-  unparseable `owlSave` and no `newCycleSave`, is `-4` (fail-closed sentinel; entry still proceeds).
+  unparseable `owlSave` and no `newCycleSave`, is `-4` (fail-closed sentinel; entry still proceeds, via
+  the rebuild in `Combo_RepairMMSaveForSlot` — see `deviations/rando.md`).
 - `SaveManager_SaveCurrentForCombo` read-modify-writes: it **refreshes** the blob when the flag matches,
   otherwise **erases** it. Never leaves it untouched — blanket preservation would let a dormant grant
   write a newer `newCycleSave` behind a stale blob, and the granted item would vanish. The refresh
@@ -679,6 +691,57 @@ the launcher boundary, where `ComboIsValidSlot` already is one. No assert was ad
 candidate — checking in `Sram_StartWriteToFlashDefault` that `curPage` matches `gSaveContext.fileNum` —
 would false-fire, because file-select copy/erase/nameset legitimately call it for `copyDestFileIndex`,
 `selectedFileIndex` and the SRAM header. The dead kaleido branches were left in place rather than
-removed, matching the quit-to-title seams above. Also noticed but not touched: the comment at
+removed, matching the quit-to-title seams above. Also noticed but not touched at the time: the comment at
 `BenPort.cpp`'s `Combo_LoadMMSaveFile` claims the caller rebuilds on a negative code — `title_setup.c`
-discards the return and rebuilds nothing. Not sent upstream.
+discarded the return and rebuilt nothing (resolved below, 2026-09-07). Not sent upstream.
+
+## MM entry on a failed load, and why nobody saw it (2026-09-07)
+
+Two independent defects, one report ("starting my rando in MM puts me in as Fierce Deity with a lot of
+Ocarinas of Time").
+
+**The symptom is the fingerprint of a save that never loaded.** `title_setup.c` called
+`Combo_LoadMMSaveFile` and ignored the code, so a refused slot entered `Play_Init` on what
+`SaveContext_Init` left: all zeros. In MM `PLAYER_FORM_FIERCE_DEITY` is `0` and `ITEM_OCARINA_OF_TIME`
+is `0x00`, so the zeroed save *is* Fierce Deity with an ocarina in every inventory slot — playable
+garbage rather than the harmless blank the fail-closed sentinel assumed. Entry now goes through
+`Combo_RepairMMSaveForSlot`, which rebuilds the half from the slot's own baked seed; the policy and the
+no-baked-seed fallback are in `deviations/rando.md`.
+
+**Client-DLL `SPDLOG_*` output never reached the log file.** spdlog's default-logger registry is per
+module. `Context::InitLogging` builds the file-backed logger *inside libultraship.dll* and sets it as the
+default **there**, so `SPDLOG_INFO`/`SPDLOG_ERROR` compiled into `2ship.dll` (and `soh.dll`) went to each
+module's own stock logger and vanished — including `SaveManager_LoadSaveFile`'s "read result" line, the
+one that would have named the failure code here. Only libultraship's own logs and the exported
+`LUSLOG_*` C entry points were ever visible, which is why `title_setup.c:21` (soh, `LUSLOG_INFO`) shows
+up in `logs/Fleet of Harkinian.log` and `BenPort.cpp`'s "Starting 2 Ship 2 Harkinian version" does not.
+`OTRGlobals::Initialize` now adopts the shared logger (`spdlog::set_default_logger(ctx->GetLogger())`)
+right after `InitLogging`. Done for `2ship.dll` only; `soh.dll` has the same one-line gap.
+
+## Bounded MM death sequence and save health floor
+
+**`mm/src/code/z_game_over.c` (COMBO_BUILD-guarded):** custom/randomized death-jingle tracks can
+replace `NA_BGM_GAME_OVER` with an arbitrarily long or looping sequence, and
+`GAMEOVER_DEATH_FADE_OUT`'s only exit condition was
+`AudioSeq_GetActiveSeqId(SEQ_PLAYER_FANFARE) != NA_BGM_GAME_OVER` — a replacement that never finishes
+hangs the death sequence forever (confirmed on a live death: jingle still playing, screen black, Link
+motionless, minutes later). Added a combo-owned counter (`sComboFadeOutTimer`, separate from
+`sGameOverTimer` because that one is live on the sibling `Kaleido.GameOver` branch and reused across
+states) that caps the wait at 200 ticks (~10s at the state's 20Hz update rate) and force-stops the
+fanfare (`SEQCMD_STOP_SEQUENCE`) only on the cap path, so a looping replacement can't bleed into the
+next scene; the vanilla condition and the Kaleido branch are untouched.
+
+**`mm/2s2h/SaveManager/SaveManager.cpp` (COMBO_BUILD-guarded, existing fence):** a stalled death (see
+above) could still be interrupted by the player (Ctrl+R) before the fade-out cap fired, and
+`SaveManager_SaveCurrentForCombo` was the only save writer with no "don't persist while dead" guard
+(owl/pause/autosave/Song-of-Time saves all floor or block elsewhere). It now floors health to `0x30` in
+the serialized `newCycleSave` doc (and the refreshed `owlSave` blob, when one is written) whenever
+`gPlayState`'s `gameOverCtx.state != GAMEOVER_INACTIVE` or live health is already 0. Live
+`gSaveContext` and the load path are untouched, so a legitimate low-health owl save still resumes at
+its real health.
+
+## `GIMMCMD` double define (2026-09-28)
+
+LUS `fast/lus_gbi.h` and `libultra/gbi.h` both define `GIMMCMD`. After the soh merge its slimmer
+includes reach `lus_gbi.h` first, so the second define warned under `/WX`. `libultra/gbi.h` `#undef`s it
+first under `COMBO_BUILD`; the resulting definition is the same.

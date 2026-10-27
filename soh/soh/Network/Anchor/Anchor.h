@@ -1,5 +1,5 @@
-#ifndef NETWORK_ANCHOR_H
-#define NETWORK_ANCHOR_H
+#pragma once
+
 #ifdef __cplusplus
 
 #include "soh/Network/Network.h"
@@ -165,6 +165,7 @@ class Anchor : public Network {
     bool IsSaveLoaded();
     bool CanTeleportTo(uint32_t clientId);
     uint32_t GetDummyPlayerClientId(const Actor* actor);
+    void RefreshClientNameTags();
 
     void SendPacket_ClearTeamState(std::string teamId);
     void SendPacket_DamagePlayer(u32 clientId, u8 damageEffect, u8 damage);
@@ -206,4 +207,3 @@ class AnchorRoomWindow : public Ship::GuiWindow {
 };
 
 #endif // __cplusplus
-#endif // NETWORK_ANCHOR_H

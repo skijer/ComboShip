@@ -1,0 +1,7 @@
+#include "winres.h"
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+// Lowest id wins as the application icon: Explorer, the taskbar and Alt-Tab all read this one.
+IDI_ICON1 ICON "FLEET.ico"

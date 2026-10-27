@@ -1,0 +1,16 @@
+{
+  "art_checkpoint": "dd66ee65",
+  "authored_recipe_recovery": "restored from conversation; all seven exported GLBs match saved reviewed files byte-for-byte",
+  "native_source_checkpoint": "2da7be11283d877f8a42ec574913708184bcb8e5",
+  "native_bundle_sha256": "411a0ff526dd45ddf7ed624c411d1d2fac7a50f117f26b022a291428a46d56be",
+  "effect_policy_git_blob": "77c7c9ff14c8ad7790be9bf19a52df98ca5cc5bc",
+  "rotation_source": {
+    "repository": "marsh6487/ComboShip",
+    "commit": "40cbef51aff81007f3f27fa643f2ebf81290d9b0",
+    "path": "soh/soh/Enhancements/randomizer/NeiGiPresentation.cpp",
+    "function": "Spin",
+    "git_blob": "3662350898696a2ba321c0be18d0ba7083259a3f"
+  },
+  "runtime_tested": false,
+  "pushed_by_packaging_task": false
+}

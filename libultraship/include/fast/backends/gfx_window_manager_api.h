@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <nlohmann/json.hpp>
 #include <stdbool.h>
 #include "ship/window/Window.h"
 namespace Fast {
@@ -28,6 +29,11 @@ class GfxWindowBackend {
     virtual void SetDimensions(uint32_t width, uint32_t height, int32_t posX, int32_t posY) = 0;
     virtual Ship::WindowRect GetPrimaryMonitorRect() = 0;
     virtual void HandleEvents() = 0;
+    virtual void SetCollectPacingTelemetry(bool) {}
+    virtual nlohmann::json GetPacingTelemetry() {
+        return {{"status", "unsupported"}, {"ready", nullptr}, {"reason", "unsupported"},
+                {"swap_wait_ms", nullptr}, {"present_call_ms", nullptr}, {"present_id", nullptr}};
+    }
     virtual bool IsFrameReady() = 0;
     virtual void SwapBuffersBegin() = 0;
     virtual void SwapBuffersEnd() = 0;

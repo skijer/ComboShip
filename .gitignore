@@ -1,4 +1,15 @@
 *.zip
+!tools/reward_gi/assets.zip
+/tools/native_forest/resources.zip
+# Native scene/market trees are restored from their verified source bundles.
+/soh/assets/custom/custom/comboship/native_forest/
+/soh/assets/custom/scenes/nonmq/comboship_forest/
+/soh/assets/custom/scenes/nonmq/skiejer_forest/
+/soh/assets/custom/scenes/shared/skiejer_forest_oot/
+/soh/assets/custom/custom/skiejer_market/
+/soh/assets/custom/scenes/nonmq/skiejer_market/
+/soh/assets/custom/scenes/shared/skiejer_market_oot/
+/soh/assets/custom/objects/nei_reward_gi/
 *.otr
 *.o2r
 .DS_Store
@@ -96,3 +107,72 @@ x64/
 /vcpkg/
 # Superpowers brainstorming companion (local mockups)
 .superpowers/
+.worktrees/
+# Expanded losslessly from tools/spin_styles/bundled before archive generation.
+/soh/assets/custom/objects/combo_spin/
+/mm/assets/custom/objects/combo_spin/
+# scratch + backup dirs of the local NEI port tooling
+.nei-port-tmp/
+.nei-port-backup/
+
+# Expanded from the checked-in compressed Chateau resource before packaging.
+/soh/assets/custom/objects/combo_chateau_romani_3ds/AtlasTex
+/mm/assets/custom/objects/combo_chateau_romani_3ds/AtlasTex
+/tools/chateau_romani_3ds/hd/Atlas-4K.png
+/tools/chateau_romani_3ds/bundled/AtlasTex.zlib
+
+# Restored from the committed chamber and dedicated tunnel-sand bundles.
+/soh/assets/custom/custom/temple_sages/
+/mm/assets/custom/custom/temple_sages/
+/soh/assets/custom/alt/custom/temple_sages/
+/mm/assets/custom/alt/custom/temple_sages/
+/soh/assets/custom/scenes/shared/tokinoma_scene/
+/mm/assets/custom/scenes/shared/tokinoma_scene/
+/soh/assets/custom/alt/scenes/shared/tokinoma_scene/
+/mm/assets/custom/alt/scenes/shared/tokinoma_scene/
+/soh/assets/custom/textures/comboship/regional/lake_hylia/sand
+/soh/assets/custom/alt/textures/comboship/regional/lake_hylia/sand
+
+# Expanded from the bounded cumulative runtime and authoring source parts.
+/mm/assets/custom/objects/magic_mirror/forest_seal
+/mm/assets/custom/objects/magic_mirror/forest_wisp
+/mm/assets/custom/textures/icon_item_custom/gItemIconMagicMirrorTex.rgba32.png
+/mm/assets/custom/textures/magic_mirror/gMagicMirrorForestReflectionTex.rgb5a1.png
+/soh/assets/custom/objects/magic_mirror/forest_seal
+/soh/assets/custom/objects/magic_mirror/forest_wisp
+/soh/assets/custom/textures/icon_item_custom/gItemIconMagicMirrorTex.rgba32.png
+/soh/assets/custom/textures/magic_mirror/gMagicMirrorForestReflectionTex.rgb5a1.png
+/tools/lake_tunnel_sand/coverage_preview.png
+/tools/magic_mirror/cast/forest_seal.png
+/tools/magic_mirror/cast/forest_wisp.png
+/tools/magic_mirror/reflection/forest-scene.png
+/tools/magic_mirror/reflection/saria-silhouette.png
+/tools/temple_sages/assets/chamber_hd/rm_kja_mark_01_C000.resource
+/tools/temple_sages/assets/chamber_hd/rm_kja_water_02_13C00.resource
+/tools/temple_sages/assets/chamber_hd/rm_kja_yuka_01_16C00.resource
+/tools/temple_sages/assets/ethereal_tunnel.png
+/tools/temple_sages/assets/portal_flow.png
+/tools/lake_tunnel_sand/parts/resources.zip.part001
+
+# Historical source-recovery notes are retained outside the public candidate.
+/docs/poc/sages-return-placement-evidence.md
+/docs/poc/temple-sages-hub-20261026.md
+/docs/poc/temple-sages-materials-poc3-20261026.md
+/docs/poc/temple-sages-poc2-20261026.md
+/docs/poc/temple-sages-return-portals-20261026.md
+/docs/poc/temple-sages-warp-songs-20261026.md
+/docs/poc/temple-sages-zelda-dialogue.md
+/docs/poc/temple-sages-zelda-glow-20261026.md
+/docs/poc/temple-sages-zelda-placement-evidence.md
+/docs/superpowers/plans/2026-10-26-temple-sages-hub.md
+/docs/superpowers/plans/2026-10-26-temple-sages-poc2.md
+/docs/superpowers/plans/2026-10-26-temple-sages-warp-songs.md
+/docs/superpowers/plans/2026-10-26-temple-sages-zelda-glow-placement.md
+/docs/superpowers/specs/2026-10-26-temple-sages-hub-design.md
+/docs/superpowers/specs/2026-10-26-temple-sages-poc2-design.md
+
+/tools/magic_mirror/cast/ART_PROVENANCE.md
+
+/tools/magic_mirror/reflection/ART_PROVENANCE.md
+
+/tools/temple_sages/assets/ART_PROVENANCE.md

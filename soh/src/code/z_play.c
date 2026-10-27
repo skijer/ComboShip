@@ -1,21 +1,49 @@
+#include "../../../combo/emotes/EmoteBridge.h"
+#include "rando/CrossEntranceBoss.h"
 #include "global.h"
 #include "vt.h"
 
 #include <string.h>
 
 #include "soh/Enhancements/gameconsole.h"
+#include "soh/Enhancements/debugger/FrameTimingProbe.h"
+#include "soh/FleetShipCombo/FleetShipCombo.h"
 #include "soh/frame_interpolation.h"
 #include <overlays/actors/ovl_En_Niw/z_en_niw.h>
 #include <overlays/misc/ovl_kaleido_scope/z_kaleido_scope.h>
 #include "soh/Enhancements/enhancementTypes.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/SwitchAge.h"
 #include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Enhancements/Graphics/PreludeNativeMaterialScroll.h"
 #include "soh/SaveManager.h"
 #include "soh/framebuffer_effects.h"
+#include "mods/items/custom_items.h"
+#include "mods/items/helpers/minish_kaleido.h"
+#include "mods/items/helpers/postman_kaleido.h"
+#include "mods/items/logic/item_postman_hat.h"
+#include "mods/transformation_masks/mm_mask_wear.h"
+#include "mods/transformation_masks/transformation_masks.h"
+#include <libultraship/libultraship.h>
 
 #include <time.h>
 #include <assert.h>
+
+#ifdef COMBO_BUILD
+#include "gameplay/MagicMirrorArrival.h"
+#include "soh/Enhancements/audio/AudioEditor.h"
+#include "soh/Enhancements/Gameplay/ComboBlackMarketNative.h"
+#include "soh/Enhancements/Gameplay/ComboSoloForest.h"
+#include "soh/Enhancements/Gameplay/ComboLostWoodsFountain.h"
+extern int Combo_SOH_CompleteCrossDungeonTransition(void);
+extern void Combo_SOH_CancelCrossDungeonTransition(void);
+#endif
+
+// SM64 Mario: snapshot actor OC colliders into libsm64's surface set. Defined in
+// expansions/sm64/sm64_mario_surfaces.c (#included into z_player.c), so it has
+// external linkage and is callable here. Must run AFTER Actor_UpdateAll.
+extern void Sm64Surfaces_RefreshActorColliders(PlayState* play);
 
 TransitionUnk sTrnsnUnk;
 s32 gTrnsnUnkState;
@@ -33,6 +61,9 @@ Input* D_8012D1F8 = NULL;
 
 PlayState* gPlayState;
 s16 firstInit = 0;
+// Actor id assigned to EnPartner (Ivan) when ActorDB registers it at boot; read by IvanCoop and
+// Hylia's Grace to spawn/find him. Lost in the upstream merge, which rewrote this globals block.
+s16 gEnPartnerId;
 
 void Play_SpawnScene(PlayState* play, s32 sceneId, s32 spawn);
 
@@ -52,6 +83,13 @@ void disableBetaQuest();
 void OTRPlay_SpawnScene(PlayState* play, s32 sceneId, s32 spawn);
 
 void Play_RequestViewpointBgCam(PlayState* play) {
+#ifdef COMBO_BUILD
+    // A later actor/hook can take the active camera after the keeper update.
+    // Release the shop before its scene viewpoint can configure that new owner.
+    if (!ComboBlackMarketNative_PrepareViewpointCamera(play)) {
+        return;
+    }
+#endif
     Camera_ChangeDataIdx(GET_ACTIVE_CAM(play), play->unk_1242B - 1);
 }
 
@@ -61,8 +99,8 @@ void Play_SetViewpoint(PlayState* play, s16 viewpoint) {
     play->unk_1242B = viewpoint;
 
     if ((YREG(15) != 0x10) && (gSaveContext.cutsceneIndex < 0xFFF0)) {
-        Audio_PlaySoundGeneral((viewpoint == 1) ? NA_SE_SY_CAMERA_ZOOM_DOWN : NA_SE_SY_CAMERA_ZOOM_UP, &gSfxDefaultPos,
-                               4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral((viewpoint == 1) ? NA_SE_SY_CAMERA_ZOOM_DOWN : NA_SE_SY_CAMERA_ZOOM_UP, &gSfxDefaultPos, 4,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 
     Play_RequestViewpointBgCam(play);
@@ -195,9 +233,14 @@ Gfx* Play_SetFog(PlayState* play, Gfx* gfx) {
 }
 
 void Play_Destroy(GameState* thisx) {
+    ComboEmotes_Reset();
+#ifdef COMBO_BUILD
+    Combo_SOH_CancelCrossDungeonTransition();
+#endif
     PlayState* play = (PlayState*)thisx;
     Player* player = GET_PLAYER(play);
 
+    MmForm_OnPlayDestroy(play, player);
     GameInteractor_ExecuteOnPlayDestroy();
 
     play->state.gfxCtx->callback = NULL;
@@ -227,7 +270,11 @@ void Play_Destroy(GameState* thisx) {
     VisMono_Destroy(&gPlayVisMono);
 
     if (gSaveContext.linkAge != play->linkAgeOnLoad) {
-        Inventory_SwapAgeEquipment();
+        if (!SwitchAge_HandleNonLogicEquipmentSwap()) {
+            extern void ExtEquip_ValidateForAge(void);
+            Inventory_SwapAgeEquipment();
+            ExtEquip_ValidateForAge(); // NEI: age-restricted page-2 pieces come off with the swap
+        }
         Player_SetEquipmentData(play, player);
     }
 
@@ -295,35 +342,42 @@ u8 CheckMedallionCount() {
 u8 CheckDungeonCount() {
     u8 dungeonCount = 0;
 
-    if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA, Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
         dungeonCount++;
     }
 
-    if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                        Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
         dungeonCount++;
     }
 
-    if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                        Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
         dungeonCount++;
     }
 
-    if (Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_PHANTOM_GANON,
+                                        Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP))) {
         dungeonCount++;
     }
 
-    if (Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_VOLVAGIA,
+                                        Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP))) {
         dungeonCount++;
     }
 
-    if (Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_MORPHA,
+                                        Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP))) {
         dungeonCount++;
     }
 
-    if (Flags_GetRandomizerInf(RAND_INF_DUNGEONS_DONE_SPIRIT_TEMPLE)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_TWINROVA,
+                                        Flags_GetRandomizerInf(RAND_INF_DUNGEONS_DONE_SPIRIT_TEMPLE))) {
         dungeonCount++;
     }
 
-    if (Flags_GetRandomizerInf(RAND_INF_DUNGEONS_DONE_SHADOW_TEMPLE)) {
+    if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BONGO_BONGO,
+                                        Flags_GetRandomizerInf(RAND_INF_DUNGEONS_DONE_SHADOW_TEMPLE))) {
         dungeonCount++;
     }
 
@@ -364,6 +418,11 @@ void Play_Init(GameState* thisx) {
     u8 baseSceneLayer;
     s32 pad[2];
 
+#ifdef COMBO_BUILD
+    ComboBlackMarketOot_NormalizeEntry();
+    ComboSoloForestOot_NormalizeEntry();
+    ComboLostWoodsFountain_NormalizeEntry();
+#endif
     enableBetaQuest();
 
     // Properly initialize the frame counter so it doesn't use garbage data
@@ -470,7 +529,11 @@ void Play_Init(GameState* thisx) {
         }
     } else if ((gEntranceTable[((void)0, gSaveContext.entranceIndex)].scene == SCENE_KOKIRI_FOREST) && LINK_IS_ADULT &&
                !IS_CUTSCENE_LAYER) {
-        gSaveContext.sceneLayer = (Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP)) ? 3 : 2;
+        gSaveContext.sceneLayer =
+            (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_PHANTOM_GANON,
+                                             Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP)))
+                ? 3
+                : 2;
     }
 
     Play_SpawnScene(play,
@@ -559,26 +622,17 @@ void Play_Init(GameState* thisx) {
 
     Fault_AddClient(&D_801614B8, ZeldaArena_Display, NULL, NULL);
 
-    // In order to keep masks equipped on first load, we need to pre-set the age reqs for the item and slot
-    if (CVarGetInteger(CVAR_ENHANCEMENT("AdultMasks"), 0) || CVarGetInteger(CVAR_CHEAT("TimelessEquipment"), 0)) {
-        for (int i = ITEM_MASK_KEATON; i <= ITEM_MASK_TRUTH; i += 1) {
-            gItemAgeReqs[i] = AGE_REQ_NONE;
-        }
-        if (INV_CONTENT(ITEM_TRADE_CHILD) >= ITEM_MASK_KEATON && INV_CONTENT(ITEM_TRADE_CHILD) <= ITEM_MASK_TRUTH) {
-            gSlotAgeReqs[SLOT_TRADE_CHILD] = AGE_REQ_NONE;
-        }
-    } else {
-        for (int i = ITEM_MASK_KEATON; i <= ITEM_MASK_TRUTH; i += 1) {
-            gItemAgeReqs[i] = AGE_REQ_CHILD;
-        }
-        gSlotAgeReqs[SLOT_TRADE_CHILD] = AGE_REQ_CHILD;
-    }
-
     // Handle Rocs Feather requirement
     gItemAgeReqs[ITEM_ROCS_FEATHER] = AGE_REQ_NONE;
     gSlotAgeReqs[SLOT_NAYRUS_LOVE] = AGE_REQ_NONE;
 
+#ifdef COMBO_BUILD
+    MagicMirror_PrepareArrival(play);
+#endif
     Actor_InitContext(play, &play->actorCtx, play->linkActorEntry);
+#ifdef COMBO_BUILD
+    MagicMirror_FinishArrival(play);
+#endif
 
     while (!func_800973FC(play, &play->roomCtx)) {
         ; // Empty Loop
@@ -586,7 +640,7 @@ void Play_Init(GameState* thisx) {
 
     player = GET_PLAYER(play);
     Camera_InitPlayerSettings(&play->mainCamera, player);
-    Camera_ChangeMode(&play->mainCamera, CAM_MODE_NORMAL);
+    Camera_RequestMode(&play->mainCamera, CAM_MODE_NORMAL);
 
     // OTRTODO: Bounds check cameraDataList to guard against scenes spawning the player with
     // an out of bounds background camera index. This requires adding an extra field to the
@@ -616,6 +670,9 @@ void Play_Init(GameState* thisx) {
         play->unk_1242B = 0;
     }
     Interface_SetSceneRestrictions(play);
+#ifdef COMBO_BUILD
+    AudioEditor_ConfigureSceneMusic(play);
+#endif
     Environment_PlaySceneSequence(play);
     gSaveContext.seqId = play->sequenceCtx.seqId;
     gSaveContext.natureAmbienceId = play->sequenceCtx.natureAmbienceId;
@@ -664,12 +721,17 @@ void Play_Init(GameState* thisx) {
         DmaMgr_DmaRomToRam(0x03FEB000, gDebugCutsceneScript, sizeof(sDebugCutsceneScriptBuf));
     }
 #endif
-
-    // nextEntranceIndex was not initialized, so the previous value was carried over during soft resets.
-    gPlayState->nextEntranceIndex = gSaveContext.entranceIndex;
 }
 
+// Generic hold-button box selector (Sheikah Slate runes, ...). Declared locally rather than via a
+// header: mods/*.h is globbed with CONFIGURE_DEPENDS, so a new header there forces a full CMake
+// regeneration. Definitions live in mods/items/helpers/box_menu.c. Skijer's NEI
+u8 BoxMenu_IsOpen(void);
+void BoxMenu_Update(PlayState* play);
+void BoxMenu_Draw(PlayState* play);
+
 void Play_Update(PlayState* play) {
+    ComboEmotes_BeginUpdate(play);
     Input* input = play->state.input;
     s32 isPaused;
     s32 pad1;
@@ -908,6 +970,12 @@ void Play_Update(PlayState* play) {
                                 play->transitionMode = TRANS_MODE_OFF;
                             }
                         } else if (play->transitionTrigger != TRANS_TRIGGER_END) {
+#ifdef COMBO_BUILD
+                            // Retain the completed native effect until the clean-frame peer handoff.
+                            if (Combo_SOH_CompleteCrossDungeonTransition()) {
+                                break;
+                            }
+#endif
                             play->state.running = false;
 
                             if (gSaveContext.gameMode != GAMEMODE_FILE_SELECT) {
@@ -964,6 +1032,11 @@ void Play_Update(PlayState* play) {
                     play->envCtx.screenFillColor[3] = (sTransitionFillTimer / 20.0f) * 255.0f;
 
                     if (sTransitionFillTimer >= 20) {
+#ifdef COMBO_BUILD
+                        if (Combo_SOH_CompleteCrossDungeonTransition()) {
+                            break;
+                        }
+#endif
                         play->state.running = false;
                         SET_NEXT_GAMESTATE(&play->state, Play_Init, PlayState);
                         gSaveContext.entranceIndex = play->nextEntranceIndex;
@@ -1006,6 +1079,11 @@ void Play_Update(PlayState* play) {
 
                 case TRANS_MODE_INSTANT:
                     if (play->transitionTrigger != TRANS_TRIGGER_END) {
+#ifdef COMBO_BUILD
+                        if (Combo_SOH_CompleteCrossDungeonTransition()) {
+                            break;
+                        }
+#endif
                         play->state.running = 0;
                         SET_NEXT_GAMESTATE(&play->state, Play_Init, PlayState);
                         gSaveContext.entranceIndex = play->nextEntranceIndex;
@@ -1038,9 +1116,8 @@ void Play_Update(PlayState* play) {
                     break;
 
                 case TRANS_MODE_SANDSTORM:
-                    Audio_PlaySoundGeneral(NA_SE_EV_SAND_STORM - SFX_FLAG, &gSfxDefaultPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_EV_SAND_STORM - SFX_FLAG, &gSfxDefaultPos, 4,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 
                     if (play->transitionTrigger == TRANS_TRIGGER_END) {
                         if (play->envCtx.sandstormPrimA < 110) {
@@ -1054,6 +1131,11 @@ void Play_Update(PlayState* play) {
                         }
                     } else {
                         if (play->envCtx.sandstormEnvA == 255) {
+#ifdef COMBO_BUILD
+                            if (Combo_SOH_CompleteCrossDungeonTransition()) {
+                                break;
+                            }
+#endif
                             play->state.running = false;
                             SET_NEXT_GAMESTATE(&play->state, Play_Init, PlayState);
                             gSaveContext.entranceIndex = play->nextEntranceIndex;
@@ -1077,9 +1159,8 @@ void Play_Update(PlayState* play) {
                     break;
 
                 case TRANS_MODE_SANDSTORM_END:
-                    Audio_PlaySoundGeneral(NA_SE_EV_SAND_STORM - SFX_FLAG, &gSfxDefaultPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_EV_SAND_STORM - SFX_FLAG, &gSfxDefaultPos, 4,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 
                     if (play->transitionTrigger == TRANS_TRIGGER_END) {
                         if (play->envCtx.sandstormPrimA <= 0) {
@@ -1152,11 +1233,6 @@ void Play_Update(PlayState* play) {
                     gSaveContext.ship.stats.playTimer++;
                     gSaveContext.ship.stats.sceneTimer++;
                     gSaveContext.ship.stats.roomTimer++;
-
-                    if (CVarGetInteger(CVAR_ENHANCEMENT("MMBunnyHood"), BUNNY_HOOD_VANILLA) != BUNNY_HOOD_VANILLA &&
-                        Player_GetMask(play) == PLAYER_MASK_BUNNY) {
-                        gSaveContext.ship.stats.count[COUNT_TIME_BUNNY_HOOD]++;
-                    }
                 }
 
                 if (play->actorCtx.freezeFlashTimer && (play->actorCtx.freezeFlashTimer-- < 5)) {
@@ -1190,8 +1266,32 @@ void Play_Update(PlayState* play) {
 
                     PLAY_LOG(3637);
 
+                    // PICTOGRAPH BOX (Skijer's NEI): the lens/photo state machine. It runs HERE, and
+                    // specifically BEFORE Actor_UpdateAll, for two reasons:
+                    //   1. The shutter halts every actor exactly like MM (z_parameter.c sets
+                    //      play->haltAllActors at PICTO_BOX_STATE_SETUP_PHOTO). A player-driven tick
+                    //      would freeze with the world and nobody could answer the keep/discard prompt.
+                    //   2. While the lens is up the pictograph OWNS A and B, and it takes them out of
+                    //      the input before Link ever reads them — otherwise his own A handling drops
+                    //      him out of first-person on the very frame we fire, and the picture comes out
+                    //      in third person.
+                    // MM runs its picto logic from the interface update for the same reasons.
+                    {
+                        extern void Picto_Update(PlayState * play);
+                        Picto_Update(play);
+                    }
+
                     if (!play->haltAllActors) {
                         Actor_UpdateAll(play, &play->actorCtx);
+                    }
+
+                    // SM64 Mario: now that Actor_UpdateAll has run, the OC
+                    // collider list is fully populated (props/doors register
+                    // after the player). Snapshot it so Mario stops phasing
+                    // through signs/torches/gates. (libsm64 only knows static +
+                    // dynapoly collision otherwise.)
+                    if (CVarGetInteger("gSm64Mario", 0)) {
+                        Sm64Surfaces_RefreshActorColliders(play);
                     }
 
                     PLAY_LOG(3643);
@@ -1229,8 +1329,8 @@ void Play_Update(PlayState* play) {
                         // "Changing viewpoint is prohibited during the cutscene"
                         osSyncPrintf(VT_FGCOL(CYAN) "デモ中につき視点変更を禁止しております\n" VT_RST);
                     } else if (YREG(15) == 0x10) {
-                        Audio_PlaySoundGeneral(NA_SE_SY_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     } else {
                         // C-Up toggle for houses, move between pivot camera and fixed camera
                         // Toggle viewpoint between VIEWPOINT_LOCKED and VIEWPOINT_PIVOT
@@ -1248,7 +1348,18 @@ void Play_Update(PlayState* play) {
 
             if ((play->pauseCtx.state != 0) || (play->pauseCtx.debugState != 0)) {
                 PLAY_LOG(3721);
-                KaleidoScopeCall_Update(play);
+                if (BoxMenu_IsOpen()) {
+                    // Generic hold-button box selector (Sheikah Slate runes, ...). Skijer's NEI
+                    BoxMenu_Update(play);
+                } else if (gCustomItemState.minishCapWarpMode) {
+                    MinishKaleido_Update(play);
+                } else if (gCustomItemState.postmanHatWarpMode) {
+                    PostmanKaleido_Update(play);
+                } else if (MmMaskWear_IsGreatFairyWarpActive()) {
+                    MmMaskWear_GreatFairyWarpUpdate(play);
+                } else {
+                    KaleidoScopeCall_Update(play);
+                }
             } else if (play->gameOverCtx.state != GAMEOVER_INACTIVE) {
                 PLAY_LOG(3727);
                 GameOver_Update(play);
@@ -1264,6 +1375,7 @@ void Play_Update(PlayState* play) {
 
             PLAY_LOG(3765);
             AnimationContext_Update(play, &play->animationCtx);
+            ComboEmotes_ApplyPose(play);
 
             PLAY_LOG(3771);
             SoundSource_UpdateAll(play);
@@ -1311,7 +1423,10 @@ skip:
 
 void Play_DrawOverlayElements(PlayState* play) {
     if ((play->pauseCtx.state != 0) || (play->pauseCtx.debugState != 0)) {
-        KaleidoScopeCall_Draw(play);
+        if (!BoxMenu_IsOpen() && !gCustomItemState.minishCapWarpMode && !gCustomItemState.postmanHatWarpMode &&
+            !MmMaskWear_IsGreatFairyWarpActive()) {
+            KaleidoScopeCall_Draw(play);
+        }
     }
 
     if (gSaveContext.gameMode == GAMEMODE_NORMAL) {
@@ -1323,9 +1438,25 @@ void Play_DrawOverlayElements(PlayState* play) {
     if (play->gameOverCtx.state != GAMEOVER_INACTIVE) {
         GameOver_FadeInLights(play);
     }
+
+    // Great Fairy Mask teleport menu overlay
+    MmMaskWear_DrawOverlay(play);
+
+    // Minish Cap warp overlay — drawn last on OVERLAY_DISP so it covers HUD
+    if (gCustomItemState.minishCapWarpMode) {
+        MinishKaleido_Draw(play);
+    } else if (gCustomItemState.postmanHatWarpMode) {
+        PostmanKaleido_Draw(play);
+    }
+
+    // Generic box selector — drawn after everything else so it sits on top. Skijer's NEI
+    BoxMenu_Draw(play);
 }
 
 void Play_Draw(PlayState* play) {
+    // Sequential phases partition draw work; nested detail/actor/weather spans are inclusive.
+    // Each early goto closes its current phase before entering the shared tail.
+    FrameTimingSpan drawPhase = FrameTiming_BeginSpan();
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     Lights* sp228;
     Vec3f sp21C;
@@ -1374,7 +1505,13 @@ void Play_Draw(PlayState* play) {
     Gfx_SetupFrame(gfxCtx, 0, 0, 0);
 
     if ((HREG(80) != 10) || (HREG(82) != 0)) {
+        FrameTiming_EndNamedSpan("play_draw", "setup", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         GameInteractor_ExecuteOnPlayDrawBegin();
+
+        FrameTiming_EndNamedSpan("play_draw", "begin_hook", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         POLY_OPA_DISP = Play_SetFog(play, POLY_OPA_DISP);
         POLY_XLU_DISP = Play_SetFog(play, POLY_XLU_DISP);
@@ -1408,6 +1545,9 @@ void Play_Draw(PlayState* play) {
             Matrix_MtxFToMtx(MATRIX_CHECKFLOATS(&play->billboardMtxF), Graph_Alloc(gfxCtx, sizeof(Mtx)));
 
         gSPSegment(POLY_OPA_DISP++, 0x01, play->billboardMtx);
+
+        FrameTiming_EndNamedSpan("play_draw", "camera_setup", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(92) != 0)) {
             Gfx* gfxP;
@@ -1448,8 +1588,12 @@ void Play_Draw(PlayState* play) {
 
             TransitionUnk_Draw(&sTrnsnUnk, &sp88);
             POLY_OPA_DISP = sp88;
+            FrameTiming_EndNamedSpan("play_draw", "transitions", drawPhase);
             goto Play_Draw_DrawOverlayElements;
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "transitions", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         PreRender_SetValues(&play->pauseBgPreRender, SCREEN_WIDTH, SCREEN_HEIGHT, gfxCtx->curFrameBuffer, gZBuffer);
 
@@ -1474,8 +1618,12 @@ void Play_Draw(PlayState* play) {
             FB_DrawFromFramebuffer(&gfxP, gPauseFrameBuffer, 255);
             POLY_OPA_DISP = gfxP;
 
+            FrameTiming_EndNamedSpan("play_draw", "pause_prepare", drawPhase);
             goto Play_Draw_DrawOverlayElements;
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "pause_prepare", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(83) != 0)) {
             if (play->skyboxId && (play->skyboxId != SKYBOX_UNSET_1D) && !play->envCtx.skyboxDisabled) {
@@ -1490,26 +1638,43 @@ void Play_Draw(PlayState* play) {
             }
         }
 
+        FrameTiming_EndNamedSpan("play_draw", "skybox", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         if ((HREG(80) != 10) || (HREG(90) & 2)) {
             if (!play->envCtx.sunMoonDisabled) {
                 Environment_DrawSunAndMoon(play);
             }
         }
 
+        FrameTiming_EndNamedSpan("play_draw", "sun_moon", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         if ((HREG(80) != 10) || (HREG(90) & 1)) {
             Environment_DrawSkyboxFilters(play);
         }
 
+        FrameTiming_EndNamedSpan("play_draw", "skybox_filters", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         if ((HREG(80) != 10) || (HREG(90) & 4)) {
+            FrameTimingSpan lightningUpdate = FrameTiming_BeginSpan();
             Environment_UpdateLightningStrike(play);
+            FrameTiming_EndNamedSpan("weather", "lightning_update", lightningUpdate);
             Environment_DrawLightning(play, 0);
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "lightning", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(90) & 8)) {
             sp228 = LightContext_NewLights(&play->lightCtx, gfxCtx);
             Lights_BindAll(sp228, play->lightCtx.listHead, NULL);
             Lights_Draw(sp228, gfxCtx);
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "lighting", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(84) != 0)) {
             if (VREG(94) == 0) {
@@ -1520,11 +1685,26 @@ void Play_Draw(PlayState* play) {
                 } else {
                     roomDrawFlags = HREG(84);
                 }
-                Scene_Draw(play);
-                Room_Draw(play, &play->roomCtx.curRoom, roomDrawFlags & 3);
-                Room_Draw(play, &play->roomCtx.prevRoom, roomDrawFlags & 3);
+                {
+                    FrameTimingSpan roomSpan = FrameTiming_BeginSpan();
+                    Scene_Draw(play);
+                    FrameTiming_EndNamedSpan("play_draw_detail", "scene", roomSpan);
+                }
+                {
+                    FrameTimingSpan roomSpan = FrameTiming_BeginSpan();
+                    Room_Draw(play, &play->roomCtx.curRoom, roomDrawFlags & 3);
+                    FrameTiming_EndNamedSpan("play_draw_detail", "room_current", roomSpan);
+                }
+                {
+                    FrameTimingSpan roomSpan = FrameTiming_BeginSpan();
+                    Room_Draw(play, &play->roomCtx.prevRoom, roomDrawFlags & 3);
+                    FrameTiming_EndNamedSpan("play_draw_detail", "room_previous", roomSpan);
+                }
             }
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "scene_rooms", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(83) != 0)) {
             if ((play->skyboxCtx.unk_140 != 0) && (GET_ACTIVE_CAM(play)->setting != CAM_SET_PREREND_FIXED)) {
@@ -1536,17 +1716,29 @@ void Play_Draw(PlayState* play) {
             }
         }
 
+        FrameTiming_EndNamedSpan("play_draw", "skybox_offset", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         if (play->envCtx.unk_EE[1] != 0) {
             Environment_DrawRain(play, &play->view, gfxCtx);
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "rain", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(84) != 0)) {
             Environment_FillScreen(gfxCtx, 0, 0, 0, play->bgCoverAlpha, FILL_SCREEN_OPA);
         }
 
+        FrameTiming_EndNamedSpan("play_draw", "background_fill", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         if ((HREG(80) != 10) || (HREG(85) != 0)) {
             Actor_DrawAll(play, &play->actorCtx);
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "actors", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(86) != 0)) {
             if (!play->envCtx.sunMoonDisabled) {
@@ -1557,6 +1749,9 @@ void Play_Draw(PlayState* play) {
             }
             Environment_DrawCustomLensFlare(play);
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "lens_flare", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         if ((HREG(80) != 10) || (HREG(87) != 0)) {
             if (MREG(64) != 0) {
@@ -1575,15 +1770,26 @@ void Play_Draw(PlayState* play) {
             }
         }
 
+        FrameTiming_EndNamedSpan("play_draw", "screen_fill", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         if ((HREG(80) != 10) || (HREG(88) != 0)) {
             if (play->envCtx.sandstormState != SANDSTORM_OFF) {
                 Environment_DrawSandstorm(play, play->envCtx.sandstormState);
             }
         }
 
+        FrameTiming_EndNamedSpan("play_draw", "sandstorm", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         if ((HREG(80) != 10) || (HREG(93) != 0)) {
             DebugDisplay_DrawObjects(play);
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "debug_objects", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
+        MmForm_DrawNativeTransformationPostProcess(play);
 
         if ((R_PAUSE_MENU_MODE == 1) || (gTrnsnUnkState == 1)) {
             Gfx* gfxP = OVERLAY_DISP;
@@ -1621,18 +1827,33 @@ void Play_Draw(PlayState* play) {
 
             // SOH [Port] Continue to render the post world for pausing to avoid flashing the HUD
             if (gTrnsnUnkState == 2) {
+                FrameTiming_EndNamedSpan("play_draw", "pause_capture", drawPhase);
+                drawPhase = FrameTiming_BeginSpan();
                 goto Play_Draw_skip;
             }
         }
 
         // Draw Enhancements that need to be placed in the world. This happens before the PostWorldDraw
         // so that they aren't drawn when the pause menu is up (e.g. collision viewer, actor name tags)
+        FrameTiming_EndNamedSpan("play_draw", "pause_capture", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
         GameInteractor_ExecuteOnPlayDrawEnd();
+        FrameTiming_EndNamedSpan("play_draw", "end_hook", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
+
+        PreludeNativeMaterialScroll_Update(play->state.gfxCtx, play->state.frames, play->gameplayFrames);
+
+        FrameTiming_EndNamedSpan("play_draw", "material_scroll", drawPhase);
 
     Play_Draw_DrawOverlayElements:
+        drawPhase = FrameTiming_BeginSpan();
         if ((HREG(80) != 10) || (HREG(89) != 0)) {
             Play_DrawOverlayElements(play);
         }
+
+        FrameTiming_EndNamedSpan("play_draw", "overlay", drawPhase);
+        drawPhase = FrameTiming_BeginSpan();
 
         // Reset the inverted culling
         if (CVarGetInteger(CVAR_ENHANCEMENT("MirroredWorld"), 0)) {
@@ -1642,6 +1863,13 @@ void Play_Draw(PlayState* play) {
     }
 
 Play_Draw_skip:
+#ifdef COMBO_BUILD
+    // Pause/capture branches can bypass the general world-draw end hook.
+    ComboBlackMarketOot_RestoreRoomAfterDraw(play);
+#endif
+
+    FrameTiming_EndNamedSpan("play_draw", "finish_setup", drawPhase);
+    drawPhase = FrameTiming_BeginSpan();
 
     if (play->view.unk_124 != 0) {
         Camera_Update(GET_ACTIVE_CAM(play));
@@ -1656,7 +1884,11 @@ Play_Draw_skip:
 
     CLOSE_DISPS(gfxCtx);
 
+    FrameTiming_EndNamedSpan("play_draw", "camera_finish", drawPhase);
+    drawPhase = FrameTiming_BeginSpan();
+
     Interface_DrawTotalGameplayTimer(play);
+    FrameTiming_EndNamedSpan("play_draw", "gameplay_timer", drawPhase);
 }
 
 time_t Play_GetRealTime() {
@@ -1703,14 +1935,18 @@ void Play_Main(GameState* thisx) {
     }
 
     if ((HREG(80) != 10) || (HREG(81) != 0)) {
+        FrameTimingSpan updateTiming = FrameTiming_BeginSpan();
         Play_Update(play);
+        FrameTiming_EndSpan(FRAME_TIMING_PLAY_UPDATE, updateTiming);
     }
 
     PLAY_LOG(4583);
 
+    FrameTimingSpan drawTiming = FrameTiming_BeginSpan();
     FrameInterpolation_StartRecord();
     Play_Draw(play);
     FrameInterpolation_StopRecord();
+    FrameTiming_EndSpan(FRAME_TIMING_PLAY_DRAW, drawTiming);
 
     PLAY_LOG(4587);
 
@@ -2146,6 +2382,9 @@ s32 Play_CamIsNotFixed(PlayState* play) {
 }
 
 s32 FrameAdvance_IsEnabled(PlayState* play) {
+    // NOTE (Fleet Ship Combo): do NOT force this true for the inactive game. The freeze is
+    // done in FrameAdvance_Update (returns false -> whole play update is skipped). Forcing
+    // IsEnabled true here also gates Effect_Add, breaking player init (null weapon-effect).
     return !!play->frameAdvCtx.enabled;
 }
 
@@ -2204,7 +2443,8 @@ void Play_PerformSave(PlayState* play) {
         if (gSaveContext.equips.buttonItems[0] == ITEM_SLINGSHOT || gSaveContext.equips.buttonItems[0] == ITEM_BOW ||
             gSaveContext.equips.buttonItems[0] == ITEM_BOMBCHU ||
             gSaveContext.equips.buttonItems[0] == ITEM_FISHING_POLE ||
-            (gSaveContext.equips.buttonItems[0] == ITEM_NONE && !Flags_GetInfTable(INFTABLE_SWORDLESS))) {
+            (gSaveContext.equips.buttonItems[0] == ITEM_NONE && !Flags_GetInfTable(INFTABLE_SWORDLESS) &&
+             CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) != EQUIP_VALUE_SWORD_NONE)) {
 
             gSaveContext.equips.buttonItems[0] = gSaveContext.buttonStatus[0];
             GameInteractor_Should(VB_TEMP_B_RESTORE_SWORDLESS, true);

@@ -5,9 +5,9 @@
  */
 
 #include "z_en_st.h"
+#include "din_fire_sword.h"
 #include "objects/object_st/object_st.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -430,14 +430,14 @@ s32 EnSt_CheckHitBackside(EnSt* this, PlayState* play) {
     if (cyl->base.acFlags & AC_HIT) {
         cyl->base.acFlags &= ~AC_HIT;
         hit = true;
-        flags |= cyl->info.acHitInfo->toucher.dmgFlags;
+        flags |= DinFireSword_OriginalDamageFlags(play, cyl->info.acHitInfo);
     }
 
     cyl = &this->colCylinder[1];
     if (cyl->base.acFlags & AC_HIT) {
         cyl->base.acFlags &= ~AC_HIT;
         hit = true;
-        flags |= cyl->info.acHitInfo->toucher.dmgFlags;
+        flags |= DinFireSword_OriginalDamageFlags(play, cyl->info.acHitInfo);
     }
 
     if (!hit) {
@@ -815,8 +815,6 @@ void EnSt_Destroy(Actor* thisx, PlayState* play) {
         Collider_DestroyCylinder(play, &this->colCylinder[i]);
     }
     Collider_DestroyJntSph(play, &this->colSph);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void EnSt_WaitOnCeiling(EnSt* this, PlayState* play) {

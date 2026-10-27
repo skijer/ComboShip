@@ -1,0 +1,86 @@
+<div id="summer-weather-preview">
+  <p class="summer-note">Summer atmosphere review · production particle paths and sprites · simulated scene lighting, no gameplay capture.</p>
+  <div class="viz-controls">
+    <button type="button" class="btn" data-hour="12" aria-pressed="true">Day</button>
+    <button type="button" class="btn" data-hour="18" aria-pressed="false">Dusk</button>
+    <button type="button" class="btn" data-hour="23" aria-pressed="false">Night</button>
+    <label class="form-check form-switch"><input id="summer-beams" class="form-check-input" type="checkbox"><span class="form-check-label">Soft sunbeams</span></label>
+    <button id="summer-play" type="button" class="btn">Pause</button>
+  </div>
+  <canvas id="summer-scene" role="img" aria-label="Animated summer weather preview: drifting dandelion fluff, optional soft sunbeams, and hovering fireflies after dusk."></canvas>
+  <div class="text-small text-muted" aria-live="polite" id="summer-caption">Day · motion preview · scene lighting simulated</div>
+</div>
+<style>
+  #summer-weather-preview { font-family:system-ui,sans-serif; color:#dce3d4; background:#151e17; padding:16px; border-radius:12px; }
+  #summer-weather-preview .summer-note { font-size:13px; line-height:1.5; margin:0 0 12px; }
+  #summer-weather-preview .viz-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  #summer-weather-preview .btn { border:1px solid #697b58; background:#223323; color:#e5eddd; border-radius:6px; padding:7px 13px; cursor:pointer; }
+  #summer-weather-preview .btn[aria-pressed="true"] { background:#486035; }
+  #summer-weather-preview .form-check { display:flex; align-items:center; gap:6px; font-size:14px; }
+  #summer-weather-preview .text-small { font-size:13px; color:#a7b5a0; }
+  #summer-weather-preview canvas { display:block; width:100%; aspect-ratio:16/9; margin:12px 0 8px; }
+</style>
+<script>
+/*__SUMMER_MOTION__*/
+(() => {
+  const root=document.getElementById('summer-weather-preview'),canvas=root.querySelector('#summer-scene');
+  const gl=canvas.getContext('webgl',{alpha:false,antialias:true});
+  if(!gl){root.querySelector('#summer-caption').textContent='This device could not display the animated preview.';return;}
+  const compile=(type,source)=>{const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;};
+  const program=gl.createProgram();
+  gl.attachShader(program,compile(gl.VERTEX_SHADER,'attribute vec4 aPosition;attribute vec2 aUv;attribute vec4 aColor;varying vec2 vUv;varying vec4 vColor;void main(){gl_Position=aPosition;vUv=aUv;vColor=aColor;}'));
+  gl.attachShader(program,compile(gl.FRAGMENT_SHADER,'precision mediump float;uniform sampler2D uTexture;uniform bool uTextured;varying vec2 vUv;varying vec4 vColor;void main(){gl_FragColor=(uTextured?texture2D(uTexture,vUv):vec4(1.0))*vColor;}'));
+  gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program));gl.useProgram(program);
+  const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+  for(const [name,size,offset] of [['aPosition',4,0],['aUv',2,16],['aColor',4,24]]){const a=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,size,gl.FLOAT,false,40,offset);}
+  const textured=gl.getUniformLocation(program,'uTextured');gl.uniform1i(gl.getUniformLocation(program,'uTexture'),0);
+  const texture=(data,w,h)=>{const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);if(w)gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,data);else gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,data);return t;};
+  const spriteBytes=__SUMMER_TEXTURES__;
+  const sprite=data=>{const bytes=new Uint8Array(16*16*4);data.forEach((v,i)=>bytes.set([255,255,255,(v&15)*17],i*4));return texture(bytes,16,16);};
+  const fluff=sprite(spriteBytes.kDandelionTexture),glow=sprite(spriteBytes.kGlowTexture);let backdrop=null;
+  const photo=new Image();photo.onload=()=>{gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);backdrop=texture(photo);draw();};photo.src='data:image/jpeg;base64,__SUMMER_BACKGROUND__';
+  const {Motion,view,billboardCorners}=globalThis.MMSummerMotion,motion=new Motion();
+  let hour=12,running=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=0,accumulator=0,visible=true;
+  const beams=root.querySelector('#summer-beams'),play=root.querySelector('#summer-play'),caption=root.querySelector('#summer-caption');
+  const inputs=seconds=>({hour,seconds,sunbeams:beams.checked});
+  motion.step(inputs(0.05));for(let i=0;i<24;i++)motion.step(inputs(0.05));
+  const snap=()=>motion.particles.map(p=>({position:p.position.slice(),alpha:p.alpha,generation:p.generation}));let previous=snap();
+  const project=p=>{const r=p.slice(0,3).map((v,i)=>v-view.eye[i]),dot=a=>r.reduce((n,v,i)=>n+v*a[i],0);return [dot(view.right)/(view.tanHalfFov*view.aspect),dot(view.up)/view.tanHalfFov,0,dot(view.forward)];};
+  const vertex=(position,uv,color)=>[...position,...uv,...color];
+  const triangle=(target,vs,indices)=>indices.forEach(i=>target.push(...vs[i]));
+  const submit=(data,tex)=>{gl.uniform1i(textured,tex?1:0);if(tex)gl.bindTexture(gl.TEXTURE_2D,tex);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.DYNAMIC_DRAW);gl.drawArrays(gl.TRIANGLES,0,data.length/10);};
+  function draw(){
+    const width=Math.max(320,Math.min(1600,Math.round(canvas.clientWidth*(devicePixelRatio||1)))),height=Math.round(width*9/16);
+    if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}gl.viewport(0,0,width,height);
+    gl.disable(gl.BLEND);gl.clearColor(0.08,0.12,0.14,1);gl.clear(gl.COLOR_BUFFER_BIT);
+    if(backdrop){
+      const tint=hour===12?[1.3,1.25,1.18,1]:hour===18?[0.82,0.74,0.72,1]:[0.34,0.40,0.58,1];
+      const q=[vertex([-1,-1,0,1],[0,0],tint),vertex([1,-1,0,1],[1,0],tint),vertex([1,1,0,1],[1,1],tint),vertex([-1,1,0,1],[0,1],tint)],data=[];triangle(data,q,[0,1,2,0,2,3]);submit(data,backdrop);
+    }
+    gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+    const sprites=[[],[]],t=running?Math.min(1,accumulator/0.05):1;
+    motion.particles.forEach((p,i)=>{
+      const old=previous[i],same=old.generation===p.generation,pos=p.position.map((v,k)=>same?old.position[k]+(v-old.position[k])*t:v),alpha=same?old.alpha+(p.alpha-old.alpha)*t:p.alpha;
+      if(alpha<1/255)return;
+      const color=p.kind?[238/255,1,154/255,alpha]:[1,244/255,204/255,alpha],r=p.radius;
+      const uvs=[[0,1],[1,1],[1,0],[0,0]],q=billboardCorners(pos,r).map((corner,j)=>vertex(project(corner),uvs[j],color));triangle(sprites[p.kind],q,[0,1,2,0,2,3]);
+    });
+    if(sprites[0].length)submit(sprites[0],fluff);
+    if(sprites[1].length)submit(sprites[1],glow);
+    const rays=[];
+    motion.beams.forEach(beam=>{const vs=beam.map(v=>vertex(project(v),[0,0],[1,244/255,204/255,v[3]]));for(let row=0;row<3;row++)for(let col=0;col<2;col++){const i=row*3+col;triangle(rays,vs,[i,i+3,i+4,i,i+4,i+1]);}});
+    if(rays.length)submit(rays,null);
+    canvas.dataset.mode=hour===12?'day':hour===18?'dusk':'night';canvas.dataset.beams=String(beams.checked);canvas.dataset.frame=String(motion.elapsed);
+  }
+  root.querySelectorAll('[data-hour]').forEach(button=>button.addEventListener('click',()=>{hour=Number(button.dataset.hour);root.querySelectorAll('[data-hour]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));motion.step(inputs(0));previous=snap();caption.textContent=`${button.textContent} · motion preview · scene lighting simulated`;draw();}));
+  beams.addEventListener('change',()=>{motion.step(inputs(0));previous=snap();draw();});
+  const updatePlay=()=>{play.textContent=running?'Pause':'Play';play.setAttribute('aria-pressed',String(running));};
+  play.addEventListener('click',()=>{running=!running;last=0;accumulator=0;updatePlay();draw();});updatePlay();
+  new ResizeObserver(draw).observe(canvas);new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;last=0;}).observe(canvas);
+  function animate(now){
+    if(running&&visible){accumulator+=last?Math.min(0.1,(now-last)/1000):0;while(accumulator>=0.05){previous=snap();motion.step(inputs(0.05));accumulator-=0.05;}draw();}
+    last=now;requestAnimationFrame(animate);
+  }
+  draw();requestAnimationFrame(animate);
+})();
+</script>

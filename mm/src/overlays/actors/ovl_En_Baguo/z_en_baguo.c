@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_en_baguo.c
  * Overlay: ovl_En_Baguo
@@ -329,6 +330,11 @@ void EnBaguo_CheckForDetonation(EnBaguo* this, PlayState* play) {
         if ((this->collider.base.acFlags & AC_HIT) || i) {
             this->collider.base.acFlags &= ~AC_HIT;
             if (i || (this->actor.colChkInfo.damageEffect == NEJIRON_DMGEFF_KILL)) {
+                if (!i) {
+                    DinFireSword_FinishConfirmedHit(play, &this->collider.base,
+                                                    this->collider.elements[0].base.acHitElem,
+                                                    this->collider.elements[0].base.acDmgInfo.dmgFlags);
+                }
                 Actor_SetColorFilter(&this->actor, COLORFILTER_COLORFLAG_RED, 255, COLORFILTER_BUFFLAG_OPA, 8);
                 this->action = NEJIRON_ACTION_EXPLODING;
                 this->actor.speed = 0.0f;

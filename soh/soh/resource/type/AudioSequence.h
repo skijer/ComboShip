@@ -2,18 +2,11 @@
 
 #include <stdint.h>
 #include <ship/resource/Resource.h>
+#include "audio_sequence_data.h"
 
 namespace SOH {
 
-typedef struct {
-    char* seqData;
-    uint32_t seqDataSize;
-    uint16_t seqNumber;
-    uint8_t medium;
-    uint8_t cachePolicy;
-    uint32_t numFonts;
-    uint8_t fonts[16];
-} Sequence;
+typedef AudioSequenceData Sequence;
 
 class AudioSequence : public Ship::Resource<Sequence> {
   public:
@@ -26,6 +19,6 @@ class AudioSequence : public Ship::Resource<Sequence> {
     Sequence* GetPointer();
     size_t GetPointerSize();
 
-    Sequence sequence;
+    Sequence sequence{};
 };
 }; // namespace SOH

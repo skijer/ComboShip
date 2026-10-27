@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+void aAudioTraceDMemImpl(int stage, uint16_t addr, unsigned samples);
 #include "libultraship/libultra/abi.h"
 
 #undef aSegment
@@ -34,6 +35,7 @@
 
 void aClearBufferImpl(uint16_t addr, int nbytes);
 void aLoadBufferImpl(const void* source_addr, uint16_t dest_addr, uint16_t nbytes);
+void aLoadBufferExactImpl(const void* source_addr, uint16_t dest_addr, uint16_t nbytes);
 void aSaveBufferImpl(uint16_t source_addr, int16_t* dest_addr, uint16_t nbytes);
 void aLoadADPCMImpl(int num_entries_times_16, const int16_t* book_source_addr);
 void aSetBufferImpl(uint8_t flags, uint16_t in, uint16_t out, uint16_t nbytes);

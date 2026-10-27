@@ -6,15 +6,14 @@
 
 #ifdef __cplusplus
 #define this thisx
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <libultraship/log/luslog.h>
 #include <soh/Enhancements/item-tables/ItemTableTypes.h>
 
 #if (LOG_LEVEL_GAME_PRINTS >= SPDLOG_ACTIVE_LEVEL) && !(LOG_LEVEL_GAME_PRINTS >= 6)
-#define osSyncPrintf(...) lusprintf(__FILE__, __LINE__, LOG_LEVEL_GAME_PRINTS , __VA_ARGS__)
+#define osSyncPrintf(...) lusprintf(__FILE__, __LINE__, LOG_LEVEL_GAME_PRINTS, __VA_ARGS__)
 #else
 #define osSyncPrintf(fmt, ...) osSyncPrintfUnused(fmt, ##__VA_ARGS__)
 #endif
@@ -28,7 +27,6 @@ void gDPSetTileSizeLerp(Gfx* pkt, int t, float uls0, float ult0, float lrs0, flo
 void gSPDisplayListOffset(Gfx* pkt, Gfx* dl, int offset);
 void gSPVertex(Gfx* pkt, uintptr_t v, int n, int v0);
 void gSPInvalidateTexCache(Gfx* pkt, uintptr_t texAddr);
-
 
 void cleararena(void);
 void bootproc(void);
@@ -44,11 +42,12 @@ const char* DmaMgr_GetFileNameImpl(uintptr_t vrom);
 const char* DmaMgr_GetFileName(uintptr_t vrom);
 void DmaMgr_ProcessMsg(DmaRequest* req);
 void DmaMgr_ThreadEntry(void* arg0);
-s32 DmaMgr_SendRequestImpl(DmaRequest* req, uintptr_t ram, uintptr_t vrom, size_t size, u32 unk, OSMesgQueue* queue, OSMesg msg);
+s32 DmaMgr_SendRequestImpl(DmaRequest* req, uintptr_t ram, uintptr_t vrom, size_t size, u32 unk, OSMesgQueue* queue,
+                           OSMesg msg);
 s32 DmaMgr_SendRequest0(uintptr_t ram, uintptr_t vrom, size_t size);
 void DmaMgr_Init(void);
-s32 DmaMgr_SendRequest2(DmaRequest* req, uintptr_t ram, uintptr_t vrom, size_t size, u32 unk5, OSMesgQueue* queue, OSMesg msg,
-                        const char* file, s32 line);
+s32 DmaMgr_SendRequest2(DmaRequest* req, uintptr_t ram, uintptr_t vrom, size_t size, u32 unk5, OSMesgQueue* queue,
+                        OSMesg msg, const char* file, s32 line);
 s32 DmaMgr_SendRequest1(void* ram0, uintptr_t vrom, size_t size, const char* file, s32 line);
 void* Yaz0_FirstDMA(void);
 void* Yaz0_NextDMA(void* curSrcPos);
@@ -71,7 +70,7 @@ void __assert(const char* exp, const char* file, s32 line);
 #endif
 void isPrintfInit(void);
 void osSyncPrintfUnused(const char* fmt, ...);
-//void osSyncPrintf(const char* fmt, ...);
+// void osSyncPrintf(const char* fmt, ...);
 void rmonPrintf(const char* fmt, ...);
 void* is_proutSyncPrintf(void* arg, const char* str, u32 count);
 void func_80002384(const char* exp, const char* file, u32 line);
@@ -169,8 +168,8 @@ void osYieldThread(void);
 u32 __osGetCause();
 s32 __osEPiRawWriteIo(OSPiHandle* handle, u32 devAddr, u32 data);
 void _Litob(_Pft* args, u8 type);
-//ldiv_t ldiv(s32 num, s32 denom);
-//lldiv_t lldiv(s64 num, s64 denom);
+// ldiv_t ldiv(s32 num, s32 denom);
+// lldiv_t lldiv(s64 num, s64 denom);
 void _Ldtob(_Pft* args, u8 type);
 s32 __osSiRawWriteIo(void* devAddr, u32 val);
 void osCreateViManager(OSPri pri);
@@ -186,7 +185,9 @@ void EnItem00_CustomItemsParticles(Actor* Parent, PlayState* play, GetItemEntry 
 void EnItem00_SetupAction(EnItem00* this, EnItem00ActionFunc actionFunc);
 void func_8001E5C8(EnItem00* this, PlayState* play);
 void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, Vec3f* spawnPos, s16 params);
-void EffectBlure_ChangeType(EffectBlure* this, int type);
+void EffectBlureShip_ChangeType(EffectBlure* this, int type);
+// Compatibility for preserved cor mods using the pre-9.3 API name.
+#define EffectBlure_ChangeType EffectBlureShip_ChangeType
 void EffectBlure_AddVertex(EffectBlure* this, Vec3f* p1, Vec3f* p2);
 void EffectBlure_AddSpace(EffectBlure* this);
 void EffectBlure_Init1(void* thisx, void* initParamsx);
@@ -249,10 +250,8 @@ void func_8002857C(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
 void func_800285EC(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
 void func_8002865C(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep);
 void func_800286CC(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep);
-void func_8002873C(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep,
-                   s16 life);
-void func_800287AC(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep,
-                   s16 life);
+void func_8002873C(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep, s16 life);
+void func_800287AC(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep, s16 life);
 void func_8002881C(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
                    Color_RGBA8* envColor);
 void func_80028858(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
@@ -260,30 +259,29 @@ void func_80028858(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, C
 void func_80028990(PlayState* play, f32 randScale, Vec3f* srcPos);
 void func_80028A54(PlayState* play, f32 randScale, Vec3f* srcPos);
 void EffectSsKiraKira_SpawnSmallYellow(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
-void EffectSsKiraKira_SpawnSmall(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
-                                 Color_RGBA8* primColor, Color_RGBA8* envColor);
-void EffectSsKiraKira_SpawnDispersed(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
-                                     Color_RGBA8* primColor, Color_RGBA8* envColor, s16 scale, s32 life);
-void EffectSsKiraKira_SpawnFocused(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
-                                   Color_RGBA8* primColor, Color_RGBA8* envColor, s16 scale, s32 life);
+void EffectSsKiraKira_SpawnSmall(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
+                                 Color_RGBA8* envColor);
+void EffectSsKiraKira_SpawnDispersed(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
+                                     Color_RGBA8* envColor, s16 scale, s32 life);
+void EffectSsKiraKira_SpawnFocused(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
+                                   Color_RGBA8* envColor, s16 scale, s32 life);
 void EffectSsBomb_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
 void EffectSsBomb2_SpawnFade(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
-void EffectSsBomb2_SpawnLayered(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale,
-                                s16 scaleStep);
+void EffectSsBomb2_SpawnLayered(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep);
 void EffectSsBlast_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
                          Color_RGBA8* envColor, s16 scale, s16 scaleStep, s16 sclaeStepDecay, s16 life);
 void EffectSsBlast_SpawnWhiteCustomScale(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale,
                                          s16 scaleStep, s16 life);
-void EffectSsBlast_SpawnShockwave(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
-                                  Color_RGBA8* primColor, Color_RGBA8* envColor, s16 life);
+void EffectSsBlast_SpawnShockwave(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
+                                  Color_RGBA8* envColor, s16 life);
 void EffectSsBlast_SpawnWhiteShockwave(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
 void EffectSsGSpk_SpawnAccel(PlayState* play, Actor* actor, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
                              Color_RGBA8* primColor, Color_RGBA8* envColor, s16 scale, s16 scaleStep);
 void EffectSsGSpk_SpawnNoAccel(PlayState* play, Actor* actor, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
                                Color_RGBA8* primColor, Color_RGBA8* envColor, s16 scale, s16 scaleStep);
 void EffectSsGSpk_SpawnFuse(PlayState* play, Actor* actor, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
-void EffectSsGSpk_SpawnRandColor(PlayState* play, Actor* actor, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
-                                 s16 scale, s16 scaleStep);
+void EffectSsGSpk_SpawnRandColor(PlayState* play, Actor* actor, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale,
+                                 s16 scaleStep);
 void EffectSsGSpk_SpawnSmall(PlayState* play, Actor* actor, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
                              Color_RGBA8* primColor, Color_RGBA8* envColor);
 void EffectSsDFire_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep,
@@ -293,57 +291,54 @@ void EffectSsDFire_SpawnFixedScale(PlayState* play, Vec3f* pos, Vec3f* velocity,
 void EffectSsBubble_Spawn(PlayState* play, Vec3f* pos, f32 yPosOffset, f32 yPosRandScale, f32 xzPosRandScale,
                           f32 scale);
 void EffectSsGRipple_Spawn(PlayState* play, Vec3f* pos, s16 radius, s16 radiusMax, s16 life);
-void EffectSsGSplash_Spawn(PlayState* play, Vec3f* pos, Color_RGBA8* primColor, Color_RGBA8* envColor,
-                           s16 type, s16 scale);
+void EffectSsGSplash_Spawn(PlayState* play, Vec3f* pos, Color_RGBA8* primColor, Color_RGBA8* envColor, s16 type,
+                           s16 scale);
 void EffectSsGMagma_Spawn(PlayState* play, Vec3f* pos);
 void EffectSsGFire_Spawn(PlayState* play, Vec3f* pos);
-void EffectSsLightning_Spawn(PlayState* play, Vec3f* pos, Color_RGBA8* primColor, Color_RGBA8* envColor,
-                             s16 scale, s16 yaw, s16 life, s16 numBolts);
-void EffectSsDtBubble_SpawnColorProfile(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale,
-                                        s16 life, s16 colorProfile, s16 randXZ);
+void EffectSsLightning_Spawn(PlayState* play, Vec3f* pos, Color_RGBA8* primColor, Color_RGBA8* envColor, s16 scale,
+                             s16 yaw, s16 life, s16 numBolts);
+void EffectSsDtBubble_SpawnColorProfile(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 life,
+                                        s16 colorProfile, s16 randXZ);
 void EffectSsDtBubble_SpawnCustomColor(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel,
                                        Color_RGBA8* primColor, Color_RGBA8* envColor, s16 scale, s16 life, s16 randXZ);
-void EffectSsHahen_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 unused, s16 scale,
-                         s16 objId, s16 life, Gfx* dList);
-void EffectSsHahen_SpawnBurst(PlayState* play, Vec3f* pos, f32 burstScale, s16 unused, s16 scale,
-                              s16 randScaleRange, s16 count, s16 objId, s16 life, Gfx* dList);
+void EffectSsHahen_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 unused, s16 scale, s16 objId,
+                         s16 life, Gfx* dList);
+void EffectSsHahen_SpawnBurst(PlayState* play, Vec3f* pos, f32 burstScale, s16 unused, s16 scale, s16 randScaleRange,
+                              s16 count, s16 objId, s16 life, Gfx* dList);
 void EffectSsStick_Spawn(PlayState* play, Vec3f* pos, s16 yaw);
-void EffectSsSibuki_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 moveDelay,
-                          s16 direction, s16 scale);
+void EffectSsSibuki_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 moveDelay, s16 direction,
+                          s16 scale);
 void EffectSsSibuki_SpawnBurst(PlayState* play, Vec3f* pos);
 void EffectSsSibuki2_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale);
-void EffectSsGMagma2_Spawn(PlayState* play, Vec3f* pos, Color_RGBA8* primColor, Color_RGBA8* envColor,
-                           s16 updateRate, s16 drawMode, s16 scale);
+void EffectSsGMagma2_Spawn(PlayState* play, Vec3f* pos, Color_RGBA8* primColor, Color_RGBA8* envColor, s16 updateRate,
+                           s16 drawMode, s16 scale);
 void EffectSsStone1_Spawn(PlayState* play, Vec3f* pos, s32 arg2);
 void EffectSsHitMark_Spawn(PlayState* play, s32 type, s16 scale, Vec3f* pos);
 void EffectSsHitMark_SpawnFixedScale(PlayState* play, s32 type, Vec3f* pos);
 void EffectSsHitMark_SpawnCustomScale(PlayState* play, s32 type, s16 scale, Vec3f* pos);
-void EffectSsFhgFlash_SpawnLightBall(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale,
-                                     u8 param);
+void EffectSsFhgFlash_SpawnLightBall(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, u8 param);
 void EffectSsFhgFlash_SpawnShock(PlayState* play, Actor* actor, Vec3f* pos, s16 scale, u8 param);
 void EffectSsKFire_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scaleMax, u8 type);
 void EffectSsSolderSrchBall_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 unused,
                                   s16* linkDetected);
-void EffectSsKakera_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* arg3, s16 gravity, s16 arg5,
-                          s16 arg6, s16 arg7, s16 arg8, s16 scale, s16 arg10, s16 arg11, s32 life, s16 colorIdx,
-                          s16 objId, Gfx* dList);
+void EffectSsKakera_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* arg3, s16 gravity, s16 arg5, s16 arg6,
+                          s16 arg7, s16 arg8, s16 scale, s16 arg10, s16 arg11, s32 life, s16 colorIdx, s16 objId,
+                          Gfx* dList);
 void EffectSsIcePiece_Spawn(PlayState* play, Vec3f* pos, f32 scale, Vec3f* velocity, Vec3f* accel, s32 life);
 void EffectSsIcePiece_SpawnBurst(PlayState* play, Vec3f* refPos, f32 scale);
 void EffectSsEnIce_SpawnFlyingVec3f(PlayState* play, Actor* actor, Vec3f* pos, s16 primR, s16 primG, s16 primB,
                                     s16 primA, s16 envR, s16 envG, s16 envB, f32 scale);
 void EffectSsEnIce_SpawnFlyingVec3s(PlayState* play, Actor* actor, Vec3s* pos, s16 primR, s16 primG, s16 primB,
                                     s16 primA, s16 envR, s16 envG, s16 envB, f32 scale);
-void EffectSsEnIce_Spawn(PlayState* play, Vec3f* pos, f32 scale, Vec3f* velocity, Vec3f* accel,
-                         Color_RGBA8* primColor, Color_RGBA8* envColor, s32 life);
+void EffectSsEnIce_Spawn(PlayState* play, Vec3f* pos, f32 scale, Vec3f* velocity, Vec3f* accel, Color_RGBA8* primColor,
+                         Color_RGBA8* envColor, s32 life);
 void EffectSsFireTail_Spawn(PlayState* play, Actor* actor, Vec3f* pos, f32 scale, Vec3f* arg4, s16 arg5,
                             Color_RGBA8* primColor, Color_RGBA8* envColor, s16 type, s16 bodyPart, s32 life);
-void EffectSsFireTail_SpawnFlame(PlayState* play, Actor* actor, Vec3f* pos, f32 arg3, s16 bodyPart,
-                                 f32 colorIntensity);
+void EffectSsFireTail_SpawnFlame(PlayState* play, Actor* actor, Vec3f* pos, f32 arg3, s16 bodyPart, f32 colorIntensity);
 void EffectSsFireTail_SpawnFlameOnPlayer(PlayState* play, f32 scale, s16 bodyPart, f32 colorIntensity);
 void EffectSsEnFire_SpawnVec3f(PlayState* play, Actor* actor, Vec3f* pos, s16 scale, s16 unk_12, s16 flags,
                                s16 bodyPart);
-void EffectSsEnFire_SpawnVec3s(PlayState* play, Actor* actor, Vec3s* vec, s16 scale, s16 arg4, s16 flags,
-                               s16 bodyPart);
+void EffectSsEnFire_SpawnVec3s(PlayState* play, Actor* actor, Vec3s* vec, s16 scale, s16 arg4, s16 flags, s16 bodyPart);
 void EffectSsExtra_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scoreIdx);
 void EffectSsFCircle_Spawn(PlayState* play, Actor* actor, Vec3f* pos, s16 radius, s16 height);
 void EffectSsDeadDb_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep,
@@ -356,12 +351,11 @@ void EffectSsDeadDd_SpawnRandYellow(PlayState* play, Vec3f* pos, s16 scale, s16 
                                     s32 randIter, s32 life);
 void EffectSsDeadDs_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale, s16 scaleStep,
                           s16 alpha, s32 life);
-void EffectSsDeadDs_SpawnStationary(PlayState* play, Vec3f* pos, s16 scale, s16 scaleStep, s16 alpha,
-                                    s32 life);
-void EffectSsDeadSound_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, u16 sfxId,
-                             s16 lowerPriority, s16 repeatMode, s32 life);
-void EffectSsDeadSound_SpawnStationary(PlayState* play, Vec3f* pos, u16 sfxId, s16 lowerPriority,
-                                       s16 repeatMode, s32 life);
+void EffectSsDeadDs_SpawnStationary(PlayState* play, Vec3f* pos, s16 scale, s16 scaleStep, s16 alpha, s32 life);
+void EffectSsDeadSound_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, u16 sfxId, s16 lowerPriority,
+                             s16 repeatMode, s32 life);
+void EffectSsDeadSound_SpawnStationary(PlayState* play, Vec3f* pos, u16 sfxId, s16 lowerPriority, s16 repeatMode,
+                                       s32 life);
 void EffectSsIceSmoke_Spawn(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel, s16 scale);
 void FlagSet_Update(PlayState* play);
 void Overlay_LoadGameState(GameStateOverlay* overlayEntry);
@@ -393,8 +387,8 @@ s32 Flags_GetCollectible(PlayState* play, s32 flag);
 void Flags_SetCollectible(PlayState* play, s32 flag);
 void TitleCard_InitBossName(PlayState* play, TitleCardContext* titleCtx, void* texture, s16 x, s16 y, u8 width,
                             u8 height, s16 hasTranslation);
-void TitleCard_InitPlaceName(PlayState* play, TitleCardContext* titleCtx, void* texture, s32 x, s32 y,
-                             s32 width, s32 height, s32 delay);
+void TitleCard_InitPlaceName(PlayState* play, TitleCardContext* titleCtx, void* texture, s32 x, s32 y, s32 width,
+                             s32 height, s32 delay);
 s32 TitleCard_Clear(PlayState* play, TitleCardContext* titleCtx);
 void Actor_Kill(Actor* actor);
 void Actor_SetFocus(Actor* actor, f32 offset);
@@ -457,7 +451,8 @@ u32 Actor_TextboxIsClosing(Actor* actor, PlayState* play);
 s8 Actor_GetPlayerExchangeItemId(PlayState* play);
 void Actor_GetScreenPos(PlayState* play, Actor* actor, s16* x, s16* y);
 u32 Actor_HasParent(Actor* actor, PlayState* play);
-// TODO: Rename the follwing 3 functions using whatever scheme we use when we rename Actor_OfferGetItem and Actor_OfferGetItemNearby.
+// TODO: Rename the follwing 3 functions using whatever scheme we use when we rename Actor_OfferGetItem and
+// Actor_OfferGetItemNearby.
 s32 GiveItemEntryWithoutActor(PlayState* play, GetItemEntry getItemEntry);
 s32 GiveItemEntryFromActor(Actor* actor, PlayState* play, GetItemEntry getItemEntry, f32 xzRange, f32 yRange);
 s32 GiveItemEntryFromActorWithFixedRange(Actor* actor, PlayState* play, GetItemEntry getItemEntry);
@@ -492,10 +487,10 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx);
 void Actor_KillAllWithMissingObject(PlayState* play, ActorContext* actorCtx);
 void func_80031B14(PlayState* play, ActorContext* actorCtx);
 void func_80031C3C(ActorContext* actorCtx, PlayState* play);
-Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 posX, f32 posY, f32 posZ,
-                   s16 rotX, s16 rotY, s16 rotZ, s16 params);
-Actor* Actor_SpawnAsChild(ActorContext* actorCtx, Actor* parent, PlayState* play, s16 actorId, f32 posX,
-                          f32 posY, f32 posZ, s16 rotX, s16 rotY, s16 rotZ, s16 params);
+Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 posX, f32 posY, f32 posZ, s16 rotX,
+                   s16 rotY, s16 rotZ, s16 params);
+Actor* Actor_SpawnAsChild(ActorContext* actorCtx, Actor* parent, PlayState* play, s16 actorId, f32 posX, f32 posY,
+                          f32 posZ, s16 rotX, s16 rotY, s16 rotZ, s16 params);
 void Actor_SpawnTransitionActors(PlayState* play, ActorContext* actorCtx);
 Actor* Actor_SpawnEntry(ActorContext* actorCtx, ActorEntry* actorEntry, PlayState* play);
 Actor* Actor_Delete(ActorContext* actorCtx, Actor* actor, PlayState* play);
@@ -531,14 +526,14 @@ void func_8003424C(PlayState* play, Vec3f* arg1);
 void Actor_SetColorFilter(Actor* actor, s16 colorFlag, s16 colorIntensityMax, s16 xluFlag, s16 duration);
 Hilite* func_800342EC(Vec3f* object, PlayState* play);
 Hilite* func_8003435C(Vec3f* object, PlayState* play);
-s32 Npc_UpdateTalking(PlayState* play, Actor* actor, s16* talkState, f32 interactRange,
-                      NpcGetTextIdFunc getTextId, NpcUpdateTalkStateFunc updateTalkState);
+s32 Npc_UpdateTalking(PlayState* play, Actor* actor, s16* talkState, f32 interactRange, NpcGetTextIdFunc getTextId,
+                      NpcUpdateTalkStateFunc updateTalkState);
 s16 Npc_GetTrackingPresetMaxPlayerYaw(s16 presetIndex);
 void Npc_TrackPoint(Actor* actor, NpcInteractInfo* interactInfo, s16 presetIndex, s16 trackingMode);
-void func_80034BA0(PlayState* play, SkelAnime* skelAnime, OverrideLimbDraw overrideLimbDraw,
-                   PostLimbDraw postLimbDraw, Actor* actor, s16 alpha);
-void func_80034CC4(PlayState* play, SkelAnime* skelAnime, OverrideLimbDraw overrideLimbDraw,
-                   PostLimbDraw postLimbDraw, Actor* actor, s16 alpha);
+void func_80034BA0(PlayState* play, SkelAnime* skelAnime, OverrideLimbDraw overrideLimbDraw, PostLimbDraw postLimbDraw,
+                   Actor* actor, s16 alpha);
+void func_80034CC4(PlayState* play, SkelAnime* skelAnime, OverrideLimbDraw overrideLimbDraw, PostLimbDraw postLimbDraw,
+                   Actor* actor, s16 alpha);
 s16 Actor_UpdateAlphaByDistance(Actor* actor, PlayState* play, s16 arg2, f32 arg3);
 void Animation_ChangeByInfo(SkelAnime* skelAnime, AnimationInfo* animationInfo, s32 index);
 void Actor_UpdateFidgetTables(PlayState* play, s16* arg1, s16* arg2, s32 arg3);
@@ -554,8 +549,8 @@ u8 Actor_ApplyDamage(Actor* actor);
 void Actor_SetDropFlag(Actor* actor, ColliderInfo* colBody, s32 freezeFlag);
 void Actor_SetDropFlagJntSph(Actor* actor, ColliderJntSph* colBody, s32 freezeFlag);
 void func_80035844(Vec3f* arg0, Vec3f* arg1, Vec3s* arg2, s32 arg3);
-Actor* func_800358DC(Actor* actor, Vec3f* spawnPos, Vec3s* spawnRot, f32* arg3, s32 timer, s16* unused,
-                     PlayState* play, s16 params, s32 arg8);
+Actor* func_800358DC(Actor* actor, Vec3f* spawnPos, Vec3s* spawnRot, f32* arg3, s32 timer, s16* unused, PlayState* play,
+                     s16 params, s32 arg8);
 void func_800359B8(Actor* actor, s16 arg1, Vec3s* arg2);
 s32 Flags_GetEventChkInf(s32 flag);
 void Flags_SetEventChkInf(s32 flag);
@@ -591,8 +586,7 @@ void BgCheck_GetStaticLookupIndicesFromPos(CollisionContext* colCtx, Vec3f* pos,
 void BgCheck_Allocate(CollisionContext* colCtx, PlayState* play, CollisionHeader* colHeader);
 s32 BgCheck_PosInStaticBoundingBox(CollisionContext* colCtx, Vec3f* pos);
 f32 BgCheck_EntityRaycastFloor1(CollisionContext* colCtx, CollisionPoly** outPoly, Vec3f* pos);
-f32 BgCheck_EntityRaycastFloor2(PlayState* play, CollisionContext* colCtx, CollisionPoly** outPoly,
-                                Vec3f* pos);
+f32 BgCheck_EntityRaycastFloor2(PlayState* play, CollisionContext* colCtx, CollisionPoly** outPoly, Vec3f* pos);
 f32 BgCheck_EntityRaycastFloor3(CollisionContext* colCtx, CollisionPoly** outPoly, s32* bgId, Vec3f* pos);
 f32 BgCheck_EntityRaycastFloor4(CollisionContext* colCtx, CollisionPoly** outPoly, s32* bgId, Actor* actor,
                                 Vec3f* arg4);
@@ -674,10 +668,14 @@ void CollisionHeader_GetVirtual(void* colHeader, CollisionHeader** dest);
 void func_800418D0(CollisionContext* colCtx, PlayState* play);
 void BgCheck_ResetPolyCheckTbl(SSNodeList* nodeList, s32 numPolys);
 u32 SurfaceType_GetCamDataIndex(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId);
-u16 func_80041A4C(CollisionContext* colCtx, u32 camId, s32 bgId);
+u16 BgCheck_GetBgCamSettingImpl(CollisionContext* colCtx, u32 bgCamIndex, s32 bgId);
+// Compatibility for preserved cor mods using the pre-9.3 API name.
+#define func_80041A4C BgCheck_GetBgCamSettingImpl
 u16 SurfaceType_GetCameraSType(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId);
 u16 SurfaceType_GetNumCameras(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId);
-Vec3s* func_80041C10(CollisionContext* colCtx, s32 camId, s32 bgId);
+Vec3s* BgCheck_GetBgCamFuncDataImpl(CollisionContext* colCtx, s32 bgCamIndex, s32 bgId);
+// Compatibility for preserved cor mods using the pre-9.3 API name.
+#define func_80041C10 BgCheck_GetBgCamFuncDataImpl
 Vec3s* SurfaceType_GetCamPosData(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId);
 u32 SurfaceType_GetSceneExitIndex(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId);
 u32 SurfaceType_GetFloorType(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId);
@@ -734,7 +732,9 @@ void Camera_InitPlayerSettings(Camera* camera, Player* player);
 s16 Camera_ChangeStatus(Camera* camera, s16 status);
 Vec3s Camera_Update(Camera* camera);
 void Camera_Finish(Camera* camera);
-s32 Camera_ChangeMode(Camera* camera, s16 mode);
+s32 Camera_RequestMode(Camera* camera, s16 mode);
+// Compatibility for preserved cor mods using the pre-9.3 API name.
+#define Camera_ChangeMode Camera_RequestMode
 s32 Camera_CheckValidMode(Camera* camera, s16 mode);
 s32 Camera_RequestSetting(Camera* camera, s16 setting);
 s32 Camera_ChangeDataIdx(Camera* camera, s32 camDataIdx);
@@ -766,8 +766,7 @@ s32 Collider_InitJntSph(PlayState* play, ColliderJntSph* collider);
 s32 Collider_FreeJntSph(PlayState* play, ColliderJntSph* collider);
 s32 Collider_DestroyJntSph(PlayState* play, ColliderJntSph* collider);
 s32 Collider_SetJntSphToActor(PlayState* play, ColliderJntSph* dest, ColliderJntSphInitToActor* src);
-s32 Collider_SetJntSphAllocType1(PlayState* play, ColliderJntSph* dest, Actor* actor,
-                                 ColliderJntSphInitType1* src);
+s32 Collider_SetJntSphAllocType1(PlayState* play, ColliderJntSph* dest, Actor* actor, ColliderJntSphInitType1* src);
 s32 Collider_SetJntSphAlloc(PlayState* play, ColliderJntSph* dest, Actor* actor, ColliderJntSphInit* src);
 s32 Collider_SetJntSph(PlayState* play, ColliderJntSph* dest, Actor* actor, ColliderJntSphInit* src,
                        ColliderJntSphElement* elements);
@@ -871,6 +870,7 @@ void Cutscene_HandleEntranceTriggers(PlayState* play);
 void Cutscene_HandleConditionalTriggers(PlayState* play);
 void Cutscene_SetSegment(PlayState* play, void* segment);
 void GetItem_Draw(PlayState* play, s16 drawId);
+Gfx* GetItem_DrawDListWithCosmetics(Gfx* gfx, const char* dlist, s16 drawId);
 void GetItemEntry_Draw(PlayState* play, GetItemEntry getItemEntry);
 void SoundSource_InitAll(PlayState* play);
 void SoundSource_UpdateAll(PlayState* play);
@@ -890,8 +890,8 @@ void SkelCurve_Destroy(PlayState* play, SkelAnimeCurve* skelCurve);
 void SkelCurve_SetAnim(SkelAnimeCurve* skelCurve, TransformUpdateIndex* transUpdIdx, f32 arg2, f32 animFinalFrame,
                        f32 animCurFrame, f32 animSpeed);
 s32 SkelCurve_Update(PlayState* play, SkelAnimeCurve* skelCurve);
-void SkelCurve_Draw(Actor* actor, PlayState* play, SkelAnimeCurve* skelCurve,
-                    OverrideCurveLimbDraw overrideLimbDraw, PostCurveLimbDraw postLimbDraw, s32 lod, void* data);
+void SkelCurve_Draw(Actor* actor, PlayState* play, SkelAnimeCurve* skelCurve, OverrideCurveLimbDraw overrideLimbDraw,
+                    PostCurveLimbDraw postLimbDraw, s32 lod, void* data);
 s32 Horse_CanSpawn(s32 scene);
 void Horse_ResetHorseData(PlayState* play);
 void Horse_FixLakeHyliaPosition(PlayState* play);
@@ -918,14 +918,13 @@ f32 Environment_LerpWeightAccelDecel(u16 endFrame, u16 startFrame, u16 curFrame,
 void Environment_UpdateSkybox(PlayState* play, u8 skyboxId, EnvironmentContext* envCtx, SkyboxContext* skyboxCtx);
 void Environment_EnableUnderwaterLights(PlayState* play, s32 waterLightsIndex);
 void Environment_DisableUnderwaterLights(PlayState* play);
-void Environment_Update(PlayState* play, EnvironmentContext* envCtx, LightContext* lightCtx,
-                        PauseContext* pauseCtx, MessageContext* msgCtx, GameOverContext* gameOverCtx,
-                        GraphicsContext* gfxCtx);
+void Environment_Update(PlayState* play, EnvironmentContext* envCtx, LightContext* lightCtx, PauseContext* pauseCtx,
+                        MessageContext* msgCtx, GameOverContext* gameOverCtx, GraphicsContext* gfxCtx);
 void Environment_DrawSunAndMoon(PlayState* play);
-void Environment_DrawSunLensFlare(PlayState* play, EnvironmentContext* envCtx, View* view,
-                                  GraphicsContext* gfxCtx, Vec3f pos, s32 unused);
-void Environment_DrawLensFlare(PlayState* play, EnvironmentContext* envCtx, View* view,
-                               GraphicsContext* gfxCtx, Vec3f pos, s32 unused, s16 arg6, f32 arg7, s16 arg8, u8 arg9);
+void Environment_DrawSunLensFlare(PlayState* play, EnvironmentContext* envCtx, View* view, GraphicsContext* gfxCtx,
+                                  Vec3f pos, s32 unused);
+void Environment_DrawLensFlare(PlayState* play, EnvironmentContext* envCtx, View* view, GraphicsContext* gfxCtx,
+                               Vec3f pos, s32 unused, s16 arg6, f32 arg7, s16 arg8, u8 arg9);
 void Environment_DrawRain(PlayState* play, View* view, GraphicsContext* gfxCtx);
 void func_80074CE8(PlayState* play, u32 arg1);
 void Environment_DrawSkyboxFilters(PlayState* play);
@@ -1046,7 +1045,8 @@ VecSph* OLib_Vec3fToVecSph(VecSph* dest, Vec3f* vec);
 VecSph* OLib_Vec3fToVecSphGeo(VecSph* arg0, Vec3f* arg1);
 VecSph* OLib_Vec3fDiffToVecSphGeo(VecSph* arg0, Vec3f* a, Vec3f* b);
 Vec3f* OLib_Vec3fDiffRad(Vec3f* dest, Vec3f* a, Vec3f* b);
-void OnePointCutscene_SetCsCamPoints(Camera* camera, s16 actionParameters, s16 initTimer, CutsceneCameraPoint* atPoints, CutsceneCameraPoint* eyePoints);
+void OnePointCutscene_SetCsCamPoints(Camera* camera, s16 actionParameters, s16 initTimer, CutsceneCameraPoint* atPoints,
+                                     CutsceneCameraPoint* eyePoints);
 s16 OnePointCutscene_Init(PlayState* play, s16 csId, s16 timer, Actor* actor, s16 parentCamId);
 s16 OnePointCutscene_EndCutscene(PlayState* play, s16 subCamId);
 s32 OnePointCutscene_Attention(PlayState* play, Actor* actor);
@@ -1071,7 +1071,8 @@ void func_800849EC(PlayState* play);
 void Interface_LoadItemIcon1(PlayState* play, u16 button);
 void Interface_LoadItemIcon2(PlayState* play, u16 button);
 void func_80084BF4(PlayState* play, u16 flag);
-uint16_t Interface_DrawTextLine(GraphicsContext* gfx, char text[], int16_t x, int16_t y, uint16_t colorR, uint16_t colorG, uint16_t colorB, uint16_t colorA, float textScale, uint8_t textShadow);
+uint16_t Interface_DrawTextLine(GraphicsContext* gfx, char text[], int16_t x, int16_t y, uint16_t colorR,
+                                uint16_t colorG, uint16_t colorB, uint16_t colorA, float textScale, uint8_t textShadow);
 u8 Item_Give(PlayState* play, u8 item);
 u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry);
 u8 Item_CheckObtainability(u8 item);
@@ -1139,6 +1140,17 @@ s32 Player_HoldsBow(Player* player);
 s32 Player_HoldsSlingshot(Player* player);
 s32 func_8008F128(Player* player);
 s32 Player_ActionToMeleeWeapon(s32 itemAction);
+// Skijer's NEI: Fierce Deity skin active AND a real sword (Master/Kokiri/Biggoron) in
+// hand — the gate for FD's always-two-handed Deity sword. See z_player_lib.c.
+s32 Player_IsFDHoldingSword(Player* player);
+// Skijer's NEI: exposed to environmental heat. Shared so z_player.c and z_player_lib.c
+// cannot drift apart on it again. See z_player_lib.c.
+s32 Player_SuffersHeat(Player* player);
+s32 Player_IsZoraBoomerangActive(void);
+s32 Player_IsDekuBubbleActive(void);
+Input* Player_GetControlInput(void);
+f32 Player_GetControlStickMagnitude(void);
+s32 Player_GetFloorType(void);
 s32 Player_GetMeleeWeaponHeld(Player* player);
 s32 Player_HoldsTwoHandedWeapon(Player* player);
 s32 Player_HoldsBrokenKnife(Player* player);
@@ -1148,19 +1160,22 @@ s32 Player_ActionToExplosive(Player* player, s32 itemAction);
 s32 Player_GetExplosiveHeld(Player* player);
 s32 func_8008F2BC(Player* player, s32 itemAction);
 s32 Player_GetEnvironmentalHazard(PlayState* play);
-void Player_DrawImpl(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount, s32 lod, s32 tunic,
-                   s32 boots, s32 face, OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, void* this);
-s32 Player_OverrideLimbDrawGameplayCommon(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* data);
-s32 Player_OverrideLimbDrawGameplayDefault(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* data);
-s32 Player_OverrideLimbDrawGameplayFirstPerson(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* data);
-s32 Player_OverrideLimbDrawGameplayCrawling(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* data);
-u8 func_80090480(PlayState* play, ColliderQuad* collider, WeaponInfo* weaponDim, Vec3f* newTip,
-                 Vec3f* newBase);
+void Player_DrawImpl(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount, s32 lod, s32 tunic, s32 boots,
+                     s32 face, OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, void* this);
+s32 Player_OverrideLimbDrawGameplayCommon(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot,
+                                          void* data);
+s32 Player_OverrideLimbDrawGameplayDefault(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot,
+                                           void* data);
+s32 Player_OverrideLimbDrawGameplayFirstPerson(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot,
+                                               void* data);
+s32 Player_OverrideLimbDrawGameplayCrawling(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot,
+                                            void* data);
+u8 func_80090480(PlayState* play, ColliderQuad* collider, WeaponInfo* weaponDim, Vec3f* newTip, Vec3f* newBase);
 void Player_DrawGetItem(PlayState* play, Player* player);
 void Player_PostLimbDrawGameplay(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot, void* data);
 u32 func_80091738(PlayState* play, u8* segment, SkelAnime* skelAnime);
-void Player_DrawPause(PlayState* play, u8* segment, SkelAnime* skelAnime, Vec3f* pos, Vec3s* rot, f32 scale,
-                   s32 sword, s32 tunic, s32 shield, s32 boots);
+void Player_DrawPause(PlayState* play, u8* segment, SkelAnime* skelAnime, Vec3f* pos, Vec3s* rot, f32 scale, s32 sword,
+                      s32 tunic, s32 shield, s32 boots);
 void PreNMI_Init(GameState* thisx);
 Vec3f* Quake_AddVec(Vec3f* dst, Vec3f* arg1, VecSph* arg2);
 void Quake_UpdateShakeInfo(QuakeRequest* req, ShakeInfo* shake, f32 y, f32 x);
@@ -1234,7 +1249,8 @@ Gfx* Gfx_TwoTexScrollEx(GraphicsContext* gfxCtx, s32 tile1, u32 x1, u32 y1, s32 
 Gfx* Gfx_TwoTexScrollEnvColor(GraphicsContext* gfxCtx, s32 tile1, u32 x1, u32 y1, s32 width1, s32 height1, s32 tile2,
                               u32 x2, u32 y2, s32 width2, s32 height2, s32 r, s32 g, s32 b, s32 a);
 Gfx* Gfx_TwoTexScrollEnvColorEx(GraphicsContext* gfxCtx, s32 tile1, u32 x1, u32 y1, s32 width1, s32 height1, s32 tile2,
-                              u32 x2, u32 y2, s32 width2, s32 height2, s32 r, s32 g, s32 b, s32 a, s32 xStep1, s32 yStep1, s32 xStep2, s32 yStep2);
+                                u32 x2, u32 y2, s32 width2, s32 height2, s32 r, s32 g, s32 b, s32 a, s32 xStep1,
+                                s32 yStep1, s32 xStep2, s32 yStep2);
 Gfx* Gfx_EnvColor(GraphicsContext* gfxCtx, s32 r, s32 g, s32 b, s32 a);
 void Gfx_SetupFrame(GraphicsContext* gfxCtx, u8 r, u8 g, u8 b);
 void func_80095974(GraphicsContext* gfxCtx);
@@ -1261,17 +1277,20 @@ s32 Scene_ExecuteCommands(PlayState* play, SceneCmd* sceneCmd);
 void TransitionActor_InitContext(GameState* state, TransitionActorContext* transiActorCtx);
 void Scene_SetTransitionForNextEntrance(PlayState* play);
 void Scene_Draw(PlayState* play);
-void SkelAnime_DrawLod(PlayState* play, void** skeleton, Vec3s* jointTable,
-                       OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, void* arg, s32 dListIndex);
+void SkelAnime_DrawLod(PlayState* play, void** skeleton, Vec3s* jointTable, OverrideLimbDrawOpa overrideLimbDraw,
+                       PostLimbDrawOpa postLimbDraw, void* arg, s32 dListIndex);
 void SkelAnime_DrawFlexLod(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
                            OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, void* arg,
                            s32 dListIndex);
+void SkelAnime_DrawFlexLodWithXlu(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
+                                  OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, void* arg,
+                                  s32 dListIndex);
 void SkelAnime_DrawSkeletonOpa(PlayState* play, SkelAnime* skelAnime, OverrideLimbDrawOpa overrideLimbDraw,
                                PostLimbDrawOpa postLimbDraw, void* arg);
 Gfx* SkelAnime_DrawSkeleton2(PlayState* play, SkelAnime* skelAnime, OverrideLimbDrawOpa overrideLimbDraw,
-                                PostLimbDrawOpa postLimbDraw, void* arg, Gfx* gfx);
-void SkelAnime_DrawOpa(PlayState* play, void** skeleton, Vec3s* jointTable,
-                       OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, void* arg);
+                             PostLimbDrawOpa postLimbDraw, void* arg, Gfx* gfx);
+void SkelAnime_DrawOpa(PlayState* play, void** skeleton, Vec3s* jointTable, OverrideLimbDrawOpa overrideLimbDraw,
+                       PostLimbDrawOpa postLimbDraw, void* arg);
 void SkelAnime_DrawFlexOpa(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
                            OverrideLimbDrawOpa overrideLimbDraw, PostLimbDrawOpa postLimbDraw, void* arg);
 s16 Animation_GetLength(void* animation);
@@ -1285,6 +1304,7 @@ Gfx* SkelAnime_Draw(PlayState* play, void** skeleton, Vec3s* jointTable, Overrid
 Gfx* SkelAnime_DrawFlex(PlayState* play, void** skeleton, Vec3s* jointTable, s32 dListCount,
                         OverrideLimbDraw overrideLimbDraw, PostLimbDraw postLimbDraw, void* arg, Gfx* gfx);
 void SkelAnime_InterpFrameTable(s32 limbCount, Vec3s* dst, Vec3s* start, Vec3s* target, f32 weight);
+void SkelAnime_GetFrameData(AnimationHeader* animation, s32 frame, s32 limbCount, Vec3s* frameTable);
 void AnimationContext_Reset(AnimationContext* animationCtx);
 void AnimationContext_SetNextQueue(PlayState* play);
 void AnimationContext_DisableQueue(PlayState* play);
@@ -1313,19 +1333,17 @@ void LinkAnimation_PlayLoopSetSpeed(PlayState* play, SkelAnime* skelAnime, LinkA
                                     f32 playSpeed);
 void LinkAnimation_CopyJointToMorph(PlayState* play, SkelAnime* skelAnime);
 void LinkAnimation_CopyMorphToJoint(PlayState* play, SkelAnime* skelAnime);
-void LinkAnimation_LoadToMorph(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation,
-                               f32 frame);
-void LinkAnimation_LoadToJoint(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation,
-                               f32 frame);
+void LinkAnimation_LoadToMorph(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation, f32 frame);
+void LinkAnimation_LoadToJoint(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation, f32 frame);
 void LinkAnimation_InterpJointMorph(PlayState* play, SkelAnime* skelAnime, f32 frame);
-void LinkAnimation_BlendToJoint(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation1,
-                                f32 frame1, LinkAnimationHeader* animation2, f32 frame2, f32 weight, Vec3s* blendTable);
-void LinkAnimation_BlendToMorph(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation1,
-                                f32 frame1, LinkAnimationHeader* animation2, f32 frame2, f32 weight, Vec3s* blendTable);
+void LinkAnimation_BlendToJoint(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation1, f32 frame1,
+                                LinkAnimationHeader* animation2, f32 frame2, f32 weight, Vec3s* blendTable);
+void LinkAnimation_BlendToMorph(PlayState* play, SkelAnime* skelAnime, LinkAnimationHeader* animation1, f32 frame1,
+                                LinkAnimationHeader* animation2, f32 frame2, f32 weight, Vec3s* blendTable);
 void LinkAnimation_EndLoop(SkelAnime* skelAnime);
 s32 LinkAnimation_OnFrame(SkelAnime* skelAnime, f32 frame);
-s32 SkelAnime_Init(PlayState* play, SkelAnime* skelAnime, SkeletonHeader* skeletonHeaderSeg,
-                   AnimationHeader* animation, Vec3s* jointTable, Vec3s* morphTable, s32 limbCount);
+s32 SkelAnime_Init(PlayState* play, SkelAnime* skelAnime, SkeletonHeader* skeletonHeaderSeg, AnimationHeader* animation,
+                   Vec3s* jointTable, Vec3s* morphTable, s32 limbCount);
 s32 SkelAnime_InitFlex(PlayState* play, SkelAnime* skelAnime, FlexSkeletonHeader* skeletonHeaderSeg,
                        AnimationHeader* animation, Vec3s* jointTable, Vec3s* morphTable, s32 limbCount);
 s32 SkelAnime_InitSkin(PlayState* play, SkelAnime* skelAnime, SkeletonHeader* skeletonHeaderSeg,
@@ -1354,9 +1372,12 @@ void Skin_UpdateVertices(MtxF* mtx, SkinVertex* skinVertices, SkinLimbModif* mod
 void Skin_DrawAnimatedLimb(GraphicsContext* gfxCtx, Skin* skin, s32 limbIndex, s32 arg3, s32 drawFlags);
 void Skin_DrawLimb(GraphicsContext* gfxCtx, Skin* skin, s32 limbIndex, Gfx* dlistOverride, s32 drawFlags);
 void func_800A6330(Actor* actor, PlayState* play, Skin* skin, SkinPostDraw postDraw, s32 setTranslation);
-void func_800A6360(Actor* actor, PlayState* play, Skin* skin, SkinPostDraw postDraw, SkinOverrideLimbDraw overrideLimbDraw, s32 setTranslation);
-void func_800A6394(Actor* actor, PlayState* play, Skin* skin, SkinPostDraw postDraw, SkinOverrideLimbDraw overrideLimbDraw, s32 setTranslation, s32 arg6);
-void func_800A63CC(Actor* actor, PlayState* play, Skin* skin, SkinPostDraw postDraw, SkinOverrideLimbDraw overrideLimbDraw, s32 setTranslation, s32 arg6, s32 drawFlags);
+void func_800A6360(Actor* actor, PlayState* play, Skin* skin, SkinPostDraw postDraw,
+                   SkinOverrideLimbDraw overrideLimbDraw, s32 setTranslation);
+void func_800A6394(Actor* actor, PlayState* play, Skin* skin, SkinPostDraw postDraw,
+                   SkinOverrideLimbDraw overrideLimbDraw, s32 setTranslation, s32 arg6);
+void func_800A63CC(Actor* actor, PlayState* play, Skin* skin, SkinPostDraw postDraw,
+                   SkinOverrideLimbDraw overrideLimbDraw, s32 setTranslation, s32 arg6, s32 drawFlags);
 void Skin_GetLimbPos(Skin* skin, s32 limbIndex, Vec3f* arg2, Vec3f* dst);
 void Skin_Init(PlayState* play, Skin* skin, SkeletonHeader* skeletonHeader, AnimationHeader* animationHeader);
 void Skin_Free(PlayState* play, Skin* skin);
@@ -1533,6 +1554,7 @@ void KaleidoScopeCall_Init(PlayState* play);
 void KaleidoScopeCall_Destroy(PlayState* play);
 void KaleidoScopeCall_Update(PlayState* play);
 void KaleidoScopeCall_Draw(PlayState* play);
+void KaleidoScope_InitVertices(PlayState* play, GraphicsContext* gfxCtx);
 void Play_SetViewpoint(PlayState* play, s16 viewpoint);
 s32 Play_CheckViewpoint(PlayState* play, s16 viewpoint);
 void Play_SetShopBrowsingViewpoint(PlayState* play);
@@ -1556,6 +1578,7 @@ s16 Play_ChangeCameraStatus(PlayState* play, s16 camId, s16 status);
 void Play_ClearCamera(PlayState* play, s16 camId);
 void Play_ClearAllSubCameras(PlayState* play);
 Camera* Play_GetCamera(PlayState* play, s16 camId);
+s16 Play_CameraGetUID(PlayState* play, s16 camId);
 s32 Play_CameraSetAtEye(PlayState* play, s16 camId, Vec3f* at, Vec3f* eye);
 s32 Play_CameraSetAtEyeUp(PlayState* play, s16 camId, Vec3f* at, Vec3f* eye, Vec3f* up);
 s32 Play_CameraSetFov(PlayState* play, s16 camId, f32 fov);
@@ -1648,7 +1671,7 @@ void GameState_Destroy(GameState* gameState);
 GameStateFunc GameState_GetInit(GameState* gameState);
 u32 GameState_IsRunning(GameState* gameState);
 void* GameState_Alloc(GameState* gameState, size_t size, char* file, s32 line);
-void func_800C55D0(GameAlloc* this);
+void GameAlloc_Cleanup(GameAlloc* this);
 void* GameAlloc_MallocDebug(GameAlloc* this, size_t size, const char* file, s32 line);
 void* GameAlloc_Malloc(GameAlloc* this, size_t size);
 void GameAlloc_Free(GameAlloc* this, void* data);
@@ -1932,7 +1955,7 @@ void UCodeDisas_Destroy(UCodeDisas*);
 // ? UCodeDisas_ParseGeometryMode(?);
 // ? UCodeDisas_ParseRenderMode(?);
 // ? UCodeDisas_PrintVertices(?);
-//void UCodeDisas_Disassemble(UCodeDisas*, Gfx*);
+// void UCodeDisas_Disassemble(UCodeDisas*, Gfx*);
 void UCodeDisas_RegisterUCode(UCodeDisas* this, s32 count, UCodeInfo* ucodeArray);
 void UCodeDisas_SetCurUCode(UCodeDisas*, void*);
 Acmd* AudioSynth_Update(Acmd* cmdStart, s32* cmdCnt, s16* aiStart, s32 aiBufLen);
@@ -1972,7 +1995,7 @@ s32 AudioLoad_SyncLoadInstrument(s32 fontId, s32 instId, s32 drumId);
 void AudioLoad_AsyncLoadSeq(s32 seqId, s32 arg1, s32 retData, OSMesgQueue* retQueue);
 void AudioLoad_AsyncLoadSampleBank(s32 sampleBankId, s32 arg1, s32 retData, OSMesgQueue* retQueue);
 void AudioLoad_AsyncLoadFont(s32 fontId, s32 arg1, s32 retData, OSMesgQueue* retQueue);
-u8* AudioLoad_GetFontsForSequence(s32 seqId, u32* arg1);
+s32* AudioLoad_GetFontsForSequence(s32 seqId, u32* arg1);
 void AudioLoad_DiscardSeqFonts(s32 seqId);
 s32 AudioLoad_SyncInitSeqPlayer(s32 playerIdx, s32 seqId, s32 arg2);
 s32 AudioLoad_SyncInitSeqPlayerSkipTicks(s32 playerIdx, s32 seqId, s32 arg2);
@@ -1994,7 +2017,7 @@ void Audio_QueueCmdS8(u32 arg0, s8 arg1);
 void Audio_QueueCmdU16(u32 arg0, u16 arg1);
 s32 Audio_ScheduleProcessCmds(void);
 u32 func_800E5E20(u32* arg0);
-u8* func_800E5E84(s32 arg0, u32* arg1);
+s32* func_800E5E84(s32 arg0, u32* arg1);
 s32 func_800E5EDC(void);
 s32 func_800E5F88(s32 arg0);
 void Audio_PreNMIInternal(void);
@@ -2055,7 +2078,9 @@ void AudioSeq_SkipForwardSequence(SequencePlayer* seqPlayer);
 void AudioSeq_ResetSequencePlayer(SequencePlayer* seqPlayer);
 void AudioSeq_InitSequencePlayerChannels(s32 playerIdx);
 void AudioSeq_InitSequencePlayers(void);
-void AudioOcarina_Start(u16);
+// Skijer's NEI: widened to u32 (MM/custom song bits 16-25). Upstream renamed this from
+// AudioOcarina_Start to AudioOcarina_Start; the wider parameter is ours and has to survive the rename.
+void AudioOcarina_Start(u32);
 void AudioOcarina_SetInstrument(u8);
 void AudioOcarina_SetPlaybackSong(s8 songIdxPlusOne, s8 playbackState);
 void AudioOcarina_SetRecordingState(u8);
@@ -2124,7 +2149,9 @@ void Audio_SetSoundOutputMode(s8 outputMode);
 void Audio_SetBaseFilter(u8);
 void Audio_SetExtraFilter(u8);
 void Audio_SetCutsceneFlag(s8 flag);
-void Audio_PlaySoundIfNotInCutscene(u16 sfxId);
+void Audio_PlaySfxIfNotInCutscene(u16 sfxId);
+// Compatibility for preserved cor mods using the pre-9.3 API name.
+#define Audio_PlaySoundIfNotInCutscene Audio_PlaySfxIfNotInCutscene
 void func_800F6964(u16);
 void Audio_StopBgmAndFanfare(u16);
 // ? Audio_DisableAllSeq(?);
@@ -2132,6 +2159,8 @@ void Audio_StopBgmAndFanfare(u16);
 void Audio_PreNMI();
 // ? func_800F6C34(?);
 void Audio_SetNatureAmbienceChannelIO(u8 channelIdxRange, u8 port, u8 val);
+u8 Audio_IsNatureRainEnabled(void);
+u8 Audio_IsNatureLightningEnabled(void);
 void Audio_PlayNatureAmbienceSequence(u8 natureAmbienceId);
 void Audio_Init();
 void Audio_InitSound();
@@ -2140,7 +2169,9 @@ void func_800F71BC(s32 arg0);
 void Audio_SetSfxBanksMute(u16 muteMask);
 void Audio_QueueSeqCmdMute(u8 channelIdx);
 void Audio_ClearBGMMute(u8 channelIdx);
-void Audio_PlaySoundGeneral(u16 sfxId, Vec3f* pos, u8 token, f32* freqScale, f32* a4, s8* reverbAdd);
+void Audio_PlaySfxGeneral(u16 sfxId, Vec3f* pos, u8 token, f32* freqScale, f32* a4, s8* reverbAdd);
+// Compatibility for preserved cor mods using the pre-9.3 API name.
+#define Audio_PlaySoundGeneral Audio_PlaySfxGeneral
 void Audio_ProcessSoundRequest(void);
 void Audio_ChooseActiveSounds(u8 bankId);
 void Audio_PlayActiveSounds(u8 bankId);
@@ -2159,7 +2190,7 @@ void func_800F8F88(void);
 u8 Audio_IsSfxPlaying(u32 sfxId);
 void Audio_ResetSounds(void);
 void func_800F9474(u8, u16);
-void func_800F94FC(u32);
+void Audio_ProcessSeqCmd(u32);
 void Audio_ProcessSeqCmd(u32);
 void Audio_ProcessSeqCmds(void);
 u16 func_800FA0B4(u8 a0);

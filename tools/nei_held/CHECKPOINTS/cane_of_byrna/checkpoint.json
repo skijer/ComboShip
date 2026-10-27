@@ -1,0 +1,39 @@
+{
+  "resource_count": 8,
+  "vertex_records": 2725,
+  "vertex_loads": 93,
+  "slug": "cane_of_byrna",
+  "name": "Cane of Byrna / gameplay cane_of_byrna",
+  "entry": "objects/nei_held_redesign/cane_of_byrna/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.349365234375,
+  "triangles": 2877,
+  "bounds_author": [
+    [
+      -39.8125,
+      -74.4375,
+      -3.125
+    ],
+    [
+      3.125,
+      39.875,
+      3.75
+    ]
+  ],
+  "markers": {
+    "legacy_axis_native": [
+      0,
+      -416,
+      0
+    ],
+    "tip_native": [
+      0,
+      223,
+      0
+    ]
+  },
+  "notes": [
+    "GI lean removed; shaft occupies measured Somaria/Byrna Y=-416..223 frame. Existing held scale/trail/charge transforms unchanged."
+  ],
+  "runtime_tested": false
+}

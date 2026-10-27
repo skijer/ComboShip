@@ -1,5 +1,8 @@
+#include "../../../combo/ComboGameMode.h"
+#include <libultraship/bridge/consolevariablebridge.h>
+#include <ship/Context.h>
+
 #include "SohMenu.h"
-#include "SohGui.hpp"
 
 extern "C" {
 extern PlayState* gPlayState;
@@ -181,9 +184,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Stats Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Stats Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Stats##Soh", /*requiresForeground=*/true); // reads live OOT play state
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Stats Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Stats##Soh", /*requiresForeground=*/true); // reads live OOT play state
+        });
+    }
 #endif
 
     // Console
@@ -195,9 +200,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Console Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Console Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Console##SoH", /*requiresForeground=*/false); // console works anytime
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Console Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Console##SoH", /*requiresForeground=*/false); // console works anytime
+        });
+    }
 #endif
 
     // Save Editor
@@ -209,9 +216,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Save Editor Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Save Editor Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Save Editor", /*requiresForeground=*/false);
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Save Editor Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Save Editor", /*requiresForeground=*/false);
+        });
+    }
 #endif
 
     // Hook Debugger
@@ -223,9 +232,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Hook Debugger Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Hook Debugger Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Hook Debugger", /*requiresForeground=*/false);
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Hook Debugger Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Hook Debugger", /*requiresForeground=*/false);
+        });
+    }
 #endif
 
     // Collision Viewer
@@ -237,9 +248,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Collision Viewer Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Collision Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Collision Viewer", /*requiresForeground=*/true);
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Collision Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Collision Viewer", /*requiresForeground=*/true);
+        });
+    }
 #endif
 
     // Actor Viewer
@@ -251,10 +264,22 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Actor Viewer Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Actor Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Actor Viewer", /*requiresForeground=*/true);
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Actor Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Actor Viewer", /*requiresForeground=*/true);
+        });
+    }
 #endif
+
+    // Animation Viewer
+    path.sidebarName = "Anim Viewer";
+    AddSidebarEntry("Dev Tools", path.sidebarName, 1);
+    AddWidget(path, "Popout Animation Viewer", WIDGET_WINDOW_BUTTON)
+        .CVar(CVAR_WINDOW("AnimationViewer"))
+        .WindowName("Animation Viewer")
+        .HideInSearch(true)
+        .Options(WindowButtonOptions().Tooltip("Enables the separate Animation Viewer Window. "
+                                               "Preview any of Link's animations on the live player."));
 
     // Display List Viewer
     path.sidebarName = "DList Viewer";
@@ -265,9 +290,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Display List Viewer Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Display List Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Display List Viewer", /*requiresForeground=*/true);
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Display List Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Display List Viewer", /*requiresForeground=*/true);
+        });
+    }
 #endif
 
     // Value Viewer
@@ -279,9 +306,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Value Viewer Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Value Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Value Viewer", /*requiresForeground=*/true);
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Value Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Value Viewer", /*requiresForeground=*/true);
+        });
+    }
 #endif
 
     // Message Viewer
@@ -293,9 +322,11 @@ void SohMenu::AddMenuDevTools() {
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Message Viewer Window."));
 #ifdef COMBO_BUILD
-    AddWidget(path, "Message Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
-        ComboInlineWindow("Message Viewer", /*requiresForeground=*/true);
-    });
+    if (Combo_IsCombinedGame()) {
+        AddWidget(path, "Message Viewer Inline", WIDGET_CUSTOM).CustomFunction([](WidgetInfo&) {
+            ComboInlineWindow("Message Viewer", /*requiresForeground=*/true);
+        });
+    }
 #endif
 
     // Gfx Debugger

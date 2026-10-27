@@ -797,9 +797,50 @@ static uint64_t qpc_to_100ns(uint64_t qpc) {
     return qpc / qpc_freq * _100NANOSECONDS_IN_SECOND + qpc % qpc_freq * _100NANOSECONDS_IN_SECOND / qpc_freq;
 }
 
+void GfxWindowBackendDXGI::SetCollectPacingTelemetry(bool enabled) {
+    mCollectPacingTelemetry = enabled;
+    if (!enabled) mPacingTelemetry = nullptr;
+}
+
+nlohmann::json GfxWindowBackendDXGI::GetPacingTelemetry() {
+    if (!mCollectPacingTelemetry) return {{"status", "disabled"}};
+    if (mPacingTelemetry.is_null()) return {{"status", "unavailable"}};
+    return mPacingTelemetry;
+}
+
+void GfxWindowBackendDXGI::RecordFrameStatistics(const DXGI_FRAME_STATISTICS& stats, HRESULT result) {
+    if (!mCollectPacingTelemetry) return;
+    mPacingTelemetry["frame_statistics_hresult"] = static_cast<int64_t>(result);
+    mPacingTelemetry["frame_statistics_status"] = result == S_OK ? "available" : "unavailable";
+    mPacingTelemetry["refresh_statistics"] = nullptr;
+    if (result == S_OK) {
+        mPacingTelemetry["refresh_statistics"] = {{"present_count", stats.PresentCount},
+            {"present_refresh_count", stats.PresentRefreshCount}, {"sync_refresh_count", stats.SyncRefreshCount},
+            {"sync_qpc", stats.SyncQPCTime.QuadPart}, {"sync_gpu_time", stats.SyncGPUTime.QuadPart},
+            {"qpc_frequency", qpc_freq}};
+    }
+}
+
 bool GfxWindowBackendDXGI::IsFrameReady() {
-    DXGI_FRAME_STATISTICS stats;
-    if (swap_chain->GetFrameStatistics(&stats) == S_OK &&
+    if (mCollectPacingTelemetry) {
+        mPacingTelemetry = {{"status", "available"}, {"ready", true}, {"reason", "ready"},
+            {"target_fps", mTargetFps}, {"refresh_hz", mDetectedHz > 0 ? nlohmann::json(mDetectedHz) : nlohmann::json(nullptr)},
+            {"vsync_enabled", mVsyncEnabled}, {"tearing_supported", mTearingSupport},
+            {"tearing_active", nullptr}, {"scheduler_reset", false}, {"requested_timestamp_ns", nullptr},
+            {"effective_timestamp_ns", nullptr}, {"observed_queue_end_ns", nullptr},
+            {"estimated_vsync_ns", nullptr}, {"requested_vsyncs", nullptr}, {"selected_vsyncs", nullptr},
+            {"queued_vsyncs", nullptr}, {"queue_length", nullptr}, {"queue_length_after_present", nullptr},
+            {"queue_length_kind", "scheduler_pending_present_records"},
+            {"swap_wait_ms", nullptr}, {"frame_cap_wait_ms", nullptr}, {"present_call_ms", nullptr},
+            {"present_id", nullptr}, {"max_frame_latency", mMaxFrameLatency}};
+    }
+    DXGI_FRAME_STATISTICS stats = {};
+    const HRESULT statisticsResult = swap_chain->GetFrameStatistics(&stats);
+    RecordFrameStatistics(stats, statisticsResult);
+    if (mCollectPacingTelemetry) {
+        mPacingTelemetry["readiness_refresh_statistics"] = mPacingTelemetry["refresh_statistics"];
+    }
+    if (statisticsResult == S_OK &&
         (stats.SyncRefreshCount != 0 || stats.SyncQPCTime.QuadPart != 0ULL)) {
         {
             LARGE_INTEGER t0;
@@ -830,6 +871,11 @@ bool GfxWindowBackendDXGI::IsFrameReady() {
     }
 
     mFrameTimeStamp += FRAME_INTERVAL_NS_NUMERATOR;
+    if (mCollectPacingTelemetry) {
+        mPacingTelemetry["requested_timestamp_ns"] = mFrameTimeStamp / FRAME_INTERVAL_NS_DENOMINATOR;
+        mPacingTelemetry["effective_timestamp_ns"] = mFrameTimeStamp / FRAME_INTERVAL_NS_DENOMINATOR;
+        mPacingTelemetry["queue_length"] = mPendingFrameStats.size();
+    }
 
     if (mFrameStats.size() >= 2) {
         DXGI_FRAME_STATISTICS* first = &mFrameStats.begin()->second;
@@ -871,6 +917,12 @@ bool GfxWindowBackendDXGI::IsFrameReady() {
         // printf("ts: %llu, last_end_ns: %llu, Init v: %f\n", mFrameTimeStamp / 3, last_end_ns,
         // vsyncs_to_wait);
 
+        if (mCollectPacingTelemetry) {
+            mPacingTelemetry["observed_queue_end_ns"] = last_end_ns;
+            mPacingTelemetry["estimated_vsync_ns"] = estimated_vsync_interval_ns;
+            mPacingTelemetry["queued_vsyncs"] = queued_vsyncs;
+            mPacingTelemetry["requested_vsyncs"] = vsyncs_to_wait;
+        }
         if (vsyncs_to_wait <= 0) {
             // Too late
 
@@ -883,10 +935,19 @@ bool GfxWindowBackendDXGI::IsFrameReady() {
                 }
                 mFrameTimeStamp =
                     FRAME_INTERVAL_NS_DENOMINATOR * (last_end_ns + vsyncs_to_wait * estimated_vsync_interval_ns);
+                if (mCollectPacingTelemetry) {
+                    mPacingTelemetry["scheduler_reset"] = true;
+                    mPacingTelemetry["effective_timestamp_ns"] = mFrameTimeStamp / FRAME_INTERVAL_NS_DENOMINATOR;
+                }
             } else {
                 // Drop frame
                 // printf("Dropping frame\n");
                 mDroppedFrame = true;
+                if (mCollectPacingTelemetry) {
+                    mPacingTelemetry["ready"] = false;
+                    mPacingTelemetry["reason"] = "scheduler_late";
+                    mPacingTelemetry["selected_vsyncs"] = vsyncs_to_wait;
+                }
                 return false;
             }
         }
@@ -916,9 +977,15 @@ bool GfxWindowBackendDXGI::IsFrameReady() {
             if (vsyncs_to_wait == 0) {
                 // printf("vsyncs_to_wait became 0 so dropping frame\n");
                 mDroppedFrame = true;
+                if (mCollectPacingTelemetry) {
+                    mPacingTelemetry["ready"] = false;
+                    mPacingTelemetry["reason"] = "rounded_vsync_zero";
+                    mPacingTelemetry["selected_vsyncs"] = vsyncs_to_wait;
+                }
                 return false;
             }
         }
+        if (mCollectPacingTelemetry) mPacingTelemetry["selected_vsyncs"] = vsyncs_to_wait;
     }
     return true;
 }
@@ -931,6 +998,7 @@ void GfxWindowBackendDXGI::SwapBuffersBegin() {
 
     LARGE_INTEGER t;
     QueryPerformanceCounter(&t);
+    const LARGE_INTEGER capWaitStart = t;
     int64_t next = qpc_to_100ns(mPreviousPresentTime.QuadPart) +
                    FRAME_INTERVAL_NS_NUMERATOR / (FRAME_INTERVAL_NS_DENOMINATOR * 100);
     int64_t left = next - qpc_to_100ns(t.QuadPart) - 15000UL;
@@ -950,6 +1018,7 @@ void GfxWindowBackendDXGI::SwapBuffersBegin() {
     }
     QueryPerformanceCounter(&t);
     mPreviousPresentTime = t;
+    const LARGE_INTEGER presentStart = t;
     if (mTearingSupport && !mVsyncEnabled) {
         // 512: DXGI_PRESENT_ALLOW_TEARING - allows for true V-Sync off with flip model
         ThrowIfFailed(swap_chain->Present(mVsyncEnabled, DXGI_PRESENT_ALLOW_TEARING));
@@ -957,10 +1026,20 @@ void GfxWindowBackendDXGI::SwapBuffersBegin() {
         ThrowIfFailed(swap_chain->Present(mVsyncEnabled, 0));
     }
 
+    if (mCollectPacingTelemetry) {
+        LARGE_INTEGER presentEnd;
+        QueryPerformanceCounter(&presentEnd);
+        mPacingTelemetry["present_call_ms"] = (presentEnd.QuadPart - presentStart.QuadPart) * 1000.0 / qpc_freq;
+        mPacingTelemetry["frame_cap_wait_ms"] = (presentStart.QuadPart - capWaitStart.QuadPart) * 1000.0 / qpc_freq;
+        mPacingTelemetry["vsync_enabled"] = mVsyncEnabled;
+        mPacingTelemetry["tearing_active"] = mTearingSupport && !mVsyncEnabled;
+    }
     UINT this_present_id;
     if (swap_chain->GetLastPresentCount(&this_present_id) == S_OK) {
         mPendingFrameStats.insert(std::make_pair(this_present_id, mVsyncEnabled));
+        if (mCollectPacingTelemetry) mPacingTelemetry["present_id"] = this_present_id;
     }
+    if (mCollectPacingTelemetry) mPacingTelemetry["queue_length_after_present"] = mPendingFrameStats.size();
     mDroppedFrame = false;
 }
 
@@ -984,6 +1063,10 @@ void GfxWindowBackendDXGI::SwapBuffersEnd() {
         mMaxFrameLatency = latency;
         ApplyMaxFrameLatency(false);
 
+        if (mCollectPacingTelemetry) {
+            QueryPerformanceCounter(&t2);
+            mPacingTelemetry["swap_wait_ms"] = (t2.QuadPart - t0.QuadPart) * 1000.0 / qpc_freq;
+        }
         return; // Make sure we don't wait a second time on the waitable object, since that would hang the program
     } else if (mAppliedMaxFrameLatency != mMaxFrameLatency) {
         ApplyMaxFrameLatency(false);
@@ -996,8 +1079,13 @@ void GfxWindowBackendDXGI::SwapBuffersEnd() {
         // else TODO: maybe sleep until some estimated time the frame will be shown to reduce lag
     }
 
-    DXGI_FRAME_STATISTICS stats;
-    swap_chain->GetFrameStatistics(&stats);
+    if (mCollectPacingTelemetry) {
+        QueryPerformanceCounter(&t2);
+        mPacingTelemetry["swap_wait_ms"] = (t2.QuadPart - t0.QuadPart) * 1000.0 / qpc_freq;
+    }
+    DXGI_FRAME_STATISTICS stats = {};
+    const HRESULT statisticsResult = swap_chain->GetFrameStatistics(&stats);
+    RecordFrameStatistics(stats, statisticsResult);
 
     QueryPerformanceCounter(&t2);
 

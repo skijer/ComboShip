@@ -1,3 +1,4 @@
+#include "soh/Enhancements/cosmetics/NativeNpcModels.h"
 /*
  * File: z_en_ma1.c
  * Overlay: En_Ma1
@@ -274,19 +275,38 @@ void EnMa1_UpdateSinging(EnMa1* this) {
 
 void EnMa1_Init(Actor* thisx, PlayState* play) {
     EnMa1* this = (EnMa1*)thisx;
+    bool enteredCastleBefore = Flags_GetInfTable(INFTABLE_ENTERED_HYRULE_CASTLE);
     bool malonReturnedFromCastle = GameInteractor_Should(VB_MALON_RETURN_FROM_CASTLE,
                                                          Flags_GetEventChkInf(EVENTCHKINF_TALON_RETURNED_FROM_CASTLE));
     bool malonTaughtEponasSong =
         GameInteractor_Should(VB_MALON_ALREADY_TAUGHT_EPONAS_SONG, CHECK_QUEST_ITEM(QUEST_SONG_EPONA));
+    s32 shouldSpawn;
     s32 pad;
 
     ActorShape_Init(&this->actor.shape, 0.0f, ActorShadow_DrawCircle, 18.0f);
-    SkelAnime_InitFlex(play, &this->skelAnime, &gMalonChildSkel, NULL, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, &this->skelAnime,
+                       (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sChildMalonNpcModel, gMalonChildSkel), NULL,
+                       NULL, NULL, 0);
     Collider_InitCylinder(play, &this->collider);
     Collider_SetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
     CollisionCheck_SetInfo2(&this->actor.colChkInfo, DamageTable_Get(22), &sColChkInfoInit);
 
-    if (!EnMa1_ShouldSpawn(this, play)) {
+    shouldSpawn = EnMa1_ShouldSpawn(this, play);
+    osSyncPrintf(
+        "[MalonSpawnProbe] stage=init scene=%d params=0x%04X placement=%d layer=%d child=%d day=%d rando=%d "
+        "talonReturned=%d enteredCastleBefore=%d enteredCastleAfter=%d eponasSong=%d taughtHook=%d shouldSpawn=%d\n",
+        play->sceneNum, (u16)this->actor.params, this->actor.shape.rot.z, gSaveContext.sceneLayer, LINK_IS_CHILD,
+        IS_DAY, IS_RANDO, Flags_GetEventChkInf(EVENTCHKINF_TALON_RETURNED_FROM_CASTLE), enteredCastleBefore,
+        Flags_GetInfTable(INFTABLE_ENTERED_HYRULE_CASTLE), CHECK_QUEST_ITEM(QUEST_SONG_EPONA), malonTaughtEponasSong,
+        shouldSpawn);
+
+    if (!shouldSpawn) {
+        osSyncPrintf(
+            "[MalonSpawnProbe] stage=kill reason=eligibility-zero scene=%d params=0x%04X placement=%d child=%d "
+            "day=%d talonReturned=%d enteredCastleBefore=%d enteredCastleAfter=%d\n",
+            play->sceneNum, (u16)this->actor.params, this->actor.shape.rot.z, LINK_IS_CHILD, IS_DAY,
+            Flags_GetEventChkInf(EVENTCHKINF_TALON_RETURNED_FROM_CASTLE), enteredCastleBefore,
+            Flags_GetInfTable(INFTABLE_ENTERED_HYRULE_CASTLE));
         Actor_Kill(&this->actor);
         return;
     }
@@ -330,6 +350,11 @@ void EnMa1_Idle(EnMa1* this, PlayState* play) {
 
     if ((play->sceneNum == SCENE_HYRULE_CASTLE) && malonReturnedFromCastle) {
         if (GameInteractor_Should(VB_SEND_MALON_HOME, true)) {
+            osSyncPrintf("[MalonSpawnProbe] stage=kill reason=send-home scene=%d params=0x%04X talonReturned=%d "
+                         "eponasSong=%d taughtHook=%d\n",
+                         play->sceneNum, (u16)this->actor.params,
+                         Flags_GetEventChkInf(EVENTCHKINF_TALON_RETURNED_FROM_CASTLE),
+                         CHECK_QUEST_ITEM(QUEST_SONG_EPONA), malonTaughtEponasSong);
             Actor_Kill(&this->actor);
         }
     } else if (!malonReturnedFromCastle || malonTaughtEponasSong) {
@@ -443,21 +468,26 @@ s32 EnMa1_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* p
     EnMa1* this = (EnMa1*)thisx;
     Vec3s vec;
 
-    if ((limbIndex == 2) || (limbIndex == 5)) {
+    if (((limbIndex == 2) || (limbIndex == 5)) && !NativeNpcModel_IsActive(&sChildMalonNpcModel)) {
         *dList = NULL;
     }
     if (limbIndex == 15) {
-        Matrix_Translate(1400.0f, 0.0f, 0.0f, MTXMODE_APPLY);
+        s32 mouth = this->mouthIndex == 2 ? 3 : this->mouthIndex;
+        *dList = NativeNpcModel_SelectHead(&sChildMalonNpcModel, *dList, this->eyeIndex, mouth);
+        /* The fitted head origin is the source neck; retain the vanilla pivot for native assets. */
+        Vec3f pivot = NativeNpcModel_IsActive(&sChildMalonNpcModel) ? *pos : (Vec3f){ 1400.0f, 0.0f, 0.0f };
+        Matrix_Translate(pivot.x, pivot.y, pivot.z, MTXMODE_APPLY);
         vec = this->interactInfo.headRot;
         Matrix_RotateX((vec.y / 32768.0f) * M_PI, MTXMODE_APPLY);
         Matrix_RotateZ((vec.x / 32768.0f) * M_PI, MTXMODE_APPLY);
-        Matrix_Translate(-1400.0f, 0.0f, 0.0f, MTXMODE_APPLY);
+        Matrix_Translate(-pivot.x, -pivot.y, -pivot.z, MTXMODE_APPLY);
     }
     if (limbIndex == 8) {
         vec = this->interactInfo.torsoRot;
         Matrix_RotateX((-vec.y / 32768.0f) * M_PI, MTXMODE_APPLY);
         Matrix_RotateZ((-vec.x / 32768.0f) * M_PI, MTXMODE_APPLY);
     }
+    *dList = NativeNpcPose_SelectLimb(&this->skelAnime, limbIndex, *dList);
     return false;
 }
 

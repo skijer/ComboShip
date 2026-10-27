@@ -10,9 +10,12 @@
 // Launcher cross-deliver seam for foreign-check backfill.
 extern "C" void (*gComboCrossDeliver)(int targetGame, const char* itemName, const char* srcCheckName);
 extern "C" void (*gComboTriforceProgress)(int game, int fileNum);
+// Shared Items: a teammate's merged tier can be higher than ours — re-evaluate.
+extern "C" void (*gComboSharedChanged)(int game, int fileNum);
 #endif
 
 extern "C" {
+#include "macros.h"
 #include "variables.h"
 extern PlayState* gPlayState;
 }
@@ -397,6 +400,10 @@ void Anchor::HandlePacket_UpdateTeamState(nlohmann::json payload) {
         // ComboShip (#136): a teammate's pieces can cross the combined goal for us too — re-evaluate.
         if (gComboTriforceProgress != NULL) {
             gComboTriforceProgress(0, gSaveContext.fileNum);
+        }
+        // ComboShip: Shared Items — the inventory union above bypasses the grant path, so poke directly.
+        if (gComboSharedChanged != NULL) {
+            gComboSharedChanged(0, gSaveContext.fileNum);
         }
 #else
         Notification::Emit({

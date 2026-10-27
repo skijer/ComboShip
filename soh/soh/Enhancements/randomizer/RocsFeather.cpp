@@ -1,16 +1,18 @@
-#include <soh/OTRGlobals.h>
-#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/Enhancements/randomizer/SeedContext.h"
+#include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/ShipInit.hpp"
-#include <soh_assets.h>
 
 extern "C" {
+#include <soh_assets.h>
 #include <z64.h>
 #include "functions.h"
 #include "variables.h"
 #include "macros.h"
 extern PlayState* gPlayState;
 }
+
+// Rito: mid-air Roc's costs magic instead of being limited to one use.
+// Defined in mods/transformation_masks/rito_flight.inc.c.
+extern "C" uint8_t MmForm_RitoAirRocsAllowed(Player* player);
 
 #define MAX_ROCS_USES 1
 
@@ -19,7 +21,9 @@ static uint8_t groundTimer = 0;
 static f32 effectsScale = 1.0f;
 
 void RegisterRocsFeather() {
-    bool shouldRegister = IS_RANDO && RAND_GET_OPTION(RSK_ROCS_FEATHER);
+    // Always register hooks - they only activate when ITEM_ROCS_FEATHER is actually used
+    // Rando-specific logic (item pool, accessibility, etc.) is handled elsewhere
+    bool shouldRegister = true;
 
     COND_HOOK(OnPlayerUpdate, shouldRegister, []() {
         Player* player = GET_PLAYER(gPlayState);
@@ -45,7 +49,11 @@ void RegisterRocsFeather() {
         if (usedItem == ITEM_ROCS_FEATHER) {
             *should = false;
 
-            if (rocsUseCount < MAX_ROCS_USES) {
+            // As a Rito, Roc's works in mid-air as often as you like — each use billed
+            // in magic instead of counted. MmForm_RitoAirRocsAllowed charges it and
+            // returns 0 for everyone else, so the vanilla one-use limit is untouched.
+            // Skijer's NEI
+            if ((rocsUseCount < MAX_ROCS_USES) || MmForm_RitoAirRocsAllowed(GET_PLAYER(gPlayState))) {
                 rocsUseCount++;
 
                 Player* player = GET_PLAYER(gPlayState);
@@ -99,4 +107,4 @@ void RegisterRocsFeather() {
     });
 }
 
-static RegisterShipInitFunc registerRocsFeather(RegisterRocsFeather, { "IS_RANDO" });
+static RegisterShipInitFunc registerRocsFeather(RegisterRocsFeather);

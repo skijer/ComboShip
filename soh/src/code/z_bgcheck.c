@@ -6,6 +6,18 @@
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include <assert.h>
 
+// Power-ups that FORCE the NoClip wall-bypass for the player (independent of the
+// gCheats.NoClip CVar): SM64 Mario's Vanish Cap and Hylia's Grace fairy flight.
+// Both phase through walls; forcing NoClip here keeps actor.wallPoly from going
+// stale so OOT's floor-based loading-zone detection still fires. Defined in
+// expansions/sm64/sm64_mario.c and mods/items/logic/item_hylias_grace.c.
+extern u8 Sm64Mario_IsVanishActive(void);
+extern s32 HGrace_WantsNoClip(void);
+// Skijer's NEI switchhook: during the position swap (+ a few settle frames) the player gets the
+// SAME full collision bypass as the NoClip cheat (z_arms_hook.c SwitchHook_PlayerNoClip), so the
+// swap can materialize Link behind walls / below floors.
+extern s32 SwitchHook_PlayerNoClip(void);
+
 #define SS_NULL 0xFFFF
 
 // bccFlags
@@ -1900,7 +1912,15 @@ s32 BgCheck_CheckWallImpl(CollisionContext* colCtx, u16 xpFlags, Vec3f* posResul
     s32 bgId2;
     f32 nx, ny, nz; // unit normal of polygon
 
-    if (!GameInteractor_Should(VB_PERFORM_WALL_COLLISION_CHECK, true, actor)) {
+    // Upstream moved the NoClip cheat itself behind VB_PERFORM_WALL_COLLISION_CHECK
+    // (Enhancements/Cheats/NoClip.cpp), so testing CVAR_CHEAT("NoClip") here would be redundant.
+    // The remaining conditions are ours and have no vanilla-behavior hook of their own: SM64
+    // Mario's vanish cap, Hylia's Grace and the switchhook's post-swap window, all player-only.
+    if (!GameInteractor_Should(VB_PERFORM_WALL_COLLISION_CHECK, true, actor) ||
+        ((Sm64Mario_IsVanishActive() || HGrace_WantsNoClip() ||
+          SwitchHook_PlayerNoClip()) && // Skijer's NEI switchhook: post-swap noclip window
+         actor != NULL &&
+         actor->id == ACTOR_PLAYER)) {
         return false;
     }
 
@@ -3865,25 +3885,26 @@ u32 SurfaceType_GetData(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId,
  * SurfaceType return CamData Index
  */
 u32 SurfaceType_GetCamDataIndex(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId) {
-
     return SurfaceType_GetData(colCtx, poly, bgId, 0) & 0xFF;
 }
 
 /**
- * CamData return cameraSType
+ * BgCam get setting of bgCam
  */
-u16 func_80041A4C(CollisionContext* colCtx, u32 camId, s32 bgId) {
-    u16 result;
+u16 BgCheck_GetBgCamSettingImpl(CollisionContext* colCtx, u32 bgCamIndex, s32 bgId) {
+    u16 camSetting;
     CollisionHeader* colHeader;
-    CamData* camData;
+    CamData* bgCamList;
 
     colHeader = BgCheck_GetCollisionHeader(colCtx, bgId);
     if (colHeader == NULL) {
-        return 0;
+        return CAM_SET_NONE;
     }
-    camData = colHeader->cameraDataList;
-    result = camData[camId].cameraSType;
-    return result;
+
+    bgCamList = colHeader->cameraDataList;
+    camSetting = bgCamList[bgCamIndex].cameraSType;
+
+    return camSetting;
 }
 
 /**
@@ -3905,7 +3926,7 @@ u16 SurfaceType_GetCameraSType(CollisionContext* colCtx, CollisionPoly* poly, s3
     if (surfaceTypes == PHYSICAL_TO_VIRTUAL(gSegments[0])) {
         return 0;
     }
-    return func_80041A4C(colCtx, SurfaceType_GetCamDataIndex(colCtx, poly, bgId), bgId);
+    return BgCheck_GetBgCamSettingImpl(colCtx, SurfaceType_GetCamDataIndex(colCtx, poly, bgId), bgId);
 }
 
 /**
@@ -3951,18 +3972,20 @@ u16 SurfaceType_GetNumCameras(CollisionContext* colCtx, CollisionPoly* poly, s32
 /**
  * CamData Get camPosData
  */
-Vec3s* func_80041C10(CollisionContext* colCtx, s32 camId, s32 bgId) {
+Vec3s* BgCheck_GetBgCamFuncDataImpl(CollisionContext* colCtx, s32 bgCamIndex, s32 bgId) {
     CollisionHeader* colHeader = BgCheck_GetCollisionHeader(colCtx, bgId);
-    CamData* cameraDataList;
+    CamData* bgCamList;
 
     if (colHeader == NULL) {
         return NULL;
     }
-    cameraDataList = colHeader->cameraDataList;
-    if (cameraDataList == PHYSICAL_TO_VIRTUAL(gSegments[0])) {
+
+    bgCamList = colHeader->cameraDataList;
+    if (bgCamList == PHYSICAL_TO_VIRTUAL(gSegments[0])) {
         return NULL;
     }
-    return (Vec3s*)SEGMENTED_TO_VIRTUAL(cameraDataList[camId].camPosData);
+
+    return (Vec3s*)SEGMENTED_TO_VIRTUAL(bgCamList[bgCamIndex].camPosData);
 }
 
 /**
@@ -3984,7 +4007,7 @@ Vec3s* SurfaceType_GetCamPosData(CollisionContext* colCtx, CollisionPoly* poly, 
     if (surfaceTypes == PHYSICAL_TO_VIRTUAL(gSegments[0])) {
         return NULL;
     }
-    return func_80041C10(colCtx, SurfaceType_GetCamDataIndex(colCtx, poly, bgId), bgId);
+    return BgCheck_GetBgCamFuncDataImpl(colCtx, SurfaceType_GetCamDataIndex(colCtx, poly, bgId), bgId);
 }
 
 /**
@@ -4018,8 +4041,18 @@ u32 func_80041D94(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId) {
 /**
  * SurfaceType Get Wall Flags
  */
+extern u8 gMogmaMittsClimbActive;
+extern u8 gKeatonClimbActive;
+// Skijer's NEI — a body held by the Sheikah Slate's Stasis rune, or a pillar raised by its Cryonis
+// rune, becomes climbable, but ONLY that body: the check is against its own bgId, so nothing else in
+// the scene is affected and the surface reverts by itself the moment the rune lets go. This is
+// deliberately done here rather than by editing surfaceTypeList — collision headers are shared,
+// cached resources, so writing to one would make every instance of that collision climbable for the
+// rest of the session.
+extern u8 Slate_IsClimbableBgId(s32 bgId);
 s32 SurfaceType_GetWallFlags(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId) {
-    if (GameInteractor_Should(VB_SURFACE_IS_CLIMBABLE, false)) {
+    if (GameInteractor_Should(VB_SURFACE_IS_CLIMBABLE, false) || gMogmaMittsClimbActive || gKeatonClimbActive ||
+        Slate_IsClimbableBgId(bgId)) {
         return WALL_FLAG_CLIMBABLE | D_80119D90[func_80041D94(colCtx, poly, bgId)];
     } else {
         return D_80119D90[func_80041D94(colCtx, poly, bgId)];

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "source_archive": "zzzz_Skiejer_Black_Market_POC14_EntranceOrientation.o2r",
+  "source_archive_sha256": "3ac1432d0e8f75e51f08892739a13e16762bb4d820a2bbc7a35469af1db872e2",
+  "source_resource": "custom/skiejer_market/texture/arcane_stone",
+  "source_resource_sha256": "e9e56df9cae334d2089bf92048c1d7f6dae0d91704cd626b54238e4b8826c5ed",
+  "pixels_sha256": "3e2bac601d1a9c3e0317d159aa6b9f5354abaac982a24848edfec5e97dbb3231",
+  "decoded_bytes": 1048576,
+  "source_encoding_manifest": "tools/black_market/assets/interior/shelf-encoded.json",
+  "encoding": "Existing verified zlib9 stream; ordered base64 parts, at most 96 KiB binary / 128 KiB text each. Exact same original pixels, no duplicate source uploads.",
+  "runtime_texture": "custom/skiejer_market/room_magic_v1/texture/arcane_stone",
+  "runtime_format": "512x512 opaque RGBA8 pixels, corrected kind-1 LOAD_AS_RAW header, logical 64x64 tile",
+  "independence": "Own runtime texture/material paths and room cosmetic colors. No shelf resource or controller changes."
+}

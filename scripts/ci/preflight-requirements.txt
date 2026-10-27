@@ -1,0 +1,5 @@
+# Use self-contained wheels so the fast gate does not wait for Ubuntu mirrors.
+# Keep the formatter identical to the version used by run-clang-format.sh.
+clang-format==14.0.6
+PyYAML==6.0.2
+-r ../assets/sword-element-ui-requirements.txt

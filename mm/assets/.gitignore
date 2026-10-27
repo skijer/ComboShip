@@ -7,4 +7,28 @@
 
 # Unignore our custom assets and header file
 !custom/**/*
+# Restored from the bounded lossless source pool before packaging.
+custom/objects/combo_spin/
 !2s2h_assets.h
+
+# Restored from the verified native forest/market source bundles.
+custom/custom/comboship/native_forest/
+custom/custom/skiejer_market/
+custom/scenes/nonmq/comboship_forest/
+custom/scenes/nonmq/skiejer_forest/
+custom/scenes/nonmq/skiejer_market/
+custom/scenes/shared/skiejer_forest_oot/
+custom/scenes/shared/skiejer_market_oot/
+
+# Prepared from the pinned compressed HD Chateau resource before packaging.
+/custom/objects/combo_chateau_romani_3ds/AtlasTex
+
+# Rebuilt from the bounded cumulative and native chamber source pools.
+/custom/objects/magic_mirror/forest_seal
+/custom/objects/magic_mirror/forest_wisp
+/custom/textures/icon_item_custom/gItemIconMagicMirrorTex.rgba32.png
+/custom/textures/magic_mirror/gMagicMirrorForestReflectionTex.rgb5a1.png
+/custom/custom/temple_sages/
+/custom/alt/custom/temple_sages/
+/custom/scenes/shared/tokinoma_scene/
+/custom/alt/scenes/shared/tokinoma_scene/

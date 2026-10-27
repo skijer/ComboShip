@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_en_tanron3.c
  * Overlay: ovl_En_Tanron3
@@ -381,6 +382,8 @@ void EnTanron3_CheckCollisions(EnTanron3* this, PlayState* play) {
     if (this->acCollider.base.acFlags & AC_HIT) {
         this->acCollider.base.acFlags &= ~AC_HIT;
         if (this->deathTimer == 0) {
+            DinFireSword_FinishConfirmedHit(play, &this->acCollider.base, this->acCollider.elem.acHitElem,
+                                            this->acCollider.elem.acDmgInfo.dmgFlags);
             this->deathTimer = 15;
             this->fogTimer = 15;
             EnTanron3_SetupDie(this, play);

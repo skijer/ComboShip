@@ -1,0 +1,16 @@
+{
+  "variant": "saria-render",
+  "bounds": [
+    -0.095,
+    0.7909999999999999,
+    0.095,
+    0.929
+  ],
+  "source_sha256": "902dfca93f4640a65a72e4266f855966fa708b412e0742789552f55f85c94aff",
+  "panels": [
+    "half",
+    "closed"
+  ],
+  "art_method": "Source face projection; imagegen eyelid edits; source pixels preserved outside feathered eye masks",
+  "neutral_revision": "centered iris/pupil gaze"
+}

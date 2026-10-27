@@ -20,8 +20,20 @@
 #include <vector>
 
 #include "CrossWorldRando.h"
+#include "SharedItems.h"
 
 namespace ComboRando {
+
+// Generation requests may include ineffective families. Every traversal uses the seed's recorded
+// effective mask when present; the argument remains a fallback for older flat placement payloads.
+inline uint32_t SharedMaskForSpoiler(const std::string& spoilerJson, uint32_t fallback) {
+    try {
+        auto j = nlohmann::json::parse(spoilerJson);
+        if (j.contains("sharedItems"))
+            return SharedMaskFromKeys(j["sharedItems"]);
+    } catch (...) {}
+    return fallback;
+}
 
 // A single placed item, parsed from a combined-fill spoiler (see ParseSpoilerPlacements). Shared by
 // RunPlaythrough and PareDownPlaythrough so both traverse the identical placement set.
@@ -80,12 +92,10 @@ inline std::vector<CwPlacedItem> ParseSpoilerPlacements(const std::string& spoil
     };
     // ComboShip: the consolidated file suffixes cross-game item-name collisions "(OOT)"/"(MM)"; strip
     // that here so oracle name resolution (bare friendly) works. No-op on the bare fill output.
-    auto stripSuffix = [](std::string s) {
-        for (const char* suf : { " (OOT)", " (MM)" }) {
-            size_t n = std::string(suf).size();
-            if (s.size() >= n && s.compare(s.size() - n, n, suf) == 0)
-                return s.substr(0, s.size() - n);
-        }
+    auto stripNativeSuffix = [](std::string s, GameId game) {
+        const std::string suffix = GameSuffix(game);
+        if (s.size() >= suffix.size() && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0)
+            return s.substr(0, s.size() - suffix.size());
         return s;
     };
     try {
@@ -93,7 +103,7 @@ inline std::vector<CwPlacedItem> ParseSpoilerPlacements(const std::string& spoil
         for (auto& fm : j.value("foreign", nlohmann::json::array())) {
             std::string cg = fm.value("checkGame", ""), cn = fm.value("checkName", "");
             std::string ig = fm.value("itemGame", "");
-            foreign[cg + ":" + cn] = { (ig == "mm") ? GAME_MM : GAME_OOT, stripSuffix(fm.value("itemName", "")),
+            foreign[cg + ":" + cn] = { (ig == "mm") ? GAME_MM : GAME_OOT, fm.value("itemName", ""),
                                        fm.value("advancement", true) };
         }
         auto addGame = [&](const char* key, GameId cg) {
@@ -103,8 +113,9 @@ inline std::vector<CwPlacedItem> ParseSpoilerPlacements(const std::string& spoil
                 auto fit = foreign.find(std::string(key) + ":" + cn);
                 bool isForeign = fit != foreign.end();
                 GameId ig = isForeign ? fit->second.itemGame : cg;
-                std::string item = (isForeign && !fit->second.itemName.empty()) ? fit->second.itemName
-                                                                                : stripSuffix(iv.get<std::string>());
+                std::string item = (isForeign && !fit->second.itemName.empty())
+                                       ? fit->second.itemName
+                                       : stripNativeSuffix(iv.get<std::string>(), cg);
                 bool adv = isForeign ? fit->second.advancement : lookupAdv(ig, item);
                 bool major = isForeign ? fit->second.advancement : lookupMajor(ig, item);
                 placements.push_back({ cg, cn, ig, item, adv, major });
@@ -170,6 +181,49 @@ inline ReachResult QueryReachableMemo(const OracleFns& o, const std::vector<std:
     memo.emplace(std::move(key), r);
     return r;
 }
+
+inline std::string CanonicalJointOwnedKey(std::vector<std::string> oot, std::vector<std::string> mm) {
+    std::string key;
+    auto append = [&](auto& owned) {
+        std::sort(owned.begin(), owned.end());
+        key += std::to_string(owned.size()) + ":";
+        for (const auto& name : owned)
+            key += std::to_string(name.size()) + ":" + name;
+    };
+    append(oot);
+    append(mm);
+    return key;
+}
+
+struct JointReachResult {
+    ReachSet oot, mm;
+};
+
+// One instance belongs to one pare-down invocation: map, settings, oracles and MM start are fixed
+// for its whole lifetime. Cache the joint fixed point together; a hit needs no native portal read.
+class JointReachMemo {
+  public:
+    JointReachMemo(const OracleFns& oot, const OracleFns& mm, bool mmInitiallyOpen)
+        : oot(oot), mm(mm), mmInitiallyOpen(mmInitiallyOpen) {
+    }
+
+    JointReachResult Query(const std::vector<std::string>& ootOwned, const std::vector<std::string>& mmOwned) {
+        auto key = CanonicalJointOwnedKey(ootOwned, mmOwned);
+        const auto found = memo.find(key);
+        if (found != memo.end())
+            return found->second;
+        auto reach = CrossDungeon::QueryJoint(oot, mm, ootOwned, mmOwned, mmInitiallyOpen, QueryReachable);
+        JointReachResult result{ std::make_shared<const std::unordered_set<std::string>>(std::move(reach.oot)),
+                                 std::make_shared<const std::unordered_set<std::string>>(std::move(reach.mm)) };
+        memo.emplace(std::move(key), result);
+        return result;
+    }
+
+  private:
+    const OracleFns oot, mm;
+    const bool mmInitiallyOpen;
+    std::unordered_map<std::string, JointReachResult> memo;
+};
 
 // Default win condition: RC_GANON reachable (OOT) AND MM's in-lair check (Majora).
 // A pluggable goal so another goal (e.g. Triforce hunt) can be swapped in without touching the
@@ -240,9 +294,12 @@ inline RequirednessResult PareDownPlaythrough(const std::string& spoilerJson, co
                                               const std::unordered_map<std::string, std::string>& mmCheckAreas = {},
                                               GoalPredicate goalReached = DefaultGanonMajoraGoal,
                                               bool portalGated = true, bool mmStart = false,
-                                              ComboGenProgress* progress = nullptr) {
+                                              ComboGenProgress* progress = nullptr, uint32_t sharedMask = 0,
+                                              const std::string& sharedPairsJson = "") {
     RequirednessResult result;
     auto placements = ParseSpoilerPlacements(spoilerJson, sohDumpJson, mmDumpJson);
+    const auto sharedGroups = BuildSharedItemGroups(ResolveSharedPairs(sharedPairsJson, mmDumpJson),
+                                                    SharedMaskForSpoiler(spoilerJson, sharedMask));
 
     auto checkKey = [](const CwPlacedItem& p) {
         return std::string(p.checkGame == GAME_OOT ? "oot:" : "mm:") + p.check;
@@ -251,6 +308,7 @@ inline RequirednessResult PareDownPlaythrough(const std::string& spoilerJson, co
     // Per-invocation reachability memo (one per oracle): the same owned-set prefixes recur across
     // every counterfactual replay (sphere 0 is identical in all), so caching collapses the repeats.
     std::unordered_map<std::string, ReachResult> ootMemo, mmMemo;
+    JointReachMemo jointMemo(ootOracle, mmOracle, !portalGated || mmStart);
     static const auto kEmptyReach = std::make_shared<const std::unordered_set<std::string>>();
 
     // Excludes a SET of placements from ever crediting their items, then sphere-collects everything
@@ -264,11 +322,24 @@ inline RequirednessResult PareDownPlaythrough(const std::string& spoilerJson, co
         // Latched: MM stays open once OOT can reach the Happy Mask Shop. Ungated (NO_LOGIC) = open,
         // and an MM start (#135) roots MM from the beginning.
         bool portalOpen = !portalGated || mmStart;
+        std::vector<std::string> ootSeen, mmSeen;
         for (;;) {
-            auto ootQ = QueryReachableMemo(ootOracle, ootOwned, ootMemo);
-            ootReach = ootQ.reach;
-            portalOpen = portalOpen || ootQ.portalOpen;
-            mmReach = portalOpen ? QueryReachableMemo(mmOracle, mmOwned, mmMemo).reach : kEmptyReach;
+            SharedOwnedViews(sharedGroups, ootOwned, mmOwned, ootSeen, mmSeen);
+            if (ootOracle.SetDungeonAccess && mmOracle.SetDungeonAccess) {
+                const auto joint = jointMemo.Query(ootSeen, mmSeen);
+                ootReach = joint.oot;
+                mmReach = joint.mm;
+            } else {
+                auto ootQ = QueryReachableMemo(ootOracle, ootSeen, ootMemo);
+                ootReach = ootQ.reach;
+                portalOpen = portalOpen || ootQ.portalOpen;
+                mmReach = portalOpen ? QueryReachableMemo(mmOracle, mmSeen, mmMemo).reach : kEmptyReach;
+            }
+            if (ootReach->contains(MagicMirrorShuffle::kOotAccessProbe)) {
+                auto forestReach = std::make_shared<std::unordered_set<std::string>>(*mmReach);
+                MagicMirrorShuffle::AddOotRoute(*ootReach, *forestReach);
+                mmReach = forestReach;
+            }
             // Test the goal per sphere and stop at the first win: we only break when the goal IS met
             // and never un-credit an item, so an early win is final regardless of oracle monotonicity.
             if (goalReached(*ootReach, *mmReach, ootOwned, mmOwned)) {
@@ -337,6 +408,8 @@ inline RequirednessResult PareDownPlaythrough(const std::string& spoilerJson, co
     // empty. Still wins -> not required; loses -> required. Definitionally correct, no monotonicity
     // assumption (unlike the old group-test binary split, which our cross-game oracle broke).
     for (size_t i : cand) {
+        if (GenCancelled(progress))
+            break; // caller discards the partial result
         ++result.replayedCount;
         classified[i] = winsWithout({ i }, nullptr) ? 0 : 1;
         if (progress)
@@ -391,7 +464,8 @@ inline PlaythroughResult RunPlaythrough(const std::string& spoilerJson, const Or
                                         const OracleFns& mmOracle, const std::string& seedLabel, void (*mmRestore)(),
                                         nlohmann::json* playthroughOut = nullptr, const std::string& sohDumpJson = "",
                                         const std::string& mmDumpJson = "", bool portalGated = true,
-                                        bool progressionOnly = false, CwGoal goal = {}, bool mmStart = false) {
+                                        bool progressionOnly = false, CwGoal goal = {}, bool mmStart = false,
+                                        uint32_t sharedMask = 0, const std::string& sharedPairsJson = "") {
     static const char* kOotGanon = "Ganon";           // RC_GANON reachable = OOT beatable (see CrossWorldRando.h)
     static const char* kMmWin = "Moon Majora Pot 01"; // ComboShip: friendly form of RC_MOON_MAJORA_POT_01
 
@@ -401,6 +475,8 @@ inline PlaythroughResult RunPlaythrough(const std::string& spoilerJson, const Or
 
     using Placed = CwPlacedItem;
     std::vector<Placed> placements = ParseSpoilerPlacements(spoilerJson, sohDumpJson, mmDumpJson);
+    const auto sharedGroups = BuildSharedItemGroups(ResolveSharedPairs(sharedPairsJson, mmDumpJson),
+                                                    SharedMaskForSpoiler(spoilerJson, sharedMask));
 
     auto queryReachable = QueryReachable;
 
@@ -420,11 +496,21 @@ inline PlaythroughResult RunPlaythrough(const std::string& spoilerJson, const Or
     // Latched: MM stays open once OOT can reach the Happy Mask Shop. Ungated (NO_LOGIC) = open, and an
     // MM start (#135) roots MM from the beginning.
     bool portalOpen = !portalGated || mmStart;
+    std::vector<std::string> ootSeen, mmSeen;
     for (int sphere = 0; sphere < kMaxSpheres; ++sphere) {
-        auto ootReach = queryReachable(ootOracle, ownedOot);
-        // Portal bit belongs to the OOT query just made; read it before crediting any MM check.
-        portalOpen = portalOpen || OraclePortalOpen(ootOracle);
-        auto mmReach = portalOpen ? queryReachable(mmOracle, ownedMm) : std::unordered_set<std::string>{};
+        SharedOwnedViews(sharedGroups, ownedOot, ownedMm, ootSeen, mmSeen);
+        std::unordered_set<std::string> ootReach, mmReach;
+        if (ootOracle.SetDungeonAccess && mmOracle.SetDungeonAccess) {
+            auto joint =
+                CrossDungeon::QueryJoint(ootOracle, mmOracle, ootSeen, mmSeen, !portalGated || mmStart, queryReachable);
+            ootReach = std::move(joint.oot);
+            mmReach = std::move(joint.mm);
+        } else {
+            ootReach = queryReachable(ootOracle, ootSeen);
+            portalOpen = portalOpen || OraclePortalOpen(ootOracle);
+            mmReach = portalOpen ? queryReachable(mmOracle, mmSeen) : std::unordered_set<std::string>{};
+        }
+        MagicMirrorShuffle::AddOotRoute(ootReach, mmReach);
         bool canGanon = ootReach.count(kOotGanon) > 0;
         bool canMajora = mmReach.count(kMmWin) > 0;
         if (goal.hunt ? CountOwnedTriforcePieces(ownedOot, ownedMm) >= goal.required : (canGanon && canMajora)) {
@@ -484,9 +570,19 @@ inline PlaythroughResult RunPlaythrough(const std::string& spoilerJson, const Or
     std::vector<std::string> allOot, allMm;
     for (auto& p : placements)
         (p.itemGame == GAME_OOT ? allOot : allMm).push_back(p.item);
-    auto everReachOot = queryReachable(ootOracle, allOot);
-    bool everPortalOpen = OraclePortalOpen(ootOracle) || mmStart;
-    auto everReachMm = everPortalOpen ? queryReachable(mmOracle, allMm) : std::unordered_set<std::string>{};
+    SharedOwnedViews(sharedGroups, allOot, allMm, ootSeen, mmSeen);
+    std::unordered_set<std::string> everReachOot, everReachMm;
+    if (ootOracle.SetDungeonAccess && mmOracle.SetDungeonAccess) {
+        auto joint =
+            CrossDungeon::QueryJoint(ootOracle, mmOracle, ootSeen, mmSeen, !portalGated || mmStart, queryReachable);
+        everReachOot = std::move(joint.oot);
+        everReachMm = std::move(joint.mm);
+    } else {
+        everReachOot = queryReachable(ootOracle, ootSeen);
+        bool everPortalOpen = !portalGated || OraclePortalOpen(ootOracle) || mmStart;
+        everReachMm = everPortalOpen ? queryReachable(mmOracle, mmSeen) : std::unordered_set<std::string>{};
+    }
+    MagicMirrorShuffle::AddOotRoute(everReachOot, everReachMm);
     result.ganonReachable = everReachOot.count(kOotGanon) > 0;
     result.majoraReachable = everReachMm.count(kMmWin) > 0;
     if (goal.hunt) {

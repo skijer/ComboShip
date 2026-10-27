@@ -1,0 +1,12 @@
+<DisplayList Version="0">
+  <PipeSync />
+  <Grayscale Enabled="false" />
+  <ClearGeometryMode G_FOG="1" />
+  <SetAlphaCompare Mode="0" />
+  <PipeSync />
+  <SetPrimColor M="0" L="0" R="255" G="70" B="50" A="255" />
+  <SetEnvColor R="127" G="35" B="25" A="255" />
+  <CallDisplayList Path="objects/combo_bottle_gi/Liquid" />
+  <CallDisplayList Path="objects/combo_bottle_gi/BottleShell" />
+  <EndDisplayList />
+</DisplayList>

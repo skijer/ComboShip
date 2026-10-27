@@ -1,14 +1,15 @@
-#include "soh/Network/Anchor/Anchor.h"
 #include <nlohmann/json.hpp>
-#include "soh/Enhancements/game-interactor/GameInteractor.h"
+
+#include "soh/Network/Anchor/Anchor.h"
+#include "soh/Enhancements/randomizer/static_data.h"
 #include "soh/Notification/Notification.h"
-#include "soh/Enhancements/randomizer/randomizer.h"
 #include "soh/SohGui/ImGuiUtils.h"
 #include "soh/Enhancements/item-tables/ItemTableManager.h"
-#include "soh/OTRGlobals.h"
 
 extern "C" {
 #include "functions.h"
+#include "mods/extended_inventory.h"
+#include "mods/items/custom_items.h"
 extern PlayState* gPlayState;
 }
 
@@ -18,7 +19,19 @@ extern PlayState* gPlayState;
 
 uint8_t incomingIceTrapsFromAnchor = 0;
 
+#ifdef COMBO_BUILD
+// ComboShip: Shared Items — suppresses this send around a local shared-tier raise (SOH_RaiseSharedTier),
+// which would otherwise broadcast a teammate toast for the player's own reconcile.
+extern "C" int gComboSuppressAnchorSend;
+extern "C" void (*gComboSharedChanged)(int game, int fileNum);
+#endif
+
 void Anchor::SendPacket_GiveItem(u16 modId, s16 getItemId) {
+#ifdef COMBO_BUILD
+    if (gComboSuppressAnchorSend) {
+        return;
+    }
+#endif
     if (!IsSaveLoaded() || isProcessingIncomingPacket || !roomState.syncItemsAndFlags) {
 #ifdef COMBO_BUILD
         SPDLOG_INFO("[Anchor] GIVE_ITEM not sent: saveLoaded={} processingIncoming={} syncItems={}", IsSaveLoaded(),
@@ -73,6 +86,24 @@ void Anchor::HandlePacket_GiveItem(nlohmann::json payload) {
     u16 modId = payload.at("modId").get<u16>();
     u16 getItemId = payload.at("getItemId").get<u16>();
 
+    // Check if this is a custom item (range 0x9C-0xB5)
+    if (modId == MOD_NONE && getItemId >= 0x9C && getItemId <= 0xB5) {
+        // Handle custom items using ExtInv_SetItemById to properly map item ID to slot
+        // This uses the gPage2Items[] array to find the correct slot for each item
+        ExtInv_SetItemById(getItemId);
+
+        // Play item fanfare sound
+        Audio_PlayFanfare(NA_BGM_ITEM_GET | 0x900);
+
+        // Create notification
+        Notification::Emit({
+            .prefix = client.name,
+            .message = "found",
+            .suffix = SohUtils::GetItemName(getItemId),
+        });
+        return;
+    }
+
     GetItemEntry getItemEntry;
     if (modId == MOD_NONE) {
         getItemEntry = ItemTableManager::Instance->RetrieveItemEntry(MOD_NONE, getItemId);
@@ -99,6 +130,11 @@ void Anchor::HandlePacket_GiveItem(nlohmann::json payload) {
     // Skip-Planting-Beans pre-plant) that this save-direct grant bypasses. See OTRGlobals.cpp.
     extern void Combo_ApplyItemReceiveSideEffects(const GetItemEntry& gie);
     Combo_ApplyItemReceiveSideEffects(getItemEntry);
+    // This save-direct path bypasses OnItemReceive. Dormant sentinel slots are re-poked by the
+    // launcher's PumpDormant using its bound slot; live packet grants can notify directly here.
+    if (gComboSharedChanged) {
+        gComboSharedChanged(0, static_cast<int>(gSaveContext.fileNum));
+    }
 #endif
 
     // Full heal if getting a heart container or piece

@@ -6,6 +6,10 @@
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/Enhancements/savestate_serialize.h"
+#include "concurrent_weather_audio.h"
+#include "night_bgm_bridge.h"
+#include "mods/transformation_masks/assets/mm_asset_loader.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 // TODO: can these macros be shared between files? code_800F9280 seems to use
 // versions without any casts...
@@ -138,6 +142,7 @@ u8 sPrevSeqMode = 0;
 f32 sAudioEnemyDist = 0.0f;
 s8 sAudioEnemyVol = 127;
 u16 sPrevMainBgmSeqId = NA_BGM_DISABLED;
+static u16 sPreviewNightBgmSeqId = NA_BGM_DISABLED;
 
 #define SEQ_RESUME_POINT_NONE 0xC0
 u8 sSeqResumePoint = 0;
@@ -1073,6 +1078,119 @@ OcarinaNote sOcarinaSongNotes[OCARINA_SONG_MAX][20] = {
         { OCARINA_PITCH_D4, 3, 0, 0, 0, 0 },
         { OCARINA_PITCH_NONE, 0, 0, 0, 0, 0 },
     },
+    // Skijer's NEI: MM-unique songs brought to OoT's quest page (real MM note data, pitch table shared:
+    // 2=D4,5=F4,9=A4,11=B4,14=D5). Format = OoT { pitch, unk, length, volume, vibrato, bend, bFlat }.
+    // OCARINA_SONG_MM_SONATA
+    {
+        { 14, 19, 92, 0, 0, 0 },
+        { 11, 19, 90, 0, 0, 0 },
+        { 14, 19, 90, 0, 0, 0 },
+        { 11, 38, 90, 0, 0, 0 },
+        { 2, 39, 92, 0, 0, 0 },
+        { 9, 76, 89, 0, 0, 0 },
+        { 2, 77, 82, 0, 0, 0 },
+        { 0xFF, 0, 86, 0, 0, 0 },
+    },
+    // OCARINA_SONG_MM_GORON_LULLABY
+    {
+        { 2, 41, 80, 0, 0, 0 },
+        { 9, 40, 72, 0, 0, 0 },
+        { 11, 39, 84, 0, 0, 0 },
+        { 2, 42, 76, 0, 0, 0 },
+        { 9, 40, 84, 0, 0, 0 },
+        { 11, 39, 76, 0, 0, 0 },
+        { 9, 41, 84, 0, 0, 0 },
+        { 2, 80, 76, 0, 0, 0 },
+        { 0xFF, 40, 76, 0, 0, 0 },
+        { 0xFF, 0, 66, 0, 0, 0 },
+    },
+    // OCARINA_SONG_MM_NEW_WAVE
+    {
+        { 11, 64, 74, 0, 0, 0 },
+        { 14, 13, 88, 0, 0, 0 },
+        { 11, 12, 90, 0, 0, 0 },
+        { 9, 78, 88, 0, 0, 0 },
+        { 5, 12, 76, 0, 0, 0 },
+        { 11, 13, 76, 0, 0, 0 },
+        { 9, 114, 76, 6, 0, 0 },
+        { 0xFF, 0, 90, 0, 0, 0 },
+    },
+    // OCARINA_SONG_MM_ELEGY
+    {
+        { 9, 85, 93, 0, 0, 0 },
+        { 11, 43, 91, 0, 0, 0 },
+        { 9, 43, 93, 0, 0, 0 },
+        { 5, 21, 88, 0, 0, 0 },
+        { 9, 21, 88, 0, 0, 0 },
+        { 14, 43, 101, 0, 0, 0 },
+        { 11, 85, 95, 0, 0, 0 },
+        { 0xFF, 0, 94, 0, 0, 0 },
+    },
+    // OCARINA_SONG_MM_OATH
+    {
+        { 9, 97, 104, 0, 0, 0 },
+        { 5, 48, 88, 0, 0, 0 },
+        { 2, 49, 78, 0, 0, 0 },
+        { 5, 49, 78, 0, 0, 0 },
+        { 9, 48, 94, 0, 0, 0 },
+        { 14, 97, 100, 0, 0, 0 },
+        { 0xFF, 0, 96, 0, 0, 0 },
+    },
+    // OCARINA_SONG_MM_SOARING
+    {
+        { 5, 18, 84, 0, 0, 0 },
+        { 11, 18, 80, 0, 0, 0 },
+        { 14, 36, 94, 0, 0, 0 },
+        { 5, 18, 73, 0, 0, 0 },
+        { 11, 18, 76, 0, 0, 0 },
+        { 14, 108, 96, 2, 0, 0 },
+        { 0xFF, 0, 90, 0, 0, 0 },
+    },
+    // OCARINA_SONG_MM_HEALING
+    {
+        { 11, 32, 88, 0, 0, 0 },
+        { 9, 33, 88, 0, 0, 0 },
+        { 5, 33, 69, 0, 0, 0 },
+        { 11, 32, 94, 0, 0, 0 },
+        { 9, 33, 88, 0, 0, 0 },
+        { 5, 121, 86, 2, 0, 0 },
+        { 0xFF, 10, 84, 0, 0, 0 },
+        { 0xFF, 0, 90, 0, 0, 0 },
+    },
+
+    // Skijer's NEI custom songs (mirror of the 2ship side; fingering = the base notes, playback may add
+    // ornament/cycle notes). OCARINA_SONG_NEI_FUGUE_OF_HOME — 6-note base played 3 rising cycles.
+    {
+        { 2, 10, 86, 0, 0, 0 },  { 5, 10, 86, 0, 0, 0 },  { 9, 10, 88, 0, 0, 0 },   { 14, 10, 88, 0, 0, 0 },
+        { 9, 10, 88, 0, 0, 0 },  { 11, 10, 90, 0, 0, 0 }, { 4, 10, 86, 0, 0, 0 },   { 7, 10, 86, 0, 0, 0 },
+        { 11, 10, 88, 0, 0, 0 }, { 16, 10, 88, 0, 0, 0 }, { 11, 10, 88, 0, 0, 0 },  { 13, 10, 90, 0, 0, 0 },
+        { 6, 10, 88, 0, 0, 0 },  { 9, 10, 88, 0, 0, 0 },  { 13, 10, 90, 0, 0, 0 },  { 18, 10, 90, 0, 0, 0 },
+        { 13, 10, 90, 0, 0, 0 }, { 15, 40, 92, 0, 0, 0 }, { 0xFF, 0, 90, 0, 0, 0 },
+    },
+    // OCARINA_SONG_NEI_COMMAND_MELODY
+    {
+        { 2, 40, 86, 0, 0, 0 },
+        { 11, 40, 86, 0, 0, 0 },
+        { 2, 40, 86, 0, 0, 0 },
+        { 9, 80, 90, 0, 0, 0 },
+        { 2, 40, 86, 0, 0, 0 },
+        { 11, 40, 86, 0, 0, 0 },
+        { 2, 40, 86, 0, 0, 0 },
+        { 9, 80, 90, 0, 0, 0 },
+        { 0xFF, 0, 90, 0, 0, 0 },
+    },
+    // OCARINA_SONG_NEI_BALLAD_OF_HERO (185 BPM, ornament eighth on note 4)
+    {
+        { 2, 19, 86, 0, 0, 0 },
+        { 5, 19, 86, 0, 0, 0 },
+        { 14, 58, 90, 0, 0, 0 },
+        { 12, 10, 88, 0, 0, 0 },
+        { 11, 10, 88, 0, 0, 0 },
+        { 9, 39, 90, 0, 0, 0 },
+        { 11, 19, 88, 0, 0, 0 },
+        { 9, 58, 92, 0, 0, 0 },
+        { 0xFF, 0, 90, 0, 0, 0 },
+    },
 };
 
 OcarinaNote* sPlaybackSong = sOcarinaSongNotes[0];
@@ -1249,6 +1367,48 @@ OcarinaSongButtons gOcarinaSongButtons[OCARINA_SONG_MAX] = {
     { 8, { 0 } },
     // OCARINA_SONG_MEMORY_GAME
     { 0, { 0 } },
+    // Skijer's NEI: MM-unique + custom song RECOGNITION note sequences (the fingering; playback in
+    // sOcarinaSongNotes may add ornament/cycle notes but the player plays only these).
+    // MM Sonata
+    { 7,
+      { OCARINA_BTN_C_UP, OCARINA_BTN_C_LEFT, OCARINA_BTN_C_UP, OCARINA_BTN_C_LEFT, OCARINA_BTN_A, OCARINA_BTN_C_RIGHT,
+        OCARINA_BTN_A } },
+    // MM Goron Lullaby
+    { 8,
+      { OCARINA_BTN_A, OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_LEFT, OCARINA_BTN_A, OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_LEFT,
+        OCARINA_BTN_C_RIGHT, OCARINA_BTN_A } },
+    // MM New Wave Bossa Nova
+    { 7,
+      { OCARINA_BTN_C_LEFT, OCARINA_BTN_C_UP, OCARINA_BTN_C_LEFT, OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_DOWN,
+        OCARINA_BTN_C_LEFT, OCARINA_BTN_C_RIGHT } },
+    // MM Elegy of Emptiness
+    { 7,
+      { OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_LEFT, OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_DOWN, OCARINA_BTN_C_RIGHT,
+        OCARINA_BTN_C_UP, OCARINA_BTN_C_LEFT } },
+    // MM Oath to Order
+    { 6,
+      { OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_DOWN, OCARINA_BTN_A, OCARINA_BTN_C_DOWN, OCARINA_BTN_C_RIGHT,
+        OCARINA_BTN_C_UP } },
+    // MM Song of Soaring
+    { 6,
+      { OCARINA_BTN_C_DOWN, OCARINA_BTN_C_LEFT, OCARINA_BTN_C_UP, OCARINA_BTN_C_DOWN, OCARINA_BTN_C_LEFT,
+        OCARINA_BTN_C_UP } },
+    // MM Song of Healing
+    { 6,
+      { OCARINA_BTN_C_LEFT, OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_DOWN, OCARINA_BTN_C_LEFT, OCARINA_BTN_C_RIGHT,
+        OCARINA_BTN_C_DOWN } },
+    // NEI Fugue of Home (6-note base)
+    { 6,
+      { OCARINA_BTN_A, OCARINA_BTN_C_DOWN, OCARINA_BTN_C_RIGHT, OCARINA_BTN_C_UP, OCARINA_BTN_C_RIGHT,
+        OCARINA_BTN_C_LEFT } },
+    // NEI Command Melody
+    { 8,
+      { OCARINA_BTN_A, OCARINA_BTN_C_LEFT, OCARINA_BTN_A, OCARINA_BTN_C_RIGHT, OCARINA_BTN_A, OCARINA_BTN_C_LEFT,
+        OCARINA_BTN_A, OCARINA_BTN_C_RIGHT } },
+    // NEI Ballad of Hero (7-note fingering; ornament is playback-only)
+    { 7,
+      { OCARINA_BTN_A, OCARINA_BTN_C_DOWN, OCARINA_BTN_C_UP, OCARINA_BTN_C_LEFT, OCARINA_BTN_C_RIGHT,
+        OCARINA_BTN_C_LEFT, OCARINA_BTN_C_RIGHT } },
 };
 // clang-format on
 
@@ -1298,7 +1458,9 @@ static u8 sOcarinaWithoutMusicStaffPos;
 static u8 sOcarinaHasStartedSong;
 static u8 sFirstOcarinaSongIndex;
 static u8 sLastOcarinaSongIndex;
-static u16 sAvailOcarinaSongFlags;
+// Skijer's NEI: widened from u16. Vanilla only ever needed bits 0-13; the MM and custom songs
+// occupy availability bits 14-23, which a u16 silently truncates.
+static u32 sAvailOcarinaSongFlags;
 static u8 sStaffOcarinaPlayingPos;
 static u16 sMusicStaffPos[OCARINA_SONG_MAX];
 static u16 sMusicStaffCurHeldLength[OCARINA_SONG_MAX];
@@ -1336,6 +1498,7 @@ s32 sAudioUpdateTaskEnd;      // decomp: debug only
     F(sAudioEnemyDist)                                 \
     F(sAudioEnemyVol)                                  \
     F(sPrevMainBgmSeqId)                               \
+    F(sPreviewNightBgmSeqId)                           \
     F(sSeqResumePoint)                                 \
     F(sPrevSceneSeqId)                                 \
     F(sNumFramesStill)                                 \
@@ -1602,19 +1765,24 @@ void AudioOcarina_MapNotesToScarecrowButtons(u8 noteSongIndex) {
  *
  * original name: Na_StartOcarinaSinglePlayCheck2
  */
-void AudioOcarina_Start(u16 ocarinaFlags) {
+// Skijer's NEI: widened to u32. OoT's flag word was 16-bit — song bits 0-13, mode flags
+// 0x4000/0x8000, sentinel 0xFFFF — leaving nowhere for the MM and custom songs. They are passed in
+// PARAMETER bits 16-25 (stepping over the mode bits) and remapped to availability bits 14-23 below.
+// The 0xCFFF/0xFFF comparisons must therefore look at the low half only, or a caller that also set
+// a high bit would fail to match and the scarecrow songs would stop being recognised.
+void AudioOcarina_Start(u32 ocarinaFlags) {
     u8 i;
 
     if ((sOcarinaSongNotes[OCARINA_SONG_SCARECROW_SPAWN][1].volume != 0xFF) && ((ocarinaFlags & 0xFFF) == 0xFFF)) {
         ocarinaFlags |= 0x1000;
     }
 
-    if ((ocarinaFlags == 0xCFFF) && (sOcarinaSongNotes[OCARINA_SONG_SCARECROW_SPAWN][1].volume != 0xFF)) {
-        ocarinaFlags = 0xDFFF;
+    if (((ocarinaFlags & 0xFFFF) == 0xCFFF) && (sOcarinaSongNotes[OCARINA_SONG_SCARECROW_SPAWN][1].volume != 0xFF)) {
+        ocarinaFlags = (ocarinaFlags & ~0xFFFFu) | 0xDFFF;
     }
 
-    if ((ocarinaFlags == 0xFFF) && (sOcarinaSongNotes[OCARINA_SONG_SCARECROW_SPAWN][1].volume != 0xFF)) {
-        ocarinaFlags = 0x1FFF;
+    if (((ocarinaFlags & 0xFFFF) == 0xFFF) && (sOcarinaSongNotes[OCARINA_SONG_SCARECROW_SPAWN][1].volume != 0xFF)) {
+        ocarinaFlags = (ocarinaFlags & ~0xFFFFu) | 0x1FFF;
     }
 
     if (ocarinaFlags != 0xFFFF) {
@@ -1624,7 +1792,14 @@ void AudioOcarina_Start(u16 ocarinaFlags) {
         if (ocarinaFlags != 0xA000) {
             sLastOcarinaSongIndex--;
         }
-        sAvailOcarinaSongFlags = ocarinaFlags & 0x3FFF;
+        // Skijer's NEI: parameter bits 16-25 (MM/custom songs) fold down onto availability bits
+        // 14-23, which sit directly above the vanilla song bits.
+        sAvailOcarinaSongFlags = (ocarinaFlags & 0x3FFF) | ((ocarinaFlags >> 2) & 0x00FFC000);
+        if (ocarinaFlags & 0x03FF0000) {
+            // A custom song is on offer, so the scan has to reach past the vanilla songs; the
+            // decrement above would otherwise stop one short of them.
+            sLastOcarinaSongIndex = OCARINA_SONG_MAX;
+        }
         sMusicStaffNumNotesPerTest = 8; // Ocarina Check
         sOcarinaHasStartedSong = false;
         sPlayedOcarinaSongIndexPlusOne = 0;
@@ -1828,7 +2003,9 @@ void AudioOcarina_CheckSongsWithoutMusicStaff(void) {
             // Loop through each of the songs
             for (i = sFirstOcarinaSongIndex; i < sLastOcarinaSongIndex; i++) {
                 // Checks to see if the song is available to be played
-                if (sAvailOcarinaSongFlags & (u16)(1 << i)) {
+                // Skijer's NEI: the (u16) cast truncated bits 16-23 to zero, so no MM or custom
+                // song could ever match here.
+                if (sAvailOcarinaSongFlags & (1u << i)) {
                     for (j = 0, k = 0; j < gOcarinaSongButtons[i].numButtons && k == 0 &&
                                        sOcarinaWithoutMusicStaffPos >= gOcarinaSongButtons[i].numButtons;) {
                         pitch = sCurOcarinaSongWithoutMusicStaff[(sOcarinaWithoutMusicStaffPos -
@@ -1958,8 +2135,8 @@ void AudioOcarina_PlayControllerInput(u8 unused) {
             Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD07, sOcarinaInstrumentId - 1);
             // Sets pitch to io port 5
             Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD05, sCurOcarinaPitch);
-            Audio_PlaySoundGeneral(NA_SE_OC_OCARINA, &gSfxDefaultPos, 4, &sCurOcarinaBendFreq, &sRelativeOcarinaVolume,
-                                   &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_OC_OCARINA, &gSfxDefaultPos, 4, &sCurOcarinaBendFreq, &sRelativeOcarinaVolume,
+                                 &gSfxDefaultReverb);
         } else if ((sPrevOcarinaPitch != OCARINA_PITCH_NONE) && (sCurOcarinaPitch == OCARINA_PITCH_NONE)) {
             // Stops ocarina sound when transitioning from playing to not playing a note
             Audio_StopSfxById(NA_SE_OC_OCARINA);
@@ -2028,6 +2205,7 @@ void AudioOcarina_SetPlaybackSong(s8 songIndexPlusOne, s8 playbackState) {
     if (songIndexPlusOne == 0) {
         sPlaybackState = 0;
         Audio_StopSfxById(NA_SE_OC_OCARINA);
+        GameInteractor_ExecuteOnOcarinaPlaybackNote(OCARINA_PITCH_NONE, 1.0f);
         return;
     }
 
@@ -2086,10 +2264,12 @@ void AudioOcarina_PlaybackSong(void) {
                     sPlaybackPitch = OCARINA_PITCH_NONE;
                 } else {
                     Audio_StopSfxById(NA_SE_OC_OCARINA);
+                    GameInteractor_ExecuteOnOcarinaPlaybackNote(OCARINA_PITCH_NONE, 1.0f);
                 }
                 return;
             } else {
-                sPlaybackNoteTimer -= nextNoteTimerStep;
+                // SoH [Fix] several audio tasks can run between updates, don't wrap below zero
+                sPlaybackNoteTimer -= MIN(nextNoteTimerStep, sPlaybackNoteTimer);
             }
 
             // Update volume
@@ -2135,10 +2315,12 @@ void AudioOcarina_PlaybackSong(void) {
                     Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD07, sOcarinaInstrumentId - 1);
                     // Sets sPlaybackPitch to channelIndex io port 5
                     Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD05, sPlaybackPitch & 0x3F);
-                    Audio_PlaySoundGeneral(NA_SE_OC_OCARINA, &gSfxDefaultPos, 4, &sRelativeNotePlaybackBend,
-                                           &sRelativeNotePlaybackVolume, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_OC_OCARINA, &gSfxDefaultPos, 4, &sRelativeNotePlaybackBend,
+                                         &sRelativeNotePlaybackVolume, &gSfxDefaultReverb);
+                    GameInteractor_ExecuteOnOcarinaPlaybackNote(sPlaybackPitch & 0x3F, sRelativeNotePlaybackBend);
                 } else {
                     Audio_StopSfxById(NA_SE_OC_OCARINA);
+                    GameInteractor_ExecuteOnOcarinaPlaybackNote(OCARINA_PITCH_NONE, 1.0f);
                 }
             }
             sPlaybackNotePos++;
@@ -2329,7 +2511,23 @@ void AudioOcarina_UpdatePlaybackStaff(void) {
 
     sPlaybackStaff.state = sPlaybackState;
 
-    if (sPlaybackSong != sScarecrowsLongSongNotes) {
+    // Skijer's NEI: a custom song can SOUND more notes than its fingering has — Fugue of Home is
+    // three rising cycles of a six-note phrase, Ballad of Hero adds ornament eighths. The staff must
+    // still only ever show the fingering the player is expected to play, so clamp the position to
+    // the fingering length and take the displayed button from the fingering table rather than from
+    // the sounding pitch. Without this the staff runs past the end of the song's button array.
+    if ((sPlaybackSong == sOcarinaSongNotes[OCARINA_SONG_NEI_FUGUE_OF_HOME]) ||
+        (sPlaybackSong == sOcarinaSongNotes[OCARINA_SONG_NEI_BALLAD_OF_HERO])) {
+        u8 neiSongIdx = (sPlaybackSong == sOcarinaSongNotes[OCARINA_SONG_NEI_FUGUE_OF_HOME])
+                            ? OCARINA_SONG_NEI_FUGUE_OF_HOME
+                            : OCARINA_SONG_NEI_BALLAD_OF_HERO;
+        u8 neiLen = gOcarinaSongButtons[neiSongIdx].numButtons;
+
+        sPlaybackStaff.pos = (sPlaybackStaffPos < neiLen) ? sPlaybackStaffPos : neiLen;
+        if (sPlaybackStaff.pos >= 1) {
+            sPlaybackStaff.buttonIndex = gOcarinaSongButtons[neiSongIdx].buttonsIndex[sPlaybackStaff.pos - 1];
+        }
+    } else if (sPlaybackSong != sScarecrowsLongSongNotes) {
         sPlaybackStaff.pos = sPlaybackStaffPos;
     } else if (sPlaybackStaffPos == 0) {
         sPlaybackStaff.pos = 0;
@@ -2595,6 +2793,7 @@ u8 sAudioBlkChgBgmWork[2] = { 0 };
 u8 sAudioBlkChgBgmSel = 0;
 char sBoolStrs[3][5] = { "OFF", "ON", "STBY" };
 u8 sAudioNatureFailed = false;
+ConcurrentWeatherAudioState sConcurrentWeatherAudioState = { 0 };
 u8 sPeakNumNotes = 0;
 
 void AudioDebug_SetInput(void) {
@@ -3386,9 +3585,9 @@ void AudioDebug_ProcessInput_SndCont(void) {
                 break;
             case 2:
             case 3:
-                Audio_PlaySoundGeneral(((sAudioSndContWork[2] << 12) & 0xFFFF) + sAudioSndContWork[3] + SFX_FLAG,
-                                       &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(((sAudioSndContWork[2] << 12) & 0xFFFF) + sAudioSndContWork[3] + SFX_FLAG,
+                                     &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultReverb);
                 break;
             case 4:
                 Audio_SetSoundOutputMode(sAudioSndContWork[sAudioSndContSel]);
@@ -3787,8 +3986,8 @@ void AudioDebug_ProcessInput_SfxParamChg(void) {
 
     if (CHECK_BTN_ANY(sDebugPadPress, BTN_A)) {
         sfx = (u16)(sAudioSfxParamChgWork[0] << 12) + sAudioSfxParamChgWork[1] + SFX_FLAG;
-        Audio_PlaySoundGeneral(sfx, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(sfx, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultReverb);
     }
 
     if (CHECK_BTN_ANY(sDebugPadPress, BTN_B)) {
@@ -3924,6 +4123,7 @@ void Audio_UpdateFanfare(void);
  */
 void Audio_Update(void) {
     if (func_800FAD34() == 0) {
+        MmSfx_UpdateGameFrame();
         sAudioUpdateTaskStart = gAudioContext.totalTaskCnt;
         sAudioUpdateStartTime = osGetTime();
         AudioOcarina_Update();
@@ -4322,8 +4522,8 @@ void Audio_PlayFanfare_Rando(GetItemEntry getItem) {
 
     if (getItem.modIndex == MOD_NONE) {
         if (((itemId >= ITEM_RUPEE_GREEN) && (itemId <= ITEM_RUPEE_GOLD)) || (itemId == ITEM_HEART)) {
-            Audio_PlaySoundGeneral(NA_SE_SY_GET_BOXITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_SY_GET_BOXITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else {
             if (itemId == ITEM_HEART_CONTAINER ||
                 ((itemId == ITEM_HEART_PIECE_2) && ((gSaveContext.inventory.questItems & 0xF0000000) == 0x40000000))) {
@@ -4395,7 +4595,7 @@ void func_800F4010(Vec3f* pos, u16 sfxId, f32 arg2) {
 
     D_80131C8C = arg2;
     sp24 = func_800F3F84(arg2);
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &D_8016B7B0, &D_8016B7A8, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &D_8016B7B0, &D_8016B7A8, &gSfxDefaultReverb);
 
     if ((sfxId & 0xF0) == 0xB0) {
         phi_f0 = 0.3f;
@@ -4413,23 +4613,23 @@ void func_800F4010(Vec3f* pos, u16 sfxId, f32 arg2) {
             sfxId2 = NA_SE_PL_METALEFFECT_KID;
         }
         D_8016B7AC = (sp24 * 0.7) + 0.3;
-        Audio_PlaySoundGeneral(sfxId2, pos, 4, &D_8016B7B0, &D_8016B7AC, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(sfxId2, pos, 4, &D_8016B7B0, &D_8016B7AC, &gSfxDefaultReverb);
     }
 }
 
 void func_800F4138(Vec3f* pos, u16 sfxId, f32 arg2) {
     func_800F3F84(arg2);
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &D_8016B7B0, &D_8016B7A8, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &D_8016B7B0, &D_8016B7A8, &gSfxDefaultReverb);
 }
 
 void func_800F4190(Vec3f* pos, u16 sfxId) {
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &D_801305B0, &gSfxDefaultFreqAndVolScale, &D_801305B4);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &D_801305B0, &gSfxDefaultFreqAndVolScale, &D_801305B4);
 }
 void Audio_PlaySoundRandom(Vec3f* pos, u16 baseSfxId, u8 randLim) {
     u8 offset = Audio_NextRandom() % randLim;
 
-    Audio_PlaySoundGeneral(baseSfxId + offset, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                           &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(baseSfxId + offset, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                         &gSfxDefaultReverb);
 }
 
 void func_800F4254(Vec3f* pos, u8 level) {
@@ -4438,12 +4638,12 @@ void func_800F4254(Vec3f* pos, u8 level) {
         sSfxSwordChargeFreq = sSfxSwordChargeFreqLevels[level];
         switch (level) {
             case 1:
-                Audio_PlaySoundGeneral(NA_SE_PL_SWORD_CHARGE, pos, 4, &sSfxSwordChargeFreq, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_PL_SWORD_CHARGE, pos, 4, &sSfxSwordChargeFreq, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultReverb);
                 break;
             case 2:
-                Audio_PlaySoundGeneral(NA_SE_PL_SWORD_CHARGE, pos, 4, &sSfxSwordChargeFreq, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_PL_SWORD_CHARGE, pos, 4, &sSfxSwordChargeFreq, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultReverb);
                 break;
         }
 
@@ -4451,8 +4651,8 @@ void func_800F4254(Vec3f* pos, u8 level) {
     }
 
     if (level != 0) {
-        Audio_PlaySoundGeneral(NA_SE_IT_SWORD_CHARGE - SFX_FLAG, pos, 4, &sSfxSwordChargeFreq,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_IT_SWORD_CHARGE - SFX_FLAG, pos, 4, &sSfxSwordChargeFreq,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 }
 
@@ -4464,14 +4664,14 @@ void func_800F436C(Vec3f* pos, u16 sfxId, f32 arg2) {
     }
 
     if (D_8016B7D8 > 0.5f) {
-        Audio_PlaySoundGeneral(sfxId, pos, 4, &D_8016B7D8, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(sfxId, pos, 4, &D_8016B7D8, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 }
 
 void func_800F4414(Vec3f* pos, u16 sfxId, f32 arg2) {
     D_801305B8--;
     if (D_801305B8 == 0) {
-        Audio_PlaySoundGeneral(sfxId, pos, 4, &D_8016B7D8, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(sfxId, pos, 4, &D_8016B7D8, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 
         if (arg2 > 2.0f) {
             arg2 = 2.0f;
@@ -4488,12 +4688,12 @@ void func_800F44EC(s8 arg0, s8 arg1) {
 
 void func_800F4524(Vec3f* pos, u16 sfxId, s8 arg2) {
     D_8016B7DC = arg2;
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &D_8016B7DC);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &D_8016B7DC);
 }
 
 void func_800F4578(Vec3f* pos, u16 sfxId, f32 arg2) {
     D_8016B7E0 = arg2;
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &gSfxDefaultFreqAndVolScale, &D_8016B7E0, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &gSfxDefaultFreqAndVolScale, &D_8016B7E0, &gSfxDefaultReverb);
 }
 
 void func_800F45D0(f32 arg0) {
@@ -4509,8 +4709,8 @@ void Audio_PlaySoundRiver(Vec3f* pos, f32 freqScale) {
         sRiverFreqScaleLerp.remainingFrames = 40;
         sRiverFreqScaleLerp.step = (sRiverFreqScaleLerp.target - sRiverFreqScaleLerp.value) / 40;
     }
-    Audio_PlaySoundGeneral(NA_SE_EV_RIVER_STREAM - SFX_FLAG, pos, 4, &sRiverFreqScaleLerp.value,
-                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(NA_SE_EV_RIVER_STREAM - SFX_FLAG, pos, 4, &sRiverFreqScaleLerp.value,
+                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 }
 
 void Audio_PlaySoundWaterfall(Vec3f* pos, f32 freqScale) {
@@ -4521,8 +4721,8 @@ void Audio_PlaySoundWaterfall(Vec3f* pos, f32 freqScale) {
         sWaterfallFreqScaleLerp.remainingFrames = 40;
         sWaterfallFreqScaleLerp.step = (sWaterfallFreqScaleLerp.target - sWaterfallFreqScaleLerp.value) / 40;
     }
-    Audio_PlaySoundGeneral(NA_SE_EV_WATER_WALL_BIG - SFX_FLAG, pos, 4, &sWaterfallFreqScaleLerp.value,
-                           &sWaterfallFreqScaleLerp.value, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(NA_SE_EV_WATER_WALL_BIG - SFX_FLAG, pos, 4, &sWaterfallFreqScaleLerp.value,
+                         &sWaterfallFreqScaleLerp.value, &gSfxDefaultReverb);
 }
 
 void Audio_StepFreqLerp(FreqLerp* lerp) {
@@ -4637,8 +4837,8 @@ void func_800F4A70(void) {
 }
 
 void Audio_PlaySoundIncreasinglyTransposed(Vec3f* pos, s16 sfxId, u8* semitones) {
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &gNoteFrequencies[semitones[sAudioIncreasingTranspose] + 39],
-                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &gNoteFrequencies[semitones[sAudioIncreasingTranspose] + 39],
+                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 
     if (sAudioIncreasingTranspose < 15) {
         sAudioIncreasingTranspose++;
@@ -4650,8 +4850,8 @@ void Audio_ResetIncreasingTranspose(void) {
 }
 
 void Audio_PlaySoundTransposed(Vec3f* pos, u16 sfxId, s8 semitone) {
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &gNoteFrequencies[semitone + 39], &gSfxDefaultFreqAndVolScale,
-                           &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &gNoteFrequencies[semitone + 39], &gSfxDefaultFreqAndVolScale,
+                         &gSfxDefaultReverb);
 }
 
 void func_800F4C58(Vec3f* pos, u16 sfxId, u8 arg2) {
@@ -4672,7 +4872,7 @@ void func_800F4C58(Vec3f* pos, u16 sfxId, u8 arg2) {
         }
         phi_s1++;
     }
-    Audio_PlaySoundGeneral(sfxId, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(sfxId, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 }
 
 void func_800F4E30(Vec3f* pos, f32 arg1) {
@@ -4946,6 +5146,7 @@ void func_800F5ACC(u16 seqId) {
 
     if ((curSeqId & 0xFF) != NA_BGM_GANON_TOWER && (curSeqId & 0xFF) != NA_BGM_ESCAPE && curSeqId != seqId) {
         Audio_SetSequenceMode(SEQ_MODE_IGNORE);
+        sPreviewNightBgmSeqId = NA_BGM_DISABLED;
         if (curSeqId != NA_BGM_DISABLED) {
             sPrevMainBgmSeqId = curSeqId;
         } else {
@@ -4957,11 +5158,12 @@ void func_800F5ACC(u16 seqId) {
 }
 
 // based on func_800F5ACC
-void PreviewSequence(u16 seqId) {
+static void Audio_PreviewSequenceInternal(u16 seqId, u8 exact) {
     u16 curSeqId = func_800FA0B4(SEQ_PLAYER_BGM_MAIN);
 
-    if ((curSeqId & 0xFF) != NA_BGM_GANON_TOWER && (curSeqId & 0xFF) != NA_BGM_ESCAPE && curSeqId != seqId) {
+    if ((curSeqId & 0xFF) != NA_BGM_GANON_TOWER && (curSeqId & 0xFF) != NA_BGM_ESCAPE && (exact || curSeqId != seqId)) {
         Audio_SetSequenceMode(SEQ_MODE_IGNORE);
+        sPreviewNightBgmSeqId = Audio_GetActiveNightBgm();
         if (curSeqId != NA_BGM_DISABLED) {
             sPrevMainBgmSeqId = curSeqId;
         } else {
@@ -4970,6 +5172,16 @@ void PreviewSequence(u16 seqId) {
 
         Audio_QueuePreviewSeqCmd(seqId);
     }
+}
+
+void PreviewSequence(u16 seqId) {
+    Audio_PreviewSequenceInternal(seqId, false);
+}
+
+void Audio_PreviewSceneSequence(u16 seqId) {
+    // Scene rows select an exact bank even when its native bookkeeping ID
+    // equals the current one, whose ordinary editor replacement may differ.
+    Audio_PreviewSequenceInternal(seqId, true);
 }
 
 /**
@@ -4985,6 +5197,7 @@ void func_800F5B58(void) {
         }
 
         sPrevMainBgmSeqId = NA_BGM_DISABLED;
+        sPreviewNightBgmSeqId = NA_BGM_DISABLED;
     }
 }
 
@@ -4996,6 +5209,7 @@ void func_800F5BF0(u8 natureAmbienceId) {
 
     if (curSeqId != NA_BGM_NATURE_AMBIENCE) {
         sPrevMainBgmSeqId = curSeqId;
+        sPreviewNightBgmSeqId = NA_BGM_DISABLED;
     }
 
     Audio_PlayNatureAmbienceSequence(natureAmbienceId);
@@ -5004,33 +5218,40 @@ void func_800F5BF0(u8 natureAmbienceId) {
 /**
  * Restores the previous sequence to the main bgm player before func_800F5BF0 was called
  */
+void Audio_CancelPreviewRestore(void) {
+    sPrevMainBgmSeqId = NA_BGM_DISABLED;
+    sPreviewNightBgmSeqId = NA_BGM_DISABLED;
+}
+
 void func_800F5C2C(void) {
-    if (sPrevMainBgmSeqId != NA_BGM_DISABLED) {
+    if (sPrevMainBgmSeqId != NA_BGM_DISABLED && !Audio_RestoreNightBgm(sPreviewNightBgmSeqId)) {
         Audio_StartSeq(SEQ_PLAYER_BGM_MAIN, 0, sPrevMainBgmSeqId);
     }
     sPrevMainBgmSeqId = NA_BGM_DISABLED;
+    sPreviewNightBgmSeqId = NA_BGM_DISABLED;
 }
 
 void Audio_PlayFanfare(u16 seqId) {
     u16 curSeqId;
     u32 outNumFonts;
-    u8* curFontId;
-    u8* requestedFontId;
+    s32 curFontId;
+    s32* requestedFontId;
 
     curSeqId = func_800FA0B4(SEQ_PLAYER_FANFARE);
 
-    // Although seqIds are u16, there is no fanfare that is above 0xFF
-    // Sometimes the game will add 0x900 to a requested fanfare ID
-    // The `& 0xFF` here is to strip off this 0x900 and get the original fanfare ID
-    // when getting the sound font data for the sequence
-    curFontId = func_800E5E84(curSeqId & 0xFF, &outNumFonts);
-    requestedFontId = func_800E5E84(seqId & 0xFF, &outNumFonts);
+    // Native requests carry flags such as 0x900; MM/custom requests prime a
+    // full-width ID separately. Compare the actual current bank to the exact
+    // requested bank without consuming that pending start or resolving twice.
+    curFontId = gAudioContext.seqPlayers[SEQ_PLAYER_FANFARE].defaultFont;
+    u16 requestedSeqId = gAudioContext.seqReplaced[SEQ_PLAYER_FANFARE] ? gAudioContext.seqToPlay[SEQ_PLAYER_FANFARE]
+                                                                       : AudioEditor_GetReplacementSeq(seqId & 0xFF);
+    requestedFontId = func_800E5E84(requestedSeqId, &outNumFonts);
 
-    if (!curFontId || !requestedFontId) {
+    if (!requestedFontId) {
         // disable BGM, we're about to null deref!
         sFanfareStartTimer = 1;
     } else {
-        if ((curSeqId == NA_BGM_DISABLED) || (*curFontId == *requestedFontId)) {
+        if ((curSeqId == NA_BGM_DISABLED) || (outNumFonts == 1 && curFontId == *requestedFontId)) {
             sFanfareStartTimer = 1;
         } else {
             sFanfareStartTimer = 5;
@@ -5094,9 +5315,12 @@ void Audio_SetSequenceMode(u8 seqMode) {
             seqMode = SEQ_MODE_IGNORE;
         }
 
-        if ((seqId == NA_BGM_DISABLED) || (Audio_GetSeqFlags((u8)(seqId & 0xFF)) & 1) ||
+        if ((seqId == NA_BGM_DISABLED) || (Audio_GetSeqFlags((u8)(seqId & 0xFF)) & 1) || Audio_IsNightBgmActive() ||
             ((sPrevSeqMode & 0x7F) == SEQ_MODE_ENEMY)) {
-            if (seqMode != (sPrevSeqMode & 0x7F)) {
+            // FIELD_LOGIC's untagged enemy mode has no SUB overlay. When
+            // night takes over mid-combat, enter the ordinary overlay once.
+            if (seqMode != (sPrevSeqMode & 0x7F) ||
+                (Audio_IsNightBgmActive() && sPrevSeqMode == SEQ_MODE_ENEMY && seqMode == SEQ_MODE_ENEMY)) {
                 if (seqMode == SEQ_MODE_ENEMY) {
                     // Start playing enemy bgm
                     if (gActiveSeqs[SEQ_PLAYER_BGM_SUB].volScales[1] - sAudioEnemyVol < 0) {
@@ -5232,12 +5456,12 @@ void Audio_UpdateMalonSinging(f32 dist, u16 arg1) {
 void func_800F64E0(u8 arg0) {
     D_80130608 = arg0;
     if (arg0 != 0) {
-        Audio_PlaySoundGeneral(NA_SE_SY_WIN_OPEN, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_WIN_OPEN, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         Audio_QueueCmdS32(0xF1000000, 0);
     } else {
-        Audio_PlaySoundGeneral(NA_SE_SY_WIN_CLOSE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_WIN_CLOSE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         Audio_QueueCmdS32(0xF2000000, 0);
     }
 }
@@ -5323,8 +5547,8 @@ void Audio_SetBaseFilter(u8 filter) {
         if (filter == 0) {
             Audio_StopSfxById(NA_SE_PL_IN_BUBBLE);
         } else if (sAudioBaseFilter == 0) {
-            Audio_PlaySoundGeneral(NA_SE_PL_IN_BUBBLE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_PL_IN_BUBBLE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     }
     sAudioBaseFilter = filter;
@@ -5350,15 +5574,15 @@ void Audio_SetCutsceneFlag(s8 flag) {
     sAudioCutsceneFlag = flag;
 }
 
-void Audio_PlaySoundGeneralIfNotInCutscene(u16 sfxId, Vec3f* pos, u8 arg2, f32* freqScale, f32* arg4, s8* reverbAdd) {
+void Audio_PlaySfxGeneralIfNotInCutscene(u16 sfxId, Vec3f* pos, u8 arg2, f32* freqScale, f32* arg4, s8* reverbAdd) {
     if (!sAudioCutsceneFlag) {
-        Audio_PlaySoundGeneral(sfxId, pos, arg2, freqScale, arg4, reverbAdd);
+        Audio_PlaySfxGeneral(sfxId, pos, arg2, freqScale, arg4, reverbAdd);
     }
 }
 
-void Audio_PlaySoundIfNotInCutscene(u16 sfxId) {
-    Audio_PlaySoundGeneralIfNotInCutscene(sfxId, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                          &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+void Audio_PlaySfxIfNotInCutscene(u16 sfxId) {
+    Audio_PlaySfxGeneralIfNotInCutscene(sfxId, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                        &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 }
 
 void func_800F6964(u16 arg0) {
@@ -5450,11 +5674,14 @@ void func_800F6C34(void) {
     sSpecReverb = sSpecReverbs[gAudioSpecId];
     D_80130608 = 0;
     sPrevMainBgmSeqId = NA_BGM_DISABLED;
+    sPreviewNightBgmSeqId = NA_BGM_DISABLED;
     Audio_QueueCmdS8(0x46 << 24 | SEQ_PLAYER_BGM_MAIN << 16, -1);
     sSariaBgmPtr = NULL;
     sFanfareStartTimer = 0;
     D_8016B9F3 = 1;
     sMalonSingingDisabled = 0;
+    sConcurrentWeatherAudioState.natureRainEnabled = false;
+    sConcurrentWeatherAudioState.natureLightningEnabled = false;
 }
 
 void Audio_SetNatureAmbienceChannelIO(u8 channelIdxRange, u8 port, u8 val) {
@@ -5466,6 +5693,9 @@ void Audio_SetNatureAmbienceChannelIO(u8 channelIdxRange, u8 port, u8 val) {
         sAudioNatureFailed = true;
         return;
     }
+
+    ConcurrentWeatherAudio_TrackNatureChannel(&sConcurrentWeatherAudioState, channelIdxRange, port, val,
+                                              NATURE_CHANNEL_RAIN, NATURE_CHANNEL_LIGHTNING, CHANNEL_IO_PORT_1);
 
     // channelIdxRange = 01 on port 1
     if (((channelIdxRange << 8) + port) == ((NATURE_CHANNEL_CRITTER_0 << 8) + CHANNEL_IO_PORT_1)) {
@@ -5484,6 +5714,16 @@ void Audio_SetNatureAmbienceChannelIO(u8 channelIdxRange, u8 port, u8 val) {
     for (channelIdx = firstChannelIdx; channelIdx <= lastChannelIdx; channelIdx++) {
         Audio_SeqCmd8(SEQ_PLAYER_BGM_MAIN, port, channelIdx, val);
     }
+}
+
+u8 Audio_IsNatureRainEnabled(void) {
+    return !ConcurrentWeatherAudio_ShouldPlayRainSfx(&sConcurrentWeatherAudioState, func_800FA0B4(SEQ_PLAYER_BGM_MAIN),
+                                                     NA_BGM_NATURE_AMBIENCE);
+}
+
+u8 Audio_IsNatureLightningEnabled(void) {
+    return !ConcurrentWeatherAudio_ShouldPlayThunderSfx(&sConcurrentWeatherAudioState,
+                                                        func_800FA0B4(SEQ_PLAYER_BGM_MAIN), NA_BGM_NATURE_AMBIENCE);
 }
 
 void Audio_StartNatureAmbienceSequence(u16 playerIO, u16 channelMask) {

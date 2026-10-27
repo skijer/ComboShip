@@ -1,0 +1,31 @@
+{
+  "resource_count": 11,
+  "vertex_records": 2681,
+  "vertex_loads": 93,
+  "slug": "iron_knuckle_axe",
+  "name": "Iron Knuckle's Axe",
+  "entry": "objects/nei_gi_redesign/iron_knuckle_axe/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 2444,
+  "bounds_author": [
+    [
+      -19.3125,
+      -54.75,
+      -5.375
+    ],
+    [
+      31.5,
+      56.9375,
+      5.375
+    ]
+  ],
+  "markers": {
+    "presentation_only": true,
+    "draw_scale": 1.0,
+    "effective_author_scale": 0.65,
+    "authored_lean_degrees": -11,
+    "reconstruction": true
+  },
+  "runtime_tested": false
+}

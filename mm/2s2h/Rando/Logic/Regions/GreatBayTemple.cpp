@@ -2,6 +2,7 @@
 #include "2s2h/ShipInit.hpp"
 
 #include "2s2h/Rando/Logic/Logic.h"
+#include "rando/CrossEntranceBoss.h"
 
 using namespace Rando::Logic;
 
@@ -54,7 +55,7 @@ static RegisterShipInitFunc initFunc([]() {
             CHECK(RC_GIANTS_CHAMBER_OATH_TO_ORDER, CanKillEnemy(ACTOR_BOSS_03)),
         },
         .exits = { //     TO                                         FROM
-            EXIT(ENTRANCE(ZORA_CAPE, 9),                             ONE_WAY_EXIT, true),
+            EXIT(ENTRANCE(ZORA_CAPE, 9),                             ONE_WAY_EXIT, !Combo_MM_CrossBossLogicEnabled() || CanKillEnemy(ACTOR_BOSS_03)),
         },
         .events = {
             EVENT(RE_CLEARED_GREAT_BAY_TEMPLE, CanKillEnemy(ACTOR_BOSS_03)),
@@ -314,7 +315,7 @@ static RegisterShipInitFunc initFunc([]() {
             CONNECTION(RR_GREAT_BAY_TEMPLE_MAP_ROOM, true),
         },
         .events = {
-           EVENT(RE_GREAT_BAY_RED_SWITCH_2, CAN_USE_MAGIC_ARROW(ICE)),
+           EVENT(RE_GREAT_BAY_RED_SWITCH_2, CAN_USE_MAGIC_ARROW(ICE) && Flags_GetRandoInf(RANDO_INF_OBTAINED_SOUL_OF_ENEMY_CHUCHUS)),
         }
     };
     Regions[RR_GREAT_BAY_TEMPLE_WART] = RandoRegion{ .sceneId = SCENE_SEA,

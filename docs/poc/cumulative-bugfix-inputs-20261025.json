@@ -1,0 +1,163 @@
+{
+  "baseline_commit": "83eed9fff57d7b5dfa1f27ecf5fbe6b65e411832",
+  "baseline_tree": "54ca0f4860ea91affc0498d8f36c8d5b03872097",
+  "baseline_ci": 40169007871,
+  "inputs": [
+    {
+      "archive": "ComboShip_BlackMarket_Refinement_20261025.zip",
+      "sha256": "d711c035534c3bc653d4e60d6122fa117e8447872c3e16c873ced844e6871599",
+      "patch": "market-refinement.patch",
+      "patch_sha256": "0953c2dfe90c6de29589330ac105ca7a9a424f38de949a4ea478a703d538ac6f",
+      "public_base": "83eed9fff57d7b5dfa1f27ecf5fbe6b65e411832",
+      "restored_tree": "f7aca4b85e51dd96186819448e9a0e5cab257f8a",
+      "expected_tree": "f7aca4b85e51dd96186819448e9a0e5cab257f8a",
+      "matches": true,
+      "changed_paths": [
+        "combo/BlackMarketInteriorEffects.h",
+        "combo/BlackMarketLock.h",
+        "combo/BlackMarketMmShopLayout.h",
+        "combo/BlackMarketMmShopScene.h",
+        "docs/poc/black-market-refinement-20261025.md",
+        "docs/poc/black-market-stock-150-20261025.md",
+        "docs/superpowers/plans/2026-10-25-market-forward.md",
+        "docs/superpowers/plans/2026-10-25-market-stock-150.md",
+        "docs/superpowers/specs/2026-10-25-market-forward-design.md",
+        "docs/superpowers/specs/2026-10-25-market-stock-150-design.md",
+        "mm/2s2h/Enhancements/Gameplay/BlackMarket.cpp",
+        "mm/2s2h/Enhancements/Gameplay/BlackMarket.h",
+        "mm/2s2h/Enhancements/Gameplay/BlackMarketCounterBarrier.h",
+        "mm/src/code/z_bgcheck.c",
+        "tests/black_market/counter_barrier_native_test.cpp",
+        "tests/black_market/interior_effects_native_test.cpp",
+        "tests/black_market/lock_draw_test.cpp",
+        "tests/black_market/native_mm_scene_runtime_test.cpp",
+        "tests/black_market/room_magic_loader_test.cpp",
+        "tests/black_market/run_counter_barrier_native_tests.py",
+        "tests/black_market/shop_camera_mm_test.cpp",
+        "tests/black_market/test_mm_shop_presentation.py",
+        "tools/black_market/lock_preview.cpp",
+        "tools/black_market/mm_shop_layout_preview.cpp",
+        "tools/black_market/mm_shop_presentation.py",
+        "tools/black_market/presentation_preview.py"
+      ],
+      "original_commit": "b090cb26960975ab57164378cbb60a1a925960a8"
+    },
+    {
+      "archive": "ComboShip_Whats_New_Room_Material_Accents_20261025.zip",
+      "sha256": "6f284d8233a315eb9e59cb42d23b10cd87da4349a93156350ce7bace69453247",
+      "patch": "room-material-accents.patch",
+      "patch_sha256": "ae4f2459d30e7a211ffe4963fa1a922046c9aebeaa68dbb4b16a2e9b72bdb045",
+      "public_base": "83eed9fff57d7b5dfa1f27ecf5fbe6b65e411832",
+      "restored_tree": "c00f23e791011defe297794b92b8a1cd891fa9ce",
+      "expected_tree": "c00f23e791011defe297794b92b8a1cd891fa9ce",
+      "matches": true,
+      "changed_paths": [
+        "combo/gui/BlackMarketAppearance.h",
+        "combo/gui/WhatsNew.h",
+        "tests/whats_new/generate_test.cpp"
+      ],
+      "original_commit": "519f63380e4355ddc560ca15d1461afdb71f539d"
+    },
+    {
+      "archive": "ComboShip_Fountain_Particles_Valley_Shimmer_Source_20261025.zip",
+      "sha256": "8338dc200a5e219ef512b8937f62175bf9479bfada10c1f246f8b30abffed48b",
+      "patch": "candidate.patch",
+      "patch_sha256": "7e91cd6eabf4087e4c5d8088a60fab35795679fc23c100fd3c4b3ff619f8b42a",
+      "public_base": "83eed9fff57d7b5dfa1f27ecf5fbe6b65e411832",
+      "restored_tree": "0cf7184d37f3d51e2ff065b66aafc5716a1045c2",
+      "expected_tree": "0cf7184d37f3d51e2ff065b66aafc5716a1045c2",
+      "matches": true,
+      "changed_paths": [
+        "combo/actors/RegionalPassagePresentation.h",
+        "combo/entrances/FountainSnowheadBridge.h",
+        "combo/entrances/MmRegionalBridgePlacements.h",
+        "docs/poc/fountain-particles-valley-shimmer-20261025.md",
+        "docs/superpowers/plans/2026-10-25-fountain-particles-valley-shimmer.md",
+        "docs/superpowers/specs/2026-10-25-fountain-particles-valley-shimmer-design.md",
+        "mm/2s2h/Enhancements/Gameplay/ComboRegionalPassages.cpp",
+        "soh/soh/Enhancements/Gameplay/ComboFountainSnowheadBridge.cpp",
+        "tests/regional_passages/chill_native_test.cpp",
+        "tests/regional_passages/mm_native_test.cpp",
+        "tests/regional_passages/run_chill_tests.py",
+        "tests/regional_passages/shimmer_coverage_test.cpp"
+      ],
+      "original_commit": "6469c2f4ff119503df0403506e85083772b77223"
+    },
+    {
+      "archive": "ComboShip_Ikana_Native_GI_Icon_Fix_20261025.zip",
+      "sha256": "93072921e909d70613ddbb4ae1772054098075dd79e8e429fc048e92d7225c2b",
+      "patch": "source.patch",
+      "patch_sha256": "7155fbb47879688b2f96654b0cd5cb68141e3136c43e07943204607d503d111b",
+      "public_base": "83eed9fff57d7b5dfa1f27ecf5fbe6b65e411832",
+      "restored_tree": "86083dcf6362795c22e5c466a8a4858231d304c5",
+      "expected_tree": "86083dcf6362795c22e5c466a8a4858231d304c5",
+      "matches": true,
+      "changed_paths": [
+        "combo/menu/ComboForeignDrawMM.h",
+        "combo/menu/ComboIkanaShieldResources.h",
+        "combo/menu/ComboItemDrawOOT.h",
+        "combo/menu/ComboItemIconOwnership.h",
+        "combo/menu/ComboItemReceiptPresentation.h",
+        "mm/2s2h/BenPort.cpp",
+        "mm/2s2h/Rando/NeiGiPresentation.cpp",
+        "mm/mods/extended_equipment.c",
+        "scripts/diagnostics/run_anklet_icon_tests.py",
+        "soh/mods/extended_equipment.c",
+        "soh/soh/Enhancements/randomizer/NeiGiPresentation.cpp",
+        "soh/soh/Enhancements/randomizer/draw.cpp",
+        "soh/soh/ResourceManagerHelpers.cpp",
+        "tests/ikana_gi/oot_cache_test.cpp",
+        "tests/ikana_gi/presentation_test.cpp",
+        "tests/ikana_gi/run_native_availability_tests.py",
+        "tests/ikana_gi/run_native_priority_tests.py",
+        "tests/ikana_gi/run_tests.py",
+        "tests/item_receipts/foreign_icon_test.cpp",
+        "tests/mm_presentation/legacy_mod_checks.inc",
+        "tests/nei_gi/presentation_test.cpp",
+        "tests/oot_equipment_pause/run_ikana_icon_tests.py"
+      ],
+      "original_commit": "a23e60103ffb72309045e97b10f2222603016451"
+    },
+    {
+      "archive": "ComboShip_Spin_Theme_Level_Parity_Source_20261025.zip",
+      "sha256": "9f3b69aafcacb00b0ec5a006cc572257987385f19783d19e3db76735ec0b9feb",
+      "patch": "candidate.patch",
+      "patch_sha256": "7420e1b01d3785e0629b3a0ed10785aa7b54653318d1e5f9b3e18e885d1d984f",
+      "public_base": "83eed9fff57d7b5dfa1f27ecf5fbe6b65e411832",
+      "restored_tree": "fb8b047778328eb799cc72f81c198ee1bf5b1231",
+      "expected_tree": "fb8b047778328eb799cc72f81c198ee1bf5b1231",
+      "matches": true,
+      "changed_paths": [
+        "combo/render/SpinAttackDraw.h",
+        "docs/poc/spin-theme-level-parity-20261025.md",
+        "scripts/diagnostics/run_spin_style_tests.py",
+        "tests/spin_style/render_test.cpp",
+        "tests/spin_style/shipped_resources.h"
+      ],
+      "original_commit": "dd4c758eb474eb905047149bd06f2fe25f46ff10"
+    },
+    {
+      "archive": "ComboShip_Zoras_Domain_Silver_Hook_POC1_Source_20261025.zip",
+      "sha256": "cecfd913d90aa24a6e7cfae952fd9aba1a3dc86d8cbbaae703c7f0a71b6a2d06",
+      "patch": "source.patch",
+      "patch_sha256": "b41f7ef025e70c524faa4320fc7beffb0ea67fbf9754c71de05d63c744c844c4",
+      "public_base": "83eed9fff57d7b5dfa1f27ecf5fbe6b65e411832",
+      "restored_tree": "33d409b8b0c24f1f806a8c5ca264761fcf8b56f1",
+      "expected_tree": null,
+      "matches": "no original tree provided; patch check passes",
+      "changed_paths": [
+        "soh/soh/Enhancements/randomizer/ShuffleSilver.cpp",
+        "tests/silver_rupee/native_test.cpp",
+        "tests/silver_rupee/run_tests.py"
+      ],
+      "original_commit": "c9b6289a31525fb9f4a14684f3fa04a0af5b1bd5"
+    }
+  ],
+  "superseded": [
+    {
+      "original_commit": "a69ac0da3cafc5fb3a8679ce146cbbf2880cf220",
+      "reason": "exact transparency correction included by Fountain checkpoint"
+    }
+  ],
+  "runtime_status": "unaccepted; candidate publication only"
+}

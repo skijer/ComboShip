@@ -1,4 +1,7 @@
 #include "z64.h"
+#include "soh/NEI/nei_exports.h" // PakLoader_GetDLOverride (centralized NEI C-linkage export)
+
+#include <bit>
 
 // OTRTODO - this is awful
 
@@ -80,9 +83,13 @@ extern "C" void gSPDisplayList(Gfx* pkt, Gfx* dl) {
         }
 #endif
 
-        // ResourceMgr_PushCurrentDirectory(imgData);
-        // gsSPPushCD(pkt++, imgData);
-        dl = ResourceMgr_LoadGfxByName(imgData);
+        // PAK Loader: Check if this OTR DL should be replaced with a custom .pak DL
+        Gfx* pakDL = PakLoader_GetDLOverride(imgData);
+        if (pakDL) {
+            dl = pakDL;
+        } else {
+            dl = ResourceMgr_LoadGfxByName(imgData);
+        }
     }
 
     __gSPDisplayList(pkt, dl);
@@ -93,12 +100,12 @@ extern "C" void gDPSetTileSizeInterp(Gfx* pkt, int t, float uls, float ult, floa
     pkt->words.w0 = _SHIFTL(G_SETTILESIZE_INTERP, 24, 8);
     pkt++;
 
-    pkt->words.w0 = *(u32*)&uls;
-    pkt->words.w1 = *(u32*)&ult;
+    pkt->words.w0 = std::bit_cast<u32>(uls);
+    pkt->words.w1 = std::bit_cast<u32>(ult);
     pkt++;
 
-    pkt->words.w0 = *(u32*)&lrs;
-    pkt->words.w1 = *(u32*)&lrt;
+    pkt->words.w0 = std::bit_cast<u32>(lrs);
+    pkt->words.w1 = std::bit_cast<u32>(lrt);
     pkt++;
 }
 
@@ -130,7 +137,16 @@ extern "C" void gSPInvalidateTexCache(Gfx* pkt, uintptr_t texAddr) {
     if (texAddr != 0 && ResourceMgr_OTRSigCheck(imgData)) {
         // Temporary solution to the mq/nonmq issue, this will be
         // handled better with LUS 1.0
-        texAddr = (uintptr_t)ResourceMgr_LoadTexOrDListByName(imgData);
+        // Defensive: ResourceMgr_LoadTexOrDListByName returns nullptr when
+        // pak_loader hot-swaps a resource mid-draw and the OTR lookup races
+        // (see ResourceManagerHelpers.cpp). Keep the original texAddr in that
+        // case so InvalidateTexCache invalidates the prior frame's address
+        // rather than a NULL pointer — the kaleido draw can then settle on
+        // the new resource next frame instead of crashing this one.
+        char* loaded = ResourceMgr_LoadTexOrDListByName(imgData);
+        if (loaded != nullptr) {
+            texAddr = (uintptr_t)loaded;
+        }
     }
 
     __gSPInvalidateTexCache(pkt, texAddr);

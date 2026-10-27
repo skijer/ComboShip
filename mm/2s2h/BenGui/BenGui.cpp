@@ -1,4 +1,5 @@
 #include "BenGui.hpp"
+#include "../../../combo/ComboGameMode.h"
 
 #include <spdlog/spdlog.h>
 #include <imgui.h>
@@ -98,9 +99,8 @@ std::shared_ptr<BenMenu> GetBenMenu() {
 void SetupMenu() {
     auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui();
     mBenMenu = std::make_shared<BenMenu>("gWindows.Menu", "Settings Menu");
-#ifndef COMBO_BUILD
-    gui->SetMenu(mBenMenu); // ComboShip: comboui owns the menu; MM only builds its tree.
-#endif
+    if (!Combo_IsCombinedGame())
+        gui->SetMenu(mBenMenu);
 
     auto& style = ImGui::GetStyle();
     style.FramePadding = ImVec2(4.0f, 6.0f);
@@ -118,22 +118,13 @@ void SetupMenu() {
 // ctor's SetupMenu() is skipped, so the slot otherwise keeps OOT's SohMenu. First call constructs
 // BenMenu; later calls re-set it.
 void ActivateMenu() {
-#ifdef COMBO_BUILD
-    // ComboShip: comboui owns the single Gui menu slot, so we never gui->SetMenu here — but mBenMenu
-    // must still be built (widgets populate via BenMenu::InitElement) so MM_ExportMenu / MM_MenuDrawCustom
-    // can walk it for the MM tab. SetupMenu's own gui->SetMenu is guarded out, so calling it here only
-    // constructs the menu. Without this, mBenMenu stays null in combo and the MM tab is empty.
     if (mBenMenu == nullptr) {
         SetupMenu();
     }
-#else
-    auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui();
-    if (mBenMenu == nullptr) {
-        SetupMenu();
-    } else {
+    if (!Combo_IsCombinedGame()) {
+        auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui();
         gui->SetMenu(mBenMenu);
     }
-#endif
 }
 
 void SetupGuiElements() {
@@ -209,11 +200,20 @@ void SetupGuiElements() {
     mDisplayOverlayWindow = std::make_shared<DisplayOverlayWindow>("gWindows.DisplayOverlay", "Display Overlay");
     gui->AddGuiWindow(mDisplayOverlayWindow);
 
-    mTimesplitsWindow = std::make_shared<TimesplitsWindow>("gWindows.Timesplits", "Time Splits Window");
+    mTimesplitsWindow =
+        std::make_shared<TimesplitsWindow>("gWindows.Timesplits", "Time Splits Window" COMBO_MM_TRACKER_SUFFIX);
     gui->AddGuiWindow(mTimesplitsWindow);
 
+#ifdef COMBO_BUILD
+    // ComboShip: "gWindows.Timesplits.Settings" is a subtree of the leaf above (breaks config save);
+    // use a sibling key and drop the old one so a stale copy can't clash either.
+    CVarClear("gWindows.Timesplits.Settings");
+    mTimesplitsSettingsWindow = std::make_shared<TimesplitsSettingsWindow>(
+        "gWindows.TimesplitsSettings", "Time Splits Settings Window" COMBO_MM_TRACKER_SUFFIX, ImVec2(567, 97));
+#else
     mTimesplitsSettingsWindow = std::make_shared<TimesplitsSettingsWindow>(
         "gWindows.Timesplits.Settings", "Time Splits Settings Window", ImVec2(567, 97));
+#endif
     gui->AddGuiWindow(mTimesplitsSettingsWindow);
 
     // ComboShip: suffix the registered name so MM's notification window does not collide with OOT's

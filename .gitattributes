@@ -1,0 +1,5 @@
+# Preserve the supplied reference exports, including their original line endings.
+tools/nei_gi/REFERENCES/room_key/*.obj whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+tools/nei_gi/REFERENCES/room_key/*.mtl whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+# Empty context lines in a unified patch require their leading space.
+patches/libultraship-custom-tex-scroll-e3cd6591.patch whitespace=-blank-at-eol

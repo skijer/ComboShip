@@ -51,6 +51,123 @@ using namespace Microsoft::WRL; // For ComPtr
 namespace Fast {
 
 GfxRenderingAPIDX11::~GfxRenderingAPIDX11() {
+    ResetGpuTiming();
+}
+
+// All query reads use DONOTFLUSH. A full ring drops only the diagnostic sample.
+void GfxRenderingAPIDX11::RecordGpuTiming(uint64_t frameId, const char* status, nlohmann::json ms,
+                                         nlohmann::json error) {
+    if (frameId == mGpuTimingFrameId) mGpuTimingStatus = status;
+    if (mGpuTimingSamples.size() >= 32) {
+        mGpuTimingSamples.erase(mGpuTimingSamples.begin());
+        ++mGpuTimingDropped;
+    }
+    mGpuTimingSamples.push_back({{"frame_id", frameId}, {"status", status}, {"gpu_ms", ms}, {"hresult", error}});
+}
+
+void GfxRenderingAPIDX11::ResetGpuTiming() {
+    EndGpuTiming();
+    for (auto& slot : mGpuTimingSlots) {
+        slot = GpuTimingSlot{}; // COM release is safe even for unfinished GPU work; never wait.
+    }
+    mGpuTimingEnabled = false;
+    mGpuTimingStatus = "disabled";
+    mGpuTimingSamples = nlohmann::json::array();
+}
+
+void GfxRenderingAPIDX11::PollGpuTiming() {
+    if (!mGpuTimingEnabled || !mContext) return;
+    for (auto& slot : mGpuTimingSlots) {
+        if (!slot.pending) continue;
+        D3D11_QUERY_DATA_TIMESTAMP_DISJOINT disjoint = {};
+        UINT64 start = 0, end = 0;
+        HRESULT hr = mContext->GetData(slot.disjoint.Get(), &disjoint, sizeof(disjoint), D3D11_ASYNC_GETDATA_DONOTFLUSH);
+        if (hr == S_FALSE) continue;
+        if (hr == S_OK && !disjoint.Disjoint && disjoint.Frequency != 0) {
+            hr = mContext->GetData(slot.start.Get(), &start, sizeof(start), D3D11_ASYNC_GETDATA_DONOTFLUSH);
+            if (hr == S_FALSE) continue;
+            if (hr == S_OK) {
+                hr = mContext->GetData(slot.end.Get(), &end, sizeof(end), D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                if (hr == S_FALSE) continue;
+            }
+        }
+        if (FAILED(hr)) {
+            RecordGpuTiming(slot.frameId, "error", nullptr, static_cast<int64_t>(hr));
+        } else if (disjoint.Disjoint || disjoint.Frequency == 0) {
+            RecordGpuTiming(slot.frameId, "disjoint");
+        } else if (end < start) {
+            RecordGpuTiming(slot.frameId, "error");
+        } else {
+            RecordGpuTiming(slot.frameId, "available", (end - start) * 1000.0 / disjoint.Frequency);
+        }
+        slot.pending = false;
+        // Recreate a failed query instead of repeatedly reusing an invalid object.
+        if (FAILED(hr)) slot = GpuTimingSlot{};
+    }
+}
+
+void GfxRenderingAPIDX11::BeginGpuTiming(uint64_t frameId, bool enabled) {
+    EndGpuTiming();
+    mGpuTimingFrameId = frameId;
+    if (!enabled) {
+        if (mGpuTimingEnabled) ResetGpuTiming();
+        return;
+    }
+    mGpuTimingEnabled = true;
+    mGpuTimingStatus = "pending";
+    if (!mDevice || !mContext) {
+        mGpuTimingStatus = "unavailable";
+        return;
+    }
+    PollGpuTiming();
+    for (int i = 0; i < 8; ++i) {
+        auto& slot = mGpuTimingSlots[i];
+        if (slot.pending) continue;
+        if (!slot.disjoint) {
+            D3D11_QUERY_DESC desc = {D3D11_QUERY_TIMESTAMP_DISJOINT, 0};
+            HRESULT hr = mDevice->CreateQuery(&desc, slot.disjoint.GetAddressOf());
+            desc.Query = D3D11_QUERY_TIMESTAMP;
+            if (SUCCEEDED(hr)) hr = mDevice->CreateQuery(&desc, slot.start.GetAddressOf());
+            if (SUCCEEDED(hr)) hr = mDevice->CreateQuery(&desc, slot.end.GetAddressOf());
+            if (FAILED(hr)) {
+                slot = GpuTimingSlot{};
+                mGpuTimingStatus = "error";
+                RecordGpuTiming(frameId, "error", nullptr, static_cast<int64_t>(hr));
+                return;
+            }
+        }
+        slot.frameId = frameId;
+        mContext->Begin(slot.disjoint.Get());
+        mContext->End(slot.start.Get());
+        mActiveGpuTimingSlot = i;
+        return;
+    }
+    ++mGpuTimingDropped;
+    mGpuTimingStatus = "dropped";
+    RecordGpuTiming(frameId, "dropped");
+}
+
+void GfxRenderingAPIDX11::EndGpuTiming() {
+    if (mActiveGpuTimingSlot < 0) return;
+    auto& slot = mGpuTimingSlots[mActiveGpuTimingSlot];
+    if (mContext) {
+        mContext->End(slot.end.Get());
+        mContext->End(slot.disjoint.Get());
+        slot.pending = true;
+    }
+    mActiveGpuTimingSlot = -1;
+}
+
+nlohmann::json GfxRenderingAPIDX11::GetGpuTimingTelemetry() {
+    PollGpuTiming();
+    size_t pending = 0;
+    for (const auto& slot : mGpuTimingSlots) pending += slot.pending ? 1 : 0;
+    nlohmann::json result = {{"status", mGpuTimingStatus}, {"current_frame_id", mGpuTimingFrameId},
+                            {"scope", "commands_and_gui"},
+                            {"pending_count", pending}, {"dropped_count", mGpuTimingDropped},
+                            {"samples", std::move(mGpuTimingSamples)}};
+    mGpuTimingSamples = nlohmann::json::array();
+    return result;
 }
 
 GfxRenderingAPIDX11::GfxRenderingAPIDX11(GfxWindowBackendDXGI* backend) {
@@ -193,6 +310,7 @@ static bool CreateDeviceFunc(class GfxRenderingAPIDX11* self, bool SoftwareRende
 };
 
 void GfxRenderingAPIDX11::Init() {
+    ResetGpuTiming();
     // Load d3d11.dll
     mDX11Module = LoadLibraryW(L"d3d11.dll");
     if (mDX11Module == nullptr) {
@@ -1447,8 +1565,8 @@ std::string gfx_direct3d_common_build_shader(size_t& numFloats, const CCFeatures
         path = std::string(shaderName) + ".hlsl";
     }
 
-    auto res = static_pointer_cast<Ship::Shader>(Ship::Context::GetRawInstance()->GetResourceManager()->LoadResource(
-        "shaders/directx/default.shader.hlsl", true, init));
+    auto res = static_pointer_cast<Ship::Shader>(
+        Ship::Context::GetRawInstance()->GetResourceManager()->LoadResource(path, true, init));
 
     if (res == nullptr) {
         SPDLOG_ERROR("Failed to load default directx shader, missing f3d.o2r?");

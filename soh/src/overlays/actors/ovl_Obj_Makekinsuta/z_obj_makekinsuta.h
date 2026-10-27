@@ -6,6 +6,10 @@
 
 struct ObjMakekinsuta;
 
+// Native bugs/shovel triggers use 1. Seasonal auto-reveal keeps the spawn but
+// does not announce it as a solved puzzle.
+#define SOFT_SOIL_TRIGGER_SEASONAL 2
+
 typedef void (*ObjMakekinsutaActionFunc)(struct ObjMakekinsuta*, PlayState*);
 
 typedef struct ObjMakekinsuta {

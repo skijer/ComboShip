@@ -233,7 +233,9 @@ typedef enum {
     /* 0x58 */ CAM_SET_NORMAL4, // Generic camera 4, used in Ikana Graveyard "NORMAL4"
     /* 0x59 */ CAM_SET_ELEGY_SHELL, // cutscene after playing elegy of emptyness and spawning a shell "SHELL"
     /* 0x5A */ CAM_SET_DUNGEON4, // Used in Pirates Fortress Interior, hidden room near hookshot "DUNGEON4"
-    /* 0x5B */ CAM_SET_MAX
+    /* 0x5B */ CAM_SET_BLACK_MARKET_OOT, // Private Black Market port of OoT's shop pivot camera
+    /* 0x5C */ CAM_SET_MAGIC_MIRROR, // Private OoT Time Gate type-10 ritual framing
+    /* 0x5D */ CAM_SET_MAX
 } CameraSettingType;
 
 typedef enum {
@@ -1511,6 +1513,18 @@ typedef struct {
 #define SPECIAL9_FLAG_1 (1 << 1)
 #define SPECIAL9_FLAG_3 (1 << 3)
 
+// OoT's Data4 shop camera, used only by CAM_SET_BLACK_MARKET_OOT. Keeping
+// fractional degrees here avoids truncating the shop's native easing through
+// MM's s16 Camera::data2 field. This fits the existing CamParamData allocation.
+typedef struct {
+    f32 yOffset;
+    f32 fov;
+    f32 faceAngle;
+    s16 interfaceFlags;
+    s16 axes;
+    PosRot eyePosRot;
+} OotShopData4;
+
 typedef union {
     Normal1 norm1;
     Normal3 norm3;
@@ -1525,6 +1539,7 @@ typedef union {
     Fixed1 fixd1;
     Fixed2 fixd2;
     Subject1 subj1;
+    OotShopData4 ootShop;
     Unique2 uniq2;
     Unique0 uniq0;
     Unique6 uniq6;
@@ -1649,6 +1664,8 @@ s32 Camera_Copy(Camera* dstCam, Camera* srcCam);
 s32 Camera_IsDbgCamEnabled(void);
 Vec3f Camera_GetQuakeOffset(Camera* camera);
 void Camera_SetCameraData(Camera* camera, s16 setDataFlags, void* data0, void* data1, s16 data2, s16 data3);
+// Set after acquiring the private shop camera, then once per native shelf turn.
+void Camera_SetOotShopFaceAngle(Camera* camera, f32 angleDegrees);
 s32 Camera_GetNegOne(void);
 s16 Camera_SetFinishedFlag(Camera* camera);
 void Camera_SetFocalActor(Camera* camera, struct Actor* actor);

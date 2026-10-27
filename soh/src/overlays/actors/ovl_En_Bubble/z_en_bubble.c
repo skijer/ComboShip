@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 #include "z_en_bubble.h"
 #include "objects/object_bubble/object_bubble.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
@@ -283,7 +284,7 @@ void EnBubble_Fly(EnBubble* this, PlayState* play) {
     Math_ApproachF(&this->velocityFromBump.z, 0.0f, 0.3f, 0.1f);
 }
 
-u32 func_809CC648(EnBubble* this) {
+u32 func_809CC648(EnBubble* this, PlayState* play) {
     if (((this->colliderSphere.base.acFlags & AC_HIT) != 0) == false) {
         return false;
     }
@@ -296,6 +297,8 @@ u32 func_809CC648(EnBubble* this) {
         this->graphicEccentricity = 0.48f;
         return false;
     }
+    DinFireSword_FinishConfirmedHit(play, &this->colliderSphere.base, this->colliderSphere.elements[0].info.acHitInfo,
+                                    this->colliderSphere.elements[0].info.bumper.dmgFlags);
     this->unk_208 = 8;
     return true;
 }
@@ -310,7 +313,7 @@ u32 EnBubble_DetectPop(EnBubble* this, PlayState* play) {
         this->unk_208 = 8;
         return true;
     }
-    return func_809CC648(this);
+    return func_809CC648(this, play);
 }
 
 void func_809CC774(EnBubble* this) {

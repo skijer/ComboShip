@@ -5,6 +5,9 @@
  */
 
 #include "z_en_door.h"
+#ifdef COMBO_BUILD
+#include "2s2h/Enhancements/Gameplay/BlackMarket.h"
+#endif
 
 #include "libc/assert.h"
 
@@ -744,8 +747,12 @@ void EnDoor_Idle(EnDoor* this, PlayState* play) {
                     player->doorType = PLAYER_DOORTYPE_TALKING;
                     // 0x1800: "It won't open"
                     this->knobDoor.dyna.actor.textId = 0x1800;
-                } else if ((this->doorType == ENDOOR_TYPE_WHOLE_DAY) || (this->doorType == ENDOOR_TYPE_DAY) ||
-                           (this->doorType == ENDOOR_TYPE_NIGHT)) {
+                } else if (((this->doorType == ENDOOR_TYPE_WHOLE_DAY) || (this->doorType == ENDOOR_TYPE_DAY) ||
+                            (this->doorType == ENDOOR_TYPE_NIGHT))
+#ifdef COMBO_BUILD
+                           && !ComboBlackMarket_IsAuthoredDoor(play, &this->knobDoor.dyna.actor)
+#endif
+                ) {
                     s32 halfDaysDayBit = (play->actorCtx.halfDaysBit & HALFDAYBIT_DAWNS) >> 1;
                     s32 halfDaysNightBit = play->actorCtx.halfDaysBit & HALFDAYBIT_NIGHTS;
                     s16 openBit = D_801AED48[ENDOOR_GET_HALFDAYBIT_INDEX_FROM_HALFDAYCHECK(this->typeVar.halfDayCheck)];

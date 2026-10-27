@@ -1,0 +1,7 @@
+PASS mm scenario=mm_native forest=combined stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_native forest=combined stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_native forest=mm stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm scenario=mm_native forest=mm stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS mm bundled structural failures: every structural path blocks; duplicate marker and pause protected; base owner absent
+PASS mm bundled structural failures: every structural path blocks; duplicate marker and pause protected; base owner absent
+BOUNDARY: bundled structural routes only; base owner and keeper are absent, full forest readiness fails closed; no gameplay proof

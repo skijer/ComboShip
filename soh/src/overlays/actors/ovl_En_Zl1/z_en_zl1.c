@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 /*
  * File: z_en_zl1.c
  * Overlay: ovl_En_Zl1
@@ -93,14 +94,21 @@ void EnZl1_Init(Actor* thisx, PlayState* play) {
         Animation_Change(&this->skelAnime, &gChildZelda1Anim_00438, 1.0f, 0.0f, frameCount, ANIMMODE_LOOP, 0.0f);
         this->unk_1E6 = 0;
         this->actionFunc = func_80B4BC78;
-    } else if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-               Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-               Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+    } else if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                               Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+               Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                               Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+               Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                               Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
         Actor_Kill(&this->actor);
-    } else if ((Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) ||
-               (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
+    } else if ((Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) ||
+               (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)))) {
         frameCount = Animation_GetLastFrame(&gChildZelda1Anim_00438);
         Animation_Change(&this->skelAnime, &gChildZelda1Anim_00438, 1.0f, 0.0f, frameCount, ANIMMODE_LOOP, 0.0f);
         this->actor.textId = 0x703D;

@@ -1,9 +1,8 @@
 name: Build (reusable)
 
-# Reusable build pipeline: the fast gate (conflict markers + clang-format) followed by the full
-# Windows Release build + cpack ZIP. Called by build-artifacts.yml (PR / develop nightly) and
-# release.yml (v* tags), so the release ZIP is built identically to what nightly tested.
-# See docs/UPSTREAM_MERGES.md and CMake/CPackProjectConfig.cmake (the combo/ship/2s2h ZIP components).
+# Reusable Windows build pipeline: full Release build + cpack ZIP. Called by build-artifacts.yml
+# (which runs preflight first and aggregates the final gate) and release.yml (v* tags). See
+# docs/UPSTREAM_MERGES.md and CMake/CPackProjectConfig.cmake (the combo/ship/2s2h ZIP components).
 
 on:
   workflow_call:
@@ -21,40 +20,7 @@ on:
         default: false
 
 jobs:
-  # Fast gate so the ~40-min Windows build doesn't run on a PR that already has committed conflict
-  # markers or formatting errors. Mirrors conflict-check.yml + clang-format.yml (which remain the
-  # branch-protection required checks); this copy exists only to give the build a `needs:` dependency,
-  # since GitHub can't make this workflow depend on a job in another file. If the gate fails the build
-  # is skipped (reported as success — a skipped job never blocks); the standalone required checks still
-  # go red and block the merge. See docs/UPSTREAM_MERGES.md.
-  gate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 2
-      - name: Scan for conflict markers
-        shell: bash
-        run: |
-          set -uo pipefail
-          hits=$(git grep -nE '^(<{7}|>{7}|\|{7})( |$)' -- . \
-                 ':(exclude).github/workflows/build.yml' \
-                 ':(exclude).github/workflows/build-artifacts.yml' \
-                 ':(exclude).github/workflows/conflict-check.yml' || true)
-          if [ -n "$hits" ]; then
-            echo "::error::Unresolved conflict markers — skipping the build until resolved:"
-            printf '%s\n' "$hits"
-            exit 1
-          fi
-          echo "No conflict markers."
-      - name: clang-format (clang-format-14)
-        run: |
-          sudo apt-get update && sudo apt-get install -y clang-format-14
-          ./run-clang-format.sh
-          git diff --exit-code
-
-  build-artifacts:
-    needs: gate
+  build:
     # Pin to VS 2022 image — matches the "Visual Studio 17 2022" generator below (see build-windows.yml).
     runs-on: windows-2022
     steps:
@@ -65,53 +31,180 @@ jobs:
         with:
           arch: x64
 
-      # The GenerateSohOtr / Generate2ShipOtr targets run OTRExporter/extract_assets.py via Python3.
+      # Python3: Generate2ShipOtr (OTRExporter/extract_assets.py) and the asset-collision gate. soh packs
+      # with Torch (soh-o2r-packer), whose configure step fetches tinyxml2/zlib/yaml-cpp (needs network).
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      # Shared with the compile gate: caches the expensive vcpkg build + CMake tree.
-      - name: Cache build dir (vcpkg + CMake)
+      - name: Verify all bundled emotes and shared playback
+        run: python -B tests/emotes/run_tests.py --msvc --compiler cl
+
+      - name: Verify game picker with Windows SDK before configuring
+        run: python -B tests/solo_games/selection_test.py --msvc --compiler cl
+
+      - name: Verify shared geometry with Windows SDK before configuring
+        run: python -B tests/regional_passages/run_header_portability_tests.py --msvc --compiler cl
+
+      - name: Verify blue-warp hook with MSVC before configuring
+        run: python -B tests/cross_dungeon/oot_blue_warp_hook_test.py --msvc --compiler cl
+
+      - name: Verify native NEI bridge DLL declarations
+        run: python tests/nei_asset_priority/run_abi_tests.py --msvc --compiler cl
+
+      - name: Verify Windows launcher icon and version resources
+        run: python -B scripts/diagnostics/run_windows_launcher_resource_tests.py
+
+      # Dependencies have a stable input key. Compile outputs rotate per commit,
+      # so an exact cache hit cannot freeze every later build at an old source tree.
+      - name: Cache Windows dependencies
         uses: actions/cache@v5
         with:
-          path: build/x64
-          key: build-x64-${{ hashFiles('CMakeLists.txt', 'CMake/**', 'libultraship/cmake/**') }}
-          restore-keys: build-x64-
+          path: build/x64/vcpkg
+          key: windows-2022-vcpkg-v2-${{ hashFiles('CMakeLists.txt', 'CMake/**', 'libultraship/cmake/**', 'torch/CMakeLists.txt') }}
+
+      - name: Cache Windows build tree
+        uses: actions/cache@v5
+        with:
+          path: |
+            build/x64
+            !build/x64/vcpkg
+            x64/Release
+          key: windows-2022-build-v2-${{ hashFiles('CMakeLists.txt', 'CMake/**', 'libultraship/cmake/**', 'torch/CMakeLists.txt') }}-${{ github.sha }}
+          restore-keys: windows-2022-build-v2-${{ hashFiles('CMakeLists.txt', 'CMake/**', 'libultraship/cmake/**', 'torch/CMakeLists.txt') }}-
 
       - name: Configure
         # See build-windows.yml: vcvars points VCPKG_ROOT at the (non-git) VS-bundled vcpkg, which
         # breaks automate-vcpkg.cmake's git pull. Point it at the build-dir vcpkg it clones+caches.
         env:
           VCPKG_ROOT: ${{ github.workspace }}/build/x64/vcpkg
-        run: cmake -B build/x64 -S . -G "Visual Studio 17 2022" -A x64
+        shell: pwsh
+        run: |
+          # vcpkg can exhaust its short download retries during a GitHub 503.
+          # A new configure resumes the existing dependency installation.
+          $PSNativeCommandUseErrorActionPreference = $false
+          for ($configureAttempt = 1; $configureAttempt -le 3; $configureAttempt++) {
+            cmake -B build/x64 -S . -G "Visual Studio 17 2022" -A x64
+            $configureExitCode = $LASTEXITCODE
+            if ($configureExitCode -eq 0) { exit 0 }
+            if ($configureAttempt -eq 3) { exit $configureExitCode }
+            $configureDelaySeconds = 10 * $configureAttempt
+            Write-Warning "Configure failed (exit $configureExitCode); retrying in $configureDelaySeconds seconds."
+            Start-Sleep -Seconds $configureDelaySeconds
+          }
 
-      # Order matters: libultraship -> soh -> 2ship (soh before 2ship; they share OTRExporter/ZAPD).
-      # comboui + ComboShip pull the rest of the runtime in as dependencies.
+      - name: Verify native file-select query with SDL and MSVC
+        run: python -B tests/item_receipts/run_file_select_sdl_main_tests.py --msvc --compiler cl --include "$PWD/build/x64/vcpkg/installed/x64-windows-static-md/include"
+
+      # Only libultraship is needed by comboui. Compile/link the UI and generate
+      # both archives before spending time compiling either game engine.
       - name: Build libultraship
         run: cmake --build build/x64 --target libultraship --config Release
+      # Validate the actual Windows DLL logging boundary before spending time
+      # compiling both games. The check uses the real engine Context/file sink.
+      - name: Verify diagnostic output across Windows DLLs
+        shell: pwsh
+        run: |
+          python scripts/diagnostics/run_build_metadata_test.py --msvc --compiler cl --json-include "$PWD/build/x64/vcpkg/installed/x64-windows-static-md/include"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build build/x64 --target frame_timing_output_check --config Release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:PATH = "$PWD/x64/Release;$env:PATH"
+          & ./build/x64/frame-timing-check/Release/frame_timing_output_check.exe "$env:RUNNER_TEMP/frame-timing-output"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build comboui
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $false
+          $comboUiBuildLog = Join-Path $env:RUNNER_TEMP "comboui-build.log"
+          cmake --build build/x64 --target comboui --config Release 2>&1 | Tee-Object -FilePath $comboUiBuildLog
+          $comboUiBuildExitCode = $LASTEXITCODE
+          if ($comboUiBuildExitCode -ne 0) {
+            $diagnosticLines = Get-Content $comboUiBuildLog |
+              Where-Object { $_ -match '(?i)(error C[0-9]{4}|fatal error|LNK[0-9]{4}|MSB[0-9]{4}|: error )' } |
+              Select-Object -Last 40
+            if (-not $diagnosticLines) {
+              $diagnosticLines = Get-Content $comboUiBuildLog | Select-Object -Last 40
+            }
+            $diagnostic = ($diagnosticLines -join "`n").Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Host "::error title=Windows UI build diagnostic::$diagnostic"
+            exit $comboUiBuildExitCode
+          }
+
+      # These targets depend on their packers and the asset-collision check,
+      # not on soh.dll/2ship.dll. Catch tool/path/archive failures early too.
+      - name: Generate soh.o2r
+        run: cmake --build build/x64 --target GenerateSohOtr --config Release
+      - name: Generate 2ship.o2r
+        run: cmake --build build/x64 --target Generate2ShipOtr --config Release
+
       - name: Build soh
-        run: cmake --build build/x64 --target soh --config Release
+        shell: pwsh
+        run: |
+          # Keep the normal build command, but surface the useful MSVC lines as a
+          # check annotation when GitHub's large job-log download is unavailable.
+          $PSNativeCommandUseErrorActionPreference = $false
+          $sohBuildLog = Join-Path $env:RUNNER_TEMP "soh-build.log"
+          cmake --build build/x64 --target soh --config Release 2>&1 | Tee-Object -FilePath $sohBuildLog
+          $sohBuildExitCode = $LASTEXITCODE
+          if ($sohBuildExitCode -ne 0) {
+            $diagnosticLines = Get-Content $sohBuildLog |
+              Where-Object { $_ -match '(?i)(error C[0-9]{4}|fatal error|LNK[0-9]{4}|MSB[0-9]{4}|: error )' } |
+              Select-Object -Last 40
+            if (-not $diagnosticLines) {
+              $diagnosticLines = Get-Content $sohBuildLog | Select-Object -Last 40
+            }
+            $diagnostic = ($diagnosticLines -join "`n").Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Host "::error title=Windows SoH build diagnostic::$diagnostic"
+            exit $sohBuildExitCode
+          }
       - name: Build 2ship
-        run: cmake --build build/x64 --target 2ship --config Release
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $false
+          $mmBuildLog = Join-Path $env:RUNNER_TEMP "2ship-build.log"
+          cmake --build build/x64 --target 2ship --config Release 2>&1 | Tee-Object -FilePath $mmBuildLog
+          $mmBuildExitCode = $LASTEXITCODE
+          if ($mmBuildExitCode -ne 0) {
+            $diagnosticLines = @(Get-Content $mmBuildLog |
+              Where-Object { $_ -match '(?i)(error C[0-9]{4}|fatal error|LNK[0-9]{4}|MSB[0-9]{4}|: error )' })
+            if ($diagnosticLines.Count -gt 40) {
+              $diagnosticLines = @($diagnosticLines | Select-Object -First 20) + @($diagnosticLines | Select-Object -Last 20)
+            }
+            if (-not $diagnosticLines) {
+              $diagnosticLines = Get-Content $mmBuildLog | Select-Object -Last 40
+            }
+            $diagnostic = ($diagnosticLines -join "`n").Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Host "::error title=Windows 2Ship build diagnostic::$diagnostic"
+            exit $mmBuildExitCode
+          }
       # Headless seed validator (pulls libultraship/soh/2ship as deps, already built above). Uploaded
       # below so validate-seed.yml can download it from develop instead of doing its own build.
       # Nothing else depends on it, so it is skipped unless a caller asks for the validator.
       - name: Build comborando
         if: inputs.validator
         run: cmake --build build/x64 --target comborando --config Release
-      - name: Build comboui
-        run: cmake --build build/x64 --target comboui --config Release
       - name: Build ComboShip
-        run: cmake --build build/x64 --target ComboShip --config Release
-
-      # Port asset archives (--norom). GenerateSohOtr/Generate2ShipOtr DEPEND on ZAPD, which these
-      # steps build on demand. They must run before cpack — the ship/2s2h ZIP components install
-      # ${CMAKE_BINARY_DIR}/soh/soh.o2r and .../mm/2ship.o2r.
-      - name: Generate soh.o2r
-        run: cmake --build build/x64 --target GenerateSohOtr --config Release
-      - name: Generate 2ship.o2r
-        run: cmake --build build/x64 --target Generate2ShipOtr --config Release
+        shell: pwsh
+        run: |
+          # Keep the normal build command, but surface the useful linker lines as
+          # a check annotation when GitHub's large job-log download is unavailable.
+          $PSNativeCommandUseErrorActionPreference = $false
+          $comboShipBuildLog = Join-Path $env:RUNNER_TEMP "comboship-build.log"
+          cmake --build build/x64 --target ComboShip --config Release 2>&1 | Tee-Object -FilePath $comboShipBuildLog
+          $comboShipBuildExitCode = $LASTEXITCODE
+          if ($comboShipBuildExitCode -ne 0) {
+            $diagnosticLines = Get-Content $comboShipBuildLog |
+              Where-Object { $_ -match '(?i)(error C[0-9]{4}|fatal error|LNK[0-9]{4}|MSB[0-9]{4}|: error )' } |
+              Select-Object -Last 40
+            if (-not $diagnosticLines) {
+              $diagnosticLines = Get-Content $comboShipBuildLog | Select-Object -Last 40
+            }
+            $diagnostic = ($diagnosticLines -join "`n").Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Host "::error title=Windows ComboShip build diagnostic::$diagnostic"
+            exit $comboShipBuildExitCode
+          }
 
       # cpack -G ZIP merges the combo/ship/2s2h components into one archive under _packages/.
       # Call cpack directly with -C Release so the multi-config generator can't package Debug by

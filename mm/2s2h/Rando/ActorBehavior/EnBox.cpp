@@ -1,6 +1,7 @@
 #include "ActorBehavior.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 #include "2s2h/Enhancements/FrameInterpolation/FrameInterpolation.h"
+#include "2s2h/Enhancements/Graphics/ChestContents.h"
 #include "2s2h/Rando/StaticData/StaticData.h"
 #include "2s2h/ShipInit.hpp"
 #include "assets/2s2h_assets.h"
@@ -49,16 +50,59 @@ void func_80837C78_override(PlayState* play, Player* player) {
     player->stateFlags1 |= (PLAYER_STATE1_400 | PLAYER_STATE1_20000000);
 }
 
+extern "C" int MMChest_GetRandoItemType(EnBox* chest) {
+    const int check = chest->contentsRandoCheck;
+    if (!IS_RANDO || check <= RC_UNKNOWN || check >= RC_MAX || !RANDO_SAVE_CHECKS[check].shuffled) {
+        return -1;
+    }
+    if (chest->dyna.actor.home.rot.z > 0 && chest->dyna.actor.home.rot.z <= RITYPE_MAX) {
+        return chest->dyna.actor.home.rot.z - 1;
+    }
+
+    const auto item = RANDO_SAVE_CHECKS[check].randoItemId;
+    RandoItemType category = RITYPE_MAX;
+    if (item == RI_TRAP) {
+        // Match the displayed knockoff; RI_TRAP's generic LESSER type would reveal the trap.
+        RandoItemId displayItem = Rando::CurrentTrapItem((RandoCheckId)check);
+        // DrawItem resolves these six native progressive models before drawing. Concrete disguises
+        // retain their own art even if already owned, so do not apply obtainability downgrades to them.
+        switch (displayItem) {
+            case RI_PROGRESSIVE_LULLABY:
+            case RI_PROGRESSIVE_MAGIC:
+            case RI_PROGRESSIVE_BOW:
+            case RI_PROGRESSIVE_BOMB_BAG:
+            case RI_PROGRESSIVE_SWORD:
+            case RI_PROGRESSIVE_WALLET:
+                displayItem = Rando::ConvertItem(displayItem, (RandoCheckId)check);
+                break;
+            default:
+                break;
+        }
+        const auto disguise = Rando::StaticData::Items.find(displayItem);
+        if (disguise != Rando::StaticData::Items.end()) {
+            category = disguise->second.randoItemType;
+        }
+    } else if (item > RI_UNKNOWN && item < RI_MAX) {
+        // This also resolves NEI progressives and ComboShip foreign-check categories.
+        category = Rando::GetItemTypeForCheck(item, (RandoCheckId)check);
+    }
+    if (chest->unk_1EC != 0 && category < RITYPE_MAX) {
+        chest->dyna.actor.home.rot.z = category + 1;
+    }
+    return category;
+}
+
 void EnBox_RandoPostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot, Actor* actor, Gfx** gfx) {
     s32 pad;
     EnBox* enBox = (EnBox*)actor;
-    RandoItemType randoItemType =
-        Rando::GetItemTypeForCheck(RANDO_SAVE_CHECKS[ENBOX_RC].randoItemId, (RandoCheckId)ENBOX_RC);
-    if (enBox->unk_1EC != 0 && actor->home.rot.z == 0) {
-        actor->home.rot.z = randoItemType + 1;
-    }
-    if (actor->home.rot.z != 0) {
-        randoItemType = (RandoItemType)(actor->home.rot.z - 1);
+    RandoItemType randoItemType = (RandoItemType)MMChest_GetRandoItemType(enBox);
+    if (enBox->contentsBodyDL != nullptr && enBox->contentsLidDL != nullptr) {
+        if (limbIndex == OBJECT_BOX_CHEST_LIMB_01 || limbIndex == OBJECT_BOX_CHEST_LIMB_03) {
+            MATRIX_FINALIZE_AND_LOAD((*gfx)++, play->state.gfxCtx);
+            gSPDisplayList(
+                (*gfx)++, (Gfx*)(limbIndex == OBJECT_BOX_CHEST_LIMB_01 ? enBox->contentsBodyDL : enBox->contentsLidDL));
+        }
+        return;
     }
 
     switch (randoItemType) {
@@ -127,12 +171,18 @@ void EnBox_RandoPostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s*
 void EnBox_RandoDraw(Actor* actor, PlayState* play) {
     s32 pad;
     EnBox* enBox = (EnBox*)actor;
+    if (play->sceneId == SCENE_TAKARAYA || MMChest_GetRandoItemType(enBox) < 0) {
+        EnBox_Draw(actor, play);
+        return;
+    }
+    f32 contentsScale = MMChest_PrepareDraw(enBox, play);
 
     OPEN_DISPS(play->state.gfxCtx);
 
     if (enBox->unk_1F4.unk_10 != NULL) {
         enBox->unk_1F4.unk_10(&enBox->unk_1F4, play);
     }
+    Matrix_Scale(contentsScale, contentsScale, contentsScale, MTXMODE_APPLY);
     if (((enBox->alpha == 255) && (enBox->type != ENBOX_TYPE_BIG_INVISIBLE) &&
          (enBox->type != ENBOX_TYPE_SMALL_INVISIBLE)) ||
         (!CHECK_FLAG_ALL(enBox->dyna.actor.flags, ACTOR_FLAG_REACT_TO_LENS) &&
@@ -174,6 +224,9 @@ void Rando::ActorBehavior::InitEnBoxBehavior() {
 
     // Replace the item in the chest with a recovery heart, to prevent any other item side effects
     COND_ID_HOOK(ShouldActorInit, ACTOR_EN_BOX, IS_RANDO, [](Actor* actor, bool* should) {
+        // Authored home.rot.x can be a collectible/upside-down marker, not a check. Keep a separate
+        // visual identity without changing the existing ENBOX_RC reward handoff.
+        ((EnBox*)actor)->contentsRandoCheck = RC_UNKNOWN;
         auto randoStaticCheck = Rando::StaticData::GetCheckFromFlag(FLAG_CYCL_SCENE_CHEST, ENBOX_GET_CHEST_FLAG(actor),
                                                                     gPlayState->sceneId);
         RandoCheckId randoCheckId = randoStaticCheck.randoCheckId;
@@ -189,6 +242,7 @@ void Rando::ActorBehavior::InitEnBoxBehavior() {
         }
 
         ENBOX_RC = randoCheckId;
+        ((EnBox*)actor)->contentsRandoCheck = randoCheckId;
         actor->params = ((actor->params & ~(0x7F << 5)) | ((GI_RECOVERY_HEART & 0x7F) << 5));
 
         if (CVarGetInteger("gRando.CSMC", 0)) {

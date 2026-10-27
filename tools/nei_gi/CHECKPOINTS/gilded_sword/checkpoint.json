@@ -1,0 +1,81 @@
+{
+  "resource_count": 7,
+  "vertex_records": 2112,
+  "vertex_loads": 73,
+  "slug": "gilded_sword",
+  "name": "Gilded Sword",
+  "entry": "objects/nei_gi_redesign/gilded_sword/gi_dl",
+  "draw_scale": 1,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 704,
+  "bounds_author": [
+    [
+      -16.4375,
+      -33.125,
+      -6.0
+    ],
+    [
+      16.4375,
+      93.625,
+      6.0
+    ]
+  ],
+  "markers": {
+    "guard_baseline_y": 0,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "source": "supplied Twilight Princess MasterSword.obj",
+    "texture_upscale": 4,
+    "blade_length_factor": 0.88,
+    "held_grip_y": -18.75,
+    "held_tip_y": 93.625,
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "supersedes_tp_planar_environment_card": true,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "TP blade",
+        "factor": 1.5
+      },
+      {
+        "part": "TP winged silver hilt",
+        "factor": 1.2
+      },
+      {
+        "part": "TP red textured grip",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword sheen over TP blade",
+        "factor": 1.5
+      }
+    ],
+    "imported_approved_model": false
+  },
+  "notes": [
+    "TP hilt UV atlas retained and blade UVs fitted to three broad gold/silver facets.",
+    "TP zero-thickness environment card is replaced by a Four-Sword-style normal-generated reflection decal over the opaque blade.",
+    "Three broad gold/silver lozenges, red grip and silver fittings; blade shortened 12% from the TP source.",
+    "Offline candidate only; gameplay and user acceptance remain pending.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "four_sword_sheen_tex": "e587740b8fdf5516484bab7804d83092b8712c87bddf682cf65f92f4a047b08d",
+      "gi_dl": "8d3a0b594565416d5bf9581e312b9201a42679207f0695d56aae4a67b1ef8575",
+      "mesh_opa_vtx": "480e91ffb59d460abf1a11410aa5f1670e2c8013c96b3dea196f2cf888e40d36",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "tp_blade_tex": "d3d518ecf6074fb4929038a3e146c285d8bc823c38ed27d04f18c5d591a609f2",
+      "tp_hilt_tex": "d92b091b73904dc0f641bc3c27c5a82aec00627bed5fb36a092aabcb9d38418c",
+      "tp_red_grip_tex": "1bf5025c19ccd7372826fa89c6aa184bf3476a9f3ab7bcc68b551f826bdf5524"
+    },
+    "glb_sha256": "839d4d1619e3bdfc752db5ff4464d4980073bd70b3ead33d06c3054b78001a1a",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  }
+}

@@ -234,6 +234,9 @@ void CustomItem00_Update(Actor* actor, PlayState* play) {
                         break;
                 }
 
+                // Keep the accepted model scale and lift the receipt pose a
+                // little above the hands for every player form.
+                height += 2.0f;
                 actor->world.pos.y += height;
             }
 

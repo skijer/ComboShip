@@ -1,0 +1,16 @@
+# Fixed regional bridges — user specification (2026-10-24)
+
+Baseline: marsh6487/ComboShip develop196ac9b7f50721dbc5102d6bf0d6b1f9b3fc58eb, tree32e1dcb6a49e936bdab838c820052e206400ba9f. All three shortcuts are reported missing in game. Replace their opportunistic geometry searches with deliberate runtime-injected passages following the working Lost Woods ↔ Woods of Mystery / Woodfall implementation. No mandatory edited archive or optional pack. No guessed visibility/runtime claims.
+
+OoT placements:
+- Lake Hylia: the marked bank BELOW the laboratory in reference image image(20261024-050101).png. Deep cave with water visibly flowing in, dark/deep-blue Woods of Mystery-style NEI shimmer and nearby spatial wave SFX. Correct child/adult drained/refilled water behavior, accessible intended approach and safe return. Preserve lab and native water/progression.
+- Graveyard: the MARKED EXISTING final grave in the row opposite Dampe's grave, nearer Royal Tomb, in reference image image(20261024-050228).png. No added grave. Native pull/open/grave-hole departure and native grotto-style return/pop-out; gold-orange Woods of Mystery shimmer identifies it. Preserve other graves/checks and avoid instant return/retrigger.
+- Zora's Fountain: marked elevated valley RIGHT of the Ice Cavern approach in reference image image(20261024-050410).png. A continuous, grounded, walkable ascent from the Ice Cavern approach makes this useful; no flight/debug warps/new item requirements. Retain native Ice Cavern entrance and place the Snowhead trigger so it can be reached without tripping that entrance collision. Ice-blue shimmer and nearby snow/chill foreshadowing. Support child/adult and native water. If the high valley requires destructive changes, choose an explicit reachable nearby ledge on the same approach and record why.
+
+MM: fixed, grounded counterparts in Road to Ikana, Great Bay Coast, Mountain Village winter/spring. User trusts placement judgment as with Woodfall. Retain season/progression conditions and native entrances.
+
+Each endpoint has ONE authored pose shared by visible bridge, collision, trigger, shimmer/audio/particles, arrival and return facing. Runtime validation may verify supported resources, but must not SEARCH for a placement or silently suppress a required route. Native/Alt lifetime, repeated entry, explicit arrival precedence, seed/file-slot ownership, solo barriers and all unrelated cumulative work remain protected. Original archives unchanged.
+
+Read-only scene evidence: the locally extracted native/Alt scene evidence includes native and Alt scene/collision/mesh from the supplied overworld export. Whole-input identities are retained privately and excluded from publication. Prior Python collision probing is exploratory, not native runtime proof. Later user-directed visual refinements are specified in `2026-10-24-regional-entrance-visual-refinements-design.md`.
+
+Use red→green production tests and real collision where available, native compile checks and relevant suites, independent review, recoverable verified milestones. Existing publishing authorization covers scoped candidate/source/asset/test/CI work. Keep develop/master unmerged. Report gameplay acceptance separately from static/build evidence.

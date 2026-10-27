@@ -5,6 +5,7 @@
  */
 
 #include "z_en_dodongo.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Bom/z_en_bom.h"
 #include "overlays/actors/ovl_En_Bombf/z_en_bombf.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
@@ -968,7 +969,7 @@ void EnDodongo_UpdateDamage(EnDodongo* this, PlayState* play) {
 
         if ((i != ARRAY_COUNT(this->collider2Elements)) &&
             ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-             !(this->collider2.elements[i].base.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3))) {
+             !(DinFireSword_OriginalDamageFlags(play, this->collider2.elements[i].base.acHitElem) & 0xDB0B3))) {
             func_80876D28(this, play);
             Math_Vec3s_ToVec3f(&sp3C, &this->collider2.elements[i].base.acDmgInfo.hitPos);
             if (this->actor.colChkInfo.damageEffect == 0xF) {
@@ -992,7 +993,7 @@ void EnDodongo_UpdateDamage(EnDodongo* this, PlayState* play) {
 
         if ((i != ARRAY_COUNT(this->collider1Elements)) &&
             ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-             !(this->collider1.elements[i].base.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3))) {
+             !(DinFireSword_OriginalDamageFlags(play, this->collider1.elements[i].base.acHitElem) & 0xDB0B3))) {
             func_80876D28(this, play);
             if (this->actor.colChkInfo.damageEffect != 0xF) {
                 if (!Actor_ApplyDamage(&this->actor)) {

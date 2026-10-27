@@ -7,6 +7,8 @@
 #define DUST_DRAWFLAG1 (1 << 0)
 #define DUST_DRAWFLAG2 (1 << 1)
 #define DUST_DRAWFLAG_RAND_COLOR_OFFSET (1 << 2)
+// Private Forest tornado appearance tag. Preserve the native low-bit draw modes.
+#define EFFECT_SS_DUST_DRAW_SW97_FOREST 0x100
 
 typedef enum {
     /* 0 */ DUST_UPDATE_NORMAL,

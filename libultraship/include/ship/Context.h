@@ -155,6 +155,7 @@ class Context {
 
     /** @brief Returns the application-wide spdlog logger. */
     std::shared_ptr<spdlog::logger> GetLogger() const;
+    std::shared_ptr<spdlog::details::thread_pool> GetLogThreadPool() const { return mLogThreadPool; }
     /** @brief Returns the Config subsystem. */
     std::shared_ptr<Config> GetConfig() const;
     /** @brief Returns the ConsoleVariable subsystem (CVars). */

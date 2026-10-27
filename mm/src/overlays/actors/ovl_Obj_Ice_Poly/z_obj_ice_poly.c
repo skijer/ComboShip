@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_obj_ice_poly.c
  * Overlay: ovl_Obj_Ice_Poly
@@ -189,13 +190,13 @@ void func_80931A38(ObjIcePoly* this, PlayState* play) {
     if (((this->colliders2[0].base.acFlags & AC_HIT) &&
          ((this->colliders2[0].base.ac == NULL) ||
           ((this->colliders2[0].base.ac->id != ACTOR_OBJ_AQUA) &&
-           (this->colliders2[0].elem.acHitElem->atDmgInfo.dmgFlags == 0x800)) ||
+           (DinFireSword_IsFireHit(play, this->colliders2[0].elem.acHitElem))) ||
           ((this->colliders2[0].base.ac->id == ACTOR_OBJ_AQUA) &&
            (this->colliders2[0].base.ac->params == AQUA_TYPE_HOT)))) ||
         ((this->colliders2[1].base.acFlags & AC_HIT) &&
          ((this->colliders2[1].base.ac == NULL) ||
           ((this->colliders2[1].base.ac->id != ACTOR_OBJ_AQUA) &&
-           (this->colliders2[1].elem.acHitElem->atDmgInfo.dmgFlags == 0x800)) ||
+           (DinFireSword_IsFireHit(play, this->colliders2[1].elem.acHitElem))) ||
           ((this->colliders2[1].base.ac->id == ACTOR_OBJ_AQUA) &&
            (this->colliders2[1].base.ac->params == AQUA_TYPE_HOT))))) {
         CutsceneManager_Queue(this->actor.csId);

@@ -1,0 +1,25 @@
+{
+  "resource_count": 10,
+  "vertex_records": 8974,
+  "vertex_loads": 358,
+  "slug": "roc_boots",
+  "name": "Roc's Boots",
+  "entry": "objects/nei_gi_redesign/roc_boots/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 7792,
+  "bounds_author": [
+    [
+      -55.0625,
+      -42.125,
+      -24.8125
+    ],
+    [
+      55.0625,
+      43.8125,
+      34.125
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

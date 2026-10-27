@@ -1,0 +1,6 @@
+<DisplayList Version="0">
+<Matrix Path="objects/nei_held_swords/razor_sword/mm_human/grip_mtx" Param="G_MTX_PUSH"/>
+<CallDisplayList Path="objects/nei_gi_redesign/razor_sword/gi_dl"/>
+<PopMatrix Param="G_MTX_MODELVIEW"/>
+<EndDisplayList/>
+</DisplayList>

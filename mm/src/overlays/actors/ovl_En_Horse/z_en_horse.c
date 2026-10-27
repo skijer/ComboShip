@@ -13,6 +13,8 @@
 #include "overlays/actors/ovl_En_Horse_Game_Check/z_en_horse_game_check.h"
 #include "objects/object_horse_link_child/object_horse_link_child.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "2s2h/Enhancements/Graphics/EponaCosmetics.h"
+#include "z_en_horse_combo.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -716,6 +718,10 @@ void func_8087CA04(EnHorse* this, PlayState* play) {
 }
 
 void EnHorse_Init(Actor* thisx, PlayState* play2) {
+#ifdef COMBO_BUILD
+    if (EnHorse_ComboTryInit(thisx, play2))
+        return;
+#endif
     PlayState* play = play2;
     EnHorse* this = (EnHorse*)thisx;
     Skin* skin = &this->skin;
@@ -4709,10 +4715,14 @@ void EnHorse_Draw(Actor* thisx, PlayState* play) {
         Gfx_SetupDL25_Opa(play->state.gfxCtx);
         this->stateFlags |= ENHORSE_DRAW;
         if (!(this->unk_1EC & 1)) {
+            s32 cosmetics = this->type == HORSE_TYPE_2 && MMEponaCosmetics_BeginDraw(play, &this->skin);
             if (this->stateFlags & ENHORSE_JUMPING) {
                 func_80138258(&this->actor, play, &this->skin, EnHorse_PostDraw, EnHorse_OverrideLimbDraw, false);
             } else {
                 func_80138258(&this->actor, play, &this->skin, EnHorse_PostDraw, EnHorse_OverrideLimbDraw, true);
+            }
+            if (cosmetics) {
+                MMEponaCosmetics_EndDraw(play, &this->skin);
             }
         } else {
             if (this->stateFlags & ENHORSE_JUMPING) {

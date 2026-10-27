@@ -1,0 +1,104 @@
+{
+  "source_baseline": "6af31f1a",
+  "runtime_verified_in_this_pass": false,
+  "assets": [
+    {
+      "filename": "Saria_Anime_Native_NPC_POC12.o2r",
+      "sha256": "94a6235b27c2329feac19b5297aa517a67f425e667edf918f723718e4b6e070f",
+      "size_bytes": 23640341,
+      "status": "accepted model preview; runtime pending",
+      "source_sha256": "dddeaed512e7b4aaedf960e1ddab13e74c480897e0f44404fb980c0c9ce5d63a",
+      "native_sha256": "ea80d61b223ee38075fe5383b652998f3b08164e903134922f63f205d995717b",
+      "namespace": "objects/object_sa/NativeNpcV1",
+      "manifest": "saria_anime_NativeNpcModelInfo.json",
+      "resource_count": 351
+    },
+    {
+      "filename": "Saria_Render_Native_NPC_POC11.o2r",
+      "sha256": "b47bd839335e91ff123d04c0c362cfc08b1f6bba9cf9aece01e12bb10e5bd0f5",
+      "size_bytes": 37159784,
+      "status": "retained accepted alternative; runtime pending",
+      "source_sha256": "902dfca93f4640a65a72e4266f855966fa708b412e0742789552f55f85c94aff",
+      "native_sha256": "ea80d61b223ee38075fe5383b652998f3b08164e903134922f63f205d995717b",
+      "namespace": "objects/object_sa/NativeNpcV1",
+      "manifest": "saria_render_NativeNpcModelInfo.json",
+      "resource_count": 361
+    },
+    {
+      "filename": "Kokiri_Twins_Render_Native_NPC_POC9.o2r",
+      "sha256": "b8c8bd1c80332d625fad152f8bbcadf78124c75086cea0cca6ba5da84d91ae02",
+      "size_bytes": 48176759,
+      "status": "accepted final model preview; runtime pending",
+      "source_sha256": "1e02c29c4af7920b2c518f9f63f18858920709f1406d8c00a7e24f5f81f1102e",
+      "native_sha256": "ea80d61b223ee38075fe5383b652998f3b08164e903134922f63f205d995717b",
+      "namespace": "objects/object_kw1/NativeNpcV1",
+      "manifest": "twins_NativeNpcModelInfo.json",
+      "resource_count": 345
+    },
+    {
+      "filename": "Young_Malon_Native_NPC_POC12.o2r",
+      "sha256": "db8af18b76ce4bbf616e737b78d2b7af670d8adaefac9224b0808db12069ec28",
+      "size_bytes": 67941599,
+      "status": "candidate; final iris acceptance and runtime pending",
+      "source_sha256": "3160899f85770bcd86f664ed73fd7d12277eea2905f42933e79be150e0d2cd3b",
+      "native_sha256": "ea80d61b223ee38075fe5383b652998f3b08164e903134922f63f205d995717b",
+      "namespace": "objects/object_ma1/NativeNpcV1",
+      "manifest": "young_malon_NativeNpcModelInfo.json",
+      "resource_count": 338
+    },
+    {
+      "filename": "Adult_Malon_Render_Native_NPC_POC5.o2r",
+      "sha256": "0fe195bc5eaa4f5170ba91aae1638febd577a6f91595d713b6c3b3a959cf49a2",
+      "size_bytes": 25103033,
+      "status": "retained; identity from preserved weekend manifest; not rehashed here"
+    },
+    {
+      "filename": "Young_Malon_Native_NPC_POC7.o2r",
+      "sha256": "3a773eaed193a4126cabefb8b68ae7fd24a29f05d7a8dfba52ef77f8e9702748",
+      "size_bytes": 36361021,
+      "status": "retained; identity from preserved weekend manifest; not rehashed here"
+    },
+    {
+      "filename": "Young_Fado_SoH_NPC_POC2_Pose_Fit.o2r",
+      "library_file_id": "libfile_d39bee9fc8148191a71c0317e00e9d89",
+      "status": "retained external pack; no fresh archive rebuild in this pass",
+      "historical_rebuild_sha256": "8f4d8994fc8c7f29b460dc0217281e389b24db7684acc7b840c0472149127649"
+    }
+  ],
+  "saria_waiting_profile": {
+    "source_sha256": "dddeaed512e7b4aaedf960e1ddab13e74c480897e0f44404fb980c0c9ce5d63a",
+    "hand": "left",
+    "body_offset": [
+      0,
+      -60,
+      -250
+    ],
+    "local_rotation_degrees": [
+      30,
+      0,
+      0
+    ],
+    "fit": "whole left arm IK; hand and sleeve routed clear of opposite hand/arm and torso; fade across native transition",
+    "elbow_swivel_degrees": -110
+  },
+  "external_archives_are_separate_from_runtime_source": true,
+  "source_inputs": [
+    {
+      "filename": "Young_Malon_Eye_Hair_POC11_Review_20261019.zip",
+      "sha256": "87dfb27f3775c67dc56b7885fdf00e731438c473023e93190d996ab23e28456a"
+    },
+    {
+      "filename": "Young_Malon_Face_Depth_POC10_Review_20261019.zip",
+      "sha256": "10580028db4f2dee553c86b64a9b51263d320279eb4b131dc3b769918593073b"
+    },
+    {
+      "filename": "Young_Malon_Face_Idle_POC9_Review_20261019.zip",
+      "sha256": "764fa30af3f4c52758f5853df9b71006d68d2984174678bf74e9685ac6fde972"
+    }
+  ],
+  "tooling_notes": [
+    "Saria Anime waiting_fit comes from final POC12 Refinement.json, replacing the WIP offset/profile.",
+    "Young Malon face_idle module is the POC10 superseding POC9 version. POC9 registered artwork is retained.",
+    "POC11 eye_hair and POC12 iris source copied exactly from saved review ZIPs. These refine external model archives; no new runtime model default is selected."
+  ]
+}

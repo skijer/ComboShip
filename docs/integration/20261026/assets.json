@@ -1,0 +1,90 @@
+{
+  "temple_sages_bundle": {
+    "manifest": "tools/temple_sages_bundle/manifest.json",
+    "bundle": {
+      "name": "temple_sages_pool",
+      "packed_bytes": 291936,
+      "packed_sha256": "6b4bc03e5001aeb0987491a395c9920e6cbaa88798534c2a2f28d764e7ac7d6c",
+      "parts": [
+        {
+          "encoded_bytes": 131072,
+          "name": "parts/pool.zlib.001.b64",
+          "sha256": "966d4d872f8ead6b39e16726e9e738685ec8dfa98f89c971bf53965b5aa93013"
+        },
+        {
+          "encoded_bytes": 131072,
+          "name": "parts/pool.zlib.002.b64",
+          "sha256": "913211bd572884d84d5068465f2c00fe19c92478ba48248d86cbf3a86201d404"
+        },
+        {
+          "encoded_bytes": 127104,
+          "name": "parts/pool.zlib.003.b64",
+          "sha256": "6918f6fe965fd61842529e2e3b4b7ff276ea27c1c0b4b1ca972599a74f7fea84"
+        }
+      ],
+      "raw_bytes": 3452383,
+      "raw_sha256": "c7458b6d54c23d5810368023b5bfd6a9a45566df6d549050ff5e0253ef4a80a0",
+      "version": 1,
+      "resource_file_count": 4096
+    },
+    "source": {
+      "kind": "native-chamber-geometry"
+    },
+    "resources": 4096,
+    "native_dependencies": 67,
+    "external_mod_dependencies": [],
+    "default_art": "Native OoT",
+    "optional_visuals": "Separate visual archive",
+    "collision_audio": {
+      "stone_sound": 2,
+      "echo": 63,
+      "walkable_polygons": 229
+    }
+  },
+  "lake_tunnel_sand": {
+    "manifest": "tools/lake_tunnel_sand/manifest.json",
+    "bundle": {
+      "directory": "bundled",
+      "encoding": "zlib-base64-pool",
+      "packed_bytes": 173602,
+      "packed_sha256": "b5b9c78aecb7e208ebd2ec651642ea17355c8103c1fa65513184d07a46da6641",
+      "parts": [
+        {
+          "bytes": 98304,
+          "decoded_sha256": "8e51b390de322766908a243610a9445693455fb0da03a7b0c07e310fab7ea7ef",
+          "encoded_bytes": 131072,
+          "name": "pool.zlib.001.b64",
+          "sha256": "566b87345c82634821f0f8727852d7f4f7dcd4c37118c1915aadc45ff82c5217"
+        },
+        {
+          "bytes": 75298,
+          "decoded_sha256": "6c841eb57642ed2df5f90badd5628cbb337af0a3c8b6d13a4c2d445d911c8487",
+          "encoded_bytes": 100400,
+          "name": "pool.zlib.002.b64",
+          "sha256": "5fc83011aabb6fca0e39c64c44d9e24e7f13155c7acb7090bed0cbeedeb5182d"
+        }
+      ],
+      "raw_bytes": 262236,
+      "raw_sha256": "a4bed76544f7d6e397e2a8341f2a849502b34b40127a939901c20d3f266f30eb",
+      "version": 1
+    },
+    "source": {
+      "kind": "dedicated-sand-resource"
+    },
+    "resources": 2
+  },
+  "cumulative_asset_pool": {
+    "manifest": "tools/cumulative_assets/bundled/manifest.json",
+    "files": 18,
+    "parts": 134,
+    "packed_sha256": "05aac9230675ff58d217571ba4e50a1b089f38325f6aa0d2567b1473abe3c572",
+    "raw_sha256": "4877fe757b2365188bb84e04b4462a2e9a307a8044c468c783b36283cc710ecc"
+  },
+  "optional_visual_archive": {
+    "name": "Temple_Sages_Visuals_Collision_Audio_POC5_20261027.prelude.o2r",
+    "sha256": "4b0667444e865fcaaf7714366defcf619e413193d233c2f3be0b26232924f3ef",
+    "bytes": 12153052,
+    "built_in_requirement": false,
+    "runtime_tested": false
+  }
+}

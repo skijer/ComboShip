@@ -449,5 +449,10 @@ void EnJsjutan_Draw(Actor* thisx, PlayState* play2) {
     }
     gSPDisplayList(POLY_OPA_DISP++, sModelDL);
 
+    // Segment 0x0C temporarily holds the carpet vertices. Later actor limbs use
+    // it as a culling display list; restore that contract before another draw
+    // can execute animated vertex data as graphics commands.
+    gSPSegment(POLY_OPA_DISP++, 0x0C, (uintptr_t)gCullBackDList);
+
     CLOSE_DISPS(play->state.gfxCtx);
 }

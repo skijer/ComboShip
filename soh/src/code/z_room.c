@@ -3,6 +3,7 @@
 #endif
 
 #include "global.h"
+#include "gameplay/ComboFaroresWind.h"
 #include "vt.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include <string.h>
@@ -12,6 +13,7 @@
 #include <libultraship/bridge/resourcebridge.h>
 #include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 void func_80095AB4(PlayState* play, Room* room, u32 flags);
 void func_80095D04(PlayState* play, Room* room, u32 flags);
@@ -416,7 +418,7 @@ BgImage* func_80096A74(PolygonType1* polygon1, PlayState* play) {
     camId = camera->camDataIdx;
     if (GameInteractor_Should(VB_SHOULD_LOAD_BG_IMAGE, true, &camId)) {
         // jfifid
-        camId2 = func_80041C10(&play->colCtx, camId, BGCHECK_SCENE)[2].y;
+        camId2 = BgCheck_GetBgCamFuncDataImpl(&play->colCtx, camId, BGCHECK_SCENE)[2].y;
         if (camId2 >= 0) {
             camId = camId2;
         }
@@ -573,6 +575,7 @@ u32 func_80096FE8(PlayState* play, RoomContext* roomCtx) {
     roomCtx->activeBufPage = 0;
     roomCtx->status = 0;
 
+    ComboFw_ValidateArrivalRoom(play->numRooms);
     frontRoom = gSaveContext.respawnFlag > 0 ? ((void)0, gSaveContext.respawn[gSaveContext.respawnFlag - 1].roomIndex)
                                              : play->setupEntranceList[play->curSpawn].room;
     Room_RequestNewRoom(play, roomCtx, frontRoom);
@@ -632,9 +635,21 @@ s32 func_800973FC(PlayState* play, RoomContext* roomCtx) {
 
 void Room_Draw(PlayState* play, Room* room, u32 flags) {
     if (room->segment != NULL) {
+        // Phantom Hourglass: the recall drains the scene to grey along with the actors. Skijer's NEI
+        extern u8 Hourglass_ShouldDrawGray(Actor * actor);
+        extern void Hourglass_PushGray(PlayState * play);
+        extern void Hourglass_PopGray(PlayState * play);
+        u8 recallGray = Hourglass_ShouldDrawGray(NULL);
+
         gSegments[3] = VIRTUAL_TO_PHYSICAL(room->segment);
         assert(room->meshHeader->base.type < ARRAY_COUNTU(sRoomDrawHandlers));
+        if (recallGray) {
+            Hourglass_PushGray(play);
+        }
         sRoomDrawHandlers[room->meshHeader->base.type](play, room, flags);
+        if (recallGray) {
+            Hourglass_PopGray(play);
+        }
     }
 }
 

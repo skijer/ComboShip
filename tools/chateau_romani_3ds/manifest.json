@@ -1,0 +1,72 @@
+{
+  "candidate": "Chateau Romani MM3D 4K clear glass POC2",
+  "source_sha256": "73c375486b5f5323137b99679e9a13ae6e3b2dea25a12a03e89a89ef63e4df34",
+  "source_credit": "Nintendo / Grezzo; model ripped by Guy for The Models Resource",
+  "source_triangles": {
+    "Milk": 40,
+    "Glass": 180,
+    "Cork": 56,
+    "Label": 8
+  },
+  "draw_triangles": {
+    "opaque": 96,
+    "translucent_including_reflections": 376
+  },
+  "height": 60,
+  "label_hex": "#4A0C41",
+  "shimmer": {
+    "label_hex": "#4A0C41",
+    "gold_hex": "#FFD45A"
+  },
+  "alternate_assets": true,
+  "runtime_tested": false,
+  "resources": {
+    "alt/objects/object_gi_bottle_21/gGiChateauRomaniBottleDL": "51fc8231ce04d1ac7b1451f1a304c580ac279e0a7b21647030a32cf1f06a411e",
+    "alt/objects/object_gi_bottle_21/gGiChateauRomaniBottleEmptyDL": "cd88885a659492f1a68fe912944868dbaff117ea1caad59e7e61deab02ac2d3a",
+    "objects/combo_chateau_romani_3ds/AtlasTex": "8dd894e2100f91ac20067303f6c642a32358097b9e3cf3654a85568b31662a13",
+    "objects/combo_chateau_romani_3ds/CorkDL": "2971900b48eada781acc59156619ca1a8bdcab2faaa21f385ea1a8df1a8993d0",
+    "objects/combo_chateau_romani_3ds/CorkVertices": "d4c75dfa6de59e45236e4754296a2708c5cc6db0dc4ab67d372dd08f23a167d0",
+    "objects/combo_chateau_romani_3ds/GlassDL": "9f7d377f00578192a6e0ebd7054632a412c878b46d34c607c67ee6cb3bb4193c",
+    "objects/combo_chateau_romani_3ds/GlassReflectionDL": "ad907fb5358f1876794807e5b8066d80f995465a3577e065e276500f6a13b089",
+    "objects/combo_chateau_romani_3ds/GlassReflectionTex": "f800378df5aead3f49e657069c4d83785a336b1cd0979198851ae49cccecb5b6",
+    "objects/combo_chateau_romani_3ds/GlassReflectionVertices": "fb8318b74fd5b3261000b59e6f0660fe10e6941c9f5496d22774ad208a6ec2be",
+    "objects/combo_chateau_romani_3ds/GlassSurfaceDL": "a4ba6e51d46f92a2cff7aa7628be3ec1064924e488da1d360a52e96f87cfe5b2",
+    "objects/combo_chateau_romani_3ds/GlassSurfaceVertices": "b10ee6811008c9fe4fea87775337dde4961afe40cc82969e45154ca0c0f2481c",
+    "objects/combo_chateau_romani_3ds/GoldReflectionTex": "4c581d28c9200c8bfcaae9893b4a52461a46624cbe5f44cef324c83b5e0cca90",
+    "objects/combo_chateau_romani_3ds/LabelDL": "a2ea5f1be7be12a821412b633625180db0fa971271f07dacf4a5ae0474e66f1c",
+    "objects/combo_chateau_romani_3ds/LabelReflectionDL": "d27c7812590bd9aa8dca6501cf559237b577cb759240891e8f6d5cfafa52f3b8",
+    "objects/combo_chateau_romani_3ds/LabelReflectionVertices": "06ead29676ddda9463a9dcb2d3e5d89736ce269c55070d8520a11e9b61e9fa61",
+    "objects/combo_chateau_romani_3ds/LabelVertices": "5d30d0bb3b6e1ee2b00abafc433ed882377ef7a2390beb96d85761ca96336793",
+    "objects/combo_chateau_romani_3ds/MilkDL": "2afb4eb3b3d1a125cc61e298c4c89be635aff37b29434ec09a2e5a5a6f50602f",
+    "objects/combo_chateau_romani_3ds/MilkVertices": "4c44cdd5a569f8012e979875f614b2b42f204127fe831859573918bb99ef58b3",
+    "objects/combo_chateau_romani_3ds/OpaqueDL": "8dac5b6a6d20bef3544d03fe043a583ac4d10b2b452f046899ee703040757e46"
+  },
+  "hd_atlas": {
+    "file": "tools/chateau_romani_3ds/hd/Atlas-4K.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "native_tile": [
+      64,
+      64
+    ],
+    "flags": 1,
+    "h_byte_scale": 64.0,
+    "v_pixel_scale": 64.0,
+    "sha256": "eecbca049ac0e039676eb310dbc32a51f4278c4649b8adfe684ea1bca9bbc069",
+    "artwork": "AI reconstructed from original 64x64 atlas; generated 1254x1254, UV packed and resampled to 4K"
+  },
+  "hd_reflection": {
+    "file": "tools/chateau_romani_3ds/hd/Glass-Reflection.png",
+    "size": [
+      512,
+      512
+    ],
+    "native_tile": [
+      32,
+      32
+    ],
+    "sha256": "c5b9086cd9764dffebedc867d7ccd75d1ae5c9ba9d7ddcad8e514f5fe4c0f592"
+  }
+}

@@ -27,6 +27,27 @@ enum WindowBackend {
 
 class Fast3dWindow : public Ship::Window {
   public:
+    // Optional elapsed stage timings; command/present time can include driver
+    // and GPU waits. These are not GPU timestamp measurements.
+    struct FrameTimings {
+        uint64_t attemptId = 0, startNs = 0, endNs = 0;
+        nlohmann::json pacing, gpu;
+        uint64_t ready = 0;
+        uint64_t setup = 0;
+        uint64_t commands = 0;
+        uint64_t gui = 0;
+        uint64_t present = 0;
+    };
+    void SetCollectFrameTimings(bool enabled) {
+        mCollectFrameTimings = enabled;
+        // Disabling at the end of an OoT tick must NOT destroy in-flight GPU
+        // queries; the next draw can still resolve them. Explicit shutdown is
+        // handled by backend teardown. New untraced draws cancel collection.
+    }
+    const FrameTimings& GetLastFrameTimings() const {
+        return mLastFrameTimings;
+    }
+
     Fast3dWindow();
     Fast3dWindow(std::vector<std::shared_ptr<Ship::GuiWindow>> guiWindows);
     Fast3dWindow(std::shared_ptr<Ship::Gui> gui);
@@ -103,5 +124,8 @@ class Fast3dWindow : public Ship::Window {
     GfxWindowBackend* mWindowManagerApi;
     std::shared_ptr<Interpreter> mInterpreter = nullptr;
     std::shared_ptr<GfxDebugger> mGfxDebugger;
+    bool mCollectFrameTimings = false;
+    FrameTimings mLastFrameTimings;
+    uint64_t mDiagnosticAttemptId = 0;
 };
 } // namespace Fast

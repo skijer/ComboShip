@@ -1,0 +1,25 @@
+{
+  "resource_count": 11,
+  "vertex_records": 2747,
+  "vertex_loads": 98,
+  "slug": "trident",
+  "name": "Trident",
+  "entry": "objects/nei_gi_redesign/trident/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 2626,
+  "bounds_author": [
+    [
+      -19.4375,
+      -58.625,
+      -5.5
+    ],
+    [
+      36.9375,
+      64.1875,
+      5.5
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

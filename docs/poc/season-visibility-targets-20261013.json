@@ -1,0 +1,1003 @@
+{
+  "baseline": "4cf4866d2dd33551e8a1372a5cce8bd7ad40196e",
+  "source_archive": "!Hyrule Field - FINAL(1).o2r",
+  "archive_sha256": "6a3c2662e03598a1b3aa4eaa6d421466dac9d0a295f121af0d5c7d864b5d49ad",
+  "archive_size_bytes": 194513783,
+  "new_hyrule_targets": [
+    {
+      "path": "custom/prelude/spot00_scene/s00_yuka_04_85D00",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/s00_yuka_04_85D00",
+          "width": 2048,
+          "height": 2048,
+          "serialized_sha256": "932cebc74cae3726a35eac27281b3d8a8d1bd17bf9bafde2616d4fa4c6ceeb18",
+          "rgba_sha256": "b4dc2723cc7ea4f177413bf402ac6285a54d48555677c7dfa0909153044b475d"
+        }
+      ]
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_yuka_04_85D00",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "scenes/shared/spot00_scene/s00_yuka_04_85D00",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "53a10ab2bfcf3c4fe307aaaa4d59449ea6a39b8ec86654ffe01ac4129f0117f9",
+          "rgba_sha256": "f1aaa214e6d2de4778048cbdc98282debbe31ee57474ee3e10963f3357cb9028"
+        }
+      ]
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_kabe_01_11300",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "scenes/shared/spot00_scene/s00_kabe_01_11300",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c306ea3006ad0360b7dab1f953f9b95fad7453df686100dd30aafb189e4ad136",
+          "rgba_sha256": "81b1e17aa25c18dbaef2225420259cde5b184bc98e01c15ef0f777aed42918db"
+        },
+        {
+          "path": "alt/scenes/shared/spot00_scene/s00_kabe_01_11300",
+          "width": 1024,
+          "height": 1024,
+          "serialized_sha256": "cc9fba079fef5b78caf0f89a9ae51e83ab3f184814818080aeddd2eddd7dffcb",
+          "rgba_sha256": "211bef0b3c9bc2cec14cb719fcc255e60e2a60d843fbc31532d9490e7e5a6dc0"
+        }
+      ]
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_kabe_05_1C700",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "scenes/shared/spot00_scene/s00_kabe_05_1C700",
+          "width": 128,
+          "height": 256,
+          "serialized_sha256": "856c36c6665cc750a0e9f474a874e67277a7495f529a6d966ec8defa03ee47fa",
+          "rgba_sha256": "8384dacdfab814cf638b3ffd7fa210ead7e6470ffa446bbfbfba0ef4384408aa"
+        },
+        {
+          "path": "alt/scenes/shared/spot00_scene/s00_kabe_05_1C700",
+          "width": 1024,
+          "height": 2048,
+          "serialized_sha256": "1c78518598177b7b5f8ee2dbeb1920967b1bad24443907383f8591bcf262df72",
+          "rgba_sha256": "40d7e20da8e27a3f7e69d6be6f0257719436c42ba7ec08b1bb5f46639996f0d7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe222_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe222_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe232_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe232_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe242_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe242_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe282_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe282_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe292_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe292_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe302_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe302_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe312_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe312_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe322_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe322_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "bf8d5a6cade755eaa1467a8417955089ec91cdd58dd3178523eedeb79984fee5",
+          "rgba_sha256": "faa585df9487e4ff0dc665742c031b83b0ace849b1247e1f06dc1393da0505dc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe223_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe223_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe233_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe233_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe243_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe243_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe283_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe283_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe293_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe293_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe303_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe303_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe313_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe313_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe323_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe323_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "617d1f6cfd0454e9891762e8feb3545d5f28b5f470b6fb2c192b61aaa4ce72b5",
+          "rgba_sha256": "2d736229c29923e974a477694098a7b91cf863d2bae63ce7d9f387dd6f2f2758"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe229_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe229_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe239_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe239_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe249_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe249_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe281_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe281_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe289_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe289_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe299_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe299_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe309_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe309_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe319_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe319_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe329_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe329_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "edc628ad0c8d4acd55c30c56388ea1dfe67e6aeeb356edf78e5de7bd8339e83c",
+          "rgba_sha256": "f993101a89473f6e6f7de45e55fe6e2d3b2c51b282a4defe3062e533a0c89ad2"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe221_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe221_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe225_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe225_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe235_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe235_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe245_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe245_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe285_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe285_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe295_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe295_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe305_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe305_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe315_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe315_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe325_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe325_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "c873224835dfd4589eed1c4e1ffbd4720518c371526c991575d0df4f86f7829f",
+          "rgba_sha256": "b13ad0843aa1226823f93b749c9ad61e0f6f93b624caa5ad674b02c52723e0fc"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe226_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe226_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe236_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe236_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe246_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe246_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe286_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe286_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe296_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe296_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe306_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe306_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe316_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe316_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe326_tex0",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe326_tex0",
+          "width": 256,
+          "height": 256,
+          "serialized_sha256": "3122e734bea1fbd616557d203cf9cb3db2a5f706e98af0178d0682f8ea9874a7",
+          "rgba_sha256": "ac016b404fb0f962e635c6c62d9c78dbd77dca80795402f222056762e1ae0fe7"
+        }
+      ]
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_hana_02_5500",
+      "surface": "Understory",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "scenes/shared/spot00_scene/s00_hana_02_5500",
+          "width": 128,
+          "height": 128,
+          "serialized_sha256": "15fd0075f06b2e4e4814a06304074e72c244e8077cb402f79a9b0dfb3d81bcc6",
+          "rgba_sha256": "9f7cec1961e9703b779f3f51166c1ebd30d0a117aae726e346dd2c00f107e576"
+        }
+      ]
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_yama_01_76B00",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        8,
+        16,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "scenes/shared/spot00_scene/s00_yama_01_76B00",
+          "width": 128,
+          "height": 128,
+          "serialized_sha256": "f7f20a77fc57c1e23167a01bbf56859dabb95cb8b9ffc9c7842af44ac8ac1256",
+          "rgba_sha256": "d3c0ad72e33c09014815a7f19fccf68be121398e922bfada26e583763fb4b699"
+        }
+      ]
+    },
+    {
+      "path": "custom/prelude/spot00_scene/recipe252_tex0",
+      "surface": "Ground",
+      "bounds_sixteenths": [
+        0,
+        8,
+        8,
+        16
+      ],
+      "source_variants": [
+        {
+          "path": "custom/prelude/spot00_scene/recipe252_tex0",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "0e3d778f81d7cd9fc5fed20468ee4bc7a83a3960909142014c1fbf1490b7cbc5",
+          "rgba_sha256": "cfbbb23ab4e11550d404b834f4aa7c892ba87ecfe4eacfdc5c7249228b11cd03"
+        }
+      ]
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_ki_02_22000",
+      "surface": "Canopy",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        12
+      ],
+      "source_variants": [
+        {
+          "path": "scenes/shared/spot00_scene/s00_ki_02_22000",
+          "width": 256,
+          "height": 128,
+          "serialized_sha256": "e05d78f001a2c36190f745a53c166a5464ae98b74c4de71036861f5521e8c6d4",
+          "rgba_sha256": "825e4321fc5791d7df7d525b1990d2bb67b4682a153a0683ce74bfcc0274d13d"
+        }
+      ]
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_ki_03_2C800",
+      "surface": "Canopy",
+      "bounds_sixteenths": [
+        0,
+        0,
+        16,
+        15
+      ],
+      "source_variants": [
+        {
+          "path": "scenes/shared/spot00_scene/s00_ki_03_2C800",
+          "width": 64,
+          "height": 64,
+          "serialized_sha256": "583cb6bac629e66331a64e7c135c9fe5fb387c9a35bd8aa0940da93e8b66e877",
+          "rgba_sha256": "4d1c655fb6506b0373c63ddc41a96e28d97cd37ed333e9eafcb3d13e6d2dcd38"
+        }
+      ]
+    }
+  ],
+  "static_scope": {
+    "room_headers": 12,
+    "mesh_roots": 44,
+    "reachable_display_lists": 2166,
+    "unresolved_hashes": 0,
+    "representative_texture_cases": 18
+  },
+  "runtime_limits": [
+    "Installed pack/GPU appearance unverified",
+    "Spring night blackout not reproduced from supplied Field native palette; shared lighting snapshot required if it persists",
+    "Lowest fringe of ki02 canopy remains native to preserve exposed trunks"
+  ]
+}

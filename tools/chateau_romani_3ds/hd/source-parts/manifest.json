@@ -1,0 +1,67 @@
+{
+  "file": "Atlas-4K.png",
+  "bytes": 19391982,
+  "sha256": "eecbca049ac0e039676eb310dbc32a51f4278c4649b8adfe684ea1bca9bbc069",
+  "parts": [
+    {
+      "file": "Atlas-4K.png.000.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "0395096deb10d511f3ec3dbe14371be29f589af6360340a8c63fc89c842765f8"
+    },
+    {
+      "file": "Atlas-4K.png.001.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "0f6a8917078148d6a1a8700f43e26f7e61071f9e0e0bc2dc031a6b3a0146af9e"
+    },
+    {
+      "file": "Atlas-4K.png.002.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "761f44d91e1c3d1f8510263e27231662c4f0dece480c7bdce775740a7bd0f0c5"
+    },
+    {
+      "file": "Atlas-4K.png.003.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "5d1c14b293fed4067819858a37f53ca54aa686c5559216e711573e7f2da39f95"
+    },
+    {
+      "file": "Atlas-4K.png.004.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "687d3ec3fbe44b2ab1347ae6ab7f4828c97f0022f99742434398d9815c8d7e1e"
+    },
+    {
+      "file": "Atlas-4K.png.005.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "01cb8178890e2fa0b3479a2fcf5a0a38c1f4335e6b85974dcd8e180318da4e93"
+    },
+    {
+      "file": "Atlas-4K.png.006.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "ae8e913114fe53fd660f456f1fe8e6adb737f8ec62aac7af94218182ba87ef80"
+    },
+    {
+      "file": "Atlas-4K.png.007.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "12b17e73c3aeca3dc9e6e499a95e81ba116a844468ac36bb1ca7a9498e8537a9"
+    },
+    {
+      "file": "Atlas-4K.png.008.b64",
+      "encoding": "base64",
+      "bytes": 2097152,
+      "sha256": "df0b7f4ad901702a40f1746f7e80d0e03560c0ac70ff5aac14bcac838329cb77"
+    },
+    {
+      "file": "Atlas-4K.png.009.b64",
+      "encoding": "base64",
+      "bytes": 517614,
+      "sha256": "b4076c2f69f62e0fe880a4739504470cb06c452a5d33ccc86cd851f57c2adafc"
+    }
+  ]
+}

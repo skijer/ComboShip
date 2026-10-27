@@ -1,0 +1,94 @@
+{
+  "accepted_sha256": "cc1963d9dae25cd684cb0fc79948a398a611f1f49fad82ccd45f455f6f4c9257",
+  "aperture_crown_clearance": 3,
+  "aperture_depth": 100,
+  "aperture_floor": -2,
+  "aperture_scale": 0.99,
+  "asset_sha256": {
+    "custom/cor_woods_bridge/bridge": "670e0342d8ac99b816ef598f8a1c0fa324c87fcd028f980b0f9667a73445a649",
+    "custom/cor_woods_bridge/bridge_vtx": "0746321360d7578d09f6f5000dcc72eee894af2ee4c09127999919d4bdf7ffc7",
+    "custom/cor_woods_bridge/canopy_vtx": "f1ba76f239b57f87f34585ecb4d4999f1af1c6ed2a89310e61738024c5a91794",
+    "custom/cor_woods_bridge/textures/bark": "8849d200d89d2e0baa05ac51a2d3fa43b264c7cbfe0213651be384e4afc7e6e1",
+    "custom/cor_woods_bridge/textures/black": "9d2909be7becdc8fc58325c50b6d814e790777c39d0cef539b6c653c9339832f",
+    "custom/cor_woods_bridge/textures/planks": "79a4eb3048757177b1830d81c2627c743f047a493cfd3e99405a285d8f6cd4f2",
+    "custom/cor_woods_bridge/wall": "95dc371107cc27052142c1af5cbd27f50edf80a7bdbd7f3a3aeb58402837c5e1",
+    "custom/cor_woods_bridge/wall_vtx": "f79324e45ac8fc5bef3f7b4537ba76db49ed843f1a37187aadb1ee89a198b96b"
+  },
+  "bridge_material_triangles": {
+    "bark": 24,
+    "black": 28,
+    "planks": 142
+  },
+  "bridge_triangles": 194,
+  "candidate": "POC6 native accepted bridge",
+  "canopy_clearance": {
+    "generated_vertex_resource": "custom/cor_woods_bridge/canopy_vtx",
+    "patch_gfx_indices": [
+      28,
+      29,
+      49,
+      50
+    ],
+    "pivot_new_xyz": [
+      213,
+      119,
+      -214
+    ],
+    "pivot_old_xyz": [
+      213,
+      88,
+      -214
+    ],
+    "preservation": "Only the two shared pivot Y fields change; native display-list materials, palettes, normals, UVs, alpha, bounds and all remaining vertex bytes are exact",
+    "source_display_list": "scenes/nonmq/Z2_26SARUNOMORI/Z2_26SARUNOMORI_room_01DL_002968",
+    "source_display_list_sha256": "8c836b21e8e230f3e762b5460f4ba0ac9b8434ce0a349c8c5814f22ba6da44de",
+    "source_vertex_resource": "scenes/nonmq/Z2_26SARUNOMORI/Z2_26SARUNOMORI_room_01Vtx_002708",
+    "source_vertex_sha256": "dabfc9b3178ff875797f180395a8253e7130dde5fa0a6c0e92626c1e8cb3e819",
+    "unchanged_cull_gfx_indices": [
+      2,
+      3
+    ],
+    "vertex_count": 38,
+    "vertex_indices": [
+      0,
+      27
+    ]
+  },
+  "clipped_wall_triangles": 223,
+  "floor_contact": "Serialized Y1/2 wood floor and matching annulus vertices lowered4 units beneath the native grass; all higher vertices and every X/Z/UV/color remain exact",
+  "mouth": [
+    110,
+    0,
+    -110
+  ],
+  "mouth_yaw": -8192,
+  "native_sha256": "bf9e1495ac363919c14c453875303977bf5f9552824b10a9dac29375adcb2161",
+  "native_wall_cull_sphere": [
+    0,
+    87,
+    0,
+    456
+  ],
+  "native_wall_sha256": "8e199906233afa056587be52c6d91d39ddd38b9d45a7c814c5112244ab193103",
+  "original_wall_triangles": 96,
+  "outer_annulus_triangles": 60,
+  "preservation": "All194 accepted bridge triangles and texture resource bytes; bridge floor Y1/2 change by-4; native canopy shared pivot Y88 changes to119; native cardinal corridors, floor, collision, headers, actors and route logic unchanged",
+  "source_bridge": "custom/cor_woods_mystery/poc1/room_1/geometry",
+  "source_native_wall": "scenes/nonmq/Z2_26SARUNOMORI/Z2_26SARUNOMORI_room_01DL_000B90",
+  "trigger_center": [
+    160,
+    0,
+    -160
+  ],
+  "wall_material": {
+    "logical_size": [
+      32,
+      32
+    ],
+    "native_sampler": 1,
+    "preservation": "Native RGBA16 image, geometry, UVs and normals unchanged; baked load uses its actual dimensions",
+    "rgba16_bytes": 2048,
+    "texture": "scenes/nonmq/Z2_26SARUNOMORI/Z2_26SARUNOMORITex_00A1C0",
+    "texture_sha256": "38287f562072095e145aa9fc53aa469b22a1d50f247fd88d458a92cce33e11f9"
+  }
+}

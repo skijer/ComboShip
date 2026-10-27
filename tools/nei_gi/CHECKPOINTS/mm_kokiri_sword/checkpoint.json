@@ -1,0 +1,208 @@
+{
+  "resource_count": 10,
+  "vertex_records": 2052,
+  "vertex_loads": 84,
+  "slug": "mm_kokiri_sword",
+  "name": "Kokiri Sword (MM)",
+  "entry": "objects/nei_gi_redesign/mm_kokiri_sword/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 2144,
+  "bounds_author": [
+    [
+      -14.0,
+      -30.0,
+      -3.75
+    ],
+    [
+      14.0,
+      63.0,
+      3.75
+    ]
+  ],
+  "markers": {
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "imported_approved_model": false,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "MM Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rounded brass rectangular guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Machined guard rim",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed guard fastener socket",
+        "factor": 1.2
+      },
+      {
+        "part": "Guard steel flush rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed guard fastener socket",
+        "factor": 1.2
+      },
+      {
+        "part": "Guard steel flush rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Machined guard rim",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed guard fastener socket",
+        "factor": 1.2
+      },
+      {
+        "part": "Guard steel flush rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed guard fastener socket",
+        "factor": 1.2
+      },
+      {
+        "part": "Guard steel flush rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Shaped oval leather grip",
+        "factor": 1.0
+      },
+      {
+        "part": "Raised diagonal leather wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Upper Kokiri guard ferrule",
+        "factor": 1.2
+      },
+      {
+        "part": "Kokiri pommel ferrule",
+        "factor": 1.0
+      },
+      {
+        "part": "Violet Kokiri pommel",
+        "factor": 1.0
+      }
+    ]
+  },
+  "notes": [
+    "MM Kokiri identity: broad clipped steel blade, rounded brass bar guard with two recessed fasteners, pale wrapped grip and violet pommel.",
+    "Rebuilt beveled steel, machined guard rims and grip fittings; continuous blade tang passes into the guard and upper grip.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "brass_edge_tex": "b06c0cd24de2f847665dfe1f4ac43c7c9da474fa0f660bfd47c4e7ad6554c3c5",
+      "brass_tex": "f91dcc0c5c49a429e2bad5a41fcc4c43f47093f02fea4d5acf37c01ce47ef099",
+      "edge_tex": "8c9b5b1548288588aece01a8e76afda8722485d75ab049ebe9f59b0978dc55a7",
+      "gi_dl": "aa25afbea89b9ca66a38d7d576337ac1d12f36cca3f1ac56361a83f5c85334ce",
+      "mesh_opa_vtx": "6d1d44d45f8d43cf356ad33e399b0adf70522cb837bce67762de0c015a7cdfea",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "steel_tex": "5ba49cfb20429ebcf49f5b76c0f464e1e83db89fc23e245062e96c9c5d1bd45f",
+      "violet_tex": "6c1d1fdf0353b6ba9379f79c511607e66c55955ec2f01649e7a43c3d36f88205",
+      "white_leather_tex": "b345559ef03ccbb86c46b5fb0a5a90347fe0822b16ad4042eee36d45c585e878",
+      "white_wrap_tex": "79cf04e8a3ee3721d4040d974e3335c7ca54163ad327daa4227ff7191d19a579"
+    },
+    "glb_sha256": "6e406335402cbb1568672960b04a863a945bfe7424a7724fc7f2d13a00b7a7db",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  },
+  "depth_parent": {
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "glb_path": "tools/nei_gi/CHECKPOINTS/mm_kokiri_sword/mm_kokiri_sword.glb",
+    "preserved": "X/Y positions, topology, UVs, materials, texture resources, display lists and scale matrix"
+  }
+}

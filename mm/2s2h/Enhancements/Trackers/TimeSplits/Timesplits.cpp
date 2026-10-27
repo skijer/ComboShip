@@ -162,7 +162,12 @@ void DrawSplitsList(bool isMain) {
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(10, 0));
 
     if (isMain) {
+#ifdef COMBO_BUILD
+        // ComboShip: own ImGui ID; OOT's split overlay (a port of this one) also opens "Timesplits".
+        ImGui::Begin("Timesplits##MM", nullptr,
+#else
         ImGui::Begin("Timesplits", nullptr,
+#endif
                      ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoDocking |
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse |
                          ImGuiWindowFlags_NoScrollbar);
@@ -196,11 +201,9 @@ void DrawSplitsList(bool isMain) {
                 SplitsPushImageButtonStyle();
                 if (ImGui::ImageButton(
                         std::to_string(i).c_str(),
-                        std::dynamic_pointer_cast<Fast::Fast3dGui>(
-                            Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                            ->GetTextureByName(splitList[i].splitType == SPLIT_TYPE_NORMAL
-                                                   ? GetItemImageById(splitList[i].splitId)
-                                                   : gPauseUnusedCursorTex),
+                        Ship_GetFast3dGui()->GetTextureByName(splitList[i].splitType == SPLIT_TYPE_NORMAL
+                                                                  ? GetItemImageById(splitList[i].splitId)
+                                                                  : gPauseUnusedCursorTex),
                         splitList[i].splitType == SPLIT_TYPE_NORMAL ? GetItemImageSizeById(splitList[i].splitId)
                                                                     : ImVec2(32.0f, 32.0f),
                         ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0),

@@ -1,0 +1,75 @@
+{
+  "variant": "twins",
+  "bounds": [
+    -0.095,
+    0.763,
+    0.095,
+    0.905
+  ],
+  "source_sha256": "1e02c29c4af7920b2c518f9f63f18858920709f1406d8c00a7e24f5f81f1102e",
+  "panels": [
+    "half",
+    "closed"
+  ],
+  "art_method": "Source face projection; ImageGen bounded skin/lash cleanup; original brow/nose/mouth ink and source geometry preserved",
+  "lash_cleanup": {
+    "method": "Bounded skin and eyelash cleanup with protected original feature ink",
+    "panels": {
+      "neutral": {
+        "original_pixel_sha256": "30c17e660451b5d44ea44ecdf29aaba8bb254be55c311d3f5641d9fc5375bf2a",
+        "revised_pixel_sha256": "4ce83b40ec927dd505a23e33e2b766af9fc3963d794cbe2a0c1b8f9ec159ab11",
+        "changed_pixels": 206575,
+        "protected_feature_ink_preserved": true
+      },
+      "half": {
+        "original_pixel_sha256": "ca0c9298340ae1b0f33a2b27b18fc51a7db1ec3c85c7252dd46b31e4309d1eaf",
+        "revised_pixel_sha256": "331afde87759c7981739c24f8e3df03e3525978652983d0e46c326ac9697efdc",
+        "changed_pixels": 206490,
+        "protected_feature_ink_preserved": true
+      },
+      "closed": {
+        "original_pixel_sha256": "8a386ecdc53f70ef064136e180484539f3ecfb14a0bf2d1f0c70371ad416d3cd",
+        "revised_pixel_sha256": "1a3c5d864b80787361a7fe789a8184a6212e618ed9adb6dc84b1ac6bf81b90f6",
+        "changed_pixels": 206522,
+        "protected_feature_ink_preserved": true
+      }
+    },
+    "generated_source": "exec-42e683b1-ccdd-4cb0-bd3e-e5b527b9c165.png"
+  },
+  "face_cleanup": {
+    "method": "ImageGen texture edit with bounded skin/lash mask and original brow/nose/mouth ink protection",
+    "panels": {
+      "neutral": {
+        "original_pixel_sha256": "30c17e660451b5d44ea44ecdf29aaba8bb254be55c311d3f5641d9fc5375bf2a",
+        "revised_pixel_sha256": "4ce83b40ec927dd505a23e33e2b766af9fc3963d794cbe2a0c1b8f9ec159ab11",
+        "changed_pixels": 206575,
+        "protected_feature_ink_preserved": true
+      },
+      "half": {
+        "original_pixel_sha256": "ca0c9298340ae1b0f33a2b27b18fc51a7db1ec3c85c7252dd46b31e4309d1eaf",
+        "revised_pixel_sha256": "331afde87759c7981739c24f8e3df03e3525978652983d0e46c326ac9697efdc",
+        "changed_pixels": 206490,
+        "protected_feature_ink_preserved": true
+      },
+      "closed": {
+        "original_pixel_sha256": "8a386ecdc53f70ef064136e180484539f3ecfb14a0bf2d1f0c70371ad416d3cd",
+        "revised_pixel_sha256": "1a3c5d864b80787361a7fe789a8184a6212e618ed9adb6dc84b1ac6bf81b90f6",
+        "changed_pixels": 206522,
+        "protected_feature_ink_preserved": true
+      }
+    },
+    "generated_source": "exec-42e683b1-ccdd-4cb0-bd3e-e5b527b9c165.png",
+    "surface_reprojection_meshes": [
+      18,
+      9,
+      10,
+      11,
+      14,
+      20
+    ],
+    "surface_mask": "surface-mask.png",
+    "forehead_edge_padding_to": 0.925,
+    "preserve_green_headband_texels": true,
+    "preserve_original_uvs": true
+  }
+}

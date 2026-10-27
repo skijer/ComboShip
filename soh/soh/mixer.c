@@ -1,9 +1,12 @@
 //! This file is always optimized by a rule in the CMakeList. This is done because the SIMD functions are very large
 //! when unoptimized and clang does not allow optimizing a single function.
+
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "mixer.h"
+
 #ifndef __clang__
 #ifndef _MSC_VER
 #pragma GCC optimize("unroll-loops")
@@ -104,31 +107,54 @@ void aLoadBufferImpl(const void* source_addr, uint16_t dest_addr, uint16_t nbyte
 #endif
 }
 
-#include <opus/opus.h>
 #include <opusfile.h>
 
-void aOPUSdecImpl(void* source_addr, uint16_t dest_addr, uint16_t nbytes, struct OggOpusFile** decState, int32_t pos,
+// The decoder is cached on the note, so remember which buffer it was opened for.
+struct OpusDecState {
+    OggOpusFile* file;
+    const void* source;
+};
+
+void aOPUSdecImpl(void* source_addr, uint16_t dest_addr, uint16_t nbytes, struct OpusDecState** decState, int32_t pos,
                   uint32_t size) {
     int readSamples = 0;
-    if (*decState == NULL) {
-        *decState = op_open_memory(source_addr, size, NULL);
+    struct OpusDecState* dec = *decState;
+
+    // Note reused for another streamed sample may have previous decoder opened,
+    // which would keep playing the previous track under new note.
+    if (dec != NULL && dec->source != source_addr) {
+        aOPUSFree(dec);
+        dec = NULL;
+        *decState = NULL;
     }
-    op_pcm_seek(*decState, pos);
-    int ret = op_read(*decState, BUF_S16(dest_addr), nbytes / 2, NULL);
+    if (dec == NULL) {
+        OggOpusFile* file = op_open_memory(source_addr, size, NULL);
+        if (file == NULL) {
+            return;
+        }
+        dec = malloc(sizeof(struct OpusDecState));
+        dec->file = file;
+        dec->source = source_addr;
+        *decState = dec;
+    }
+
+    op_pcm_seek(dec->file, pos);
+    int ret = op_read(dec->file, BUF_S16(dest_addr), nbytes / 2, NULL);
     if (ret < 0) {
         return;
     }
     readSamples += ret;
     while (readSamples < nbytes / 2) {
-        ret = op_read(*decState, BUF_S16(dest_addr + readSamples * 2), (nbytes - readSamples * 2) / 2, NULL);
+        ret = op_read(dec->file, BUF_S16(dest_addr + readSamples * 2), (nbytes - readSamples * 2) / 2, NULL);
         if (ret == 0)
             break;
         readSamples += ret;
     }
 }
 
-void aOPUSFree(struct OggOpusFile* opusFile) {
-    op_free(opusFile);
+void aOPUSFree(struct OpusDecState* dec) {
+    op_free(dec->file);
+    free(dec);
 }
 
 void aSaveBufferImpl(uint16_t source_addr, int16_t* dest_addr, uint16_t nbytes) {
@@ -659,10 +685,13 @@ static void aMixImplSSE2(uint16_t count, int16_t gain, uint16_t in_addr, uint16_
 
             // Interleave the lo and hi bits into one 32 bit value for each vector element.
             // So now we have 4 full elements in each vector instead of 8 half elements.
+            // Both halves must read the original product words before either is replaced.
+            __m128i outProductHiVec = _mm_unpackhi_epi16(outx7fffLoVec, outx7fffHiVec);
+            __m128i inProductHiVec = _mm_unpackhi_epi16(inxGainLoVec, inxGainHiVec);
             outx7fffLoVec = _mm_unpacklo_epi16(outx7fffLoVec, outx7fffHiVec);
-            outx7fffHiVec = _mm_unpackhi_epi16(outx7fffLoVec, outx7fffHiVec);
+            outx7fffHiVec = outProductHiVec;
             inxGainLoVec = _mm_unpacklo_epi16(inxGainLoVec, inxGainHiVec);
-            inxGainHiVec = _mm_unpackhi_epi16(inxGainLoVec, inxGainHiVec);
+            inxGainHiVec = inProductHiVec;
 
             // Now we have 4 32 bit elements.  Continue the calculaton per the reference implementation.
             // We already did out + 0x7fff and in * gain.

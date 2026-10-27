@@ -176,8 +176,7 @@ std::string GetTotalCheckCount() {
 
 void DrawCheckTypeIcon(RandoCheckId randoCheckId) {
     RandoCheckType checkType = Rando::StaticData::Checks[randoCheckId].randoCheckType;
-    ImGui::Image(std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                     ->GetTextureByName(checkTypeIconList[checkType]),
+    ImGui::Image(Ship_GetFast3dGui()->GetTextureByName(checkTypeIconList[checkType]),
                  checkType == RCTYPE_SONG  ? ImVec2(12.0f * trackerScale, 18.0f * trackerScale)
                  : checkType == RCTYPE_OWL ? ImVec2(18.0f * trackerScale, 9.0f * trackerScale)
                                            : ImVec2(18.0f * trackerScale, 18.0f * trackerScale),
@@ -319,6 +318,8 @@ comboPeekRefresh:;
     std::unordered_map<RandoRegionId, Rando::Logic::RegionTimeState> regionTimeStates =
         Rando::Logic::InitializeRegionTimeStates(RR_MAX);
 
+    std::set<std::pair<RandoEvent, std::function<bool()>>*> appliedEvents;
+
     // Iteratively explore until no new regions/events discovered
     bool changed = true;
     while (changed) {
@@ -337,8 +338,9 @@ comboPeekRefresh:;
             Rando::Logic::SetCurrentRegionTime(regionTimeStates, regionId);
 
             for (auto& event : randoRegion.events) {
-                if (!RANDO_EVENTS[event.first] && event.second()) {
+                if (!appliedEvents.contains(&event) && event.second()) {
                     RANDO_EVENTS[event.first]++;
+                    appliedEvents.insert(&event);
                     changed = true;
                 }
             }
@@ -590,8 +592,8 @@ comboSkipVisibilityGates:;
 
 #ifdef COMBO_BUILD
     // ComboShip dormant peek: no play state, but the slot's save is loaded (see
-    // EnsureMmSaveLoadedForPeek / MM_LoadSaveForCombo) — draw from it. The headless load never
-    // fires OnFileLoad, so build the scene-check map here. IS_RANDO is what rejects a refused load
+    // EnsureMmSaveLoadedForPeek / MM_LoadSaveForCombo) — draw from it. MM_LoadSaveForCombo rebuilds the
+    // scene-check map; this is the fallback if it is still empty. IS_RANDO is what rejects a refused load
     // (fileNum parks at 0xFF, which is still >= 0, but saveType is cleared).
     if (comboPeek && IS_RANDO && gSaveContext.fileNum >= 0) {
         if (sceneChecks.empty()) {
@@ -667,11 +669,9 @@ comboSkipSaveGate:;
                 ImGui::PushStyleColor(ImGuiCol_Button, buttonCol);
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 1.0f, 1.0f, 0.2f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 1.0f, 1.0f, 0.1f));
-                TexturePtr textureId =
-                    std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                        ->GetTextureByName(randoCheckType == RCTYPE_UNKNOWN
-                                               ? (const char*)gShootingGalleryOctorokCrossTex
-                                               : checkTypeIconList[randoCheckType]);
+                TexturePtr textureId = Ship_GetFast3dGui()->GetTextureByName(
+                    randoCheckType == RCTYPE_UNKNOWN ? (const char*)gShootingGalleryOctorokCrossTex
+                                                     : checkTypeIconList[randoCheckType]);
                 if (randoCheckType == RCTYPE_OWL) {
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4.0f);
                 } else if (randoCheckType == RCTYPE_SONG) {
@@ -721,16 +721,16 @@ comboSkipSaveGate:;
 }
 
 void SettingsWindow::DrawElement() {
-#ifndef COMBO_BUILD
-    // ComboShip: gWindows.CheckTracker is derived from the combo master toggle — hide this button.
-    if (CVarGetInteger("gWindows.CheckTracker", 0)) {
-        UIWidgets::WindowButton("Disable Check Tracker", "gWindows.CheckTracker", BenGui::mRandoCheckTrackerWindow,
-                                { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Red });
-    } else {
-        UIWidgets::WindowButton("Enable Check Tracker", "gWindows.CheckTracker", BenGui::mRandoCheckTrackerWindow,
-                                { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Green });
+    if (!Combo_IsCombinedGame()) {
+        // ComboShip: gWindows.CheckTracker is derived from the combo master toggle — hide this button.
+        if (CVarGetInteger("gWindows.CheckTracker", 0)) {
+            UIWidgets::WindowButton("Disable Check Tracker", "gWindows.CheckTracker", BenGui::mRandoCheckTrackerWindow,
+                                    { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Red });
+        } else {
+            UIWidgets::WindowButton("Enable Check Tracker", "gWindows.CheckTracker", BenGui::mRandoCheckTrackerWindow,
+                                    { .size = UIWidgets::Sizes::Inline, .color = UIWidgets::Colors::Green });
+        }
     }
-#endif
     if (ImGui::BeginTable("Settings Table", 2)) {
         ImGui::TableSetupColumn("col1", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("col2", ImGuiTableColumnFlags_WidthStretch);

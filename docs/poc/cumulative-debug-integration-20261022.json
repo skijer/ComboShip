@@ -1,0 +1,708 @@
+{
+  "schema": 1,
+  "repository": "marsh6487/ComboShip",
+  "branch": "poc/market-forest-followup-20261022",
+  "base_commit": "4fff75754ef1578e586312fbf8c68e3adb99b4df",
+  "base_tree": "9148689c91ac9ef22ed11613ce10bc9b0260f340",
+  "core_patch": {
+    "name": "ComboShip-Debug-Fixes-20261022.patch",
+    "revision": 6,
+    "bytes": 1334471,
+    "sha256": "2a4f05a38f08056d2d8a9d866c0a83a8f295c089ca5f03c27cde3dfbe724335e"
+  },
+  "source_paths": 52,
+  "optional_asset_paths": 35,
+  "asset_encoding": {
+    "format": "lossless zlib stream split into ordered base64 text parts",
+    "new_parts": 33,
+    "max_compressed_bytes_per_part": 98304,
+    "max_text_bytes_per_part": 131072,
+    "strict_hashes": true,
+    "bounded_decompression": true,
+    "exact_roundtrip": true,
+    "old_91_parts_unchanged": true,
+    "raw_png_o2r_zip_inputs_published": false
+  },
+  "optional_runtimes": {
+    "shop-appearance": {
+      "bytes": 4345822,
+      "sha256": "0cd51fd6076e26e99e8c9e2d2968eb1fb9f3947bd457288ba4a88499961591a6",
+      "resources": 7
+    },
+    "mirror-ramp": {
+      "bytes": 12195,
+      "sha256": "dc6882cbe3b513b6598c42261e580003f05fd1c38b48bbc7438c7031a739079a",
+      "resources": 6
+    },
+    "native-oot-titles": {
+      "bytes": 1965386,
+      "sha256": "9dbd8e1c6c122553c0cd1e88cea97b18d1d8144ef708712dcd1c538c4ef6565e",
+      "resources": 46
+    }
+  },
+  "optional_resources": 59,
+  "evidence": {
+    "source_patch_exact_context_applied": true,
+    "all_base_git_blob_hashes_verified": true,
+    "new_paths_absent_at_base": true,
+    "optional_file_identities_verified": true,
+    "pinned_audio_changed_range_clang_format": "14.0.6 byte-stable",
+    "native_audio_clock_fixture": "recorded 40 assertions pass on both hosts with ASan/UBSan; RED old clock fails 26",
+    "native_sequence_reference": "8 cue complete sequence/PCM traces agree through fixed driver; batch-native terminal cadence differs",
+    "full_build": "pending GitHub CI",
+    "configured_gameplay": "not accepted",
+    "gpu_visual_acceptance": "not accepted",
+    "redacted_title_manifest_exact_rebuild": true
+  },
+  "open_items": [
+    "Ice sword white-quad mesh/texture remains open; bounded palette/SFX candidate only.",
+    "Gerudo eye segment binding addressed; broader no-assets face appearance and exact updated icon/GI not promoted.",
+    "Fixed 176-frame audio update retains about 1 percent cadence difference from native batches.",
+    "Native OoT title pack covers 61 of 67 English titles; six whole-title MM fallbacks remain.",
+    "Biggoron casing report resolved by enabling BGS Sword Unlocked; no hand/casing code change."
+  ],
+  "visual_zip_companion_identity": {
+    "zip_record": {
+      "name": "ComboShip-Debug-Fixes-20261022.patch",
+      "bytes": 1314918,
+      "sha256": "2d443ef900bb9603291a73fb51953fe0c302041e58752a1dfb341c56ab3b86fd"
+    },
+    "current": {
+      "name": "ComboShip-Debug-Fixes-20261022.patch",
+      "bytes": 1334471,
+      "sha256": "2a4f05a38f08056d2d8a9d866c0a83a8f295c089ca5f03c27cde3dfbe724335e"
+    },
+    "action": "Report mismatch; preserve existing visual ZIP byte-for-byte unless coordinator explicitly chooses a metadata-only replacement. Runtime payloads and optional source members are unchanged."
+  },
+  "payload_files": [
+    {
+      "path": "combo/BlackMarketBrowsing.h",
+      "bytes": 3275,
+      "sha": "706759594eb3564d3e88ecbcbe9c7016f2167dbd",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "combo/BlackMarketBrowsingNative.h",
+      "bytes": 10885,
+      "sha": "538a544e33f554b21de92cc2ab89c0c9badab59c",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "combo/BlackMarketReceipt.h",
+      "bytes": 1231,
+      "sha": "56e8fde09d2d291272780fc24b6186727445b90a",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "mm/2s2h/Enhancements/Gameplay/BlackMarket.cpp",
+      "bytes": 55710,
+      "sha": "00cefe68d40acfcd8cefb39eeec45d485c5912ed",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/soh/Enhancements/Gameplay/ComboBlackMarketNative.cpp",
+      "bytes": 50969,
+      "sha": "64532f79048bd7c740cdaf22da86c41c6a86444d",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/soh/Enhancements/randomizer/randomizer.cpp",
+      "bytes": 153830,
+      "sha": "15725e836db09862838160a2e2b1b2b4a4933b04",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/soh/Enhancements/item-tables/ItemTableTypes.h",
+      "bytes": 4361,
+      "sha": "d6ff875d91309baa2edf7954ea9b37d53bb1cd4b",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/black_market_receipt_test.py",
+      "bytes": 21261,
+      "sha": "0d1d28d39f7020304ea07461bd220f196fa5c240",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/soh/Enhancements/Gameplay/ComboBlackMarketItems.h",
+      "bytes": 461,
+      "sha": "a78e70e21794147166435b6ed9495bce47fc8865",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "mm/src/code/z_message.c",
+      "bytes": 297918,
+      "sha": "59a1d5bfc86c8c4dc828abd65ad6497c7463d1a8",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "mm/2s2h/BenGui/BenMenu.cpp",
+      "bytes": 221021,
+      "sha": "28aed55cd451d2984287ee7e00732a16212115ba",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "mm/2s2h/Enhancements/Graphics/OotLocationTitleCard.h",
+      "bytes": 374,
+      "sha": "62f9e67fcda36539938ec14f6d9f47eec7ed12b6",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "mm/2s2h/Enhancements/Graphics/OotLocationTitleCard.c",
+      "bytes": 12389,
+      "sha": "2320d78060210a82d30a41a552c28f7e24036ce8",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "mm/2s2h/Enhancements/Graphics/OotLocationTitleResources.cpp",
+      "bytes": 1051,
+      "sha": "a7b22e379d31609901c8d4f78975516944526a28",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/location_titles/run_tests.py",
+      "bytes": 26054,
+      "sha": "b47f9c061ea3e4369b0c076905a60f262be85c47",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "docs/poc/mm-oot-style-location-cards-20261022.md",
+      "bytes": 6254,
+      "sha": "49591ccc4170ae3903ab401029c2090f89d9966d",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/mods/transformation_masks/mm_player_form.cpp",
+      "bytes": 1004963,
+      "sha": "e7101db9532ecb03425cc4ba02579a4acc13703c",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/gerudo_mask/test_eye_binding.py",
+      "bytes": 4148,
+      "sha": "e28bad0a21b6bfd5eaa64496036c479d6845d090",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/mods/transformation_masks/mm_native_transform.inc.h",
+      "bytes": 33151,
+      "sha": "10b6579f3ab205b42c610a983b8235aa64c0d504",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/mods/sound_translator/mm_sfx_synth_glue.cpp",
+      "bytes": 10143,
+      "sha": "7193c5939817f4ad24629f0b0680a38fa2ef7544",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/mm_sfx_render/run_tests.py",
+      "bytes": 2607,
+      "sha": "f0cea34e73a06bbbf4ccb3e4a1ef1b3326471c2b",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/native_transformations/audio_lifecycle_test.py",
+      "bytes": 17713,
+      "sha": "45c122d456b1bd3ff70a6af92ab6d30ba3448c80",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/mm_sfx_render/clock_test.py",
+      "bytes": 11548,
+      "sha": "e3dc0c24041c5613640cd0301ebd5a4de90e762f",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "combo/gameplay/elemental_sword_finish_impl.h",
+      "bytes": 24816,
+      "sha": "10c1c45303d270b2ed0a5d3ae7762ec60de6bbe8",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/elemental_sword_finish_native_test.py",
+      "bytes": 11192,
+      "sha": "7187f31d560e6bc51695b3e1a39225115d8cff5f",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.001.b64",
+      "bytes": 131072,
+      "sha": "77c9cd754fa7f5d8870ff2fbc3706d2e448e226c",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.002.b64",
+      "bytes": 131072,
+      "sha": "4c2e9e9f544f1acbbbeeef38712da7d3ba109513",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.003.b64",
+      "bytes": 131072,
+      "sha": "88f6b245f04df888e124e2d5c83cdd3667dc586e",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.004.b64",
+      "bytes": 131072,
+      "sha": "86f0524126caec06c615b70cab48e64a26f2e2fc",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.005.b64",
+      "bytes": 131072,
+      "sha": "1a3db3e0d955607ecf3c92cc8ea2e75f3185a4fd",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.006.b64",
+      "bytes": 131072,
+      "sha": "cb0c46678d70c6acb4e132c7d51fdbe995f3277a",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.007.b64",
+      "bytes": 131072,
+      "sha": "f8357ed7684f08aa0d2b9eb33d4f8fd9edbe4c7e",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf.zlib.008.b64",
+      "bytes": 14500,
+      "sha": "7ca8aa034cc6976bf8ccc895eff485f3ea636658",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/shelf-encoded.json",
+      "bytes": 3165,
+      "sha": "11350f5fb5fbfdfc876e508b15e9e67b401d985c",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/market_interior.py",
+      "bytes": 23668,
+      "sha": "15fb0db780dc60fd127d01ae2c25c23241d31011",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "CMake/NativeMarketAssets.cmake",
+      "bytes": 3669,
+      "sha": "20baf1871d8ec9e4c785510f457d05ed475d0b79",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/native_market/test_shelf_texture.py",
+      "bytes": 3386,
+      "sha": "7e087dd80184ca5467d6592addf22499bfaed30c",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/native_market/test_interior.py",
+      "bytes": 12304,
+      "sha": "3cc1833f685b93581559ef8475d56aa74ae89f19",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/prop_appearance.py",
+      "bytes": 7451,
+      "sha": "6fc2c2429b554888b062e8b3dfc373d8b662bd81",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/prop-glass.json",
+      "bytes": 1183,
+      "sha": "c38c7e84701a35738c6617a1de01b8ce2fd18698",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/prop-glass.zlib.001.b64",
+      "bytes": 107684,
+      "sha": "10f1c4df19474d1dee8e52dc9839ff09727f75c0",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/prop-glass-prompt.txt",
+      "bytes": 1509,
+      "sha": "73c5d10cd263702940469072d35f5d702cbcb868",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/native_market/test_prop_appearance.py",
+      "bytes": 7541,
+      "sha": "1bdad4d4312faa487286efbab535ffb7599902bb",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/forest_presentation.py",
+      "bytes": 8358,
+      "sha": "46cb402add4c7c2a9933bab263efee246caedb4f",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/native_forest/manifest.json",
+      "bytes": 37287,
+      "sha": "dac27aa76f10d0e21472698847ceb99a3c7777d0",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/black_market/check_mirror_ramp_translucent.py",
+      "bytes": 5763,
+      "sha": "76c0e662e648b1b8d06ed944ae03fd9f11b3a463",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tests/season_storms_preservation_test.py",
+      "bytes": 13385,
+      "sha": "0f24c70504337938ef26e96bd80ddb0a2ab8d2a3",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/soh/Enhancements/Graphics/SeasonFoliage.cpp",
+      "bytes": 5315,
+      "sha": "7ad7cc088cee1f130d2b999f93adeb7d533954d0",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/soh/Enhancements/Graphics/SeasonFoliageMaterials.inc",
+      "bytes": 20210,
+      "sha": "72a1461b6b060b4d5bfc9b2b6b0d6b61666f8d11",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/tests/season_foliage_binding_test.cpp",
+      "bytes": 53570,
+      "sha": "73db7f9344ca3b2b7f1c313b2e654762bdfc2417",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/soh/Enhancements/Graphics/SeasonFoliageTint.h",
+      "bytes": 11308,
+      "sha": "c65abec6d6ac5168809ac1feeb7e766f4fc0f0dc",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "soh/tests/season_foliage_stubs/z64.h",
+      "bytes": 272,
+      "sha": "0b5f8757100c3e8df638f53405bc6bb157540cb9",
+      "mode": "100644",
+      "group": "main"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/README.md",
+      "bytes": 3530,
+      "sha": "9d316147fcd4e4952ffa98ea9b89d4ab108068ed",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/build_overlay.py",
+      "bytes": 2294,
+      "sha": "78a34e93a729d76954b114481243ce6a2d5e2f36",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-01.zlib.001.b64",
+      "bytes": 4080,
+      "sha": "b5d4fccb100b108cd0f9ee279844b4f7a739689e",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-02.zlib.001.b64",
+      "bytes": 10004,
+      "sha": "d0f796ab7ecb8795f1a7c964850edbc552a9db02",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-03.zlib.001.b64",
+      "bytes": 1800,
+      "sha": "f195cf4710b5cf6bba9529009ac9077ffab2c86b",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-04.zlib.001.b64",
+      "bytes": 131072,
+      "sha": "fec94dc208798ac3e83667f0ff0baa6c7743e818",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-04.zlib.002.b64",
+      "bytes": 131072,
+      "sha": "a403bb0b808395d58f0aef8b2dd98bed0cda3f38",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-04.zlib.003.b64",
+      "bytes": 84276,
+      "sha": "0a2b51a85fd097d038fdae92f8bbac9e77353665",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-05.zlib.001.b64",
+      "bytes": 131072,
+      "sha": "a5452025f1db58ba6bb48993b11109b917ac8e36",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-05.zlib.002.b64",
+      "bytes": 131072,
+      "sha": "9a11d4c4bd980aab22c96cf52e1c5bd3569a78c7",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-05.zlib.003.b64",
+      "bytes": 131072,
+      "sha": "4a73dc2addafde00a72d73904e6f1d3eb533f142",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-05.zlib.004.b64",
+      "bytes": 131072,
+      "sha": "2d0c23d90b63f37a43aa9f22044f1c952d235a97",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-05.zlib.005.b64",
+      "bytes": 85884,
+      "sha": "d8f0ba814fe48e01500a2d65b06961adec011264",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-06.zlib.001.b64",
+      "bytes": 131072,
+      "sha": "945df3d0d325d1fe2c9b24847bdb2282deb61284",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-06.zlib.002.b64",
+      "bytes": 131072,
+      "sha": "5925200aaf8613aacfe5c7209e6bc05b4e76da92",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-06.zlib.003.b64",
+      "bytes": 131072,
+      "sha": "14e68a2497875a0d1fb933373a8df69a69631ba8",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-06.zlib.004.b64",
+      "bytes": 131072,
+      "sha": "d7913f54d9200bef1152819a200bb7700955f2d4",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-06.zlib.005.b64",
+      "bytes": 131072,
+      "sha": "6f7dbb89050d9a15dcd4f7be3a596e21e1db70d5",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-06.zlib.006.b64",
+      "bytes": 65652,
+      "sha": "2b526fafd4fc138fc12d207e9bedfbda0db00a17",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-07.zlib.001.b64",
+      "bytes": 131072,
+      "sha": "6e56781456a27817befdf21ffb82394c75673283",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-07.zlib.002.b64",
+      "bytes": 131072,
+      "sha": "c823632dbb182117ae816c28249ed5d0fa3522be",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-07.zlib.003.b64",
+      "bytes": 131072,
+      "sha": "3232cce62bc568a36f18c10ef61649a1c225d111",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-07.zlib.004.b64",
+      "bytes": 131072,
+      "sha": "78433a0c0e04d43864e97d10cb8ed823e94d37b4",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay-07.zlib.005.b64",
+      "bytes": 17976,
+      "sha": "99807634b34246e8ef63f96637b34d754ffbb37a",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/shop-appearance-v1/overlay.json",
+      "bytes": 10750,
+      "sha": "9f74829d841798c1e06ab92a83462891fecd5218",
+      "mode": "100644",
+      "group": "shop_appearance_v1"
+    },
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/README.md",
+      "bytes": 3257,
+      "sha": "6b079746adbd43ad5d4d0e56c56d4681191b8079",
+      "mode": "100644",
+      "group": "native_titles"
+    },
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/PROVENANCE.md",
+      "bytes": 2656,
+      "sha": "773ed13e8ca88e393bb4664c77059a430a6b429c",
+      "mode": "100644",
+      "group": "native_titles"
+    },
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/build_pack.py",
+      "bytes": 5885,
+      "sha": "66cb1cd9f624f5ba2bea775e0275240432c5ea67",
+      "mode": "100644",
+      "group": "native_titles"
+    },
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/native-title-pack.json",
+      "bytes": 30485,
+      "sha": "94a23eea9b7abe02c7062a4791de8f12442db162",
+      "mode": "100644",
+      "group": "native_titles"
+    },
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/native-title-pack.zlib.001.b64",
+      "bytes": 37228,
+      "sha": "171326e0a69d532db311472c67bea51ca68cd1f6",
+      "mode": "100644",
+      "group": "native_titles"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/mirror-ramp-translucent-v3/README.md",
+      "bytes": 3191,
+      "sha": "8b0cedb5f2abf6e32841e4b7672b4d22beab0d14",
+      "mode": "100644",
+      "group": "translucent_ramp"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/mirror-ramp-translucent-v3/build_overlay.py",
+      "bytes": 4052,
+      "sha": "82783f19c4adee255014021a8ec3d8692b16255d",
+      "mode": "100644",
+      "group": "translucent_ramp"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/mirror-ramp-translucent-v3/overlay.json",
+      "bytes": 2252,
+      "sha": "fb823da283e058b1b6b70c4bb4031da3bd163116",
+      "mode": "100644",
+      "group": "translucent_ramp"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/mirror-ramp-translucent-v3/ramp-xlu.zlib.001.b64",
+      "bytes": 4304,
+      "sha": "e22d58e462f733e5ea086c4355488fb582042f04",
+      "mode": "100644",
+      "group": "translucent_ramp"
+    },
+    {
+      "path": "tools/black_market/assets/interior/candidates/mirror-ramp-translucent-v3/test_overlay.py",
+      "bytes": 1701,
+      "sha": "d1d01e9baf70cf862cb623c0ddec2342cd78cb97",
+      "mode": "100644",
+      "group": "translucent_ramp"
+    }
+  ],
+  "publication_metadata_changes": [
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/PROVENANCE.md",
+      "old_sha": "9d8ec623c86b6d4350a8e7bcef509fea58b59135",
+      "new_sha": "773ed13e8ca88e393bb4664c77059a430a6b429c",
+      "reason": "Omit private input archive fingerprints and upload/storage details; retain native-source attribution and exact derived-resource rebuild identities."
+    },
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/native-title-pack.json",
+      "old_sha": "844b13eb726e62fed6770901cdffc3ca4664c2bf",
+      "new_sha": "94a23eea9b7abe02c7062a4791de8f12442db162",
+      "reason": "Omit private input archive fingerprints and upload/storage details; retain native-source attribution and exact derived-resource rebuild identities."
+    },
+    {
+      "path": "tools/location_titles/assets/native-oot-v2/README.md",
+      "old_sha": "7334facdb6d676bc66c6d42b0d93321569a38bdf",
+      "new_sha": "6b079746adbd43ad5d4d0e56c56d4681191b8079",
+      "reason": "Omit private input archive fingerprints and upload/storage details; retain native-source attribution and exact derived-resource rebuild identities."
+    }
+  ]
+}

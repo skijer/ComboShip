@@ -80,7 +80,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 medium;
-    /* 0x01 */ u8 seqOrFontId;
+    s32 seqOrFontId;
     /* 0x02 */ u16 instId;
     /* 0x04 */ s32 unkMediumParam;
     /* 0x08 */ uintptr_t curDevAddr;
@@ -126,7 +126,7 @@ s32 AudioLoad_SyncLoadInstrument(s32 fontId, s32 instId, s32 drumId);
 void AudioLoad_AsyncLoadSeq(s32 seqId, s32 arg1, s32 retData, OSMesgQueue* retQueue);
 void AudioLoad_AsyncLoadSampleBank(s32 sampleBankId, s32 arg1, s32 retData, OSMesgQueue* retQueue);
 void AudioLoad_AsyncLoadFont(s32 fontId, s32 arg1, s32 retData, OSMesgQueue* retQueue);
-u8* AudioLoad_GetFontsForSequence(s32 seqId, u32* outNumFonts, u8* buff);
+s32* AudioLoad_GetFontsForSequence(s32 seqId, u32* outNumFonts);
 void AudioLoad_DiscardSeqFonts(s32 seqId);
 void func_8018FA60(u32 tableType, u32 id, s32 type, s32 data);
 s32 AudioLoad_SyncInitSeqPlayer(s32 playerIndex, s32 seqId, s32 arg2);

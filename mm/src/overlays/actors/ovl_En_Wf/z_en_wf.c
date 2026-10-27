@@ -5,6 +5,7 @@
  */
 
 #include "z_en_wf.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Bom_Chu/z_en_bom_chu.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 #include "overlays/actors/ovl_Obj_Ice_Poly/z_obj_ice_poly.h"
@@ -1421,7 +1422,7 @@ void func_8099386C(EnWf* this, PlayState* play) {
         this->collider1.base.atFlags &= ~AT_ON;
 
         if (((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-             !(collider->elem.acHitElem->atDmgInfo.dmgFlags &
+             !(DinFireSword_OriginalDamageFlags(play, collider->elem.acHitElem) &
                (0x80000 | 0x40000 | 0x10000 | 0x8000 | 0x2000 | 0x1000 | 0x80 | 0x20 | 0x10 | 0x2 | 0x1))) &&
             (this->actor.colChkInfo.damageEffect != 0xF)) {
             if (!Actor_ApplyDamage(&this->actor)) {

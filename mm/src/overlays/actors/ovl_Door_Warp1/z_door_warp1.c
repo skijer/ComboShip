@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 /*
  * File: z_door_warp1.c
  * Overlay: ovl_Door_Warp1
@@ -181,6 +182,7 @@ void DoorWarp1_Destroy(Actor* thisx, PlayState* play) {
     LightContext_RemoveLight(play, &play->lightCtx, this->unk_1DC);
     LightContext_RemoveLight(play, &play->lightCtx, this->unk_1F0);
 
+    Environment_ClearNativeLightningAmbient();
     for (i = 0; i < ARRAY_COUNT(play->envCtx.adjLightSettings.light1Color); i++) {
         play->envCtx.adjLightSettings.ambientColor[i] = play->envCtx.adjLightSettings.fogColor[i] =
             play->envCtx.adjLightSettings.light1Color[i] = 0;
@@ -643,6 +645,30 @@ void func_808BA10C(DoorWarp1* this, PlayState* play) {
     u8 phi_a0;
     s32 phi_v0_3;
 
+    // First reward use preserves the queued Giant/Oath bookkeeping. Repeats have no
+    // Giant transition and complete directly, independent of the target's world-clear flag.
+    if (this->unk_202 == 0 && Combo_MM_CrossBossWarp(play->sceneId)) {
+        switch (play->sceneId) {
+            case SCENE_MITURIN_BS:
+                play->nextEntrance = ENTRANCE(WOODFALL_TEMPLE, 1);
+                break;
+            case SCENE_HAKUGIN_BS:
+                play->nextEntrance = ENTRANCE(MOUNTAIN_VILLAGE_SPRING, 7);
+                break;
+            case SCENE_SEA_BS:
+                play->nextEntrance = ENTRANCE(ZORA_CAPE, 9);
+                break;
+            case SCENE_INISIE_BS:
+                play->nextEntrance = ENTRANCE(IKANA_CANYON, 15);
+                break;
+        }
+        gSaveContext.nextCutsceneIndex = 0xFFEF;
+        play->transitionTrigger = TRANS_TRIGGER_START;
+        play->transitionType = TRANS_TYPE_FADE_WHITE;
+        gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+        return;
+    }
+
     if ((play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) ||
         (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS)) {
         gDungeonBossWarpSceneId = play->sceneId;
@@ -872,6 +898,7 @@ void func_808BA550(DoorWarp1* this, PlayState* play) {
     if (1) {}
     temp_f0 = 1.0f - ((f32)(D_808BC000 - this->unk_1D0) / ((D_808BC000 - tempS) + 100));
     if (temp_f0 > 0.0f) {
+        Environment_ClearNativeLightningAmbient();
         for (i = 0; i < ARRAY_COUNT(play->envCtx.adjLightSettings.light1Color); i++) {
             play->envCtx.adjLightSettings.ambientColor[i] = play->envCtx.adjLightSettings.fogColor[i] =
                 play->envCtx.adjLightSettings.light1Color[i] = -255.0f * temp_f0;

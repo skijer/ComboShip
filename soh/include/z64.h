@@ -93,15 +93,16 @@ typedef struct {
     /* 0x14 */ s16  data[REG_GROUPS * REG_PER_GROUP]; // 0xAE0 entries
 } GameInfo; // size = 0x15D4
 
+// Changed the main buffers to be 1MiB to make them basically impossible to overflow
 typedef struct {
     /* 0x00000 */ u16 headMagic; // GFXPOOL_HEAD_MAGIC
-    /* 0x00008 */ Gfx polyOpaBuffer[0x2FC0];
-    /* 0x0BF08 */ Gfx polyXluBuffer[0x1000];
-    /* 0x0FF08 */ Gfx overlayBuffer[0x800];
-    /* 0x11F08 */ Gfx workBuffer[0x100];
-    /* 0x11308 */ Gfx unusedBuffer[0x40];
+    /* 0x00008 */ Gfx polyOpaBuffer[1 * 1024 * 1024]; // original size was 0x17E0
+    /* 0x0BF08 */ Gfx polyXluBuffer[1 * 1024 * 1024]; // original size was 0x800
+    /* 0x0FF08 */ Gfx overlayBuffer[1 * 1024 * 1024]; // original size was 0x400
+    /* 0x11F08 */ Gfx workBuffer[0x80];
+    /* 0x11308 */ Gfx unusedBuffer[0x20];
     /* 0x12408 */ u16 tailMagic; // GFXPOOL_TAIL_MAGIC
-} GfxPool; // size = 0x24820
+} GfxPool; // size = 0x12410
 
 typedef struct {
     /* 0x0000 */ u32    size;
@@ -351,7 +352,8 @@ typedef struct {
     /* 0x0001 */ char   unk_01[0x01];
     /* 0x0002 */ u8     unk_02;
     /* 0x0003 */ u8     lensActive;
-    /* 0x0004 */ char   unk_04[0x04];
+    /*        */ u8     lensFromLantern; // Skijer's NEI
+    /* 0x0004 */ char   unk_04[0x03];
     /* 0x0008 */ u8     total; // total number of actors loaded
     /* 0x000C */ ActorListEntry actorLists[ACTORCAT_MAX];
     /* 0x006C */ TargetContext targetCtx;
@@ -454,9 +456,27 @@ typedef enum OcarinaSongId {
     /* 11 */ OCARINA_SONG_STORMS,
     /* 12 */ OCARINA_SONG_SCARECROW_SPAWN,
     /* 13 */ OCARINA_SONG_MEMORY_GAME,
-    /* 14 */ OCARINA_SONG_MAX,
-    /* 14 */ OCARINA_SONG_SCARECROW_LONG = OCARINA_SONG_MAX // anything larger than 13 is considered the long scarecrow's song
+    // Skijer's NEI: MM-unique songs + 3 custom brought to OoT's quest page (mirror of the OoT songs
+    // ported into MM). OoT's song-flag bitmask has bits 14-29 free (mode flags at 30/31), so these
+    // slots recognize/play natively — no side-recognition needed (unlike the 2ship side).
+    /* 14 */ OCARINA_SONG_MM_SONATA,
+    /* 15 */ OCARINA_SONG_MM_GORON_LULLABY,
+    /* 16 */ OCARINA_SONG_MM_NEW_WAVE,
+    /* 17 */ OCARINA_SONG_MM_ELEGY,
+    /* 18 */ OCARINA_SONG_MM_OATH,
+    /* 19 */ OCARINA_SONG_MM_SOARING,
+    /* 20 */ OCARINA_SONG_MM_HEALING,
+    /* 21 */ OCARINA_SONG_NEI_FUGUE_OF_HOME,
+    /* 22 */ OCARINA_SONG_NEI_COMMAND_MELODY,
+    /* 23 */ OCARINA_SONG_NEI_BALLAD_OF_HERO,
+    /* 24 */ OCARINA_SONG_MAX,
+    /* 24 */ OCARINA_SONG_SCARECROW_LONG = OCARINA_SONG_MAX // anything larger than MAX is the long scarecrow's song
 } OcarinaSongId;
+
+#define OCARINA_SONG_MM_FIRST OCARINA_SONG_MM_SONATA
+#define OCARINA_SONG_MM_LAST OCARINA_SONG_MM_HEALING
+#define OCARINA_SONG_NEI_CUSTOM_FIRST OCARINA_SONG_NEI_FUGUE_OF_HOME
+#define OCARINA_SONG_NEI_CUSTOM_LAST OCARINA_SONG_NEI_BALLAD_OF_HERO
 
 typedef enum {
     /* 0x00 */ OCARINA_ACTION_UNK_0, // acts like free play but never set
@@ -719,7 +739,8 @@ typedef enum {
     /* 0x07 */ DO_ACTION_DIVE,
     /* 0x08 */ DO_ACTION_FASTER,
     /* 0x09 */ DO_ACTION_THROW,
-    /* 0x0A */ DO_ACTION_NONE, // in do_action_static, the texture at this position is NAVI, however this value is in practice the "No Action" value
+    /* 0x0A */ DO_ACTION_NONE, // in do_action_static, the texture at this position is NAVI, however this value is in
+                               // practice the "No Action" value
     /* 0x0B */ DO_ACTION_CLIMB,
     /* 0x0C */ DO_ACTION_DROP,
     /* 0x0D */ DO_ACTION_DOWN,
@@ -738,7 +759,9 @@ typedef enum {
     /* 0x1A */ DO_ACTION_6,
     /* 0x1B */ DO_ACTION_7,
     /* 0x1C */ DO_ACTION_8,
-    /* 0x1D */ DO_ACTION_MAX
+    /* 0x1D */ DO_ACTION_MAX,
+    // Keep the native 0x1D/0x1E no-action sentinels; custom labels start after them.
+    /* 0x1F */ DO_ACTION_EXPLODE = 0x1F
 } DoAction;
 
 typedef struct {
@@ -1607,6 +1630,10 @@ typedef struct FileChooseContext {
     uint8_t randomizerIndex;
     int16_t randomizerUIAlpha;
     uint16_t randomizerArrowOffset;
+    uint8_t speedrunIndex;
+    uint8_t speedrunOffset;
+    int16_t speedrunUIAlpha;
+    uint16_t speedrunArrowOffset;
 } FileChooseContext; // size = 0x1CAE0
 
 // Macros for `EntranceInfo.field`

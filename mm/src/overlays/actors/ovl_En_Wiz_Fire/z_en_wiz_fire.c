@@ -128,6 +128,7 @@ void EnWizFire_Destroy(Actor* thisx, PlayState* play) {
         play->envCtx.adjLightSettings.light1Color[2] = play->envCtx.adjLightSettings.fogColor[2];
         play->envCtx.adjLightSettings.light1Color[1] = play->envCtx.adjLightSettings.fogColor[2];
         play->envCtx.adjLightSettings.light1Color[0] = play->envCtx.adjLightSettings.fogColor[2];
+        Environment_ClearNativeLightningAmbient();
         play->envCtx.adjLightSettings.ambientColor[2] = play->envCtx.adjLightSettings.fogColor[2];
         play->envCtx.adjLightSettings.ambientColor[1] = play->envCtx.adjLightSettings.fogColor[2];
         play->envCtx.adjLightSettings.ambientColor[0] = play->envCtx.adjLightSettings.fogColor[2];
@@ -521,6 +522,7 @@ void EnWizFire_Update(Actor* thisx, PlayState* play2) {
             play->envCtx.adjLightSettings.fogNear =
                 TRUNCF_BINANG((fogNear - play->envCtx.lightSettings.fogNear) * this->blendScaleFrac);
 
+            Environment_ClearNativeLightningAmbient();
             play->envCtx.adjLightSettings.ambientColor[0] =
                 TRUNCF_BINANG(((f32)sLightSettingsColors[index].r - play->envCtx.lightSettings.ambientColor[0]) *
                               this->blendScaleFrac);

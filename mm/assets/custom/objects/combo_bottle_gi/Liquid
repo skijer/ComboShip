@@ -1,0 +1,10 @@
+<DisplayList Version="0">
+  <CallDisplayList Path="objects/combo_bottle_gi/LiquidMaterial" />
+  <CallDisplayList Path="objects/combo_bottle_gi/LiquidTriangles" />
+  <CallDisplayList Path="objects/combo_bottle_gi/LiquidGlossMaterial" />
+  <CallDisplayList Path="objects/combo_bottle_gi/LiquidTriangles" />
+  <CallDisplayList Path="objects/combo_bottle_gi/LiquidRimMaterial" />
+  <CallDisplayList Path="objects/combo_bottle_gi/LiquidRimTriangles" />
+  <CallDisplayList Path="objects/combo_bottle_gi/CleanupXlu" />
+  <EndDisplayList />
+</DisplayList>

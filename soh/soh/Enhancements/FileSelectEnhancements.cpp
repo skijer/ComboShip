@@ -1,8 +1,13 @@
-﻿#include "FileSelectEnhancements.h"
+#include "../../../combo/ComboGameMode.h"
+#include "FileSelectEnhancements.h"
+
+#include <ship/Context.h>
 
 #include "soh/OTRGlobals.h"
+#include "soh/ResourceManagerHelpers.h"
 #include "soh/SohGui/SohModals.h"
 #include "soh/SohGui/SohGui.hpp"
+#include "soh/SohGui/UIWidgets.hpp"
 
 #include <array>
 #include <string>
@@ -75,8 +80,69 @@ std::array<std::string, LANGUAGE_MAX> RandomizerSettingsMenuText[RSM_MAX] = {
 #endif
 };
 
+// Quests are hidden when their O2R is missing or their File Select "Hide" option is on
+bool SohFileSelect_IsQuestHidden(u8 quest) {
+#ifdef COMBO_BUILD
+    if (Combo_IsCombinedGame()) {
+        return quest != QUEST_RANDOMIZER;
+    }
+    // The legacy paired quest lies between Boss Rush and Speedrun in the native enum.
+    if (quest == QUEST_OOTXMM) {
+        return true;
+    }
+#endif
+    switch (quest) {
+        case QUEST_NORMAL:
+            return !ResourceMgr_GameHasOriginal() || CVarGetInteger(CVAR_ENHANCEMENT("FileSelect.HideNormalQuest"), 0);
+        case QUEST_MASTER:
+            return !ResourceMgr_GameHasMasterQuest() ||
+                   CVarGetInteger(CVAR_ENHANCEMENT("FileSelect.HideMasterQuest"), 0);
+        case QUEST_RANDOMIZER:
+            return CVarGetInteger(CVAR_ENHANCEMENT("FileSelect.HideRandomizerQuest"), 0);
+        case QUEST_BOSSRUSH:
+            return CVarGetInteger(CVAR_ENHANCEMENT("FileSelect.HideBossRushQuest"), 0);
+        case QUEST_SPEEDRUN:
+            return !ResourceMgr_GameHasOriginal() ||
+                   CVarGetInteger(CVAR_ENHANCEMENT("FileSelect.HideSpeedrunQuest"), 0);
+        case QUEST_SPEEDRUN_MASTER:
+            return !ResourceMgr_GameHasMasterQuest() ||
+                   CVarGetInteger(CVAR_ENHANCEMENT("FileSelect.HideSpeedrunMasterQuest"), 0);
+        default:
+            return false;
+    }
+}
+
+u8 SohFileSelect_CountVisibleQuests() {
+    u8 count = 0;
+    for (u8 quest = QUEST_NORMAL; quest <= QUEST_SPEEDRUN_MASTER; ++quest) {
+        if (!SohFileSelect_IsQuestHidden(quest)) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
 const char* SohFileSelect_GetSettingText(uint8_t optionIndex, uint8_t language) {
     return RandomizerSettingsMenuText[optionIndex][language].c_str();
+}
+
+// Combo-worded variant of the sub-screen options (QUEST_OOTXMM), indexed by CBO_*. English text is
+// used for every language (the combo is niche); translate later if wanted.
+std::array<std::string, LANGUAGE_MAX> ComboSettingsMenuText[CBO_MAX] = {
+    { "Start Combo (create OoT + MM save)", "Start Combo (create OoT + MM save)",
+      "Start Combo (create OoT + MM save)" },
+    { "Generate New Combo Seed", "Generate New Combo Seed", "Generate New Combo Seed" },
+    { "Load Combo Seed (.fleet)", "Load Combo Seed (.fleet)", "Load Combo Seed (.fleet)" },
+    { "Open Combo Settings", "Open Combo Settings", "Open Combo Settings" },
+    { "Generating combo...", "Generating combo...", "Generating combo..." },
+    { "No combo seed yet.\nGenerate one, or Load Combo Seed (.fleet).",
+      "No combo seed yet.\nGenerate one, or Load Combo Seed (.fleet).",
+      "No combo seed yet.\nGenerate one, or Load Combo Seed (.fleet)." },
+};
+
+const char* SohFileSelect_GetComboSettingText(uint8_t optionIndex, uint8_t language) {
+    return ComboSettingsMenuText[optionIndex][language].c_str();
 }
 
 void SohFileSelect_ShowPresetMenu() {

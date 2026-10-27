@@ -11,6 +11,7 @@
  */
 
 #include "z_en_okuta.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 
 #include "objects/object_okuta/object_okuta.h"
@@ -854,7 +855,7 @@ void EnOkuta_UpdateDamage(EnOkuta* this, PlayState* play) {
     this->collider.base.acFlags &= ~AC_HIT;
 
     if (this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX ||
-        !(this->collider.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+        !(DinFireSword_OriginalDamageFlags(play, this->collider.elem.acHitElem) & 0xDB0B3)) {
         Actor_SetDropFlag(&this->actor, &this->collider.elem);
         EnOkuta_Thaw(this, play);
 

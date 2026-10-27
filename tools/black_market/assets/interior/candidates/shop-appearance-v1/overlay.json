@@ -1,0 +1,229 @@
+{
+  "archive_bytes": 4345822,
+  "archive_sha256": "0cd51fd6076e26e99e8c9e2d2968eb1fb9f3947bd457288ba4a88499961591a6",
+  "parent_commit": "4fff75754ef1578e586312fbf8c68e3adb99b4df",
+  "resource_provenance": {
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_14": {
+      "owner": "task14 six-path props overlay",
+      "resource_sha256": "73eca3ac0bdd1f80eab18d159f27f5cf87c354585b736f64cd7aa3bc2909879b",
+      "source_archive_sha256": "9c083f1e10aab7b4bcc19e0348f583875eed6f8dcac8443fe63d5d8a1fd47de4"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_2": {
+      "owner": "task14 six-path props overlay",
+      "resource_sha256": "acfb157a4d42b6c1452908f0ac48cc67444677482cd7e9c64149f734ecce4c63",
+      "source_archive_sha256": "9c083f1e10aab7b4bcc19e0348f583875eed6f8dcac8443fe63d5d8a1fd47de4"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_24": {
+      "owner": "task14 six-path props overlay",
+      "resource_sha256": "e5881804a457b728a79548569442e51202c88070693ee74088a4f40e8495b7d6",
+      "source_archive_sha256": "9c083f1e10aab7b4bcc19e0348f583875eed6f8dcac8443fe63d5d8a1fd47de4"
+    },
+    "custom/skiejer_market/texture/baseline_ceramic": {
+      "owner": "task14 six-path props overlay",
+      "resource_sha256": "ee027e7c1f94aaf5ef5aa8e4dd31237a37636aca561da7957be1ad9df978736e",
+      "source_archive_sha256": "9c083f1e10aab7b4bcc19e0348f583875eed6f8dcac8443fe63d5d8a1fd47de4"
+    },
+    "custom/skiejer_market/texture/baseline_counter_atlas": {
+      "owner": "task14 six-path props overlay",
+      "resource_sha256": "25aed50f4a1bd39e4d64e98792c2586118b692a0e651e5ec4bf6ebe25eeb8ef6",
+      "source_archive_sha256": "9c083f1e10aab7b4bcc19e0348f583875eed6f8dcac8443fe63d5d8a1fd47de4"
+    },
+    "custom/skiejer_market/texture/baseline_fittings_atlas": {
+      "owner": "task14 six-path props overlay",
+      "resource_sha256": "41bfd1bd98d57d59821cefb989eef96c74ed232601cbf1e531a4951713cda49c",
+      "source_archive_sha256": "9c083f1e10aab7b4bcc19e0348f583875eed6f8dcac8443fe63d5d8a1fd47de4"
+    },
+    "custom/skiejer_market/texture/baseline_timber": {
+      "owner": "task6 exact timber candidate",
+      "resource_sha256": "b816b1d85087ddede0fad252b37fb3fcaeb00d9aca4eb408d0b83ce95e3d11e3",
+      "source_archive_sha256": "78654e4a67f9d3487a47d49757be1941537556d6dcb74359bdff6a497288ca04"
+    }
+  },
+  "resources": {
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_14": {
+      "bytes": 36409,
+      "packed_sha256": "3ba9b8c46a76335a98754d87333f91987012ed5ecb60cfa3d1347343fcd78488",
+      "parts": [
+        {
+          "base64_sha256": "8e53650865a146763e78e6c4d127d29a02db4ff6f4627d7381915f07a50b955f",
+          "bytes": 3060,
+          "name": "overlay-01.zlib.001.b64",
+          "sha256": "3ba9b8c46a76335a98754d87333f91987012ed5ecb60cfa3d1347343fcd78488"
+        }
+      ],
+      "sha256": "73eca3ac0bdd1f80eab18d159f27f5cf87c354585b736f64cd7aa3bc2909879b"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_2": {
+      "bytes": 97673,
+      "packed_sha256": "336c3537ddd386d77810e4d5577ba3ff58c0d0ea52a3b42284fe68f5ae5aafc1",
+      "parts": [
+        {
+          "base64_sha256": "74efc1c38db9467ce429f30f367f51cea41c56a439cb13e63f4543306fcc5977",
+          "bytes": 7501,
+          "name": "overlay-02.zlib.001.b64",
+          "sha256": "336c3537ddd386d77810e4d5577ba3ff58c0d0ea52a3b42284fe68f5ae5aafc1"
+        }
+      ],
+      "sha256": "acfb157a4d42b6c1452908f0ac48cc67444677482cd7e9c64149f734ecce4c63"
+    },
+    "custom/skiejer_market/geometry/mahouya_room_0DL_006548_vtx_24": {
+      "bytes": 15758,
+      "packed_sha256": "602e01706924196cd76f4cc9bb78c58e2154bc730ac54b69d58d43a3feb8cf5f",
+      "parts": [
+        {
+          "base64_sha256": "5b6b40f1d9c8423b0c09be181d14900a86b02d35044982ca2614e1b8566d3c02",
+          "bytes": 1349,
+          "name": "overlay-03.zlib.001.b64",
+          "sha256": "602e01706924196cd76f4cc9bb78c58e2154bc730ac54b69d58d43a3feb8cf5f"
+        }
+      ],
+      "sha256": "e5881804a457b728a79548569442e51202c88070693ee74088a4f40e8495b7d6"
+    },
+    "custom/skiejer_market/texture/baseline_ceramic": {
+      "bytes": 1048668,
+      "packed_sha256": "d4f61473af6735c83475234cbc45c4350c54ecdac08fb630573b6111c761f20d",
+      "parts": [
+        {
+          "base64_sha256": "283669adc4ff0a981df9d329c4a8c448f3cdefc4d2e43ac1b516a1032256b261",
+          "bytes": 98304,
+          "name": "overlay-04.zlib.001.b64",
+          "sha256": "1f9f47158abae0f65dee237132350a13931b03a1ab7a7c839112f7ef3eb0887a"
+        },
+        {
+          "base64_sha256": "bd9943fb54e1b17896347fafb2f5dcfcd6b195e4b8b3528a61c1af79f6f5dfc1",
+          "bytes": 98304,
+          "name": "overlay-04.zlib.002.b64",
+          "sha256": "4e0785fda394c93a183231b1805d6cb9bfe3b953dc7d90c5fba2f747fd9f1d2d"
+        },
+        {
+          "base64_sha256": "3d92ca1b8c23c8ea7cba3c585232c730240751d3d40f42cf5ed2909e6e708394",
+          "bytes": 63206,
+          "name": "overlay-04.zlib.003.b64",
+          "sha256": "8ff555c42e35f464e27f2c6b675a17b6da77e8846bc342bce491cd7f597b7ba5"
+        }
+      ],
+      "sha256": "ee027e7c1f94aaf5ef5aa8e4dd31237a37636aca561da7957be1ad9df978736e"
+    },
+    "custom/skiejer_market/texture/baseline_counter_atlas": {
+      "bytes": 1048668,
+      "packed_sha256": "deb72b2d26106095f59ddb697985556dec7580d2d601054a2a2d9d69ed37f54d",
+      "parts": [
+        {
+          "base64_sha256": "76608b4ea873c45e8b57fdad40459acae0308c0387e71d1468740f017129fd0b",
+          "bytes": 98304,
+          "name": "overlay-05.zlib.001.b64",
+          "sha256": "f0d9e860ae7b3aef8acdc6ba2d22de0c03b8a0ff8c4eba73a9ce34093669f7fc"
+        },
+        {
+          "base64_sha256": "9f91f97b519ad9f1df80add03776122e88da6d725b4088d6b68038f73b71ce89",
+          "bytes": 98304,
+          "name": "overlay-05.zlib.002.b64",
+          "sha256": "286b239e3d98e67547213afbcac7e87df0c9dc66b58429f4394b3335a75b5bdb"
+        },
+        {
+          "base64_sha256": "4ec4292314fdeb2dcb1dfe7cdfb62becd296e6cc034c826e295d9de20bdc790f",
+          "bytes": 98304,
+          "name": "overlay-05.zlib.003.b64",
+          "sha256": "24a890eb4a5bac8e52e118dd54a95b107de45c769c2d88678697081a38a871e4"
+        },
+        {
+          "base64_sha256": "7ac78bd41f39ef2870d5f04f41ec586c42adcb0c3dcc3ab6405c041a3c07d328",
+          "bytes": 98304,
+          "name": "overlay-05.zlib.004.b64",
+          "sha256": "80b6ea254dfddbc49c19cf2922e42b93f97a5591d47355e02eb4586370c05235"
+        },
+        {
+          "base64_sha256": "c46545e28af1f0f03b2a22d20a2c0027270d12dcb82ecf949b06a77625788c33",
+          "bytes": 64411,
+          "name": "overlay-05.zlib.005.b64",
+          "sha256": "cbf8418c39b3db396b2c081d59b37ab2643968b3c8e09bfabcbefdb118bb7ba5"
+        }
+      ],
+      "sha256": "25aed50f4a1bd39e4d64e98792c2586118b692a0e651e5ec4bf6ebe25eeb8ef6"
+    },
+    "custom/skiejer_market/texture/baseline_fittings_atlas": {
+      "bytes": 1048668,
+      "packed_sha256": "55f5085ce04fce88a99ece90eb1a6029296a84655763fb28f1e26fc7a9091d9b",
+      "parts": [
+        {
+          "base64_sha256": "c46b1e509e16917cf5c09952a2b365770f92343016f6a02d6a15e04a8186a29a",
+          "bytes": 98304,
+          "name": "overlay-06.zlib.001.b64",
+          "sha256": "9168e46bcb6b751fd53dc1f4fd3981852fab2f93a963d13ad6fc40c1a4ed6583"
+        },
+        {
+          "base64_sha256": "b02536092c4bde8355e17bf428f1427e47261703487b7e310ea0d86172587f7f",
+          "bytes": 98304,
+          "name": "overlay-06.zlib.002.b64",
+          "sha256": "53d7a0dd1d7a0ff7ee6154875a96b0fb9a60d67b92dae08aceb1c38e0c3a6748"
+        },
+        {
+          "base64_sha256": "85b5c5b5b15b7899b76e57d2b328db5a49bead9343999548946eb8ee536d1d70",
+          "bytes": 98304,
+          "name": "overlay-06.zlib.003.b64",
+          "sha256": "ed46cd34bcbf119979c5d5ec78b91376166853bc368bde3154297fc91e1d6af5"
+        },
+        {
+          "base64_sha256": "f61de3a5c9481153866e8531e7433d787cef27534112e4fcbd1a55294af41ea9",
+          "bytes": 98304,
+          "name": "overlay-06.zlib.004.b64",
+          "sha256": "f11b3aaf3a42fae09b6328bf3f93b7576a7559a67392b2e2d9d03ed89efd0a6c"
+        },
+        {
+          "base64_sha256": "696c9f72c324c8e630572810d9aca332d07a258f61eadc2d4f782cd0394753c0",
+          "bytes": 98304,
+          "name": "overlay-06.zlib.005.b64",
+          "sha256": "0763409b28523afe675fe86c0a086b951570962c297a238fed76fe6102e95f80"
+        },
+        {
+          "base64_sha256": "fee37667dabc9adfa788ca89f3902807a6b77d3b2f23f2510b466038e0556a5a",
+          "bytes": 49237,
+          "name": "overlay-06.zlib.006.b64",
+          "sha256": "2720cef043b428fda41a289ae044f6d0dce00c23d563c196b8e1f9f05fd80268"
+        }
+      ],
+      "sha256": "41bfd1bd98d57d59821cefb989eef96c74ed232601cbf1e531a4951713cda49c"
+    },
+    "custom/skiejer_market/texture/baseline_timber": {
+      "bytes": 1048668,
+      "packed_sha256": "9d83bfc1fa3fdb6336c7a282407925ebb4c83fb69e4b69344fed44d2ee5606e2",
+      "parts": [
+        {
+          "base64_sha256": "851753c33275f10a8161439c0604644d337fd3e8d601cc31c750fd808c255721",
+          "bytes": 98304,
+          "name": "overlay-07.zlib.001.b64",
+          "sha256": "e574e3d47d2417514dcf3e295d6aa377e56a9a243acada3674b315353bd48ddc"
+        },
+        {
+          "base64_sha256": "992392869716471281556926550ce2d1e6d1bf4002497eec41f1545805d27abe",
+          "bytes": 98304,
+          "name": "overlay-07.zlib.002.b64",
+          "sha256": "cbf76924f591446fb0e3afdd7e0683b2e52788e64ebee6d38d95f06115ced10e"
+        },
+        {
+          "base64_sha256": "fb6eec0c4e736e735c6108a6a69d93c24931b39fdbe38d333bfed10534ff6958",
+          "bytes": 98304,
+          "name": "overlay-07.zlib.003.b64",
+          "sha256": "71994a0357ad8532ffca9a058b8f03747cd1bd24cdd797c2007331a508976d7b"
+        },
+        {
+          "base64_sha256": "fad84091e8adb8f8ad13af648ed08bed43f1d72cec7d9ce018f0de8d9876eead",
+          "bytes": 98304,
+          "name": "overlay-07.zlib.004.b64",
+          "sha256": "595c6e609498e4818efdecc37e105b2886bf7ed6a265fdbeb4aeef91cdc0af82"
+        },
+        {
+          "base64_sha256": "58d21dd92b796f0eb99636ceda33def468510f3ed724898fd6a5508a453118b2",
+          "bytes": 13480,
+          "name": "overlay-07.zlib.005.b64",
+          "sha256": "f5da36e09d1e43cf9d1b89e77abf36e53d4e385839c09dfac5cfb0e5022f845b"
+        }
+      ],
+      "sha256": "b816b1d85087ddede0fad252b37fb3fcaeb00d9aca4eb408d0b83ce95e3d11e3"
+    }
+  },
+  "runtime_status": "single recommended shop appearance candidate; no installed priority/GPU proof",
+  "source_parent": "exactbaseline + task11 arcane restoration",
+  "version": 1,
+  "wood_underlay": "task6 candidate; preserved byte-for-byte outside new vessel pixels"
+}

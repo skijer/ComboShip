@@ -1,0 +1,131 @@
+{
+  "archive_sha256": "ea80d61b223ee38075fe5383b652998f3b08164e903134922f63f205d995717b",
+  "profiles": {
+    "native_oot_master": {
+      "root": "objects/object_link_boy/gLinkAdultLeftHandHoldingMasterSwordNearDL",
+      "blade_x_clip": [
+        852,
+        true
+      ],
+      "source_sha256": {
+        "objects/object_link_boy/gLinkAdultLeftHandHoldingMasterSwordNearDL": "e370a0eb81184275d1d08102b27430ca4ecf01faa8c826e65afa843ec99a7d45",
+        "objects/object_link_boy/object_link_boyVtx_010EE8": "eb0e8fda39539e5859c8f9899a7f4014f00126c07dc98b3a0d1a4f8936ca344f"
+      },
+      "blade_bounds": [
+        [
+          852,
+          3387
+        ],
+        [
+          52,
+          605
+        ],
+        [
+          -153,
+          0
+        ]
+      ]
+    },
+    "native_oot_kokiri": {
+      "root": "objects/object_link_child/gLinkChildLeftFistAndKokiriSwordNearDL",
+      "blade_x_clip": [
+        480,
+        true
+      ],
+      "source_sha256": {
+        "objects/object_link_child/gLinkChildLeftFistAndKokiriSwordNearDL": "3e5eb1bdd62aa5077ff02833d0d8c4dbbeb5c188289cd86664857d213cb23855",
+        "objects/object_link_child/object_link_childVtx_00B1B0": "5e004c843521588e6ce08859c27e6c798298be3cc0af90d30f1999969eaafa83"
+      },
+      "blade_bounds": [
+        [
+          480,
+          1666
+        ],
+        [
+          71,
+          389
+        ],
+        [
+          -38,
+          38
+        ]
+      ]
+    },
+    "native_oot_bgs": {
+      "root": "objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL",
+      "blade_x_clip": [
+        900,
+        true
+      ],
+      "source_sha256": {
+        "objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL": "9c5b38802d346f9fa12d20bf47723abe880b799ae93209e9cc6d0fe45ade6869",
+        "objects/object_link_boy/object_link_boyVtx_014448": "ba46d04b6d06535d9d2395f55da5cb327e2efc9b4a7d726ade590a5e3a662f23"
+      },
+      "blade_bounds": [
+        [
+          900,
+          5492
+        ],
+        [
+          63,
+          641
+        ],
+        [
+          -105,
+          -5
+        ]
+      ]
+    },
+    "native_oot_broken": {
+      "root": "objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeDL",
+      "blade_x_clip": [
+        900,
+        true
+      ],
+      "source_sha256": {
+        "objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeDL": "4a1e5b1092bc12a0daf4ab37eef66d621c5652b09da11de574140141bb56cff7",
+        "objects/object_link_boy/object_link_boyVtx_014BA8": "b4392e9a36a3914cf26134be70743cff3c9e706a4ae7ad9c38bfab8bbd5972c7"
+      },
+      "blade_bounds": [
+        [
+          900,
+          1474
+        ],
+        [
+          74,
+          636
+        ],
+        [
+          -117,
+          7
+        ]
+      ]
+    },
+    "native_oot_child_master": {
+      "root": "objects/object_link_child/gLinkChildLeftHandHoldingMasterSwordDL",
+      "blade_x_clip": [
+        -900,
+        false
+      ],
+      "source_sha256": {
+        "objects/object_link_child/gLinkChildLeftHandHoldingMasterSwordDL": "16cd84aa6d6acfb9e851db947f74dd93f57432f032d8ea0608cf99f703e5cdff",
+        "objects/object_link_child/object_link_childVtx_00D4E0": "8ddb6a653f9e5a03b73478bcfb33168e01503dd07189be81abe00f7822d5ae24"
+      },
+      "blade_bounds": [
+        [
+          -3171,
+          -900
+        ],
+        [
+          -784,
+          66
+        ],
+        [
+          -309,
+          176
+        ]
+      ]
+    }
+  },
+  "records_sha256": "0bf02ec6c0af42603b5c50edaadf78281639ab0b3dac272cc898afa6919793ca"
+}

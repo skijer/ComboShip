@@ -1,0 +1,125 @@
+{
+  "format": "mono-s16-pcm-exact",
+  "clips": [
+    {
+      "source": "TP_Transform_Wolf.wav",
+      "wav_sha256": "6c2342fecf8fd356cba79777d6d55d0d05669e51742a7906590a6f46befb362b",
+      "pcm_sha256": "168a41e5dedfb7a5f0053a010d0f197574315a8b82e769475a9159ac6ad1fee0",
+      "sample_rate": 22050,
+      "sample_count": 70365,
+      "duration_seconds": 3.191156462585034
+    },
+    {
+      "source": "TP_Transform_Human.wav",
+      "wav_sha256": "11af9ce279dfde51e2c1c6bb6adb0bef0eb96ad5d4d7709c2ad920e69bf38f15",
+      "pcm_sha256": "c03627cded91227a3c3cbe4609eb74fb6d90ac41571785bbf459f559a55a9928",
+      "sample_rate": 22050,
+      "sample_count": 70365,
+      "duration_seconds": 3.191156462585034
+    },
+    {
+      "source": "TP_WolfLink_Lunge1.wav",
+      "wav_sha256": "fac4b0741153c7a153d1d401226c57df33e3da64460f2716a5f84b7a05497638",
+      "pcm_sha256": "9b8829e858c386366ca31f274c01b123de4d8a4444a195a759ccf0ace7c61812",
+      "sample_rate": 44100,
+      "sample_count": 18695,
+      "duration_seconds": 0.42392290249433107
+    },
+    {
+      "source": "TP_WolfLink_Lunge2.wav",
+      "wav_sha256": "3766cfa7f7d6a75f9f1c6257628dd49edf3a712aee6308a16ad66a852e1f5a1f",
+      "pcm_sha256": "8e5d67dac4167906046768dd7dedffb9837357a75eb3c4a8b0563a9982e61dff",
+      "sample_rate": 44100,
+      "sample_count": 17914,
+      "duration_seconds": 0.4062131519274376
+    },
+    {
+      "source": "TP_WolfLink_Lunge3.wav",
+      "wav_sha256": "c14eead9c3f4d7468dcd5f955ee2940c378e31b6feeacf780ac11b4809d97dae",
+      "pcm_sha256": "f6952aca0eeecaebf12a46b133de24654b040102a0cab934ed7fbcbb976ecab9",
+      "sample_rate": 44100,
+      "sample_count": 18739,
+      "duration_seconds": 0.4249206349206349
+    },
+    {
+      "source": "TP_WolfLink_Lunge4.wav",
+      "wav_sha256": "da771a2a00210447704aec475114271f451f6a2fce4ec01480c9fa180c5d6148",
+      "pcm_sha256": "62ffd6a56f98ab85b79839b0f64d19a851ceea3e1511a5e784de07bd36886564",
+      "sample_rate": 44100,
+      "sample_count": 18746,
+      "duration_seconds": 0.42507936507936506
+    },
+    {
+      "source": "TP_WolfLink_Lunge5.wav",
+      "wav_sha256": "df42a149a1284f26d750e46e56094613c85aa40d21b1bdcf231d4ad5870b9737",
+      "pcm_sha256": "25f1f58a1a284a29ca400723ef37c8a925786d62e6ccde5ad76d46eb7005b8b8",
+      "sample_rate": 44100,
+      "sample_count": 18781,
+      "duration_seconds": 0.42587301587301585
+    },
+    {
+      "source": "TP_WolfLink_JumpAttack1.wav",
+      "wav_sha256": "2506b272644b6528dc444b49f8373c32addefae45489259270e6affe5c1b166a",
+      "pcm_sha256": "faea2e2c6a575e8d25f15a0d1246ce8b96416ecf744358dc7e5a18d0c93d0cd1",
+      "sample_rate": 44100,
+      "sample_count": 30328,
+      "duration_seconds": 0.6877097505668934
+    },
+    {
+      "source": "TP_WolfLink_JumpAttack2.wav",
+      "wav_sha256": "7ef91574134a52b2217952ad32d81f77b5983235da63c0d9ae391e13475b9a3f",
+      "pcm_sha256": "758cacf298833856a5bc31d402c4df0b6973cd1d9ab634d9e5ac5a994aca0194",
+      "sample_rate": 44100,
+      "sample_count": 31800,
+      "duration_seconds": 0.7210884353741497
+    },
+    {
+      "source": "TP_WolfLink_Charge_Attack_A1.wav",
+      "wav_sha256": "c4227140a428f96ebf2d57e1406af7283d53f4b6495e3af5961071890de1dc5a",
+      "pcm_sha256": "f1400d3f4a7b60f1917dbc153dceef79213d8b4f9e760451e9121500006c16fe",
+      "sample_rate": 44100,
+      "sample_count": 29818,
+      "duration_seconds": 0.6761451247165533
+    },
+    {
+      "source": "TP_WolfLink_Charge_Attack_A2.wav",
+      "wav_sha256": "886e32408cacc951b6d2a29ea566e04d1b2650203b14b12226a8d6129e0d5d38",
+      "pcm_sha256": "13c1b37a2b73edf0bb623b7ffcaa073f006f8cb9a4335e10158317b220baad94",
+      "sample_rate": 44100,
+      "sample_count": 29467,
+      "duration_seconds": 0.6681859410430839
+    },
+    {
+      "source": "TP_WolfLink_Charge_Attack_A3.wav",
+      "wav_sha256": "0bbd6209a414ee72ffa271f8997e475bf16599b2dd9211f3facd868ed0c0a169",
+      "pcm_sha256": "cf38f269bb5083101dbfa7c45f37261164e2a4fac3d7fb8dce44d3a71721f13f",
+      "sample_rate": 44100,
+      "sample_count": 29508,
+      "duration_seconds": 0.6691156462585034
+    },
+    {
+      "source": "TP_WolfLink_Huff_A1.wav",
+      "wav_sha256": "3f85432569f8c57f3820aa302c5524bb4efa2fa592b327b91446b0ea5a0882f3",
+      "pcm_sha256": "2edb3bcca391a1025eacbe933a9246ebd392eca7a20ec491bcad071065994700",
+      "sample_rate": 16000,
+      "sample_count": 5417,
+      "duration_seconds": 0.3385625
+    },
+    {
+      "source": "TP_WolfLink_Huff_A2.wav",
+      "wav_sha256": "78b7761d5dfbc25c18fb5a98014e804b49a3b7ac9af06353967242111bde1809",
+      "pcm_sha256": "55236fc8b58291ec064e47854bfdd0417b2ad069025c16159797958c571155bb",
+      "sample_rate": 16000,
+      "sample_count": 5299,
+      "duration_seconds": 0.3311875
+    },
+    {
+      "source": "TP_WolfLink_Huff_A3.wav",
+      "wav_sha256": "277993403e963e5932bfb4acf288ac4cddd2bffd1fcf23d55ca6528666284637",
+      "pcm_sha256": "519bdf7d84a06715d6942e60444b2884aa1d3914ac433ee76e1b59b6dabf550d",
+      "sample_rate": 16000,
+      "sample_count": 5780,
+      "duration_seconds": 0.36125
+    }
+  ]
+}

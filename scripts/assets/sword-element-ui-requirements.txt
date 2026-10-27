@@ -1,0 +1,3 @@
+# Use a binary wheel: its bundled FreeType rasterizer reproduces the committed
+# Montserrat glyph pixels. Ubuntu's system Pillow/FreeType produces other masks.
+Pillow==12.3.0

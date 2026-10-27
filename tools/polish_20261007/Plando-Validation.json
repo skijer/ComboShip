@@ -1,0 +1,59 @@
+{
+  "build": "13901c677d0084e0305eec4672c0557f4434aea7",
+  "status": "source and compiled production lookup/tier fixtures passed",
+  "mainTestPickups": 90,
+  "equipmentGIs": 44,
+  "foreignEquipmentChecks": 43,
+  "productionLookupAssertions": 332,
+  "productionTierAssertions": 19,
+  "independentEquipmentAudit": {
+    "donorEquipmentRows": 11,
+    "extendedEquipmentRows": 14,
+    "nativeSwordAndShieldRows": 6
+  },
+  "previousFailure": "Previous foreign array omitted all sword and custom tunic test cases; the main seed had no progressive sword copies.",
+  "fixtures": "Production function/case bodies with source-derived catalogs and explicit inventory inputs. No game execution or complete importer/save hydration.",
+  "notRun": [
+    "Full native importer",
+    "Save initialization and cross-game grant hydration",
+    "Generated entrance/boss layout",
+    "Physical pot/check ordering",
+    "Alt/vanilla model presentation, clipping, shimmer and particles",
+    "Beatability"
+  ],
+  "files": [
+    {
+      "file": "01-MM-All-Equipment-Progressive-20261007.json",
+      "testPickups": 90,
+      "foreignPickups": 89,
+      "MMHintSupportChecks": 4,
+      "OoTHintSupportChecks": 9,
+      "sha256": "f32ad2e1eed138cd93ec2aa641257b2b4ace1fb8129140ce9416b89350f347f9"
+    },
+    {
+      "file": "02-MM-Direct-Equipment-Control.json",
+      "testPickups": 44,
+      "foreignPickups": 43,
+      "MMHintSupportChecks": 4,
+      "OoTHintSupportChecks": 9,
+      "sha256": "f84b8411c6434d64f5befa938cc6a974036829cf538a8032c95c61fc126be77d"
+    },
+    {
+      "file": "03-MM-Native-Progressive-Control.json",
+      "testPickups": 15,
+      "foreignPickups": 0,
+      "MMHintSupportChecks": 4,
+      "OoTHintSupportChecks": 9,
+      "sha256": "7d9994de2588b57bfdfa19762b7a589b437796414671db66e896cd589f529525"
+    },
+    {
+      "file": "04-MM-Legacy-Goron-Sword-Control.json",
+      "testPickups": 1,
+      "foreignPickups": 1,
+      "MMHintSupportChecks": 4,
+      "OoTHintSupportChecks": 9,
+      "sha256": "4b4d3dc4230584ed73addd430f3c9dcaaa9ca9fa6658e90a481dddc3d2c06237"
+    }
+  ],
+  "baselineSeedSHA256": "f97640962617a6fb940d5ea1f0aac7044a86a78961086c379902cb1751be8cf9"
+}

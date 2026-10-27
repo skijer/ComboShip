@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "baseline_commit": "4fff75754ef1578e586312fbf8c68e3adb99b4df",
+  "resources": [
+    {
+      "path": "custom/comboship/native_forest/authored/prelude/mirror_ramp_flow_v2",
+      "bytes": 2128,
+      "sha256": "a2764231cd858edbf59b370db09390deba9728ce50672f783c7e1f818c8423d3"
+    },
+    {
+      "path": "custom/comboship/native_forest/mirror_access_material",
+      "bytes": 1611,
+      "sha256": "2138206f8b762d2edd01a9b5b5d2340a964a465a09e43a1cc10c347950c9c3d1"
+    },
+    {
+      "path": "custom/comboship/native_forest/mirror_access_root",
+      "bytes": 3604,
+      "sha256": "10d44219f9d1a723e401ebded9ee10f49fca091c8453c04690d713f31acc530d"
+    },
+    {
+      "path": "scenes/nonmq/comboship_forest/comboship_forest_room_0",
+      "bytes": 1239,
+      "sha256": "cd9ee0e2a3b9a5a53345d14cae9a79479558a4da0774cd532605c97fa2500f98"
+    },
+    {
+      "path": "scenes/nonmq/skiejer_forest/skiejer_forest_room_0",
+      "bytes": 1239,
+      "sha256": "cd9ee0e2a3b9a5a53345d14cae9a79479558a4da0774cd532605c97fa2500f98"
+    },
+    {
+      "path": "scenes/shared/skiejer_forest_oot/skiejer_forest_oot_room_0",
+      "bytes": 1238,
+      "sha256": "40d21f23b17beb90f5891512fa2c85be28b71322045bb6670a98ec4d9035749b"
+    }
+  ],
+  "decoded_bytes": 11059,
+  "decoded_sha256": "3f7092111e466feab197957f92d297a4da5306fbfd1df00baf9e6a40d103c101",
+  "parts": [
+    {
+      "name": "ramp-xlu.zlib.001.b64",
+      "bytes": 3226,
+      "sha256": "751d636f77ef45f3fb4fa50910f184518592255c7fcc8e0e7c9bc4648187c45b",
+      "base64_sha256": "0ccaac420ba372747a9a8a1d0fe6486bbd1a719323ea521c6ce531f9faf2fe7d"
+    }
+  ],
+  "private_mask_sha256": "a2764231cd858edbf59b370db09390deba9728ce50672f783c7e1f818c8423d3",
+  "primitive_alpha": 112,
+  "runtime_proven": false,
+  "source_correction_patch": "task-13.patch",
+  "note": "Standalone6resource optional overlay. Replaces rejected task9 opaque ramp overlay; do not mount both.",
+  "native_mask_header_sha256": "740165d6470157e678e140c456379d991478bb430656593b08efa4204d4d4407",
+  "root_geometry_prefix_nodes": 41,
+  "root_geometry_prefix_sha256": "d97ba0d11856338c91394ae367bc3715386b524bfda1cc64ed82f3bf3fb1056f",
+  "archive_sha256": "dc6882cbe3b513b6598c42261e580003f05fd1c38b48bbc7438c7031a739079a"
+}

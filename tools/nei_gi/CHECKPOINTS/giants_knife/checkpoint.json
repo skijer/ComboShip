@@ -1,0 +1,140 @@
+{
+  "resource_count": 9,
+  "vertex_records": 2009,
+  "vertex_loads": 69,
+  "slug": "giants_knife",
+  "name": "Giant's Knife",
+  "entry": "objects/nei_gi_redesign/giants_knife/gi_dl",
+  "draw_scale": 1,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 1990,
+  "bounds_author": [
+    [
+      -23.0,
+      -49.0,
+      -4.75
+    ],
+    [
+      23.0,
+      152.0,
+      4.75
+    ]
+  ],
+  "markers": {
+    "guard_baseline_y": 0,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "held_grip_y": -23.25,
+    "held_tip_y": 152.0,
+    "source": "supplied TP Ordon sword blade; separately authored heavy guard/grip",
+    "source_blade_width_factor": 2.32,
+    "texture_upscale": 4,
+    "adult_two_handed_proportions": true,
+    "blade_seat_y": 0,
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "Ordon-inspired heavy fullered blade",
+        "factor": 1.5
+      },
+      {
+        "part": "Riveted iron Knife crossbar",
+        "factor": 1.2
+      },
+      {
+        "part": "Machined guard lip",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Machined guard lip",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Iron crossbar rivet",
+        "factor": 1.2
+      },
+      {
+        "part": "Shaped oval leather grip",
+        "factor": 1.0
+      },
+      {
+        "part": "Raised diagonal leather wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Heavy blade seat collar",
+        "factor": 1.0
+      },
+      {
+        "part": "Heavy capped pommel",
+        "factor": 1.0
+      },
+      {
+        "part": "Pommel machined ring",
+        "factor": 1.0
+      },
+      {
+        "part": "Four Sword sheen over Ordon-inspired heavy fullered blade",
+        "factor": 1.5
+      }
+    ],
+    "imported_approved_model": false
+  },
+  "notes": [
+    "Straight Ordon blade/fullers retained with wider two-handed proportions and a separately closed, beveled guard.",
+    "Broader, shorter steel blade, iron riveted bar guard, red-brown grip and subdued sheen distinguish the Knife.",
+    "Scimitar ornament informed machined fittings only; its curved silhouette is preserved as a separate reference.",
+    "Opaque metal plus normal-generated reflection decal; no collision, damage or progression edits.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "fittings_tex": "716a1639b52e3fc2a8700f656fa3e4aded199fbd90c6b87154d738519b620739",
+      "four_sword_sheen_tex": "ebea8c792669fe90f3c090c63d2fcb4fda442298f0be9bf9177824894bb3bf63",
+      "gi_dl": "d3f71637ad60aa344f66683f2a3ff8c092e1217a267b9a99a8d3a197fabc9805",
+      "leather_tex": "0e1f7142ee1b8f70824c53dd719893aa2d3bcbb15a3f4e7c78ab264f429fc90a",
+      "mesh_opa_vtx": "aac2027bc348aed3dde6e3c37751dcf5e150047fbc99b7012e656d3d79f31ae9",
+      "ordon_steel_tex": "b643f1b80ccd817f7c3ea1aa5f767db0fc16fe332ad6f1efae5c93a0e49c73b8",
+      "rim_tex": "a0c831fa25e06c1148b765465ce946e39d153f884e74aecbcb212875273f1831",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "wrap_tex": "d18cb25283108da233c6f31ea33706d1f9c6d4577cfbe52401a295df846ea0f5"
+    },
+    "glb_sha256": "30e024195247ee1e690769e53ec818f4a020665dc81891692cf287dedd1c13f1",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  }
+}

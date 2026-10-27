@@ -1,0 +1,335 @@
+{
+  "provenance": {
+    "status": "authored reconstruction candidates",
+    "original_nintendo_gi_vertex_data_available": false,
+    "secondary_held_reference_commit": "d1c59355532d7fd81209a40e73dbf586a4738aa9",
+    "measurement": "quantized authored vertices with exported fixed-point matrix, before host actor transforms",
+    "latest_three_model_reference": "User-provided steel Master, gold True Master and Gilded images; image component ratios do not determine absolute Nintendo GI scale.",
+    "latest_two_model_adjustment": "User feedback shortens Gilded blade and widens Master blade root; accepted True Master preserved exactly."
+  },
+  "models": {
+    "master_sword": {
+      "author_to_native": 0.659912109375,
+      "full_author_bounds": [
+        [
+          -16.375,
+          -30.0,
+          -3.6875
+        ],
+        [
+          16.375,
+          110.0,
+          3.6875
+        ]
+      ],
+      "full_native_bounds": [
+        [
+          -10.806060791015625,
+          -19.79736328125,
+          -2.4334259033203125
+        ],
+        [
+          10.806060791015625,
+          72.59033203125,
+          2.4334259033203125
+        ]
+      ],
+      "blade_native_bounds": [
+        [
+          -3.299560546875,
+          -4.619384765625,
+          -0.907379150390625
+        ],
+        [
+          3.299560546875,
+          72.59033203125,
+          0.907379150390625
+        ]
+      ],
+      "blade_parts": [
+        "Forged blade cutting bevel",
+        "Forged blade fuller face"
+      ],
+      "guard_baseline_y_native": 0,
+      "runtime_tested": false,
+      "reference_blade_to_hilt_ratio": 3.6666666666666665
+    },
+    "true_master_sword": {
+      "author_to_native": 0.659912109375,
+      "full_author_bounds": [
+        [
+          -19.0,
+          -37.0,
+          -3.6875
+        ],
+        [
+          19.0,
+          103.0,
+          3.6875
+        ]
+      ],
+      "full_native_bounds": [
+        [
+          -12.538330078125,
+          -24.416748046875,
+          -2.4334259033203125
+        ],
+        [
+          12.538330078125,
+          67.970947265625,
+          2.4334259033203125
+        ]
+      ],
+      "blade_native_bounds": [
+        [
+          -3.547027587890625,
+          -4.619384765625,
+          -0.9486236572265625
+        ],
+        [
+          3.547027587890625,
+          67.970947265625,
+          0.9486236572265625
+        ]
+      ],
+      "blade_parts": [
+        "Forged blade cutting bevel",
+        "Forged blade fuller face"
+      ],
+      "guard_baseline_y_native": 0,
+      "runtime_tested": false,
+      "reference_blade_to_hilt_ratio": 2.7837837837837838
+    },
+    "gilded_sword": {
+      "author_to_native": 0.659912109375,
+      "full_author_bounds": [
+        [
+          -15.0,
+          -27.0,
+          -2.9375
+        ],
+        [
+          15.0,
+          100.0,
+          2.9375
+        ]
+      ],
+      "full_native_bounds": [
+        [
+          -9.898681640625,
+          -17.817626953125,
+          -1.9384918212890625
+        ],
+        [
+          9.898681640625,
+          65.9912109375,
+          1.9384918212890625
+        ]
+      ],
+      "blade_native_bounds": [
+        [
+          -3.547027587890625,
+          -4.619384765625,
+          -0.8661346435546875
+        ],
+        [
+          3.547027587890625,
+          65.9912109375,
+          0.8661346435546875
+        ]
+      ],
+      "blade_parts": [
+        "Continuous Gilded blade tang and seat cutting bevel",
+        "Continuous Gilded blade tang and seat fuller face",
+        "Forged blade inlay surround",
+        "Tempered gold fitted diamond"
+      ],
+      "guard_baseline_y_native": 0,
+      "runtime_tested": false,
+      "reference_blade_to_hilt_ratio": 3.7037037037037037
+    },
+    "great_fairy_sword": {
+      "author_to_native": 0.659912109375,
+      "full_author_bounds": [
+        [
+          -22.0,
+          -42.3125,
+          -3.375
+        ],
+        [
+          22.0,
+          154.5,
+          3.375
+        ]
+      ],
+      "full_native_bounds": [
+        [
+          -14.51806640625,
+          -27.922531127929688,
+          -2.227203369140625
+        ],
+        [
+          14.51806640625,
+          101.9564208984375,
+          2.227203369140625
+        ]
+      ],
+      "blade_native_bounds": [
+        [
+          -8.991302490234375,
+          -3.95947265625,
+          -1.15484619140625
+        ],
+        [
+          8.991302490234375,
+          101.9564208984375,
+          1.15484619140625
+        ]
+      ],
+      "blade_parts": [
+        "Rose-tempered fairy blade cutting bevel",
+        "Rose-tempered fairy blade fuller face"
+      ],
+      "guard_baseline_y_native": 0,
+      "runtime_tested": false
+    },
+    "razor_sword": {
+      "author_to_native": 0.64990234375,
+      "blade_includes_seated_tang": true,
+      "blade_author_bounds": [
+        [
+          -9.4375,
+          -22.5,
+          -1.625
+        ],
+        [
+          9.4375,
+          56.5,
+          1.625
+        ]
+      ],
+      "blade_native_bounds": [
+        [
+          -6.133453369140625,
+          -14.622802734375,
+          -1.05609130859375
+        ],
+        [
+          6.133453369140625,
+          36.719482421875,
+          1.05609130859375
+        ]
+      ],
+      "full_author_bounds": [
+        [
+          -23.0,
+          -56.5,
+          -4.6875
+        ],
+        [
+          23.0,
+          56.5,
+          4.6875
+        ]
+      ],
+      "full_native_bounds": [
+        [
+          -14.94775390625,
+          -36.719482421875,
+          -3.046417236328125
+        ],
+        [
+          14.94775390625,
+          36.719482421875,
+          3.046417236328125
+        ]
+      ],
+      "grip_native_bounds": [
+        [
+          -2.03094482421875,
+          -28.920654296875,
+          -2.03094482421875
+        ],
+        [
+          2.03094482421875,
+          -14.622802734375,
+          2.03094482421875
+        ]
+      ],
+      "guard_baseline_y_native": -11.373291015625,
+      "before_guard_baseline_y_native": -11.04833984375,
+      "authored_lean_degrees": 0,
+      "runtime_tested": false
+    },
+    "biggoron_sword": {
+      "author_to_native": 0.64990234375,
+      "blade_includes_seated_tang": true,
+      "blade_author_bounds": [
+        [
+          -9.0,
+          -39.5,
+          -1.8125
+        ],
+        [
+          9.0,
+          80.5,
+          1.8125
+        ]
+      ],
+      "blade_native_bounds": [
+        [
+          -5.84912109375,
+          -25.671142578125,
+          -1.177947998046875
+        ],
+        [
+          5.84912109375,
+          52.317138671875,
+          1.177947998046875
+        ]
+      ],
+      "full_author_bounds": [
+        [
+          -20.0,
+          -80.5,
+          -4.6875
+        ],
+        [
+          20.0,
+          80.5,
+          4.6875
+        ]
+      ],
+      "full_native_bounds": [
+        [
+          -12.998046875,
+          -52.317138671875,
+          -3.046417236328125
+        ],
+        [
+          12.998046875,
+          52.317138671875,
+          3.046417236328125
+        ]
+      ],
+      "grip_native_bounds": [
+        [
+          -2.071563720703125,
+          -47.767822265625,
+          -2.071563720703125
+        ],
+        [
+          2.071563720703125,
+          -25.671142578125,
+          2.071563720703125
+        ]
+      ],
+      "guard_baseline_y_native": -23.31524658203125,
+      "before_guard_baseline_y_native": -12.388763427734375,
+      "authored_lean_degrees": 0,
+      "runtime_tested": false,
+      "total_length_ratio_to_prechange_forged_master": 1.37502784720781,
+      "visible_blade_start_y_native": -23.071533203125
+    }
+  }
+}

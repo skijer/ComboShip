@@ -1,6 +1,7 @@
 #include "MiscBehavior.h"
 #include "2s2h/BenGui/HudEditor.h"
 #include "2s2h/Enhancements/FrameInterpolation/FrameInterpolation.h"
+#include "2s2h/Rando/RupeeCounterDigits.h"
 
 extern "C" {
 #include "interface/parameter_static/parameter_static.h"
@@ -29,36 +30,18 @@ static void DrawTycoonRupeeCounter() {
 
     OPEN_DISPS(play->state.gfxCtx);
 
-    s16 counterDigits[4] = { 0, 0, 0, 0 };
-    counterDigits[3] = gSaveContext.save.saveInfo.playerData.rupees;
-
-    if ((counterDigits[3] > 9999) || (counterDigits[3] < 0)) {
-        counterDigits[3] &= 0xDDD;
-    }
-
-    while (counterDigits[3] >= 1000) {
-        counterDigits[0]++;
-        counterDigits[3] -= 1000;
-    }
-
-    while (counterDigits[3] >= 100) {
-        counterDigits[1]++;
-        counterDigits[3] -= 100;
-    }
-
-    while (counterDigits[3] >= 10) {
-        counterDigits[2]++;
-        counterDigits[3] -= 10;
-    }
+    s16 counterDigits[RUPEE_COUNTER_MAX_DIGITS];
+    s16 minimumDigits = CUR_CAPACITY(UPG_WALLET) >= 1000 ? 4 : 3;
+    s16 digitCount =
+        RupeeCounter_BuildDigits(gSaveContext.save.saveInfo.playerData.rupees, minimumDigits, counterDigits);
 
     s16 magicAlpha = interfaceCtx->magicAlpha;
     if (magicAlpha > 180) {
         magicAlpha = 180;
     }
 
-    // Tycoon wallet: start at digit 0, show all 4 digits
+    // Match the live wallet capacity (ComboShip uses 999); restored balances still expand.
     s16 digitIndex = 0;
-    s16 digitCount = 4;
     s16 xPos = 42;
 
     for (s16 i = 0; i < digitCount; i++, digitIndex++, xPos += 8) {

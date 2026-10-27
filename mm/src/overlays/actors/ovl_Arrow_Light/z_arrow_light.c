@@ -8,6 +8,7 @@
 #include "overlays/actors/ovl_En_Arrow/z_en_arrow.h"
 
 #include "2s2h/BenGui/CosmeticEditor.h"
+#include "2s2h/Enhancements/Graphics/ElementalArrowSfx.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -152,7 +153,7 @@ void ArrowLight_Fly(ArrowLight* this, PlayState* play) {
     ArrowLight_Lerp(&this->firedPos, &this->actor.world.pos, 0.05f);
 
     if (arrow->unk_261 & 1) {
-        Actor_PlaySfx(&this->actor, NA_SE_IT_EXPLOSION_LIGHT);
+        Actor_PlaySfx(&this->actor, ElementalArrow_GetImpactSfx(NA_SE_IT_EXPLOSION_LIGHT));
         ArrowLight_SetupAction(this, ArrowLight_Hit);
         this->timer = 32;
         this->alpha = 255;

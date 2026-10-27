@@ -1,4 +1,5 @@
 #include "z_en_ma2.h"
+#include "soh/Enhancements/cosmetics/NativeNpcModels.h"
 #include "objects/object_ma2/object_ma2.h"
 
 #define FLAGS                                                                                  \
@@ -217,7 +218,9 @@ void EnMa2_Init(Actor* thisx, PlayState* play) {
     s32 pad;
 
     ActorShape_Init(&this->actor.shape, 0.0f, ActorShadow_DrawCircle, 18.0f);
-    SkelAnime_InitFlex(play, &this->skelAnime, &gMalonAdultSkel, NULL, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, &this->skelAnime,
+                       (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sAdultMalonNpcModel, gMalonAdultSkel), NULL,
+                       NULL, NULL, 0);
     Collider_InitCylinder(play, &this->collider);
     Collider_SetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
     CollisionCheck_SetInfo2(&this->actor.colChkInfo, DamageTable_Get(22), &sColChkInfoInit);
@@ -284,8 +287,8 @@ void EnMa2_WaitForEponasSong(EnMa2* this, PlayState* play) {
         this->actionFunc = EnMa2_WaitForOcarina;
         play->msgCtx.ocarinaMode = OCARINA_MODE_04;
     } else if (play->msgCtx.ocarinaMode == OCARINA_MODE_03) {
-        Audio_PlaySoundGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         this->timer = 0x1E;
         Flags_SetInfTable(INFTABLE_8E);
         this->actionFunc = EnMa2_ForceTalkAfterSong;
@@ -331,16 +334,23 @@ void EnMa2_Update(Actor* thisx, PlayState* play) {
 s32 EnMa2_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* thisx) {
     EnMa2* this = (EnMa2*)thisx;
     Vec3s vec;
+    static const u8 mouthMap[] = { 0, 2, 1 };
 
     if ((limbIndex == MALON_ADULT_LEFT_THIGH_LIMB) || (limbIndex == MALON_ADULT_RIGHT_THIGH_LIMB)) {
-        *dList = NULL;
+        if (!NativeNpcModel_IsActive(&sAdultMalonNpcModel)) {
+            *dList = NULL;
+        }
     }
     if (limbIndex == MALON_ADULT_HEAD_LIMB) {
-        Matrix_Translate(1400.0f, 0.0f, 0.0f, MTXMODE_APPLY);
+        s32 mouth = this->mouthIndex >= 0 && this->mouthIndex < 3 ? mouthMap[this->mouthIndex] : 0;
+        *dList = NativeNpcModel_SelectHead(&sAdultMalonNpcModel, *dList, this->eyeIndex, mouth);
+        /* The fitted head origin is the source neck; retain the vanilla pivot for native assets. */
+        Vec3f pivot = NativeNpcModel_IsActive(&sAdultMalonNpcModel) ? *pos : (Vec3f){ 1400.0f, 0.0f, 0.0f };
+        Matrix_Translate(pivot.x, pivot.y, pivot.z, MTXMODE_APPLY);
         vec = this->interactInfo.headRot;
         Matrix_RotateX((vec.y / 32768.0f) * M_PI, MTXMODE_APPLY);
         Matrix_RotateZ((vec.x / 32768.0f) * M_PI, MTXMODE_APPLY);
-        Matrix_Translate(-1400.0f, 0.0f, 0.0f, MTXMODE_APPLY);
+        Matrix_Translate(-pivot.x, -pivot.y, -pivot.z, MTXMODE_APPLY);
     }
     if (limbIndex == MALON_ADULT_CHEST_AND_NECK_LIMB) {
         vec = this->interactInfo.torsoRot;
@@ -352,6 +362,7 @@ s32 EnMa2_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* p
         rot->y += Math_SinS(this->upperBodyRot[limbIndex].y) * 200.0f;
         rot->z += Math_CosS(this->upperBodyRot[limbIndex].z) * 200.0f;
     }
+    *dList = NativeNpcPose_SelectLimb(&this->skelAnime, limbIndex, *dList);
     return false;
 }
 
@@ -365,7 +376,8 @@ void EnMa2_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot,
         Matrix_MultVec3f(&vec, &this->actor.focus.pos);
     }
     if ((limbIndex == MALON_ADULT_LEFT_HAND_LIMB) && (this->skelAnime.animation == &gMalonAdultStandStillAnim)) {
-        gSPDisplayList(POLY_OPA_DISP++, gMalonAdultBasketDL);
+        gSPDisplayList(POLY_OPA_DISP++,
+                       NativeNpcPose_SelectProp(&this->skelAnime, "Basket", (Gfx*)gMalonAdultBasketDL));
     }
 
     CLOSE_DISPS(play->state.gfxCtx);

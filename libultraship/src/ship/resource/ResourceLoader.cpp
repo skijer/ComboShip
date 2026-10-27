@@ -1,6 +1,7 @@
 #include "ship/resource/ResourceLoader.h"
 #include "ship/resource/ResourceFactory.h"
 #include "ship/resource/ResourceManager.h"
+#include "ship/resource/archive/Archive.h"
 #include "ship/resource/Resource.h"
 #include "ship/resource/File.h"
 #include "ship/Context.h"
@@ -183,8 +184,7 @@ std::shared_ptr<ResourceInitData> ResourceLoader::ReadResourceInitData(const std
         initData->Format = RESOURCE_FORMAT_XML;
     }
 
-    initData->Type =
-        Context::GetRawInstance()->GetResourceManager()->GetResourceLoader()->GetResourceType(parsed["type"]);
+    initData->Type = GetResourceType(parsed["type"]);
     initData->ResourceVersion = parsed["version"];
     initData->IsCustom = parsed.value("isCustom", false);
 
@@ -216,25 +216,35 @@ static void SetBufferOffset(const std::shared_ptr<File>& file, const std::shared
 
 std::shared_ptr<ResourceInitData> ResourceLoader::ResolveMetaAlias(const std::string& filePath,
                                                                    std::shared_ptr<File>& fileToLoad) {
-    auto resourceManager = Context::GetRawInstance()->GetResourceManager();
-    auto metaFileToLoad = resourceManager->LoadFileProcess(filePath + ".meta");
+    return ResolveMetaAlias(filePath, fileToLoad, nullptr);
+}
+
+std::shared_ptr<ResourceInitData> ResourceLoader::ResolveMetaAlias(const std::string& filePath,
+                                                                   std::shared_ptr<File>& fileToLoad,
+                                                                   const std::shared_ptr<Archive>& archive) {
+    const auto resourceManager = archive ? nullptr : Context::GetRawInstance()->GetResourceManager();
+    const auto metaFileToLoad =
+        archive ? archive->LoadFile(filePath + ".meta") : resourceManager->LoadFileProcess(filePath + ".meta");
     if (metaFileToLoad == nullptr) {
         return nullptr;
     }
 
     auto metaInitData = ReadResourceInitData(filePath, metaFileToLoad);
-    auto aliasedFileToLoad = resourceManager->LoadFileProcess(metaInitData->Path);
+    const auto aliasedFileToLoad =
+        archive ? archive->LoadFile(metaInitData->Path) : resourceManager->LoadFileProcess(metaInitData->Path);
     if (aliasedFileToLoad == nullptr) {
         return nullptr;
     }
 
     // The alias wins only if its target lives in an equal-or-higher priority archive than the
     // real asset at filePath (ties go to the alias; a missing real asset reports priority -1).
-    auto archiveManager = resourceManager->GetArchiveManager();
-    int32_t realPriority = archiveManager->GetFilePriority(filePath);
-    int32_t aliasPriority = archiveManager->GetFilePriority(metaInitData->Path);
-    if (aliasPriority < realPriority) {
-        return nullptr;
+    if (!archive) {
+        const auto archiveManager = resourceManager->GetArchiveManager();
+        const int32_t realPriority = archiveManager->GetFilePriority(filePath);
+        const int32_t aliasPriority = archiveManager->GetFilePriority(metaInitData->Path);
+        if (aliasPriority < realPriority) {
+            return nullptr;
+        }
     }
 
     fileToLoad = aliasedFileToLoad;
@@ -243,11 +253,17 @@ std::shared_ptr<ResourceInitData> ResourceLoader::ResolveMetaAlias(const std::st
 
 std::shared_ptr<IResource> ResourceLoader::LoadResource(std::string filePath, std::shared_ptr<File> fileToLoad,
                                                         std::shared_ptr<ResourceInitData> initData) {
+    return LoadResource(std::move(filePath), std::move(fileToLoad), std::move(initData), nullptr);
+}
+
+std::shared_ptr<IResource> ResourceLoader::LoadResource(std::string filePath, std::shared_ptr<File> fileToLoad,
+                                                        std::shared_ptr<ResourceInitData> initData,
+                                                        const std::shared_ptr<Archive>& archive) {
     // fileToLoad is the highest-priority real asset at filePath, or null when the resource
     // exists only as a `.meta` alias. Prefer a winning alias, else read the real asset's header.
     bool legacyInitData = false;
     if (initData == nullptr) {
-        initData = ResolveMetaAlias(filePath, fileToLoad);
+        initData = ResolveMetaAlias(filePath, fileToLoad, archive);
     }
     if (initData == nullptr && fileToLoad != nullptr) {
         initData = ReadResourceInitDataLegacy(filePath, fileToLoad);

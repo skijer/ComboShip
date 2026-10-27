@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "asset": "Sword-origin scoped ice frost and opacity masks",
+  "source": "ImageGen",
+  "sourcePrompt": "Use case: stylized-concept. Asset type: seamless grayscale intensity texture for a small Nintendo 64 ice material, to be reduced to 64 by 32 pixels. Create ONE flat, edge-to-edge, perfectly tileable 2:1 landscape image of translucent frost and cracked ice. View directly perpendicular to the surface, with no perspective or 3D object. Dark charcoal-to-medium-gray clear-ice base with a few broad readable branching silver-white fracture veins, softer cloudy frost between the cracks, tiny restrained frost grains. Keep the vein pattern irregular and organic; no regular polygon cells, no large solid white regions, no black holes. The cracks need enough width and contrast to remain readable after strong downsampling. Uniform surface response with no directional light, shadow, specular hotspot, vignette or border. All edges must match seamlessly when tiled. Monochrome only: the game's shader will supply the icy blue color. No text, no labels, no watermark, no separate samples, no layout or presentation background.",
+  "recovery": "Regenerated once after scratch reset; prior raster and packed bytes were unavailable from tool history or Library recovery.",
+  "imagegenOutputName": "exec-fa427a7d-9d14-4632-a49d-39db5086f51e.png",
+  "boundedSource": "frost-source.png",
+  "packingCommand": "python3 -B scripts/assets/build_sword_finish_ice.py",
+  "validationCommand": "python3 -B tests/elemental_swords/run_ice_material_tests.py",
+  "runtimeBytes": 2560,
+  "runtimeTextures": [
+    {
+      "symbol": "sSwordFinishIceFrostTex",
+      "file": "frost.i8.png",
+      "format": "I8",
+      "width": 32,
+      "height": 16,
+      "bytes": 512
+    },
+    {
+      "symbol": "sSwordFinishIceOpacityTex",
+      "file": "opacity.i8.png",
+      "format": "I8",
+      "width": 64,
+      "height": 32,
+      "bytes": 2048
+    }
+  ],
+  "sha256": {
+    "combo/render/sword_finish_ice_assets/frost-source.png": "83fbb0d35b80a1cc3870dac71119a52a204a8b76bd7073b06ec7e312394b98dd",
+    "combo/render/sword_finish_ice_assets/frost.i8.png": "cbe168afeaa037f4b5249c812c2e1226138775a2342bd9776dcd13a2f02c459b",
+    "combo/render/sword_finish_ice_assets/opacity.i8.png": "c0fc49fcff730c754e90e475288e95e760443388ec264763c21cbac7dfeb9b4f",
+    "combo/render/SwordFinishIceData.h": "a049b307b4808804dd241e5edb3418d656edd788452c44d657fd9b1b2c125f7d"
+  },
+  "sourceRecovery": "13 code paths recovered from retained exact tool text/hunks. Three tiny ABI/header/host wrappers reconstructed equivalently. All original native geometry/UV/normal commands retained; unsupported roots use native fallback. Actual configured runtime appearance requires user verification.",
+  "packingCheckCommand": "python3 -B scripts/assets/build_sword_finish_ice.py --check"
+}

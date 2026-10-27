@@ -1,0 +1,35 @@
+{
+  "resource_count": 11,
+  "vertex_records": 2681,
+  "vertex_loads": 93,
+  "slug": "iron_knuckle_axe",
+  "name": "Iron Knuckle's Axe / gameplay iron_knuckle_axe",
+  "entry": "objects/nei_held_redesign/iron_knuckle_axe/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 4.375,
+  "triangles": 2444,
+  "bounds_author": [
+    [
+      -20.25,
+      -6.25,
+      -76.4375
+    ],
+    [
+      31.5,
+      4.5,
+      35.0625
+    ]
+  ],
+  "markers": {
+    "source_axis_native": [
+      395,
+      -62,
+      0
+    ],
+    "source_units_per_author_unit": 70
+  },
+  "notes": [
+    "Approved crescent axe mapped back to original 69-vertex Iron Knuckle frame. Held and thrown axe retain their original matrices and physics."
+  ],
+  "runtime_tested": false
+}

@@ -1,0 +1,180 @@
+{
+  "scope": "Source candidate verification; full executable link, configured gameplay and user acceptance remain pending.",
+  "tested_source_ref": "00b843da591c53e0433778141a29ae44900f4e38",
+  "development_baseline": "520d7b6dc64ab5742226b9b2f998a34bcd6b4a9e",
+  "published_prerequisite": "43131342882972eeb4a257599ec8b061c7dc6d43",
+  "focused_gate": {
+    "command": [
+      "bash",
+      "scripts/diagnostics/run_elemental_sword_regressions.sh"
+    ],
+    "commands": [
+      "python3 -B scripts/diagnostics/run_sword_element_state_tests.py --combat --sanitize",
+      "python3 -B scripts/diagnostics/run_sword_element_save_tests.py --sanitize",
+      "python3 -B scripts/diagnostics/run_sword_element_hud_tests.py --sanitize",
+      "python3 -B scripts/diagnostics/sword_element_kaleido_tests.py",
+      "python3 -B scripts/assets/build_elemental_sword_aura.py --check",
+      "python3 -B scripts/diagnostics/run_elemental_sword_aura_tests.py --sanitize",
+      "python3 -B scripts/diagnostics/run_din_fire_sword_tests.py",
+      "python3 -B scripts/diagnostics/run_din_fire_sword_damage_tests.py",
+      "python3 -B scripts/diagnostics/run_mm_din_fire_tests.py",
+      "python3 -B scripts/diagnostics/run_mm_din_fire_damage_tests.py",
+      "python3 -B scripts/diagnostics/run_mm_ice_arrows_tests.py --sanitize",
+      "python3 -B scripts/diagnostics/run_mm_ice_octorok_tests.py --sanitize",
+      "python3 -B tests/item_receipts/run_sword_element_receipt_tests.py --sanitize"
+    ],
+    "returncode": 0,
+    "seconds": 255.96,
+    "source_stable_during_gate": true,
+    "inputs_still_match_before_ledger": true,
+    "result": {
+      "file": "verification/elemental-focused-final-result.json",
+      "sha256": "6b764b24c36642fb8810e0221cc1ac8d3b08c6221f6b51a3b89044e67cb40443"
+    },
+    "log": {
+      "file": "verification/elemental-focused-final.log",
+      "sha256": "32bd608ee71f410a4a2809f7abaf739241c657b09b3a46f60c960bcae00a6a47"
+    },
+    "sanitizers": "Address/undefined-behavior checks enabled in supported suites; LeakSanitizer disabled because the container restricts process inspection."
+  },
+  "aura_native_objects": {
+    "passed": 16,
+    "total": 16,
+    "matrix": "Eight complete native translation units in standalone and Combo modes, with real headers; weapon modules included through actual player host units.",
+    "recorded_source_ref": "5424e2e86417ac4e4e65bfbdb9d4bebeb886716b",
+    "current_matching_input_files": 1622,
+    "input_mismatches": [],
+    "result": {
+      "file": "verification/aura-final-native/verification-summary.json",
+      "sha256": "3ad01c80ffb4e749479424fa57da637575a0cab853b2cc1cf4991f87b1cdce57"
+    },
+    "final_source_identity_check": {
+      "file": "verification/aura-native-final-source-match.json",
+      "sha256": "39b1b08babc10548026eb905f3c8f17d95ead144a71b5decefb189726ef63a39"
+    }
+  },
+  "source_format": {
+    "version": "clang-format 14.0.6",
+    "changed_source_files_checked": 73,
+    "returncode": 0,
+    "result": {
+      "file": "verification/elemental-format-final-result.json",
+      "sha256": "3b4dd30be455517997a0ad5dd8280072f26e9e0f1bad478146221f11d9f4d6d4"
+    }
+  },
+  "additional_recorded_checks": [
+    {
+      "file": "verification/receipt-native-final-result.json",
+      "sha256": "b6e1bc110f58dde2a478218acdbda98ddd225412511a62b8cf327910fc3834e0"
+    },
+    {
+      "file": "verification/sword-settings-native/verification-summary.json",
+      "sha256": "332d46607ab80bb0e85172e7558eb5ecd5dda746e6539d11b8be286acd3dc1ef"
+    },
+    {
+      "file": "verification/kaleido-compat-validation.json",
+      "sha256": "ad22b889f21a219527030d49f0506478454113c83e9eb9fc704fcfff1d5a5a67"
+    },
+    {
+      "file": "verification/legacy-mm-receipts-final-result.json",
+      "sha256": "6d0e059fbca1de96be31cfab8bee76b4733f694b98e620d2409ccc144375c369"
+    },
+    {
+      "file": "verification/wand-compat-final-result.json",
+      "sha256": "e2432341c452315137d1546106308ff11db5354a0e7e78afd4bb8ba3061ccc72"
+    },
+    {
+      "file": "verification/lantern-compat-final-result.json",
+      "sha256": "844684f4dd8b661286775bae88312cdc3ea24c21c698738fa4ace6b4e8e0aee5"
+    },
+    {
+      "file": "verification/mod-discovery-final-result.json",
+      "sha256": "f02fed3e6faf4b939ce6a0738e7bd2dce612447756436d65fa9ac6a95b96cfc0"
+    }
+  ],
+  "broader_project_gate": {
+    "status": "Blocked by inherited Black Market fixture boundaries; not a clean full-project or final-head pass.",
+    "development_prefix": {
+      "file": "verification/canonical-result.json",
+      "sha256": "8fc4d5bad3efceed2d1eaae096a6d7cba5c66bdce06cef123a4fe79478a77000"
+    },
+    "development_continuation": {
+      "file": "verification/canonical-continuation-results.json",
+      "sha256": "ad4b6b6ae603eeef6cf43ec3a1df39098ffaa3bccc271e56b3d083547d93b125"
+    },
+    "baseline_reproduction": {
+      "file": "verification/baseline-gate-blockers.json",
+      "sha256": "c70bc5a24f6c164f970d9d5c76389d0aa0c53dc787a9ba868731d1d8c9879ce7"
+    },
+    "baseline_ref": "520d7b6dc64ab5742226b9b2f998a34bcd6b4a9e",
+    "remaining_inherited_commands": [
+      {
+        "command": [
+          "python3",
+          "-B",
+          "scripts/diagnostics/run_mm_static_gi_bridge_tests.py",
+          "--sanitize"
+        ],
+        "returncode": 1,
+        "seconds": 1.22
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "scripts/diagnostics/run_tunic_material_tests.py",
+          "--sanitize"
+        ],
+        "returncode": 1,
+        "seconds": 0.54
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "tests/item_receipts/run_mm_first_seed_gate_test.py",
+          "--sanitizers"
+        ],
+        "returncode": 1,
+        "seconds": 3.98
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "scripts/diagnostics/run_bottle_gi_tests.py"
+        ],
+        "returncode": 1,
+        "seconds": 0.42
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "tests/mm_presentation/run_foreign_scale_tests.py"
+        ],
+        "returncode": 1,
+        "seconds": 3.73
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "scripts/diagnostics/run_mm_nei_tests.py"
+        ],
+        "returncode": 1,
+        "seconds": 6.8
+      }
+    ],
+    "note": "Development fixture/environment failures affecting this change were corrected and separately rechecked. These six residual failures also reproduce on the unchanged baseline."
+  },
+  "not_verified": [
+    "Full application link or installation",
+    "Configured game runtime, final aura fit/appearance and subsequent actor graphics state",
+    "In-game fusion/audio/tutorial timing, controller behavior and HUD placement",
+    "In-game standing/swimming collision, scene return and all installed replacement model combinations",
+    "User acceptance or master promotion"
+  ],
+  "offline_preview": "verification/aura-offline-comparison.png is an offline diagnostic projection, not a gameplay capture.",
+  "runtime_checklist": "docs/poc/elemental-swords-mm-ice-arrows-20261019.md"
+}

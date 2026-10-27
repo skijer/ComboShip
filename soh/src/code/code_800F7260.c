@@ -124,7 +124,7 @@ void Audio_ClearBGMMute(u8 channelIdx) {
     }
 }
 
-void Audio_PlaySoundGeneral(u16 sfxId, Vec3f* pos, u8 token, f32* freqScale, f32* vol, s8* reverbAdd) {
+void Audio_PlaySfxGeneral(u16 sfxId, Vec3f* pos, u8 token, f32* freqScale, f32* vol, s8* reverbAdd) {
     size_t i;
     SoundRequest* req;
 
@@ -227,6 +227,9 @@ void Audio_ProcessSoundRequest(void) {
         req->sfxId = newSfxId;
     }
     bankId = SFX_BANK(req->sfxId);
+    if (bankId >= ARRAY_COUNT(gSoundBanks)) {
+        return;
+    }
     if ((1 << bankId) & D_801333F0) {
         AudioDebug_ScrPrt((const s8*)D_80133340, req->sfxId);
         bankId = SFX_BANK(req->sfxId);

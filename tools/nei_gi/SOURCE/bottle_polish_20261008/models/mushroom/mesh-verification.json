@@ -1,0 +1,26 @@
+{
+  "triangles": 2688,
+  "vertices": 1346,
+  "closed_edges": 4032,
+  "signed_volume": 2645.6372665952736,
+  "bounds": [
+    [
+      -8.679151668072166,
+      -24.6,
+      -8.330916228087334
+    ],
+    [
+      10.272603955061257,
+      -0.7499999999999991,
+      8.330916228087334
+    ]
+  ],
+  "max_radial_distance": 10.272603955061257,
+  "texture": [
+    512,
+    512
+  ],
+  "native_height_match": 23.85,
+  "runtime_status": "not integrated or tested in game",
+  "geometry": "new procedural mesh, not a rescaled stock model"
+}

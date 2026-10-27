@@ -1,0 +1,31 @@
+{
+  "resource_count": 14,
+  "vertex_records": 2219,
+  "vertex_loads": 73,
+  "slug": "elemental_wand",
+  "name": "Elemental Wand",
+  "entry": "objects/nei_gi_redesign/elemental_wand/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 2056,
+  "bounds_author": [
+    [
+      -16.4375,
+      -51.4375,
+      -9.0
+    ],
+    [
+      26.1875,
+      54.1875,
+      9.0
+    ]
+  ],
+  "markers": {
+    "tip_author": [
+      9.434953928387042,
+      37.841533324763866,
+      0.0
+    ]
+  },
+  "runtime_tested": false
+}

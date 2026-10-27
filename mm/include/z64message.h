@@ -333,6 +333,7 @@ bool Message_ShouldAdvance(struct PlayState* play);
 void Message_CloseTextbox(struct PlayState* play);
 void Message_DrawTextChar(struct PlayState* play, TexturePtr texture, Gfx** gfxP);
 void Message_DrawItemIcon(struct PlayState* play, Gfx** gfxP);
+int Message_DrawItemReceiptIcon(struct PlayState* play, Gfx** gfxP);
 void Message_HandleOcarina(struct PlayState* play);
 void Message_LoadItemIcon(struct PlayState* play, u16 itemId, s16 arg2);
 void Message_DecodeHeader(struct PlayState* play);

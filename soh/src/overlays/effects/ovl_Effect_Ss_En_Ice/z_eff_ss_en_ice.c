@@ -5,12 +5,16 @@
  */
 
 #include "z_eff_ss_en_ice.h"
+#include "din_fire_sword.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "render/SwordFinishIceMaterial.h"
 
 #define rLifespan regs[0]
 #define rYaw regs[1]
 #define rPitch regs[2]
 #define rRotSpeed regs[3]
+// Flying clumps never read rRotSpeed; capture provenance before the actor can die.
+#define rSwordIceMaterial regs[3]
 #define rPrimColorR regs[4]
 #define rPrimColorG regs[5]
 #define rPrimColorB regs[6]
@@ -34,6 +38,7 @@ EffectSsInit Effect_Ss_En_Ice_InitVars = {
 u32 EffectSsEnIce_Init(PlayState* play, u32 index, EffectSs* this, void* initParamsx) {
     EffectSsEnIceInitParams* initParams = (EffectSsEnIceInitParams*)initParamsx;
 
+    this->rRotSpeed = 0;
     if (initParams->type == 0) {
         Vec3f zeroVec = { 0.0f, 0.0f, 0.0f };
 
@@ -57,6 +62,7 @@ u32 EffectSsEnIce_Init(PlayState* play, u32 index, EffectSs* this, void* initPar
         this->rEnvColorB = initParams->envColor.b;
         this->rAlphaMode = 1;
         this->rPitch = Rand_CenteredFloat(65536.0f);
+        this->rSwordIceMaterial = DinFireSword_UseIceMaterial(play, initParams->actor);
     } else if (initParams->type == 1) {
         this->pos = initParams->pos;
         this->vec = initParams->pos;
@@ -92,6 +98,9 @@ void EffectSsEnIce_Draw(PlayState* play, u32 index, EffectSs* this) {
     Vec3f hiliteLightDir;
     u32 gameplayFrames;
     f32 alpha;
+    Gfx* iceMaterial = (this->update == EffectSsEnIce_UpdateFlying && this->rSwordIceMaterial)
+                           ? SwordFinishIce_GetDisplayList(play->gameplayFrames)
+                           : NULL;
 
     scale = this->rScale * 0.01f;
     gameplayFrames = play->gameplayFrames;
@@ -124,10 +133,11 @@ void EffectSsEnIce_Draw(PlayState* play, u32 index, EffectSs* this) {
     gSPSegment(POLY_XLU_DISP++, 0x08,
                Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, gameplayFrames & 0xFF, 0x20, 0x10, 1, 0,
                                   (gameplayFrames * 2) & 0xFF, 0x40, 0x20, 0, 1, 0, 2));
-    gDPSetPrimColor(POLY_XLU_DISP++, 0, 0x80, this->rPrimColorR, this->rPrimColorG, this->rPrimColorB,
-                    this->rPrimColorA);
-    gDPSetEnvColor(POLY_XLU_DISP++, this->rEnvColorR, this->rEnvColorG, this->rEnvColorB, (u32)alpha);
-    gSPDisplayList(POLY_XLU_DISP++, gEffIceFragment2DL);
+    gDPSetPrimColor(POLY_XLU_DISP++, 0, 0x80, iceMaterial ? 95 : this->rPrimColorR,
+                    iceMaterial ? 165 : this->rPrimColorG, iceMaterial ? 215 : this->rPrimColorB, this->rPrimColorA);
+    gDPSetEnvColor(POLY_XLU_DISP++, iceMaterial ? 230 : this->rEnvColorR, iceMaterial ? 250 : this->rEnvColorG,
+                   iceMaterial ? 255 : this->rEnvColorB, (u32)alpha);
+    gSPDisplayList(POLY_XLU_DISP++, iceMaterial ? iceMaterial : gEffIceFragment2DL);
 
     CLOSE_DISPS(gfxCtx);
 }
@@ -160,5 +170,5 @@ void EffectSsEnIce_UpdateFlying(PlayState* play, u32 index, EffectSs* this) {
 }
 
 void EffectSsEnIce_Update(PlayState* play, u32 index, EffectSs* this) {
-    this->rPitch += this->rRotSpeed; // rRotSpeed is not initialized so this does nothing
+    this->rPitch += this->rRotSpeed; // Normal clumps initialize rRotSpeed to zero.
 }

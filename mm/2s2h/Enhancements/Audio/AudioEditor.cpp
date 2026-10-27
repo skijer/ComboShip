@@ -1,4 +1,6 @@
 #include "AudioEditor.h"
+#include "MMWeather.h"
+#include "2s2h/Enhancements/Graphics/MMSummerAtmosphere.h"
 
 #include <map>
 #include <set>
@@ -13,7 +15,13 @@
 #include "2s2h/BenGui/BenGui.hpp"
 #include "AudioCollection.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "../../../../combo/gui/WhatsNew.h"
 #include <random>
+#ifdef COMBO_BUILD
+#include "audio/SceneMusic.h"
+#include "2s2h/Enhancements/Gameplay/ComboOpeningForest.h"
+static uint16_t sComboSceneMusicPreviewRow = 0;
+#endif
 
 extern "C" Vec3f gZeroVec3f;
 extern "C" f32 gSfxDefaultFreqAndVolScale;
@@ -36,6 +44,8 @@ static WidgetInfo voicePitchEnable;
 static WidgetInfo randoMusicOnSceneChange;
 static WidgetInfo randomAudioOnSeedGen;
 static WidgetInfo useSongCategories;
+static std::array<WidgetInfo, 8> weatherWidgets;
+static std::array<WidgetInfo, 13> seasonWeatherWidgets;
 
 namespace AudioPreview {
 
@@ -51,6 +61,16 @@ extern u8 sSeqFlags[];
 static u16 sPreviewRestoreSeqId = NA_BGM_DISABLED;
 static bool sIsBgmPreviewing = false;
 static uint8_t sGraceFrames = 0;
+
+#ifdef COMBO_BUILD
+void CancelForScene() {
+    sComboSceneMusicPreviewRow = 0;
+    sPreviewRestoreSeqId = NA_BGM_DISABLED;
+    sIsBgmPreviewing = false;
+    sGraceFrames = 0;
+    CVarSetInteger(CVAR_AUDIO("Playing"), 0);
+}
+#endif
 
 void Update() {
     if (sGraceFrames > 0) {
@@ -79,10 +99,17 @@ void Update() {
     if (!isPlaying) {
         CVarSetInteger(CVAR_AUDIO("Playing"), 0);
         sIsBgmPreviewing = false;
+#ifdef COMBO_BUILD
+        if (sComboSceneMusicPreviewRow)
+            CancelForScene();
+#endif
     }
 }
 
 void Stop() {
+#ifdef COMBO_BUILD
+    sComboSceneMusicPreviewRow = 0;
+#endif
     u16 playingSeqId = CVarGetInteger(CVAR_AUDIO("Playing"), 0);
     if (playingSeqId == 0) {
         return;
@@ -103,6 +130,11 @@ void Stop() {
 }
 
 void Play(u16 sequenceId, SeqType sequenceType) {
+#ifdef COMBO_BUILD
+    sComboSceneMusicPreviewRow = ComboSceneMusic::IsEntry(sequenceId) ? sequenceId : 0;
+    if (sComboSceneMusicPreviewRow)
+        sequenceId = AudioCollection::Instance->GetAllSequences().at(sComboSceneMusicPreviewRow).sequenceId;
+#endif
 
     // Restore original BGM before switching to non-BGM preview (songs/fanfares/ocarina).
     // Prevents the preview BGM from becoming orphaned without a stop button.
@@ -143,6 +175,10 @@ void Play(u16 sequenceId, SeqType sequenceType) {
     }
 }
 } // namespace AudioPreview
+#ifdef COMBO_BUILD
+#define COMBO_SCENE_MUSIC_MM
+#include "audio/SceneMusicNative.h"
+#endif
 
 namespace BenGui {
 extern std::shared_ptr<BenMenu> mBenMenu;
@@ -162,6 +198,15 @@ extern std::shared_ptr<BenMenu> mBenMenu;
 
 size_t AuthenticCountBySequenceType(SeqType type) {
     return AudioCollection::Instance->CountSequencesByType(type);
+}
+
+static uint16_t CurrentBGMReplacement(uint16_t sequenceId) {
+#ifdef COMBO_BUILD
+    const auto row = AudioEditor_GetSceneMusicRow(sequenceId);
+    if (row)
+        return AudioCollection::Instance->GetReplacementSequence(row);
+#endif
+    return AudioCollection::Instance->GetReplacementSequence(sequenceId);
 }
 
 // Grabs the current BGM sequence ID and replays it
@@ -189,7 +234,11 @@ void UpdateCurrentBGM(u16 seqKey, SeqType seqType) {
     }
 
     u16 curSeqId = AudioSeq_GetActiveSeqId(SEQ_PLAYER_BGM_MAIN);
-    if (curSeqId == seqKey) {
+    if (curSeqId == seqKey
+#ifdef COMBO_BUILD
+        || AudioEditor_GetSceneMusicRow(curSeqId) == seqKey
+#endif
+    ) {
         ReplayCurrentBGM();
     }
 }
@@ -386,7 +435,12 @@ void DrawPreviewButton(uint16_t sequenceId, std::string sfxKey, SeqType sequence
     const std::string previewButton = ICON_FA_PLAY + hiddenKey;
 
     UIWidgets::PushStyleButton(THEME_COLOR, ImVec2(10.0f, 6.0f));
-    if (CVarGetInteger(CVAR_AUDIO("Playing"), 0) == sequenceId) {
+    bool isPlaying = CVarGetInteger(CVAR_AUDIO("Playing"), 0) == sequenceId;
+#ifdef COMBO_BUILD
+    if (ComboSceneMusic::IsEntry(sequenceId))
+        isPlaying = sComboSceneMusicPreviewRow == sequenceId && CVarGetInteger(CVAR_AUDIO("Playing"), 0) != 0;
+#endif
+    if (isPlaying) {
         if (ImGui::Button(stopButton.c_str())) {
             AudioPreview::Stop();
         }
@@ -413,10 +467,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type) {
     UIWidgets::PushStyleButton(THEME_COLOR);
     if (ImGui::Button(resetAllButton.c_str())) {
         auto currentBGM = AudioSeq_GetActiveSeqId(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         ResetGroup(map, type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -424,10 +478,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type) {
     ImGui::SameLine();
     if (ImGui::Button(randomizeAllButton.c_str())) {
         auto currentBGM = AudioSeq_GetActiveSeqId(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         RandomizeGroup(type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -435,10 +489,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type) {
     ImGui::SameLine();
     if (ImGui::Button(lockAllButton.c_str())) {
         auto currentBGM = AudioSeq_GetActiveSeqId(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         LockGroup(map, type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -446,10 +500,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type) {
     ImGui::SameLine();
     if (ImGui::Button(unlockAllButton.c_str())) {
         auto currentBGM = AudioSeq_GetActiveSeqId(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         UnlockGroup(map, type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -476,7 +530,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type) {
         if ((((seqData.type & SEQ_BGM_CUSTOM) || seqData.type == SEQ_BGM_CUSTOM_FANFARE) &&
              defaultValue >= MAX_AUTHENTIC_SEQID) ||
             seqData.canBeReplaced == false) {
-            continue;
+#ifdef COMBO_BUILD
+            if (!ComboSceneMusic::IsEntry(defaultValue))
+#endif
+                continue;
         }
 
         const std::string initialSfxKey = seqData.sfxKey;
@@ -487,7 +544,11 @@ void Draw_SfxTab(const std::string& tabId, SeqType type) {
         const std::string randomizeButton = ICON_FA_RANDOM + hiddenKey;
         const std::string lockedButton = ICON_FA_LOCK + hiddenKey;
         const std::string unlockedButton = ICON_FA_UNLOCK + hiddenKey;
-        const int currentValue = CVarGetInteger(cvarKey.c_str(), defaultValue);
+        const int currentValue =
+#ifdef COMBO_BUILD
+            ComboSceneMusic::IsEntry(defaultValue) ? AudioCollection::Instance->GetReplacementSequence(defaultValue) :
+#endif
+                                                   CVarGetInteger(cvarKey.c_str(), defaultValue);
 
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
@@ -646,9 +707,10 @@ void DrawTypeChip(SeqType type) {
     ImGui::EndDisabled();
 }
 
-void AudioEditorRegisterRandomizeAllOnNewScene() {
-    COND_VB_SHOULD(VB_PLAY_TRANSITION_CS, CVarGetInteger(CVAR_AUDIO("RandomizeAllOnNewScene"), 0),
-                   { AudioEditor_RandomizeAll(); });
+extern "C" void AudioEditor_RandomizeOnSceneLoad() {
+    if (gSaveContext.gameMode == GAMEMODE_NORMAL && CVarGetInteger(CVAR_AUDIO("RandomizeAllOnNewScene"), 0)) {
+        AudioEditor_RandomizeAll();
+    }
 }
 
 void AudioEditor::InitElement() {
@@ -660,6 +722,41 @@ void AudioEditor::InitElement() {
 
     // This prevents preview state from getting out of sync when the menu is closed
     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnGameStateUpdate>(AudioPreview::Update);
+}
+
+static void DrawWeatherOptions() {
+    const auto draw = [](WidgetInfo& widget) {
+        BenGui::mBenMenu->MenuDrawItem(widget, ImGui::GetContentRegionAvail().x, THEME_COLOR);
+    };
+
+    ImGui::SeparatorText("Seasonal Presentation");
+    draw(seasonWeatherWidgets[0]);
+    ImGui::TextWrapped("Manual seasons affect outdoor presentation without unlocking the Rod or seasons. "
+                       "Native restores original game weather. Seasonal effects defer to story scenes.");
+    ImGui::TextWrapped("Configure each season below; opening a tab does not change the selected season.");
+    if (ImGui::BeginTabBar("SeasonWeatherSettings")) {
+        const auto drawSeason = [&](const char* name, size_t first, size_t last) {
+            if (WhatsNew::BeginTabItem(name, CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0)) {
+                for (size_t i = first; i <= last; ++i) {
+                    draw(seasonWeatherWidgets[i]);
+                }
+                ImGui::EndTabItem();
+            }
+        };
+        drawSeason("Spring", 1, 2);
+        drawSeason("Summer", 3, 6);
+        drawSeason("Autumn", 7, 8);
+        drawSeason("Winter", 9, 12);
+        ImGui::EndTabBar();
+    }
+
+    ImGui::SeparatorText("Outdoor Rain");
+    for (auto& widget : weatherWidgets) {
+        draw(widget);
+    }
+    ImGui::TextWrapped("Outdoor Rain is an independent override: when enabled, it takes priority over "
+                       "Native weather and seasonal rain choices, including Off. It also overrides outdoor "
+                       "story weather restrictions. Indoor and underwater views are excluded.");
 }
 
 void AudioEditor::DrawElement() {
@@ -717,6 +814,13 @@ void AudioEditor::DrawElement() {
             ImGui::EndChild();
             ImGui::EndTable();
             ImGui::PopStyleVar(1);
+            ImGui::EndTabItem();
+        }
+        if (WhatsNew::BeginTabItem("Weather & Seasons", CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0)) {
+            if (ImGui::BeginChild("WeatherOptions", ImVec2(0, -8))) {
+                DrawWeatherOptions();
+            }
+            ImGui::EndChild();
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Background Music")) {
@@ -976,11 +1080,191 @@ void AudioEditor_UnlockAll() {
     Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
 }
 
-void AddAudioSearchWidget(WidgetInfo& widgetInfo) {
-    BenGui::mBenMenu->AddSearchWidget({ widgetInfo, "Enhancements", "Audio Editor", "Audio Options" });
+void AddAudioSearchWidget(WidgetInfo& widgetInfo, const char* tab = "Audio Options") {
+    BenGui::mBenMenu->AddSearchWidget({ widgetInfo, "Enhancements", "Audio Editor", tab });
 }
 
 void RegisterAudioWidgets() {
+
+    weatherWidgets[0] = { .name = "Enable Outdoor Rain", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    weatherWidgets[0]
+        .CVar(MM_WEATHER_CVAR("Enabled"))
+        .Options(
+            CheckboxOptions()
+                .DefaultValue(false)
+                .Color(THEME_COLOR)
+                .Tooltip("Adds rain outdoors while playing MM, overriding story weather and lighting restrictions. "
+                         "Independent of OoT weather. Indoor and underwater views are excluded."));
+    static const std::unordered_map<int32_t, const char*> rainModes = { { 0, "Persistent" }, { 1, "Intermittent" } };
+    weatherWidgets[1] = { .name = "Outdoor Rain Mode", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    weatherWidgets[1]
+        .CVar(MM_WEATHER_CVAR("Mode"))
+        .Options(
+            ComboboxOptions()
+                .ComboMap(&rainModes)
+                .DefaultIndex(0)
+                .Color(THEME_COLOR)
+                .Tooltip("Persistent rain continues outdoors. Intermittent rain alternates showers and dry periods."));
+    weatherWidgets[2] = { .name = "Outdoor Rain Color", .type = WidgetType::WIDGET_CUSTOM };
+    weatherWidgets[2].CVar(MM_WEATHER_CVAR("RainColor"));
+    weatherWidgets[2].CustomFunction([](WidgetInfo&) {
+        UIWidgets::CVarColorPicker("Outdoor Rain Color", MM_WEATHER_CVAR("RainColor"),
+                                   Color_RGBA8{ 150, 255, 255, 255 }, false, nullptr, THEME_COLOR);
+    });
+    weatherWidgets[3] = { .name = "Overcast During Outdoor Rain", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    weatherWidgets[3]
+        .CVar(MM_WEATHER_CVAR("Overcast"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Blends in cloudy skies and dims outdoor lighting during added rain."));
+    weatherWidgets[4] = { .name = "Thunder During Outdoor Rain", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    weatherWidgets[4]
+        .CVar(MM_WEATHER_CVAR("Thunder"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Adds lightning and thunder during added rain. An active flash finishes when disabled."));
+    weatherWidgets[5] = { .name = "Outdoor Rain Volume: %d%%", .type = WidgetType::WIDGET_CVAR_SLIDER_INT };
+    weatherWidgets[5]
+        .CVar(MM_WEATHER_CVAR("RainVolume"))
+        .Options(IntSliderOptions()
+                     .Min(0)
+                     .Max(100)
+                     .DefaultValue(100)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Volume of added rain, also controlled by Master and Sound Effects volume."));
+    weatherWidgets[6] = { .name = "Outdoor Thunder Volume: %d%%", .type = WidgetType::WIDGET_CVAR_SLIDER_INT };
+    weatherWidgets[6]
+        .CVar(MM_WEATHER_CVAR("ThunderVolume"))
+        .Options(IntSliderOptions()
+                     .Min(0)
+                     .Max(100)
+                     .DefaultValue(100)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Volume of added thunder. Changes also apply to thunder that is already playing."));
+    weatherWidgets[7] = { .name = "Outdoor Thunder Frequency: %d%%", .type = WidgetType::WIDGET_CVAR_SLIDER_INT };
+    weatherWidgets[7]
+        .CVar(MM_WEATHER_CVAR("ThunderFrequency"))
+        .Options(IntSliderOptions()
+                     .Min(25)
+                     .Max(200)
+                     .DefaultValue(100)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Higher values produce thunder more often during added rain."));
+    for (auto& widget : weatherWidgets) {
+        AddAudioSearchWidget(widget, "Weather & Seasons");
+    }
+
+    static const std::unordered_map<int32_t, const char*> seasonChoices = {
+        { -2, "Follow Game / Rod" }, { -1, "Native" },
+        { SEASON_SPRING, "Spring" }, { SEASON_SUMMER, "Summer" },
+        { SEASON_AUTUMN, "Autumn" }, { SEASON_WINTER, "Winter" }
+    };
+    seasonWeatherWidgets[0] = { .name = "Native Weather", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    seasonWeatherWidgets[0]
+        .CVar(MM_WEATHER_CVAR("Season"))
+        .Options(ComboboxOptions()
+                     .ComboMap(&seasonChoices)
+                     .DefaultIndex(-2)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Follow Game / Rod uses your current gameplay season. Native restores the original game "
+                              "presentation. Manual Spring, Summer, Autumn and Winter affect outdoor visuals only, "
+                              "without granting the Rod, unlocking seasons or changing seed progress."));
+    static const std::unordered_map<int32_t, const char*> seasonRainModes = {
+        { -1, "Season Default" }, { 0, "Off" }, { 1, "Persistent" }, { 2, "Intermittent" }
+    };
+    seasonWeatherWidgets[1] = { .name = "Spring Rain", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    seasonWeatherWidgets[1]
+        .CVar(MM_WEATHER_CVAR("Spring.RainMode"))
+        .Options(ComboboxOptions()
+                     .ComboMap(&seasonRainModes)
+                     .DefaultIndex(-1)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Season Default keeps persistent Spring rain and soft overcast on all three days. "
+                              "Off, Persistent and Intermittent replace native rain while Spring is active. "
+                              "The separate Outdoor Rain override still takes priority."));
+    seasonWeatherWidgets[2] = { .name = "Spring Falling Petals", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[2]
+        .CVar(MM_WEATHER_CVAR("Spring.Blossoms"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Falling pink petals outdoors during Spring."));
+    seasonWeatherWidgets[3] = { .name = "Summer Atmosphere", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[3]
+        .CVar(MM_SUMMER_CVAR("Enabled"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Enables Summer fluff, nighttime fireflies and optional sunbeams. "
+                              "Each effect also has its own setting below."));
+    seasonWeatherWidgets[4] = { .name = "Summer Drifting Fluff", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[4]
+        .CVar(MM_SUMMER_CVAR("Fluff"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Drifting dandelion fluff during clear Summer days."));
+    seasonWeatherWidgets[5] = { .name = "Summer Nighttime Fireflies", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[5]
+        .CVar(MM_SUMMER_CVAR("Fireflies"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Keeps the existing softly pulsing Summer fireflies after dusk."));
+    seasonWeatherWidgets[6] = { .name = "Soft Summer Sunbeams", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[6]
+        .CVar(MM_SUMMER_CVAR("Sunbeams"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(false)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Three soft shafts of sunlight during clear Summer days. Disabled by default."));
+    seasonWeatherWidgets[7] = { .name = "Autumn Rain", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    seasonWeatherWidgets[7]
+        .CVar(MM_WEATHER_CVAR("Autumn.RainMode"))
+        .Options(ComboboxOptions()
+                     .ComboMap(&seasonRainModes)
+                     .DefaultIndex(-1)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Season Default keeps gentle intermittent Autumn showers with clear skies between them. "
+                              "Off, Persistent and Intermittent replace native rain while Autumn is active. "
+                              "The separate Outdoor Rain override still takes priority."));
+    seasonWeatherWidgets[8] = { .name = "Autumn Falling Leaves", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[8]
+        .CVar(MM_WEATHER_CVAR("Autumn.Leaves"))
+        .Options(
+            CheckboxOptions().DefaultValue(true).Color(THEME_COLOR).Tooltip("Falling leaves outdoors during Autumn."));
+    seasonWeatherWidgets[9] = { .name = "Winter Snow", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[9]
+        .CVar(MM_WEATHER_CVAR("Winter.Snow"))
+        .Options(
+            CheckboxOptions().DefaultValue(true).Color(THEME_COLOR).Tooltip("Falling snow outdoors during Winter."));
+    seasonWeatherWidgets[10] = { .name = "Winter Windblown Flurries", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[10]
+        .CVar(MM_WEATHER_CVAR("Winter.Flurries"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(false)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Adds gusts of windblown snow when Winter Snow is enabled."));
+    seasonWeatherWidgets[11] = { .name = "Winter Freezing Mist", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[11]
+        .CVar(MM_WEATHER_CVAR("Winter.Mist"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Soft ground mist outdoors during Winter, independent of Winter Snow."));
+    seasonWeatherWidgets[12] = { .name = "Winter Nighttime Aurora", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[12]
+        .CVar(MM_WEATHER_CVAR("Winter.Aurora"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Blue and green ribbons in the normal outdoor sky during Winter nights. "
+                              "Fades in at dusk and out at dawn, independent of Winter Snow and Mist."));
+    for (auto& widget : seasonWeatherWidgets) {
+        AddAudioSearchWidget(widget, "Weather & Seasons");
+    }
 
     lowHpAlarm = { .name = "Mute Low HP Alarm", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
     lowHpAlarm.CVar(CVAR_AUDIO("LowHpAlarm"))
@@ -1015,12 +1299,13 @@ void RegisterAudioWidgets() {
                               "your custom music for each scene more often."));
     AddAudioSearchWidget(enemyProx);
 
-    randoMusicOnSceneChange = { .name = "Randomize All Music and Sound Effects on New Scene",
+    randoMusicOnSceneChange = { .name = "Randomize All Music and Sound Effects on Scene Reload",
                                 .type = WidgetType::WIDGET_CVAR_CHECKBOX };
     randoMusicOnSceneChange.CVar(CVAR_AUDIO("RandomizeAllOnNewScene"))
         .Options(CheckboxOptions()
                      .Color(THEME_COLOR)
-                     .Tooltip("Enables randomizing all unlocked music and sound effects when you enter a new scene."));
+                     .Tooltip("Randomizes unlocked music and sound effects whenever you enter or reload a scene. "
+                              "Disabled by default; respects locks, the shuffle pool, and song categories."));
     AddAudioSearchWidget(randoMusicOnSceneChange);
 
     randomAudioOnSeedGen = { .name = "Randomize All Music and Sound Effects on Randomizer Generation",
@@ -1078,6 +1363,3 @@ void RegisterAudioWidgets() {
 }
 
 static RegisterMenuInitFunc initAudioWidgets(RegisterAudioWidgets);
-
-static RegisterShipInitFunc initFuncRandomizeAllOnNewScene(AudioEditorRegisterRandomizeAllOnNewScene,
-                                                           { CVAR_AUDIO("RandomizeAllOnNewScene") });

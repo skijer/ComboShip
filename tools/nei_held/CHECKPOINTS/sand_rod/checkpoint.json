@@ -1,0 +1,64 @@
+{
+  "resource_count": 9,
+  "vertex_records": 1826,
+  "vertex_loads": 64,
+  "slug": "sand_rod",
+  "name": "Sand Rod",
+  "entry": "objects/nei_held_redesign/sand_rod/gi_dl",
+  "draw_scale": 0.12,
+  "matrix_scale": 0.0625,
+  "triangles": 1848,
+  "bounds_author": [
+    [
+      -36.0,
+      -175.0,
+      -23.0
+    ],
+    [
+      36.0,
+      175.0,
+      23.0
+    ]
+  ],
+  "markers": {
+    "grip_native": [
+      0,
+      -45.5,
+      0
+    ],
+    "shaft_axis_native": [
+      0,
+      1,
+      0
+    ],
+    "tip_native": [
+      0,
+      175,
+      0
+    ],
+    "native_bounds": [
+      [
+        -36,
+        -175,
+        -23
+      ],
+      [
+        36,
+        175,
+        23
+      ]
+    ],
+    "axial_scale_about_grip": [
+      3.2375,
+      3.3923076923076922
+    ]
+  },
+  "notes": [
+    "GI Z -14-degree display tilt removed; no GI spin/shimmer.",
+    "Exact native +Y axis, legacy leather grip center -45.5 and 350-unit axial envelope.",
+    "Small piecewise axial fit about grip retains both pommel and crown endpoints.",
+    "OoT calibrated parent pose is unchanged; MM uses its measured right-palm socket.",
+    "All used source materials are opaque; no synthetic translucent shell."
+  ],
+  "runtime_tested": false
+}

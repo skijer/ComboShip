@@ -9,6 +9,10 @@
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include <libultraship/bridge/consolevariablebridge.h>
+
+// Mask of Truth gossip-stone fairy reveal (randomizer-aware). Skijer's NEI
+extern s32 ShuffleFairies_SpawnStoneFairyOnTalk(EnGs* gossipStone);
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -183,6 +187,19 @@ void func_80A4E648(EnGs* this, PlayState* play) {
         this->unk_19C = func_80A4E3EC(this, play);
     } else if (Actor_ProcessTalkRequest(&this->actor, play)) {
         this->unk_19C = 2;
+        // Mask of Truth: talking to a gossip stone reveals its fairy — the same
+        // fairies the fairy-spawning songs summon (randomizer-checked). Gated by
+        // the stone's own switch flag so it spawns once and the song path won't
+        // re-spawn it afterward. Skijer's NEI
+        if (Player_GetMask(play) == PLAYER_MASK_TRUTH && !Flags_GetSwitch(play, (this->actor.params >> 8) & 0x3F)) {
+            if (!ShuffleFairies_SpawnStoneFairyOnTalk(this)) {
+                // Vanilla (no stone-fairy shuffle): spawn the heal fairy directly.
+                Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ELF, this->actor.world.pos.x,
+                            this->actor.world.pos.y + 40.0f, this->actor.world.pos.z, 0, 0, 0, FAIRY_HEAL_TIMED);
+                Audio_PlayActorSound2(&this->actor, NA_SE_EV_BUTTERFRY_TO_FAIRY);
+                Flags_SetSwitch(play, (this->actor.params >> 8) & 0x3F);
+            }
+        }
     } else {
         Actor_GetScreenPos(play, &this->actor, &sp26, &sp24);
         if ((sp26 >= 0) && (sp26 <= SCREEN_WIDTH) && (sp24 >= 0) && (sp24 <= SCREEN_HEIGHT) && (this->unk_19C != 3)) {
@@ -324,14 +341,14 @@ void func_80A4ED34(EnGs* this, PlayState* play) {
             if (this->unk_200 < 20) {
                 Color_RGBA8_Copy(&this->flashColor, &flashRed);
                 if ((this->unk_200 % 20) == 7) {
-                    Audio_PlaySoundGeneral(NA_SE_SY_WARNING_COUNT_E, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_WARNING_COUNT_E, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
             } else {
                 Color_RGBA8_Copy(&this->flashColor, &flashBlue);
                 if ((this->unk_200 % 20) == 7) {
-                    Audio_PlaySoundGeneral(NA_SE_SY_WARNING_COUNT_N, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_WARNING_COUNT_N, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
             }
         }

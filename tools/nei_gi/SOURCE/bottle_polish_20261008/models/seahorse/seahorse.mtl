@@ -1,0 +1,10 @@
+newmtl material3
+Kd 1 1 1
+d 1
+illum 2
+map_Kd seahorse_00.png
+newmtl material2
+Kd 1 1 1
+d 1
+illum 2
+map_Kd seahorse_00.png

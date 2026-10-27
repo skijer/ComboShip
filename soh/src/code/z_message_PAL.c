@@ -1,5 +1,8 @@
 #include "global.h"
+#include "young_epona.h"
 #include "message_data_static.h"
+#include "ComboBossSoulColor.h"
+#include "ComboItemReceiptRender.h"
 #include "vt.h"
 
 #include <string.h>
@@ -11,10 +14,39 @@
 #include "soh/Enhancements/cosmetics/cosmeticsTypes.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+// Defines SHIP_SAVESTATE_DEFINE, used at the bottom of this file. It arrived with the upstream
+// merge in the same include block we resolved in favour of ours, so it has to be restored.
+#include "soh/Enhancements/savestate_serialize.h"
 #include "soh/OTRGlobals.h"
 #include "soh/SaveManager.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Enhancements/savestate_serialize.h"
+#include "mods/extended_inventory.h"
+#include "mods/extended_equipment.h"
+#include "mods/nei_save.h" // Skijer's NEI: mmQuestItems (MM/custom song ownership for the MM quest page)
+#include "mods/transformation_masks/transformation_masks.h" // MmForm_GetOcarinaPlaybackInstrument
+
+static u8 sCapeVisibilityChoice;
+
+void Message_SetCapeVisibilityChoice(int enabled) {
+    sCapeVisibilityChoice = enabled != 0;
+}
+
+static int Message_HandleCapeVisibilityChoice(PlayState* play) {
+    MessageContext* msgCtx = &play->msgCtx;
+    if (!sCapeVisibilityChoice || msgCtx->msgMode != MSGMODE_TEXT_DONE ||
+        msgCtx->textboxEndType != TEXTBOX_ENDTYPE_2_CHOICE)
+        return false;
+    // Fast-text B/C-up presses must never accept the appearance preference.
+    if (CHECK_BTN_ALL(play->state.input[0].press.button, BTN_A) && Message_ShouldAdvance(play)) {
+        Nei_Save()->capeHidden = msgCtx->choiceIndex != 0;
+        sCapeVisibilityChoice = false;
+        Message_CloseTextbox(play);
+    }
+    return true;
+}
+
+// SOH [Enhancement] Text Speed which fills whole box in one frame
+#define TEXT_SPEED_INSTANT 6
 
 // #region SOH [NTSC] - Allows custom messages to work on japanese
 static bool sDisplayNextMessageAsEnglish = false;
@@ -44,7 +76,7 @@ static s16 sHasSunsSong = false;
 
 s16 sMessageHasSetSfx = false;
 
-static u16 sOcarinaSongBitFlags = 0; // ocarina bit flags
+u32 sOcarinaSongBitFlags = 0; // ocarina bit flags (Skijer's NEI: widened — MM/custom songs at param bits 16-25)
 
 MessageTableEntry* sNesMessageEntryTablePtr = NULL;
 MessageTableEntry* sGerMessageEntryTablePtr = NULL;
@@ -165,8 +197,8 @@ u8 Message_ShouldAdvance(PlayState* play) {
                                                                          : CHECK_BTN_ALL(input->press.button, BTN_B);
 
     if (CHECK_BTN_ALL(input->press.button, BTN_A) || isB_Held || CHECK_BTN_ALL(input->press.button, BTN_CUP)) {
-        Audio_PlaySoundGeneral(NA_SE_SY_MESSAGE_PASS, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_MESSAGE_PASS, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
     return CHECK_BTN_ALL(input->press.button, BTN_A) || isB_Held || CHECK_BTN_ALL(input->press.button, BTN_CUP);
 }
@@ -191,8 +223,8 @@ void Message_CloseTextbox(PlayState* play) {
         msgCtx->stateTimer = 2;
         msgCtx->msgMode = MSGMODE_TEXT_CLOSING;
         msgCtx->textboxEndType = TEXTBOX_ENDTYPE_DEFAULT;
-        Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultReverb);
     }
 }
 
@@ -208,8 +240,8 @@ void Message_HandleChoiceSelection(PlayState* play, u8 numChoices) {
         if (msgCtx->choiceIndex > 128) {
             msgCtx->choiceIndex = 0;
         } else {
-            Audio_PlaySoundGeneral(NA_SE_SY_CURSOR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_SY_CURSOR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     } else if ((input->rel.stick_y <= -30 && !sAnalogStickHeld) ||
                (dpad && CHECK_BTN_ALL(input->press.button, BTN_DDOWN))) {
@@ -218,8 +250,8 @@ void Message_HandleChoiceSelection(PlayState* play, u8 numChoices) {
         if (msgCtx->choiceIndex > numChoices) {
             msgCtx->choiceIndex = numChoices;
         } else {
-            Audio_PlaySoundGeneral(NA_SE_SY_CURSOR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_SY_CURSOR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     } else if (ABS(input->rel.stick_y) < 30) {
         sAnalogStickHeld = false;
@@ -838,24 +870,90 @@ f32 sFontWidths[144] = {
     14.0f, // ?
 };
 
+// Receipt layout is staged by the message object, then reset before every
+// new textbox. Read-only donor exports never stage or alter this state.
+static CwItemReceiptPresentation sItemReceiptPresentation;
+static CwItemReceiptLayout sItemReceiptLayout;
+static int sItemReceiptFirstPage;
+static int sItemReceiptReflowed;
+
+void Message_SetItemReceiptPresentation(const CwItemReceiptPresentation* presentation) {
+    memset(&sItemReceiptPresentation, 0, sizeof(sItemReceiptPresentation));
+    memset(&sItemReceiptLayout, 0, sizeof(sItemReceiptLayout));
+    sItemReceiptFirstPage = false;
+    sItemReceiptReflowed = false;
+    if (presentation && presentation->singleBox == 1) {
+        sItemReceiptPresentation = *presentation;
+        if (!ComboReceipt_HasIcon(presentation))
+            sItemReceiptPresentation.iconPath[0] = '\0';
+    }
+}
+
+static void Message_ApplyItemReceiptLayout(PlayState* play) {
+    MessageContext* msgCtx = &play->msgCtx;
+    if (!sItemReceiptPresentation.singleBox)
+        return;
+    if (!sItemReceiptReflowed) {
+        sItemReceiptLayout = ComboReceipt_Layout(&sItemReceiptPresentation, msgCtx->font.msgBuf, msgCtx->msgLength,
+                                                 sizeof(msgCtx->font.msgBuf), false, sFontWidths, 144);
+        msgCtx->msgLength = msgCtx->font.msgLength = sItemReceiptLayout.bodySize;
+        sItemReceiptReflowed = true;
+    }
+    sItemReceiptFirstPage = (uint32_t)msgCtx->msgBufPos >= sItemReceiptLayout.iconPageStart &&
+                            (uint32_t)msgCtx->msgBufPos <= sItemReceiptLayout.firstPageEnd;
+    R_TEXT_CHAR_SCALE = sItemReceiptFirstPage ? sItemReceiptLayout.textScale : 75;
+    R_TEXT_LINE_SPACING = 12;
+}
+
+static int Message_HasItemReceiptIcon(void) {
+    return sItemReceiptFirstPage && ComboReceipt_HasIcon(&sItemReceiptPresentation);
+}
+
+static void Message_DrawItemReceiptIcon(PlayState* play, Gfx** p) {
+    MessageContext* msgCtx = &play->msgCtx;
+    if (Message_HasItemReceiptIcon()) {
+        int y = sItemReceiptPresentation.rewardLine == 1
+                    ? R_TEXT_INIT_YPOS + sItemReceiptLayout.iconY
+                    : msgCtx->textPosY - (sItemReceiptLayout.iconHeight - R_TEXT_CHAR_SCALE * 16 / 100) / 2;
+        *p = ComboReceipt_DrawIcon(*p, &sItemReceiptPresentation, &sItemReceiptLayout,
+                                   R_TEXT_INIT_XPOS + sItemReceiptLayout.iconX, y, msgCtx->textColorAlpha);
+    }
+}
+
 u16 Message_DrawItemIcon(PlayState* play, u16 itemId, Gfx** p, u16 i) {
     s32 pad;
     Gfx* gfx = *p;
     MessageContext* msgCtx = &play->msgCtx;
 
     // clang-format off
-    if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) { Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb); }
+    if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) { Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb); }
     // clang-format on
 
     gDPPipeSync(gfx++);
     gDPSetCombineMode(gfx++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
     gDPSetPrimColor(gfx++, 0, 0, 255, 255, 255, msgCtx->textColorAlpha);
 
+    if (Message_HasItemReceiptIcon()) {
+        Message_DrawItemReceiptIcon(play, &gfx);
+        *p = gfx;
+        return i + 1;
+    }
+
     // Invalidate icon texture as it may have changed from the last time a text box had an icon
     gSPInvalidateTexCache(gfx++, (uintptr_t)msgCtx->textboxSegment + MESSAGE_STATIC_TEX_SIZE);
 
-    if (GameInteractor_Should(VB_DRAW_ITEM_ICON, itemId < ITEM_CUSTOM, &gfx)) {
-        if (itemId >= ITEM_MEDALLION_FOREST) {
+    if (GameInteractor_Should(VB_DRAW_ITEM_ICON, true, &gfx)) {
+        // Mirror develop's vanilla behavior (>= ITEM_MEDALLION_FOREST → 24x24, else → 32x32),
+        // and carve out only the NEI custom-item range [ITEM_ROCS_FEATHER_SKIJER..ITEM_EXT_BOOTS_3]
+        // into the 32x32 branch. Items beyond ITEM_EXT_BOOTS_3 (e.g. ITEM_LAST_USED, ITEM_NONE)
+        // stay on the 24x24 path matching mainline so vanilla quest icons don't glitch.
+        if (itemId >= ITEM_MEDALLION_FOREST && !(itemId >= ITEM_ROCS_FEATHER_SKIJER && itemId <= ITEM_EXT_BOOTS_3) &&
+            // Bottle Randomizer extras (0xF4/0xF5) sit past ITEM_EXT_BOOTS_3 but are NEI custom
+            // items with 32x32 icons (Message_LoadItemIcon's >= ITEM_ROCS_FEATHER_SKIJER branch),
+            // so they must draw on the 32x32 path too. Skijer's NEI
+            !(itemId == ITEM_NET || itemId == ITEM_BOTTOMLESS_BOTTLE) &&
+            // La pluma SHIP-VANILLA (0x9D): 32x32 en gItemIcons, un id por debajo del rango custom.
+            itemId != ITEM_ROCS_FEATHER) {
             gDPLoadTextureBlock(gfx++, (uintptr_t)msgCtx->textboxSegment + MESSAGE_STATIC_TEX_SIZE, G_IM_FMT_RGBA,
                                 G_IM_SIZ_32b, 24, 24, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                 G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
@@ -865,9 +963,12 @@ u16 Message_DrawItemIcon(PlayState* play, u16 itemId, Gfx** p, u16 i) {
                                 G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
         }
     }
+    // Custom song receipts retain the native 16x24 clef aspect. All other
+    // receipt icons use the existing square 24/32px metrics.
+    s16 iconHeight = R_TEXTBOX_ICON_SIZE == 16 ? 24 : R_TEXTBOX_ICON_SIZE;
     gSPTextureRectangle(gfx++, (msgCtx->textPosX + R_TEXTBOX_ICON_XPOS) << 2, R_TEXTBOX_ICON_YPOS << 2,
                         (msgCtx->textPosX + R_TEXTBOX_ICON_XPOS + R_TEXTBOX_ICON_SIZE) << 2,
-                        (R_TEXTBOX_ICON_YPOS + R_TEXTBOX_ICON_SIZE) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                        (R_TEXTBOX_ICON_YPOS + iconHeight) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
     gDPPipeSync(gfx++);
     gDPSetCombineLERP(gfx++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0);
 
@@ -990,8 +1091,8 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
             case MESSAGE_BOX_BREAK_JPN:
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
                     if (!sTextboxSkipped) {
-                        Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         msgCtx->msgMode = MSGMODE_TEXT_AWAIT_NEXT;
                         Font_LoadMessageBoxIcon(&play->msgCtx.font, TEXTBOX_ICON_TRIANGLE);
                     } else {
@@ -1009,8 +1110,8 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
                 GameInteractor_Should(VB_FIX_TEXT_SPEED_SOFTLOCK, false, i + 1);
                 msgCtx->textboxEndType = TEXTBOX_ENDTYPE_HAS_NEXT;
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
-                    Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     Font_LoadMessageBoxIcon(&play->msgCtx.font, TEXTBOX_ICON_TRIANGLE);
                 }
@@ -1066,9 +1167,8 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
             case MESSAGE_SFX_JPN:
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING && !sMessageHasSetSfx) {
                     sMessageHasSetSfx = true;
-                    Audio_PlaySoundGeneral(msgCtx->msgBufDecodedWide[i + 1], &gSfxDefaultPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(msgCtx->msgBufDecodedWide[i + 1], &gSfxDefaultPos, 4,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 i++;
                 break;
@@ -1078,7 +1178,7 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
             case MESSAGE_BACKGROUND_JPN:
                 // clang-format off
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) { \
-                    Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 // clang-format on
                 gDPPipeSync(gfx++);
@@ -1161,8 +1261,8 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     if (msgCtx->textboxEndType == TEXTBOX_ENDTYPE_DEFAULT) {
-                        Audio_PlaySoundGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         Font_LoadMessageBoxIcon(font, TEXTBOX_ICON_SQUARE);
                         if (play->csCtx.state == 0) {
                             Interface_SetDoAction(play, DO_ACTION_RETURN);
@@ -1193,8 +1293,8 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
                 return;
             case MESSAGE_PERSISTENT_JPN:
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
-                    Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     msgCtx->textboxEndType = TEXTBOX_ENDTYPE_PERSISTENT;
                 }
@@ -1205,8 +1305,8 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     msgCtx->textboxEndType = TEXTBOX_ENDTYPE_EVENT;
                     Font_LoadMessageBoxIcon(&play->msgCtx.font, TEXTBOX_ICON_TRIANGLE);
-                    Audio_PlaySoundGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 *gfxP = gfx;
                 return;
@@ -1228,8 +1328,8 @@ void Message_DrawTextJPN(PlayState* play, Gfx** gfxP) {
                 }
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING && i + 1 == msgCtx->textDrawPos &&
                     msgCtx->textDelayTimer == msgCtx->textDelay) {
-                    Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 Message_DrawTextChar(play, &font->charTexBuf[charTexIdx], &gfx);
                 charTexIdx += FONT_CHAR_TEX_SIZE;
@@ -1324,15 +1424,26 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
                 break;
             case MESSAGE_COLOR:
                 Message_SetTextColor(msgCtx, msgCtx->msgBufDecoded[++i] & 0xF);
+                if ((msgCtx->msgBufDecoded[i] & 0xF) == 2) {
+                    const uint32_t rgb = ComboBossSoulSpanColor((const uint8_t*)msgCtx->msgBufDecoded + i + 1,
+                                                                sizeof(msgCtx->msgBufDecoded) - i - 1, false);
+                    if (rgb) {
+                        msgCtx->textColorR = (rgb >> 16) & 0xFF;
+                        msgCtx->textColorG = (rgb >> 8) & 0xFF;
+                        msgCtx->textColorB = rgb & 0xFF;
+                    }
+                }
                 break;
             case ' ':
-                msgCtx->textPosX += CVarGetInteger(CVAR_ENHANCEMENT("TextSpacing"), 6);
+                msgCtx->textPosX += sItemReceiptPresentation.singleBox && sItemReceiptFirstPage
+                                        ? 6 * sItemReceiptLayout.textScale / 75
+                                        : CVarGetInteger(CVAR_ENHANCEMENT("TextSpacing"), 6);
                 break;
             case MESSAGE_BOX_BREAK:
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
                     if (!sTextboxSkipped) {
-                        Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         msgCtx->msgMode = MSGMODE_TEXT_AWAIT_NEXT;
                         Font_LoadMessageBoxIcon(font, TEXTBOX_ICON_TRIANGLE);
                     } else {
@@ -1349,8 +1460,8 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
             case MESSAGE_TEXTID:
                 msgCtx->textboxEndType = TEXTBOX_ENDTYPE_HAS_NEXT;
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
-                    Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     Font_LoadMessageBoxIcon(font, TEXTBOX_ICON_TRIANGLE);
                 }
@@ -1423,9 +1534,8 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
                     // "Sound (SE)"
                     osSyncPrintf("サウンド（ＳＥ）\n");
                     sfxHi = msgCtx->msgBufDecoded[i + 1] << 8;
-                    Audio_PlaySoundGeneral(sfxHi | msgCtx->msgBufDecoded[i + 2], &gSfxDefaultPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(sfxHi | msgCtx->msgBufDecoded[i + 2], &gSfxDefaultPos, 4,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 i += 2;
                 break;
@@ -1434,7 +1544,7 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
                 break;
             case MESSAGE_BACKGROUND:
                 // clang-format off
-                if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) { Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb); }
+                if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) { Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb); }
                 // clang-format on
                 gDPPipeSync(gfx++);
                 gDPSetCombineMode(gfx++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
@@ -1517,8 +1627,8 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     if (msgCtx->textboxEndType == TEXTBOX_ENDTYPE_DEFAULT) {
-                        Audio_PlaySoundGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         Font_LoadMessageBoxIcon(font, TEXTBOX_ICON_SQUARE);
                         if (play->csCtx.state == 0) {
                             Interface_SetDoAction(play, DO_ACTION_RETURN);
@@ -1549,8 +1659,8 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
                 return;
             case MESSAGE_PERSISTENT:
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING) {
-                    Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     msgCtx->textboxEndType = TEXTBOX_ENDTYPE_PERSISTENT;
                 }
@@ -1561,8 +1671,8 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
                     msgCtx->msgMode = MSGMODE_TEXT_DONE;
                     msgCtx->textboxEndType = TEXTBOX_ENDTYPE_EVENT;
                     Font_LoadMessageBoxIcon(font, TEXTBOX_ICON_TRIANGLE);
-                    Audio_PlaySoundGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_MESSAGE_END, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 *gfxP = gfx;
                 return;
@@ -1572,8 +1682,8 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
                     gSaveContext.ship.filenameLanguage == NAME_LANGUAGE_NTSC_JPN) {
                     if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING && i + 1 == msgCtx->textDrawPos &&
                         msgCtx->textDelayTimer == msgCtx->textDelay) {
-                        Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     }
                     Message_DrawTextChar(play, &font->charTexBuf[charTexIdx], &gfx);
                     charTexIdx += FONT_CHAR_TEX_SIZE;
@@ -1586,8 +1696,8 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
             default:
                 if (msgCtx->msgMode == MSGMODE_TEXT_DISPLAYING && i + 1 == msgCtx->textDrawPos &&
                     msgCtx->textDelayTimer == msgCtx->textDelay) {
-                    Audio_PlaySoundGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(0, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 Message_DrawTextChar(play, &font->charTexBuf[charTexIdx], &gfx);
                 charTexIdx += FONT_CHAR_TEX_SIZE;
@@ -1608,17 +1718,35 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
 }
 
 void Message_LoadItemIcon(PlayState* play, u16 itemId, s16 y) {
+    lusprintf(__FILE__, __LINE__, 2, "ITEM WITH ID:  %#x  OBTAINED\n", itemId);
     static s16 sIconItem32XOffsets[] = { 74, 74, 74, 54 };
     static s16 sIconItem24XOffsets[] = { 72, 72, 72, 50 };
     MessageContext* msgCtx = &play->msgCtx;
     InterfaceContext* interfaceCtx = &play->interfaceCtx;
     u8 language = sDisplayNextMessageAsEnglish ? LANGUAGE_ENG : gSaveContext.language;
 
+    if (Message_HasItemReceiptIcon()) {
+        memcpy((uintptr_t)msgCtx->textboxSegment + MESSAGE_STATIC_TEX_SIZE, sItemReceiptPresentation.iconPath,
+               strlen(sItemReceiptPresentation.iconPath) + 1);
+        msgCtx->msgBufPos++;
+        return;
+    }
+
+    // The alternate GI item ID names the pause menu's IA8 progress wedge.
+    // A receipt needs the full RGBA inventory icon at the normal mod path.
+    if (itemId == ITEM_HEART_PIECE_2)
+        itemId = ITEM_HEART_PIECE;
+
     if (itemId == ITEM_DUNGEON_MAP) {
         interfaceCtx->mapPalette[30] = 0xFF;
         interfaceCtx->mapPalette[31] = 0xFF;
     }
-    if (itemId < ITEM_MEDALLION_FOREST) {
+    // Main's structure: < ITEM_MEDALLION_FOREST = 32x32, else = 24x24.
+    // SoH addition: custom items (>= ITEM_ROCS_FEATHER_SKIJER) also use 32x32.
+    // ITEM_ROCS_FEATHER (0x9D, la pluma SHIP-VANILLA) queda UN id por debajo del rango custom: su
+    // textura gRocsFeatherTex es 32x32 y en la rama 24x24 salia corrupta — mismo bug historico que
+    // bomb bags/boots/tunics. Va por la rama vanilla de 32x32 (gItemIcons la tiene). Skijer's NEI
+    if (itemId < ITEM_MEDALLION_FOREST || itemId == ITEM_ROCS_FEATHER) {
         R_TEXTBOX_ICON_XPOS = R_TEXT_INIT_XPOS - sIconItem32XOffsets[language];
         R_TEXTBOX_ICON_YPOS = y + 6;
         R_TEXTBOX_ICON_SIZE = 32;
@@ -1626,12 +1754,32 @@ void Message_LoadItemIcon(PlayState* play, u16 itemId, s16 y) {
                strlen(gItemIcons[itemId]) + 1);
         // "Item 32-0"
         osSyncPrintf("アイテム32-0\n");
+    } else if (itemId >= ITEM_ROCS_FEATHER_SKIJER) {
+        // Custom items: 32x32, resolved via ExtInv_GetItemIcon
+        R_TEXTBOX_ICON_XPOS = R_TEXT_INIT_XPOS - sIconItem32XOffsets[language];
+        R_TEXTBOX_ICON_YPOS = y + 6;
+        R_TEXTBOX_ICON_SIZE = 32;
+        void* iconPtr = ExtInv_GetItemIcon(itemId);
+        // A rando row that passes its RG as the itemId (every MM port does) lands here with a value
+        // no icon table knows, and ExtInv_GetItemIcon answers NULL — strlen(NULL) would crash, and
+        // an unresolved buffer renders as a glitched texture. Placeholder instead. Skijer's NEI
+        if (iconPtr == NULL || ((const char*)iconPtr)[0] == '\0') {
+            iconPtr = (void*)"__OTR__textures/icon_item_custom/gItemIconReservedSlotTex";
+        }
+        memcpy((uintptr_t)msgCtx->textboxSegment + MESSAGE_STATIC_TEX_SIZE, iconPtr, strlen((const char*)iconPtr) + 1);
     } else {
         R_TEXTBOX_ICON_XPOS = R_TEXT_INIT_XPOS - sIconItem24XOffsets[language];
         R_TEXTBOX_ICON_YPOS = y + 10;
         R_TEXTBOX_ICON_SIZE = 24;
-        memcpy((uintptr_t)msgCtx->textboxSegment + MESSAGE_STATIC_TEX_SIZE, gItemIcons[itemId],
-               strlen(gItemIcons[itemId]) + 1);
+        // Same protection for the 24x24 half: gItemIcons only reaches ITEM_ROCS_FEATHER and carries
+        // empty strings in the 0x82..0x9B gap, so an id past the end (or in the gap) used to read
+        // out of bounds / copy "" and paint garbage. Falls back to a REAL 24x24 entry so the size
+        // the draw side picks by id still matches the texture. Skijer's NEI
+        const char* icon24 = (itemId < ARRAY_COUNT(gItemIcons)) ? gItemIcons[itemId] : NULL;
+        if (icon24 == NULL || icon24[0] == '\0') {
+            icon24 = gItemIcons[ITEM_HEART_PIECE];
+        }
+        memcpy((uintptr_t)msgCtx->textboxSegment + MESSAGE_STATIC_TEX_SIZE, icon24, strlen(icon24) + 1);
         // "Item 24"
         osSyncPrintf("アイテム24＝%d (%d) {%d}\n", itemId, itemId - ITEM_KOKIRI_EMERALD, 84);
     }
@@ -2192,8 +2340,8 @@ void Message_DecodeJPN(PlayState* play) {
             }
         } else if (curChar == MESSAGE_ITEM_ICON_JPN) {
             msgCtx->msgBufDecodedWide[++decodedBufPos] = font->msgBufWide[msgCtx->msgBufPos + 1];
-            if (GameInteractor_Should(VB_LOAD_ITEM_ICON, (uint8_t)font->msgBuf[msgCtx->msgBufPos + 1] < ITEM_CUSTOM,
-                                      sDisplayNextMessageAsEnglish)) {
+            if (Message_HasItemReceiptIcon() ||
+                GameInteractor_Should(VB_LOAD_ITEM_ICON, true, sDisplayNextMessageAsEnglish)) {
                 Message_LoadItemIcon(play, font->msgBufWide[msgCtx->msgBufPos + 1], R_TEXTBOX_Y + 10);
             }
         } else if (curChar == MESSAGE_BACKGROUND_JPN) {
@@ -2252,6 +2400,8 @@ void Message_Decode(PlayState* play) {
     f32 timeInSeconds;
     MessageContext* msgCtx = &play->msgCtx;
     Font* font = &play->msgCtx.font;
+
+    Message_ApplyItemReceiptLayout(play);
 
     // #region SOH [NTSC] - allow switching languages mid text
     sTextBoxNum++;
@@ -2314,6 +2464,9 @@ void Message_Decode(PlayState* play) {
                 } else if (numLines == 2) {
                     R_TEXT_INIT_YPOS = (u16)(R_TEXTBOX_Y + 16);
                 }
+            }
+            if (sItemReceiptPresentation.singleBox) {
+                R_TEXT_INIT_YPOS = (u16)(R_TEXTBOX_Y + 16);
             }
             if (phi_s1 == MESSAGE_TEXTID) {
                 osSyncPrintf("NZ_NEXTMSG=%x, %x, %x\n", font->msgBuf[msgCtx->msgBufPos],
@@ -2625,9 +2778,9 @@ void Message_Decode(PlayState* play) {
             msgCtx->msgBufDecoded[++decodedBufPos] = font->msgBuf[msgCtx->msgBufPos + 1];
             osSyncPrintf("ITEM_NO=(%d) (%d)\n", msgCtx->msgBufDecoded[decodedBufPos],
                          font->msgBuf[msgCtx->msgBufPos + 1]);
-            if (GameInteractor_Should(VB_LOAD_ITEM_ICON, (uint8_t)font->msgBuf[msgCtx->msgBufPos + 1] < ITEM_CUSTOM,
-                                      sDisplayNextMessageAsEnglish)) {
-                Message_LoadItemIcon(play, font->msgBuf[msgCtx->msgBufPos + 1], R_TEXTBOX_Y + 10);
+            if (Message_HasItemReceiptIcon() ||
+                GameInteractor_Should(VB_LOAD_ITEM_ICON, true, sDisplayNextMessageAsEnglish)) {
+                Message_LoadItemIcon(play, (u8)font->msgBuf[msgCtx->msgBufPos + 1], R_TEXTBOX_Y + 10);
             }
         } else if (temp_s2 == MESSAGE_BACKGROUND) {
             msgCtx->textboxBackgroundIdx = font->msgBuf[msgCtx->msgBufPos + 1] * 2;
@@ -2689,6 +2842,8 @@ void Message_OpenText(PlayState* play, u16 textId) {
     Font* font = &msgCtx->font;
     s16 textBoxType;
 
+    Message_SetItemReceiptPresentation(NULL);
+    Message_SetCapeVisibilityChoice(false);
     bool loadFromMessageTable = true;
     GameInteractor_ExecuteOnOpenText(&textId, &loadFromMessageTable);
 
@@ -2784,10 +2939,10 @@ void Message_OpenText(PlayState* play, u16 textId) {
         // font->msgOffset), font->msgLength, __FILE__, __LINE__);
 
     } else if (CVarGetInteger(CVAR_ENHANCEMENT("AskToEquip"), 0) &&
-               (((LINK_IS_ADULT || CVarGetInteger(CVAR_CHEAT("TimelessEquipment"), 0)) &&
+               ((GameInteractor_Should(VB_PLAYER_MEETS_AGE_REQ, LINK_IS_ADULT, LINK_AGE_ADULT) &&
                  // 0C = Biggoron, 4B = Giant's, 4E = Mirror Shield, 50-51 = Tunics
                  (textId == 0x0C || textId == 0x4B || textId == 0x4E || textId == 0x50 || textId == 0x51)) ||
-                ((!LINK_IS_ADULT || CVarGetInteger(CVAR_CHEAT("TimelessEquipment"), 0)) &&
+                (GameInteractor_Should(VB_PLAYER_MEETS_AGE_REQ, !LINK_IS_ADULT, LINK_AGE_CHILD) &&
                  // 4C = Deku Shield, A4 = Kokiri Sword
                  (textId == 0x4C || textId == 0xA4)) ||
                 // 4D == Hylian Shield
@@ -2927,6 +3082,24 @@ void Message_StartOcarina(PlayState* play, u16 ocarinaActionId) {
     if (gSaveContext.scarecrowSpawnSongSet) {
         sOcarinaSongBitFlags |= (1 << OCARINA_SONG_SCARECROW_SPAWN);
     }
+
+    // Skijer's NEI: MM songs + custom songs (ocarina slots 14-23) — expose their recognition bits
+    // (bits 14-29 of OoT's song-flag mask are free) gated on the NEI mmQuestItems store (FC_MMQ_*
+    // layout, FleetShipCombo/FleetComboIds.h). Slots 21-23 are the customs replacing the doubled
+    // Epona/Time/Storms rows, so they use those rows' FC bits.
+    {
+        // slot (OCARINA_SONG_MM_FIRST + i) ← FC_MMQ bit: Sonata 6, GoronLullaby 7, NewWave 8,
+        // Elegy 9, Oath 10, Soaring 15, Healing 13, Fugue(=Epona row) 14, Command(=Time row) 12,
+        // Ballad(=Storms row) 16.
+        static const u8 sNeiMmSongFcBit[10] = { 6, 7, 8, 9, 10, 15, 13, 14, 12, 16 };
+        u32 mmQuest = Nei_Save()->mmQuestItems;
+
+        for (i = 0; i < 10; i++) {
+            if (mmQuest & (1u << sNeiMmSongFcBit[i])) {
+                sOcarinaSongBitFlags |= (1u << (OCARINA_SONG_MM_FIRST + i + 2)); // param bits 16-25
+            }
+        }
+    }
     osSyncPrintf("ocarina_bit = %x\n", sOcarinaSongBitFlags);
     osSyncPrintf(VT_RST);
 
@@ -2951,8 +3124,8 @@ void Message_StartOcarina(PlayState* play, u16 ocarinaActionId) {
         osSyncPrintf("ocarina_set 000000000000000000  = %d\n", ocarinaActionId);
         msgCtx->ocarinaAction = ocarinaActionId;
         if (ocarinaActionId >= OCARINA_ACTION_CHECK_SARIA && ocarinaActionId <= OCARINA_ACTION_CHECK_STORMS) {
-            Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
         if (ocarinaActionId == OCARINA_ACTION_SCARECROW_PLAYBACK) {
             Message_OpenText(play, 0x86F); // Ocarina
@@ -3419,6 +3592,19 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                 break;
             case MSGMODE_OCARINA_PLAYING:
                 msgCtx->ocarinaStaff = AudioOcarina_GetPlayingStaff();
+
+                // Skijer's NEI "Pause Play": deterministic forced-success handoff (mirror of the 2ship
+                // side — the audio-side played-song latch survives only one ocarina-update tick, so the
+                // quest page hands the song here directly and we stamp it into the staff state, which
+                // the chain below consumes synchronously).
+                {
+                    extern s16 gNeiPausePlayForcedSong; // z_kaleido_collect.c
+                    if ((gNeiPausePlayForcedSong >= 0) && (msgCtx->ocarinaAction == OCARINA_ACTION_FREE_PLAY)) {
+                        msgCtx->ocarinaStaff->state = (u8)gNeiPausePlayForcedSong;
+                        gNeiPausePlayForcedSong = -1;
+                    }
+                }
+
                 if (msgCtx->ocarinaStaff->pos) {
                     osSyncPrintf("locate=%d  onpu_pt=%d\n", msgCtx->ocarinaStaff->pos, sOcarinaButtonIndexBufPos);
                     if (msgCtx->ocarinaStaff->pos == 1 && sOcarinaButtonIndexBufPos == 8) {
@@ -3432,6 +3618,25 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                     }
                 }
                 msgCtx->lastPlayedSong = msgCtx->ocarinaStaff->state;
+
+                // Skijer's NEI: MM songs + customs (slots 14-23). The vanilla chain below only knows
+                // songs < MEMORY_GAME (its owned-check indexes gOcarinaSongItemMap — OOB for 14+), so
+                // run the same FREE_PLAY success path for them here: generic ocarina textbox +
+                // MSGMODE_SONG_PLAYED, which then replays the melody like any other song.
+                if ((msgCtx->ocarinaAction == OCARINA_ACTION_FREE_PLAY) &&
+                    (msgCtx->ocarinaStaff->state >= OCARINA_SONG_MM_FIRST) &&
+                    (msgCtx->ocarinaStaff->state < OCARINA_SONG_MAX)) {
+                    sLastPlayedSong = msgCtx->unk_E3F2 = msgCtx->lastPlayedSong = msgCtx->ocarinaStaff->state;
+                    Message_ContinueTextbox(play, 0x86F); // Ocarina staff box
+                    msgCtx->msgMode = MSGMODE_SONG_PLAYED;
+                    msgCtx->textBoxType = TEXTBOX_TYPE_OCARINA;
+                    msgCtx->stateTimer = 10;
+                    Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Interface_ChangeHudVisibilityMode(1);
+                    break;
+                }
+
                 if (msgCtx->ocarinaStaff->state < OCARINA_SONG_MEMORY_GAME) {
                     if (msgCtx->ocarinaStaff->state == OCARINA_SONG_SCARECROW_SPAWN ||
                         CHECK_QUEST_ITEM(QUEST_SONG_MINUET + gOcarinaSongItemMap[msgCtx->ocarinaStaff->state])) {
@@ -3442,9 +3647,9 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                             if (msgCtx->ocarinaStaff->state < OCARINA_SONG_SARIAS ||
                                 msgCtx->ocarinaStaff->state == OCARINA_SONG_SCARECROW_SPAWN) {
                                 AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_OFF);
-                                Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4,
-                                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                                       &gSfxDefaultReverb);
+                                Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4,
+                                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                                     &gSfxDefaultReverb);
                                 msgCtx->msgMode = MSGMODE_OCARINA_STARTING;
                             } else {
                                 // "Ocarina_Flog Correct Example Performance"
@@ -3453,17 +3658,17 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                                 msgCtx->msgMode = MSGMODE_SONG_PLAYED;
                                 msgCtx->textBoxType = TEXTBOX_TYPE_OCARINA;
                                 msgCtx->stateTimer = 10;
-                                Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
-                                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                                       &gSfxDefaultReverb);
+                                Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
+                                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                                     &gSfxDefaultReverb);
                                 Interface_ChangeHudVisibilityMode(1);
                             }
                         } else if (msgCtx->ocarinaAction == OCARINA_ACTION_CHECK_SCARECROW) {
                             if (msgCtx->ocarinaStaff->state < OCARINA_SONG_SCARECROW_SPAWN) {
                                 AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_OFF);
-                                Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4,
-                                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                                       &gSfxDefaultReverb);
+                                Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4,
+                                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                                     &gSfxDefaultReverb);
                                 msgCtx->stateTimer = 10;
                                 msgCtx->msgMode = MSGMODE_OCARINA_FAIL;
                             } else {
@@ -3473,9 +3678,9 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                                 msgCtx->msgMode = MSGMODE_SONG_PLAYED;
                                 msgCtx->textBoxType = TEXTBOX_TYPE_OCARINA;
                                 msgCtx->stateTimer = 10;
-                                Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
-                                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                                       &gSfxDefaultReverb);
+                                Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
+                                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                                     &gSfxDefaultReverb);
                                 Interface_ChangeHudVisibilityMode(1);
                             }
                         } else if (msgCtx->ocarinaAction == OCARINA_ACTION_FREE_PLAY) {
@@ -3485,25 +3690,25 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                             msgCtx->msgMode = MSGMODE_SONG_PLAYED;
                             msgCtx->textBoxType = TEXTBOX_TYPE_OCARINA;
                             msgCtx->stateTimer = 10;
-                            Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
-                                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                                   &gSfxDefaultReverb);
+                            Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
+                                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                                 &gSfxDefaultReverb);
                         } else {
-                            Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
-                                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                                   &gSfxDefaultReverb);
+                            Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4,
+                                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                                 &gSfxDefaultReverb);
                         }
                         Interface_ChangeHudVisibilityMode(1);
                     } else {
                         AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_OFF);
-                        Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         msgCtx->msgMode = MSGMODE_OCARINA_STARTING;
                     }
                 } else if (msgCtx->ocarinaStaff->state == 0xFF) {
                     AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_OFF);
-                    Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->stateTimer = 10;
                     msgCtx->msgMode = MSGMODE_OCARINA_FAIL;
                 } else if (isB_Held) {
@@ -3643,6 +3848,15 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                                     sOcarinaEffectActorIds[msgCtx->lastPlayedSong - OCARINA_SONG_SARIAS],
                                     player->actor.world.pos.x, player->actor.world.pos.y, player->actor.world.pos.z, 0,
                                     0, 0, sOcarinaEffectActorParams[msgCtx->lastPlayedSong - OCARINA_SONG_SARIAS]);
+                    } else if (msgCtx->lastPlayedSong >= OCARINA_SONG_MM_FIRST &&
+                               msgCtx->lastPlayedSong < OCARINA_SONG_MAX) {
+                        // Skijer's NEI: MM + custom songs had NO "song played" visual — the vanilla
+                        // table above only covers Saria..Storms. Spawn OCEFF_WIPE (the rising colored
+                        // frustum around Link); its draw now loads the frustum assets from mm.o2r
+                        // (soh.o2r ships no OcEff assets in this combo build). Every MM/custom song
+                        // uses the one actor so the single mm.o2r-backed effect covers them all.
+                        Actor_Spawn(&play->actorCtx, play, ACTOR_OCEFF_WIPE, player->actor.world.pos.x,
+                                    player->actor.world.pos.y, player->actor.world.pos.z, 0, 0, 0, 0);
                     }
                 }
                 break;
@@ -3656,16 +3870,43 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                     } else {
                         Message_DrawText(play, &gfx);
                     }
+                    // MM resets to DEFAULT and then re-selects the FORM's instrument before
+                    // starting the replay (z_message.c MSGMODE_SETUP_DISPLAY_SONG_PLAYED), so
+                    // a song played while transformed is replayed in that form's voice. Both
+                    // of MM's calls were transcribed as DEFAULT here, which is why the replay
+                    // always came back as the plain ocarina.
                     AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_DEFAULT);
-                    AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_DEFAULT);
+                    AudioOcarina_SetInstrument(MmForm_GetOcarinaPlaybackInstrument());
                     AudioOcarina_SetPlaybackSong(msgCtx->lastPlayedSong + 1, 1);
                 } else {
                     AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_DEFAULT);
-                    AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_DEFAULT);
+                    AudioOcarina_SetInstrument(MmForm_GetOcarinaPlaybackInstrument());
                 }
-                if (msgCtx->lastPlayedSong != OCARINA_SONG_SCARECROW_SPAWN) {
-                    Audio_PlayFanfare(sOcarinaSongFanfares[msgCtx->lastPlayedSong]);
+                // Skijer's NEI: sOcarinaSongFanfares has 12 entries — slots 12+ (scarecrow, memory
+                // game, MM songs 14-20, customs 21-23) must not index it. MM songs get their real MM
+                // fanfare sequence from mm.o2r via MmBgm (silent no-op if the sequence is missing);
+                // customs rely on the ocarina melody replay above (mod window pending, like 2ship).
+                if (msgCtx->lastPlayedSong < ARRAY_COUNT(sOcarinaSongFanfares)) {
+                    // A form with its own MM voice sings the jingle itself: OoT's sequence
+                    // hard-codes the ocarina instrument and is bound to a soundfont that does
+                    // not contain the form voices, so it cannot be re-voiced in place.
+                    if (!FormJingle_Start(msgCtx->lastPlayedSong)) {
+                        Audio_PlayFanfare(sOcarinaSongFanfares[msgCtx->lastPlayedSong]);
+                    }
                     Audio_SetSfxBanksMute(0x20);
+                } else if ((msgCtx->lastPlayedSong >= OCARINA_SONG_MM_FIRST) &&
+                           (msgCtx->lastPlayedSong <= OCARINA_SONG_MM_LAST)) {
+                    static const char* sNeiMmSongFanfareNames[7] = {
+                        "SonataOfAwakening(Ocarina)_4B", "GoronLullaby(Ocarina)_4C", "NewWaveBossaNova(Ocarina)_5D",
+                        "ElegyOfEmptiness(Ocarina)_5E",  "OathToOrder(Ocarina)_5F",  "SongOfSoaring(Ocarina)_47",
+                        "SongOfHealing(Ocarina)_48",
+                    };
+                    extern void MmBgm_PlayFanfare(const char* mmBgmName, u8 melodyInstrument); // sound_translator
+                    // MM voices the fanfare's melody with the FORM's instrument too, not just
+                    // the note replay above (z_message.c: Audio_PlayFanfareWithPlayerIOPort7
+                    // with sOcarinaSongFanfareIoData[CUR_FORM]).
+                    MmBgm_PlayFanfare(sNeiMmSongFanfareNames[msgCtx->lastPlayedSong - OCARINA_SONG_MM_FIRST],
+                                      MmForm_GetSongFanfareInstrument());
                 }
                 play->msgCtx.ocarinaMode = OCARINA_MODE_01;
                 if (msgCtx->ocarinaAction == OCARINA_ACTION_FREE_PLAY) {
@@ -3706,7 +3947,18 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                 }
                 break;
             case MSGMODE_DISPLAY_SONG_PLAYED_TEXT_BEGIN:
-                Message_ContinueTextbox(play, msgCtx->lastPlayedSong + 0x893); // You played [song name]
+                // Skijer's NEI: the "You played [song name]" message is `lastPlayedSong + 0x893`, but
+                // those texts only exist for OoT's 12 native songs (0x893..0x89E). MM songs (14-20)
+                // and customs (21-23) would resolve to 0x8A1+ which is NOT in the message table →
+                // Message_FindMessage leaves msgOffset bogus → memcpy in Message_OpenText crashes
+                // (0xC0000005). Show the generic ocarina staff box for them instead (the song name
+                // already appears on the quest page; a per-song "You played" text is a later pass,
+                // mirroring the 2ship mod-window). See [[project_mm_songs_in_oot_mirror]].
+                if (msgCtx->lastPlayedSong >= OCARINA_SONG_MM_FIRST) {
+                    Message_ContinueTextbox(play, 0x86F); // Ocarina (generic, valid message)
+                } else {
+                    Message_ContinueTextbox(play, msgCtx->lastPlayedSong + 0x893); // You played [song name]
+                }
                 Message_Decode(play);
                 msgCtx->msgMode = MSGMODE_DISPLAY_SONG_PLAYED_TEXT;
 
@@ -3766,6 +4018,7 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                     } else {
                         Message_CloseTextbox(play);
                         if (msgCtx->lastPlayedSong == OCARINA_SONG_EPONAS) {
+                            Horse_TrySummonYoungEpona(play);
                             DREG(53) = 1;
                         }
                         osSyncPrintf(VT_FGCOL(YELLOW));
@@ -3854,11 +4107,11 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                     osSyncPrintf("z_message.c 取得メロディ＝%d\n", ITEM_SONG_MINUET + msgCtx->ocarinaStaff->state);
                     osSyncPrintf(VT_RST);
                     msgCtx->stateTimer = 20;
-                    Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 } else if (msgCtx->ocarinaStaff->state == 0xFF) {
-                    Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->stateTimer = 10;
                     msgCtx->msgMode = MSGMODE_SONG_PLAYBACK_FAIL;
                 }
@@ -3923,8 +4176,8 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                                      msgCtx->ocarinaStaff->state);
                         gSaveContext.scarecrowLongSongSet = true;
                     }
-                    Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     osSyncPrintf("aaaaaaaaaaaaaa\n");
                     AudioOcarina_SetRecordingState(OCARINA_RECORD_OFF);
                     msgCtx->stateTimer = 10;
@@ -4002,8 +4255,8 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                     msgCtx->stateTimer = 20;
                     gSaveContext.scarecrowSpawnSongSet = true;
                     msgCtx->msgMode = MSGMODE_SCARECROW_RECORDING_DONE;
-                    Audio_PlaySoundGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_TRE_BOX_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     osSyncPrintf(VT_FGCOL(YELLOW));
                     osSyncPrintf("\n====================================================================\n");
                     memcpy(gSaveContext.scarecrowSpawnSong, gScarecrowSpawnSongPtr,
@@ -4017,8 +4270,8 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                     // "Played an existing song！！！"
                     osSyncPrintf("すでに存在する曲吹いた！！！ \n");
                     AudioOcarina_SetRecordingState(OCARINA_RECORD_OFF);
-                    Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     Message_CloseTextbox(play);
                     msgCtx->msgMode = MSGMODE_SCARECROW_RECORDING_FAILED;
                 }
@@ -4047,8 +4300,8 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                 break;
             case MSGMODE_MEMORY_GAME_LEFT_SKULLKID_PLAYING:
             case MSGMODE_MEMORY_GAME_RIGHT_SKULLKID_PLAYING:
-                Audio_PlaySoundGeneral(NA_SE_SY_METRONOME_LV - SFX_FLAG, &gSfxDefaultPos, 4,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_SY_METRONOME_LV - SFX_FLAG, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 msgCtx->ocarinaStaff = AudioOcarina_GetPlaybackStaff();
                 if (msgCtx->ocarinaStaff->pos && sOcarinaButtonIndexBufPos == msgCtx->ocarinaStaff->pos - 1) {
                     sOcarinaButtonIndexBuf[msgCtx->ocarinaStaff->pos - 1] = msgCtx->ocarinaStaff->buttonIndex;
@@ -4058,12 +4311,11 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                 if (msgCtx->stateTimer == 0) {
                     if (msgCtx->ocarinaStaff->state == 0) {
                         if (msgCtx->msgMode == MSGMODE_MEMORY_GAME_LEFT_SKULLKID_PLAYING) {
-                            Audio_PlaySoundGeneral(NA_SE_SY_METRONOME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                            Audio_PlaySfxGeneral(NA_SE_SY_METRONOME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         } else {
-                            Audio_PlaySoundGeneral(NA_SE_SY_METRONOME_2, &gSfxDefaultPos, 4,
-                                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                                   &gSfxDefaultReverb);
+                            Audio_PlaySfxGeneral(NA_SE_SY_METRONOME_2, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         }
                         msgCtx->msgMode++;
                     }
@@ -4081,8 +4333,8 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                 }
                 break;
             case MSGMODE_MEMORY_GAME_PLAYER_PLAYING:
-                Audio_PlaySoundGeneral(NA_SE_SY_METRONOME_LV - SFX_FLAG, &gSfxDefaultPos, 4,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_SY_METRONOME_LV - SFX_FLAG, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 msgCtx->ocarinaStaff = AudioOcarina_GetPlayingStaff();
                 if (msgCtx->ocarinaStaff->pos && sOcarinaButtonIndexBufPos == msgCtx->ocarinaStaff->pos - 1) {
                     sOcarinaButtonIndexBuf[msgCtx->ocarinaStaff->pos - 1] = msgCtx->ocarinaStaff->buttonIndex;
@@ -4093,15 +4345,15 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                     // "Musical round failed！！！！！！！！！"
                     osSyncPrintf("輪唱失敗！！！！！！！！！\n");
                     AudioOcarina_SetInstrument(OCARINA_INSTRUMENT_OFF);
-                    Audio_PlaySoundGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_OCARINA_ERROR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->stateTimer = 10;
                     play->msgCtx.ocarinaMode = OCARINA_MODE_03;
                 } else if (msgCtx->ocarinaStaff->state == 0xD) {
                     // "Musical round succeeded！！！！！！！！！"
                     osSyncPrintf("輪唱成功！！！！！！！！！\n");
-                    Audio_PlaySoundGeneral(NA_SE_SY_GET_ITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_GET_ITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     msgCtx->msgMode = MSGMODE_MEMORY_GAME_ROUND_SUCCESS;
                     msgCtx->stateTimer = 30;
                 }
@@ -4121,8 +4373,8 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
                 msgCtx->stateTimer--;
                 if (msgCtx->stateTimer == 0) {
                     if (AudioOcarina_MemoryGameNextNote() != 1) {
-                        Audio_PlaySoundGeneral(NA_SE_SY_METRONOME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_METRONOME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         msgCtx->ocarinaStaff = AudioOcarina_GetPlayingStaff();
                         msgCtx->ocarinaStaff->pos = sOcarinaButtonIndexBufPos = 0;
                         Message_ResetOcarinaNoteState();
@@ -4216,8 +4468,21 @@ void Message_DrawMain(PlayState* play, Gfx** p) {
             gDPSetCombineLERP(gfx++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0, PRIMITIVE,
                               ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
 
+            // Which song's full fingering staff (greyed target notes) to show. Vanilla only shows it
+            // while DEMONSTRATING a song (MSGMODE_SONG_PLAYBACK, indexed by the teach/playback action).
+            // Skijer's NEI: MM + custom songs are played via free-play (pause-play), whose success runs
+            // through MSGMODE_DISPLAY_SONG_PLAYED — which otherwise reveals only the one-by-one replay
+            // notes. Draw the target staff there too (keyed by lastPlayedSong) so the song's notes are
+            // clearly visible during the replay and it reads as a real song.
+            g = -1;
             if (msgCtx->msgMode == MSGMODE_SONG_PLAYBACK) {
                 g = msgCtx->ocarinaAction - OCARINA_ACTION_PLAYBACK_MINUET;
+            } else if ((msgCtx->msgMode == MSGMODE_DISPLAY_SONG_PLAYED) &&
+                       (msgCtx->lastPlayedSong >= OCARINA_SONG_MM_FIRST) &&
+                       (msgCtx->lastPlayedSong < OCARINA_SONG_MAX)) {
+                g = msgCtx->lastPlayedSong;
+            }
+            if (g >= 0) {
                 r = gOcarinaSongButtons[g].numButtons;
                 for (notePosX = R_OCARINA_NOTES_XPOS, i = 0; i < r; i++, notePosX += R_OCARINA_NOTES_XPOS_OFFSET) {
                     gDPPipeSync(gfx++);
@@ -4531,7 +4796,7 @@ void Message_Update(PlayState* play) {
                     R_TEXTBOX_TEXHEIGHT = 512;
                 } else {
                     Message_GrowTextbox(msgCtx);
-                    Audio_PlaySoundIfNotInCutscene(0);
+                    Audio_PlaySfxIfNotInCutscene(0);
                     msgCtx->stateTimer = 0;
                     msgCtx->msgMode = MSGMODE_TEXT_BOX_GROWING;
                 }
@@ -4589,6 +4854,9 @@ void Message_Update(PlayState* play) {
             }
             break;
         case MSGMODE_TEXT_DONE:
+            if (Message_HandleCapeVisibilityChoice(play)) {
+                break;
+            }
             if (msgCtx->textboxEndType == TEXTBOX_ENDTYPE_FADING) {
                 msgCtx->stateTimer--;
                 if (msgCtx->stateTimer == 0) {
@@ -4608,16 +4876,16 @@ void Message_Update(PlayState* play) {
                 } else if (Message_ShouldAdvanceSilent(play)) {
                     osSyncPrintf("select=%d\n", msgCtx->textboxEndType);
                     if (msgCtx->textboxEndType == TEXTBOX_ENDTYPE_HAS_NEXT) {
-                        Audio_PlaySoundGeneral(NA_SE_SY_MESSAGE_PASS, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_MESSAGE_PASS, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         if (gSaveContext.language == LANGUAGE_JPN && !sTextIsCredits && !sDisplayNextMessageAsEnglish) {
                             Message_ContinueTextbox(play, msgCtx->msgBufDecodedWide[msgCtx->textDrawPos]);
                         } else {
                             Message_ContinueTextbox(play, sNextTextId);
                         }
                     } else {
-                        Audio_PlaySoundGeneral(NA_SE_SY_DECIDE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_DECIDE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                         Message_CloseTextbox(play);
                     }
                 }
@@ -4721,6 +4989,7 @@ UNK_TYPE D_80153D7C = 0x00000000;
 s16 gGameOverTimer = 0;
 
 #define MESSAGE_PAL_SHIP_SAVESTATE_FIELDS(F) \
+    F(sCapeVisibilityChoice)                 \
     F(sOcarinaButtonIndexBufPos)             \
     F(sOcarinaButtonIndexBufLen)             \
     F(sOcarinaButtonIndexBuf)                \

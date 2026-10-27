@@ -1,0 +1,32 @@
+name: Required build or test
+
+on:
+  workflow_call:
+    inputs:
+      check:
+        description: Platform build or regression group to run
+        required: true
+        type: string
+      validator:
+        description: Include the develop seed validator in the Windows build
+        default: false
+        type: boolean
+
+# The caller owns the matrix so failure cancels every required component,
+# including builds. Unknown names reach the runner and fail rather than skip.
+jobs:
+  windows:
+    if: inputs.check == 'windows'
+    uses: ./.github/workflows/build.yml
+    with:
+      validator: ${{ inputs.validator }}
+
+  linux:
+    if: inputs.check == 'linux'
+    uses: ./.github/workflows/build-linux.yml
+
+  regression:
+    if: inputs.check != 'windows' && inputs.check != 'linux'
+    uses: ./.github/workflows/regressions.yml
+    with:
+      suite: ${{ inputs.check }}

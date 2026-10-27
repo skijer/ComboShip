@@ -1,0 +1,16 @@
+{
+  "repository": "marsh6487/Shipwright",
+  "commit": "c77c18587a976f6d6cb5c8f91f27593286469218",
+  "files": {
+    "NeiUsedMagicPolicy.h": {
+      "path": "soh/soh/Enhancements/randomizer/NeiUsedMagicPolicy.h",
+      "git_blob_sha": "abbaeb809c01db6684b021db46c8a5e0095dd3db",
+      "url": "https://github.com/marsh6487/Shipwright/blob/c77c18587a976f6d6cb5c8f91f27593286469218/soh/soh/Enhancements/randomizer/NeiUsedMagicPolicy.h"
+    },
+    "NeiUsedMagicPresentation.cpp": {
+      "path": "soh/soh/Enhancements/randomizer/NeiUsedMagicPresentation.cpp",
+      "git_blob_sha": "82c6861e873d36bb97d2bd1931e34d00d88d686c",
+      "url": "https://github.com/marsh6487/Shipwright/blob/c77c18587a976f6d6cb5c8f91f27593286469218/soh/soh/Enhancements/randomizer/NeiUsedMagicPresentation.cpp"
+    }
+  }
+}

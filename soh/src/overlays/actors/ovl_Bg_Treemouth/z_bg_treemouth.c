@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 /*
  * File: z_bg_treemouth.c
  * Overlay: ovl_Bg_Treemouth
@@ -100,8 +101,8 @@ void func_808BC65C(BgTreemouth* this, PlayState* play) {
             if (npcAction->action == 2) {
                 BgTreemouth_SetupAction(this, func_808BC80C);
             } else if (npcAction->action == 3) {
-                Audio_PlaySoundGeneral(NA_SE_EV_WOODDOOR_OPEN, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_EV_WOODDOOR_OPEN, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 BgTreemouth_SetupAction(this, func_808BC6F8);
             }
         }
@@ -206,8 +207,8 @@ void func_808BCAF0(BgTreemouth* this, PlayState* play) {
             if (npcAction->action == 2) {
                 BgTreemouth_SetupAction(this, func_808BC80C);
             } else if (npcAction->action == 3) {
-                Audio_PlaySoundGeneral(NA_SE_EV_WOODDOOR_OPEN, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_EV_WOODDOOR_OPEN, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 BgTreemouth_SetupAction(this, func_808BC6F8);
             }
         }
@@ -237,7 +238,8 @@ void BgTreemouth_Draw(Actor* thisx, PlayState* play) {
     Gfx_SetupDL_25Opa(play->state.gfxCtx);
 
     if ((gSaveContext.sceneLayer < 4) || LINK_IS_ADULT) {
-        if (Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD)) {
+        if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                            Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD))) {
             alpha = 2150;
         }
     } else { // neeeded to match

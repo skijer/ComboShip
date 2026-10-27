@@ -1,0 +1,373 @@
+{
+  "resource_count": 11,
+  "vertex_records": 12068,
+  "vertex_loads": 432,
+  "slug": "four_sword",
+  "name": "Four Sword",
+  "entry": "objects/nei_gi_redesign/four_sword/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 8660,
+  "bounds_author": [
+    [
+      -19.5,
+      -35.3125,
+      -5.25
+    ],
+    [
+      19.5,
+      78.0,
+      5.25
+    ]
+  ],
+  "markers": {
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "imported_approved_model": false,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword integral recessed guard bands",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword integral recessed guard bands",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword integral recessed guard bands",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword integral recessed guard bands",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword integral recessed guard bands",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword integral recessed guard bands",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid curved guard",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid guard end cap",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword solid guard end cap",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword forked gold blade collar",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword circular ruby socket",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword dark ruby bezel",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword concentric gold ruby bezel",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword round red ruby",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword dark ruby bezel",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword concentric gold ruby bezel",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword round red ruby",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword grip core",
+        "factor": 1.0
+      },
+      {
+        "part": "Four Sword close-wound ivory cloth",
+        "factor": 1.0
+      },
+      {
+        "part": "Four Sword gold grip collar",
+        "factor": 1.0
+      },
+      {
+        "part": "Four Sword gold grip collar",
+        "factor": 1.0
+      },
+      {
+        "part": "Four Sword round gold pommel",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword blue pommel enamel",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword gold pommel rim",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed Triforce engraving",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed Triforce engraving",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed Triforce engraving",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword blue pommel enamel",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword gold pommel rim",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed Triforce engraving",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed Triforce engraving",
+        "factor": 1.2
+      },
+      {
+        "part": "Recessed Triforce engraving",
+        "factor": 1.2
+      }
+    ]
+  },
+  "notes": [
+    "Four Sword follows the user-supplied reference: curved gold guard with three integral recessed bands, round red ruby, ivory cloth grip and circular blue/gold Triforce pommel.",
+    "No dangling cloth tails. Blade tang and forked collar join continuously; reflective steel and gold are real exported materials.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "edge_tex": "8c9b5b1548288588aece01a8e76afda8722485d75ab049ebe9f59b0978dc55a7",
+      "gi_dl": "591c6d49c609dcad58afa185f3283d26b8279bb93e88cc2107f70be529f03a4d",
+      "gold_edge_tex": "d499b1a4d2f97541a6805df075e60932c1a08eecee2110c1cf0a695830e8b406",
+      "gold_tex": "4e5b29e2944e2fe09421c00f401fa6c938d6cec6f5a41d9071d1025c12ea9698",
+      "guard_groove_tex": "f8ec402c9c5db2a271aaa5f896c0bfa15812a8e297ce7969266dbc06429abe2f",
+      "ivory_cloth_tex": "b88fc44bd3a6fafc795e43e1e4c128191cd2e3485a25a1bdaa4171b2b0fb6e35",
+      "mesh_opa_vtx": "b579c23726302d48ebc986155944ead61db2f5c8a1e3c7df44400d9a338f3d20",
+      "pommel_blue_tex": "c1355e75c29ed7e9242151f6eac0de73af446bcd4675fcb3cf59fae5923925bd",
+      "ruby_tex": "f1312863f0566109d575bca6cad118a25d4bf53e1bc7cc18b1e5ce5e8522f267",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "steel_tex": "5ba49cfb20429ebcf49f5b76c0f464e1e83db89fc23e245062e96c9c5d1bd45f"
+    },
+    "glb_sha256": "cd5198334b9848e4034cf3081d169fd9883234059765531a14b4ce9ea2425316",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  },
+  "depth_parent": {
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "glb_path": "tools/nei_gi/CHECKPOINTS/four_sword/four_sword.glb",
+    "preserved": "X/Y positions, topology, UVs, materials, texture resources, display lists and scale matrix"
+  }
+}

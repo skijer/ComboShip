@@ -1,9 +1,19 @@
+#include "rando/CrossEntranceBoss.h"
 #include "global.h"
+#ifdef COMBO_BUILD
+#include "BlackMarketFairy.h"
+#endif
+#include "gameplay/ComboFaroresWind.h"
+#include "soh/Enhancements/debugger/FrameTimingProbe.h"
+#include <stdio.h>
+#include "din_fire_sword.h"
 #include "vt.h"
 
 #include "overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
 #include "overlays/actors/ovl_En_Arrow/z_en_arrow.h"
 #include "overlays/actors/ovl_En_Part/z_en_part.h"
+#include "overlays/actors/ovl_En_Viewer/static_story_actor.h"
+#include "overlays/actors/ovl_Bg_Toki_Swd/z_bg_toki_swd.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "objects/gameplay_dangeon_keep/gameplay_dangeon_keep.h"
 #include "objects/object_bdoor/object_bdoor.h"
@@ -14,13 +24,28 @@
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/Enhancements/nametag.h"
+#include "soh/Enhancements/Gameplay/ComboForestActors.h"
 
 #include "soh/ActorDB.h"
 #include "soh/OTRGlobals.h"
+#include "mods/transformation_masks/transformation_masks.h"
+#include "mods/transformation_masks/mm_mask_wear.h"
+
+// SW97 Shadow Medallion stealth — defined in expansions/sw97/player/sw97_player_behavior.inc.c
+// (compiled into z_player.c's TU via sw97_router.c). Returns nonzero while the
+// Shadow spell is active. Same hook semantics as Stone Mask: enemies can't detect Link.
+extern s32 Sw97_ShadowStealthActive(void);
+
+// SW97 per-actor blindness — Shadow ARROW and Shadow-element gustjar BLOW tag
+// individual enemies as "can't see Link" for ~10 sec. Returns nonzero while the
+// passed actor has an active blindness timer.
+extern s32 Sw97_IsBlinded(Actor* actor);
+#include "soh/ShipUtils.h"
 
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #if defined(_MSC_VER) || defined(__GNUC__)
 #include "textures/place_title_cards/g_pn_49.h"
@@ -90,6 +115,14 @@ f32 iceTrapScale;
 
 // For Link's voice pitch SFX modifier
 static f32 freqMultiplier = 1;
+
+// Skijer's NEI shared time control (mods/items/helpers/timestop_helper.c).
+// gChampionSlowFactor: 1.0f = normal, 0.0f = fully stopped, in between = slow motion.
+// It is defined in mods/extended_equipment.c and arbitrated by timestop_helper so
+// Champion's Tunic, Zonai Permafrost and the Phantom Hourglass cannot fight over it.
+extern f32 gChampionSlowFactor;
+extern s32 TimeCtl_IsActorExempt(Actor* actor);
+extern s32 TimeCtl_GetStutterFrames(void);
 
 void ActorShape_Init(ActorShape* shape, f32 yOffset, ActorShadowFunc shadowDraw, f32 shadowScale) {
     shape->yOffset = yOffset;
@@ -441,6 +474,12 @@ void Attention_Init(TargetContext* targetCtx, Actor* actor, PlayState* play) {
 
 void Attention_Draw(TargetContext* targetCtx, PlayState* play) {
     Actor* actor = targetCtx->targetedActor;
+
+#ifdef COMBO_BUILD
+    if (ComboBlackMarket_FairyQuiet(COMBO_GAME_OOT, play->sceneNum, SCENE_SKIEJER_MARKET)) {
+        return;
+    }
+#endif
 
     OPEN_DISPS(play->state.gfxCtx);
 
@@ -1133,16 +1172,16 @@ void TitleCard_Draw(PlayState* play, TitleCardContext* titleCtx) {
     if (titleCtx->alpha != 0) {
         width = titleCtx->width;
         height = titleCtx->height;
-        s16 TitleCard_PosX_Modifier = (titleCtx->isBossCard ? CVarGetInteger(CVAR_COSMETIC("TitleCard.Boss.PosX"), 0)
-                                                            : CVarGetInteger(CVAR_COSMETIC("TitleCard.Map.PosX"), 0));
-        s16 TitleCard_PosY_Modifier = (titleCtx->isBossCard ? CVarGetInteger(CVAR_COSMETIC("TitleCard.Boss.PosY"), 0)
-                                                            : CVarGetInteger(CVAR_COSMETIC("TitleCard.Map.PosY"), 0));
-        s16 TitleCard_PosType_Checker =
-            (titleCtx->isBossCard ? CVarGetInteger(CVAR_COSMETIC("TitleCard.Boss.PosType"), 0)
-                                  : CVarGetInteger(CVAR_COSMETIC("TitleCard.Map.PosType"), 0));
-        s16 TitleCard_Margin_Checker =
-            (titleCtx->isBossCard ? CVarGetInteger(CVAR_COSMETIC("TitleCard.Boss.UseMargins"), 0)
-                                  : CVarGetInteger(CVAR_COSMETIC("TitleCard.Map.UseMargins"), 0));
+        s16 TitleCard_PosX_Modifier = titleCtx->isBossCard ? CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Boss.PosX"), 0)
+                                                           : CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Map.PosX"), 0);
+        s16 TitleCard_PosY_Modifier = titleCtx->isBossCard ? CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Boss.PosY"), 0)
+                                                           : CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Map.PosY"), 0);
+        s16 TitleCard_PosType_Checker = titleCtx->isBossCard
+                                            ? CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Boss.PosType"), 0)
+                                            : CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Map.PosType"), 0);
+        s16 TitleCard_Margin_Checker = titleCtx->isBossCard
+                                           ? CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Boss.UseMargins"), 0)
+                                           : CVarGetInteger(CVAR_COSMETIC("HUD.TitleCard.Map.UseMargins"), 0);
         s16 TitleCard_MarginX = 0;
         s16 TitleCard_PosX = titleCtx->x;
         s16 TitleCard_PosY = titleCtx->y;
@@ -1199,6 +1238,7 @@ s32 TitleCard_Clear(PlayState* play, TitleCardContext* titleCtx) {
 }
 
 void Actor_Kill(Actor* actor) {
+    DinFireSword_FinishFatal(gPlayState, actor);
     GameInteractor_ExecuteOnActorKill(actor);
     actor->draw = NULL;
     actor->update = NULL;
@@ -1269,8 +1309,11 @@ void Actor_Init(Actor* actor, PlayState* play) {
 }
 
 void Actor_Destroy(Actor* actor, PlayState* play) {
+    DinFireSword_FinishForget(play, actor);
     if (actor->destroy != NULL) {
-        actor->destroy(actor, play);
+        if (GameInteractor_ShouldActorDestroy(actor)) {
+            actor->destroy(actor, play);
+        }
         actor->destroy = NULL;
     } else {
         // "No Actor class destruct [%s]"
@@ -1282,6 +1325,16 @@ void Actor_Destroy(Actor* actor, PlayState* play) {
 
 void Actor_UpdatePos(Actor* actor) {
     f32 speedRate = R_UPDATE_RATE * 0.5f;
+
+    // Skijer's NEI time control. Only a FULL stop zeroes motion here. A PARTIAL
+    // slowdown deliberately does NOT scale speedRate: the slow is expressed by letting
+    // the actor tick 1 frame in N (see the freeze in Actor_UpdateAll), and scaling its
+    // motion on top of that MULTIPLIES the two — which is why a nominal 0.15 read as a
+    // dead stop instead of slow motion. Exemptions (Link, native projectiles, Link's
+    // children) are centralized in TimeCtl_IsActorExempt.
+    if ((gChampionSlowFactor <= 0.0f) && !TimeCtl_IsActorExempt(actor)) {
+        speedRate = 0.0f;
+    }
 
     actor->world.pos.x += (actor->velocity.x * speedRate) + actor->colChkInfo.displacement.x;
     actor->world.pos.y += (actor->velocity.y * speedRate) + actor->colChkInfo.displacement.y;
@@ -1400,6 +1453,15 @@ f32 Actor_HeightDiff(Actor* actorA, Actor* actorB) {
 
 f32 Player_GetHeight(Player* player) {
     f32 offset = (player->stateFlags1 & PLAYER_STATE1_ON_HORSE) ? 32.0f : 0.0f;
+
+    // Transformation Masks: use form-specific height from MM decomp z_actor.c:1374-1400.
+    // Fixes camera positioning during get-item, Z-targeting, and general gameplay.
+    {
+        f32 formHeight = TransformMasks_GetFormHeight();
+        if (formHeight > 0.0f) {
+            return offset + formHeight;
+        }
+    }
 
     if (LINK_IS_ADULT) {
         return offset + 68.0f;
@@ -1602,7 +1664,15 @@ s32 Actor_ActorAIsFacingAndNearActorB(Actor* actorA, Actor* actorB, f32 range, s
 }
 
 s32 func_8002E234(Actor* actor, f32 arg1, s32 arg2) {
-    if ((actor->bgCheckFlags & 0x1) && (arg1 < -11.0f)) {
+    // bgCheckFlags 0x800 = MM's BGCHECKFLAG_PLAYER_800 (mm z_actor.c:1766). An actor
+    // owning it never hugs small drops: it leaves the ground the instant the floor
+    // falls away, so ledges and ramps LAUNCH it instead of gluing it to the terrain.
+    // MM's Goron roll (Player_Action_96) sets the flag on entry and clears it on exit.
+    // MM puts the exemption in this function's CALLER, because there the <=11-unit hug
+    // is part of the on-ground branch condition; OOT instead splits that hug down here,
+    // so the check belongs here. Nothing in vanilla OOT ever sets 0x800, so this is
+    // inert for every other actor.
+    if ((actor->bgCheckFlags & 0x1) && ((arg1 < -11.0f) || (actor->bgCheckFlags & 0x800))) {
         actor->bgCheckFlags &= ~0x1;
         actor->bgCheckFlags |= 0x4;
 
@@ -1748,6 +1818,8 @@ void Actor_UpdateBgCheckInfo(PlayState* play, Actor* actor, f32 wallCheckHeight,
             actor->yDistToWater = BGCHECK_Y_MIN;
         }
     }
+
+    GameInteractor_Should(VB_AFTER_ACTOR_UPDATE_BGCHECKINFO, true, actor);
 }
 
 Mtx D_8015BBA8;
@@ -2115,12 +2187,36 @@ s32 GiveItemEntryFromActorWithFixedRange(Actor* actor, PlayState* play, GetItemE
 // If you're doing something for randomizer, you're probably looking for GiveItemEntryFromActor
 s32 Actor_OfferGetItem(Actor* actor, PlayState* play, s32 getItemId, f32 xzRange, f32 yRange) {
     Player* player = GET_PLAYER(play);
+    s32 localTimePedestal =
+        actor->id == ACTOR_BG_TOKI_SWD && actor->params == BG_TOKI_SWD_TIME_PEDESTAL && getItemId == GI_NONE;
 
-    if (!(player->stateFlags1 &
-          (PLAYER_STATE1_DEAD | PLAYER_STATE1_CHARGING_SPIN_ATTACK | PLAYER_STATE1_HANGING_OFF_LEDGE |
-           PLAYER_STATE1_CLIMBING_LEDGE | PLAYER_STATE1_JUMPING | PLAYER_STATE1_FREEFALL | PLAYER_STATE1_FIRST_PERSON |
-           PLAYER_STATE1_CLIMBING_LADDER)) &&
-        Player_GetExplosiveHeld(player) < 0) {
+    // Transformation masks (Skijer's NEI): the Zora swim needs a wider offer window.
+    // Vanilla's yRange is 10.0f (Actor_OfferGetItemNearby) — fine on land, where the
+    // player and a floor item share the ground plane, but a swimming Zora floats well
+    // above sea-floor drops, so heart pieces / small keys / rando checks were never
+    // offered at all and MmForm_HandleFormInteractions had nothing to accept. The
+    // JUMPING/FREEFALL veto is dropped for the same reason: the dolphin jump and the
+    // fast-swim arcs set them, and there is nothing unsafe about accepting an item
+    // mid-arc underwater. Deliberately NOT applied on land — this is swim-only.
+    u32 blockedStates = PLAYER_STATE1_DEAD | PLAYER_STATE1_CHARGING_SPIN_ATTACK | PLAYER_STATE1_HANGING_OFF_LEDGE |
+                        PLAYER_STATE1_CLIMBING_LEDGE | PLAYER_STATE1_JUMPING | PLAYER_STATE1_FREEFALL |
+                        PLAYER_STATE1_FIRST_PERSON | PLAYER_STATE1_CLIMBING_LADDER;
+
+    {
+        extern u8 MmForm_IsZoraSwimming(Player * player);
+
+        if (MmForm_IsZoraSwimming(player)) {
+            if (xzRange < 60.0f) {
+                xzRange = 60.0f;
+            }
+            if (yRange < 60.0f) {
+                yRange = 60.0f;
+            }
+            blockedStates &= ~(PLAYER_STATE1_JUMPING | PLAYER_STATE1_FREEFALL);
+        }
+    }
+
+    if (!(player->stateFlags1 & blockedStates) && Player_GetExplosiveHeld(player) < 0) {
         if ((((player->heldActor != NULL) || (actor == player->talkActor)) &&
              ((getItemId > GI_NONE) && (getItemId < GI_MAX))) ||
             (!(player->stateFlags1 & (PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_IN_CUTSCENE)))) {
@@ -2128,10 +2224,12 @@ s32 Actor_OfferGetItem(Actor* actor, PlayState* play, s32 getItemId, f32 xzRange
                 s16 yawDiff = actor->yawTowardsPlayer - player->actor.shape.rot.y;
                 s32 absYawDiff = ABS(yawDiff);
 
-                if ((getItemId != GI_NONE) || (player->getItemDirection < absYawDiff)) {
+                if (localTimePedestal || (getItemId != GI_NONE) || (player->getItemDirection < absYawDiff)) {
                     player->getItemId = getItemId;
                     player->interactRangeActor = actor;
-                    player->getItemDirection = absYawDiff;
+                    // The custom ceremony handles alignment. Keep its offer
+                    // ahead of ordinary carry actors until the next frame.
+                    player->getItemDirection = localTimePedestal ? 0x8000 : absYawDiff;
                     return true;
                 }
             }
@@ -2239,18 +2337,53 @@ void Actor_SetPlayerKnockbackSmallNoDamage(PlayState* play, Actor* actor, f32 ar
 }
 
 void Player_PlaySfx(Actor* actor, u16 sfxId) {
-    if (actor->id != ACTOR_PLAYER || sfxId < NA_SE_VO_LI_SWORD_N || sfxId > NA_SE_VO_LI_ELECTRIC_SHOCK_LV_KID) {
-        Audio_PlaySoundGeneral(sfxId, &actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultReverb);
-    } else {
-        freqMultiplier = CVarGetFloat(CVAR_LINK_VOICE_FREQ_MULTIPLIER, 1.0);
-        if (freqMultiplier <= 0) {
-            freqMultiplier = 1;
+    // Suppress OOT SFX when in MM transformation form.
+    // MM forms play their own sounds via MmSfx_PlayAtPos / MmForm_PlaySfx.
+    // Keep: floor/surface SFX (WALK, JUMP, LAND, SLIP), environmental, water, status effects.
+    extern u8 TransformMasks_IsTransformed(void);
+    extern u8 GerudoForm_IsActive(void);
+    // Gerudo is the exception — soh.o2r doesn't ship MM combat SFX, so its
+    // dual-scimitar combo plays vanilla OOT sword sounds (NA_SE_IT_SWORD_SWING,
+    // etc.) directly. Without this carve-out the swing audio is silently
+    // dropped by the NA_SE_IT_* block below. Same pattern as
+    // Player_PlayVoiceSfx's Gerudo exception (z_player.c:1833).
+    if (actor->id == ACTOR_PLAYER && TransformMasks_IsTransformed() && !GerudoForm_IsActive()) {
+        // Block ALL item/weapon SFX (NA_SE_IT_* = 0x1800-0x18FF)
+        if ((sfxId & 0xF800) == 0x1800) {
+            return;
         }
-        // Authentic behavior uses D_801333E0 for both freqScale and a4
-        // Audio_PlaySoundGeneral(sfxId, &actor->projectedPos, 4, &D_801333E0 , &D_801333E0, &D_801333E8);
-        Audio_PlaySoundGeneral(sfxId, &actor->projectedPos, 4, &freqMultiplier, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultReverb);
+        // Block ALL voice SFX (NA_SE_VO_LI_*)
+        if (sfxId >= NA_SE_VO_LI_SWORD_N && sfxId <= NA_SE_VO_LI_ELECTRIC_SHOCK_LV_KID) {
+            return;
+        }
+        // Block only combat SFX that MM handles via its own system.
+        // Keep body sounds (BODY_HIT, DAMAGE) — they're form-neutral impacts.
+        switch (sfxId) {
+            case NA_SE_PL_THROW:
+            case NA_SE_PL_CHANGE_ARMS:
+            case NA_SE_PL_CATCH_BOOMERANG:
+            case NA_SE_PL_KNOCK:
+            case NA_SE_PL_SPARK:
+                return;
+        }
+    }
+
+    if (actor->id != ACTOR_PLAYER || sfxId < NA_SE_VO_LI_SWORD_N || sfxId > NA_SE_VO_LI_ELECTRIC_SHOCK_LV_KID) {
+        Audio_PlaySfxGeneral(sfxId, &actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultReverb);
+    } else {
+        // Custom voice pack interception: a loaded pack may replace this Link
+        // voice id with a sample from a .pak in mods/. If it handles the id we
+        // skip the vanilla SFX so we don't double-play.
+        extern u8 VoicePack_PlayIfMatch(u16 sfxId, Vec3f * pos);
+        if (!VoicePack_PlayIfMatch(sfxId, &actor->projectedPos)) {
+            freqMultiplier = CVarGetFloat(CVAR_LINK_VOICE_FREQ_MULTIPLIER, 1.0);
+            if (freqMultiplier <= 0) {
+                freqMultiplier = 1;
+            }
+            Audio_PlaySfxGeneral(sfxId, &actor->projectedPos, 4, &freqMultiplier, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultReverb);
+        }
     }
 
     if (actor->id == ACTOR_PLAYER) {
@@ -2335,6 +2468,8 @@ f32 D_8015BC18;
 
 void func_8002FA60(PlayState* play) {
     Vec3f lightPos;
+
+    ComboFw_SyncPoint();
 
     if (gSaveContext.fw.set) {
         gSaveContext.respawn[RESPAWN_MODE_TOP].data = 0x28;
@@ -2527,6 +2662,9 @@ void func_80030488(PlayState* play) {
 void Actor_DisableLens(PlayState* play) {
     if (play->actorCtx.lensActive) {
         play->actorCtx.lensActive = false;
+        // lensFromLantern is NOT cleared here: it belongs to the Poe-fire lantern, which
+        // re-asserts it every frame anyway. Clearing it made turning the Lens of Truth off
+        // (or any cutscene calling this) fight the lantern for the flag. Skijer's NEI
         Magic_Reset(play);
     }
 }
@@ -2572,6 +2710,9 @@ u32 D_80116068[ACTORCAT_MAX] = {
 };
 
 void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+    FrameTimingSpan updateAllSpan = FrameTiming_BeginSpan();
+    uint64_t actorsVisited = 0;
+    uint64_t actorsUpdated = 0;
     Actor* refActor;
     Actor* actor;
     Player* player;
@@ -2626,6 +2767,7 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
 
         actor = actorCtx->actorLists[i].head;
         while (actor != NULL) {
+            actorsVisited++;
             if (actor->world.pos.y < -25000.0f) {
                 actor->world.pos.y = -25000.0f;
             }
@@ -2664,9 +2806,23 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                 }
             } else {
                 Math_Vec3f_Copy(&actor->prevPos, &actor->world.pos);
-                actor->xzDistToPlayer = Actor_WorldDistXZToActor(actor, &player->actor);
-                actor->yDistToPlayer = Actor_HeightDiff(actor, &player->actor);
-                actor->xyzDistToPlayerSq = SQ(actor->xzDistToPlayer) + SQ(actor->yDistToPlayer);
+
+                // Stone Mask + SW97 Shadow Medallion: enemies and NPCs can't detect Link.
+                // Also covers hostile MISC actors like Leever (ACTORCAT_MISC) that would
+                // otherwise bypass the gate.
+                // Sw97_IsBlinded is a per-actor gate (Shadow Arrow / Shadow gustjar
+                // tag specific targets) and fires regardless of category.
+                if (((MmMaskWear_IsStoneMaskActive() || Sw97_ShadowStealthActive()) &&
+                     (i == ACTORCAT_ENEMY || i == ACTORCAT_NPC || (actor->flags & ACTOR_FLAG_HOSTILE))) ||
+                    Sw97_IsBlinded(actor)) {
+                    actor->xzDistToPlayer = 32000.0f;
+                    actor->yDistToPlayer = 32000.0f;
+                    actor->xyzDistToPlayerSq = SQ(32000.0f) + SQ(32000.0f);
+                } else {
+                    actor->xzDistToPlayer = Actor_WorldDistXZToActor(actor, &player->actor);
+                    actor->yDistToPlayer = Actor_HeightDiff(actor, &player->actor);
+                    actor->xyzDistToPlayerSq = SQ(actor->xzDistToPlayer) + SQ(actor->yDistToPlayer);
+                }
 
                 actor->yawTowardsPlayer = Actor_WorldYawTowardActor(actor, &player->actor);
                 actor->flags &= ~ACTOR_FLAG_SFX_FOR_PLAYER_BODY_HIT;
@@ -2688,8 +2844,31 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                         actor->colorFilterTimer--;
                     }
                     if (GameInteractor_ShouldActorUpdate(actor)) {
+                        FrameTimingSpan actorSpan = FrameTiming_BeginSpan();
+                        char actorTimingName[48];
+                        if (actorSpan.epoch != 0) {
+                            snprintf(actorTimingName, sizeof(actorTimingName), "id=%04x params=%04x",
+                                     (unsigned)(u16)actor->id, (unsigned)(u16)actor->params);
+                        }
+                        actorsUpdated++;
+                        DinFireSword_FinishBeginActor(play, actor);
                         actor->update(actor, play);
+                        DinFireSword_FinishEndActor(play, actor);
+                        if (actorSpan.epoch != 0) {
+                            FrameTiming_EndNamedSpan("actor_update", actorTimingName, actorSpan);
+                        }
+                        actorSpan = FrameTiming_BeginSpan();
                         GameInteractor_ExecuteOnActorUpdate(actor);
+                        FrameTiming_EndNamedSpan("actor_update_detail", "update_hook", actorSpan);
+                        // Skijer's NEI partial slowdown: re-freeze for TimeCtl_GetStutterFrames()
+                        // after each update, so the actor ticks 1 frame in N and its animations and
+                        // AI timers slow with it. The interval is derived from the requested factor,
+                        // so 0.33 really is a third of normal speed. A FULL stop is not handled here
+                        // — timestop_helper drives that directly so newly spawned actors are caught.
+                        if ((gChampionSlowFactor > 0.0f) && (gChampionSlowFactor < 1.0f) &&
+                            !TimeCtl_IsActorExempt(actor)) {
+                            actor->freezeTimer = TimeCtl_GetStutterFrames();
+                        }
                     }
                     func_8003F8EC(play, &play->colCtx.dyna, actor);
                 }
@@ -2723,6 +2902,11 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
     Attention_Update(&actorCtx->targetCtx, player, actor, play);
     TitleCard_Update(play, &actorCtx->titleCtx);
     DynaPoly_UpdateBgActorTransforms(play, &play->colCtx.dyna);
+    if (updateAllSpan.epoch != 0) {
+        FrameTiming_Count("actors_update_visited", actorsVisited);
+        FrameTiming_Count("actors_updated", actorsUpdated);
+    }
+    FrameTiming_EndNamedSpan("play_update", "actors", updateAllSpan);
 }
 
 void Actor_FaultPrint(Actor* actor, char* command) {
@@ -2747,8 +2931,17 @@ void Actor_FaultPrint(Actor* actor, char* command) {
 }
 
 void Actor_Draw(PlayState* play, Actor* actor) {
+    FrameTimingSpan actorSpan = FrameTiming_BeginSpan();
+    FrameTimingSpan detailSpan = actorSpan;
+    char actorTimingName[48];
     FaultClient faultClient;
     Lights* lights;
+
+    if (actorSpan.epoch != 0) {
+        snprintf(actorTimingName, sizeof(actorTimingName), "id=%04x params=%04x", (unsigned)(u16)actor->id,
+                 (unsigned)(u16)actor->params);
+        FrameTiming_Count("actors_drawn", 1);
+    }
 
     Fault_AddClient(&faultClient, Actor_FaultPrint, actor, "Actor_draw");
 
@@ -2761,6 +2954,8 @@ void Actor_Draw(PlayState* play, Actor* actor) {
                    (actor->flags & ACTOR_FLAG_IGNORE_POINTLIGHTS) ? NULL : &actor->world.pos);
     Lights_Draw(lights, play->state.gfxCtx);
 
+    FrameTiming_EndNamedSpan("actor_draw_detail", "lighting", detailSpan);
+    detailSpan = FrameTiming_BeginSpan();
     FrameInterpolation_RecordActorPosRotMatrix();
     if (actor->flags & ACTOR_FLAG_IGNORE_QUAKE) {
         Matrix_SetTranslateRotateYXZ(
@@ -2796,7 +2991,25 @@ void Actor_Draw(PlayState* play, Actor* actor) {
         }
     }
 
-    actor->draw(actor, play);
+    {
+        // Phantom Hourglass: the recall drains everything but Link and its target to grey. Skijer's NEI
+        extern u8 Hourglass_ShouldDrawGray(Actor * actor);
+        extern void Hourglass_PushGray(PlayState * play);
+        extern void Hourglass_PopGray(PlayState * play);
+        u8 recallGray = Hourglass_ShouldDrawGray(actor);
+
+        if (recallGray) {
+            Hourglass_PushGray(play);
+        }
+        FrameTiming_EndNamedSpan("actor_draw_detail", "setup", detailSpan);
+        detailSpan = FrameTiming_BeginSpan();
+        actor->draw(actor, play);
+        FrameTiming_EndNamedSpan("actor_draw_detail", "draw_callback", detailSpan);
+        detailSpan = FrameTiming_BeginSpan();
+        if (recallGray) {
+            Hourglass_PopGray(play);
+        }
+    }
 
     if (actor->colorFilterTimer != 0) {
         if (actor->colorFilterParams & 0x2000) {
@@ -2806,20 +3019,33 @@ void Actor_Draw(PlayState* play, Actor* actor) {
         }
     }
 
+    FrameTiming_EndNamedSpan("actor_draw_detail", "restore", detailSpan);
+    detailSpan = FrameTiming_BeginSpan();
     if (actor->shape.shadowDraw != NULL) {
         actor->shape.shadowDraw(actor, lights, play);
     }
+
+    // VB_ACTOR_POST_DRAW: subscribers (e.g. Harpoon's Triforce Thief carrier
+    // indicator) can draw extra geometry attached to this actor after its
+    // own draw + shadow pass.
+    FrameTiming_EndNamedSpan("actor_draw_detail", "shadow", detailSpan);
+    detailSpan = FrameTiming_BeginSpan();
+    GameInteractor_Should(VB_ACTOR_POST_DRAW, true, play, actor);
 
     CLOSE_DISPS(play->state.gfxCtx);
     FrameInterpolation_RecordCloseChild();
 
     Fault_RemoveClient(&faultClient);
+    FrameTiming_EndNamedSpan("actor_draw_detail", "post_draw_hook_cleanup", detailSpan);
+    if (actorSpan.epoch != 0) {
+        FrameTiming_EndNamedSpan("actor_draw", actorTimingName, actorSpan);
+    }
 }
 
 void Actor_UpdateFlaggedAudio(Actor* actor) {
     if (actor->flags & ACTOR_FLAG_SFX_ACTOR_POS_2) {
-        Audio_PlaySoundGeneral(actor->sfx, &actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(actor->sfx, &actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     } else if (actor->flags & ACTOR_AUDIO_FLAG_SFX_CENTERED_1) {
         Sfx_PlaySfxCentered(actor->sfx);
     } else if (actor->flags & ACTOR_AUDIO_FLAG_SFX_CENTERED_2) {
@@ -2862,6 +3088,29 @@ void Actor_DrawLensActors(PlayState* play, s32 numInvisibleActors, Actor** invis
     Actor** invisibleActor;
     GraphicsContext* gfxCtx;
     s32 i;
+
+    // Poe lantern: whole-screen lens with no overlay (no red tint, no circle mask).
+    //
+    // The room's lens mode still decides WHAT the lens does to these actors, and the
+    // two modes are opposites — go by the value, the LensMode enum names above read
+    // the wrong way round:
+    //   0 (LENS_MODE_HIDE_ACTORS): actors invisible by default → the lens reveals them.
+    //   1 (LENS_MODE_SHOW_ACTORS): actors visible by default (fake walls, fake floors,
+    //                              illusory chests) → the lens has to make them vanish.
+    // Drawing both cases is what made fake geometry stay solid on screen while only the
+    // hidden actors appeared; in mode 1 the correct output is to draw nothing at all.
+    // ...but only when the lantern is the one driving the lens. The Lens of Truth ITEM parks
+    // magicState in MAGIC_STATE_CONSUME_LENS while it runs; the lantern never does, so that is
+    // what tells the two apart — and it keeps the real Lens' circle overlay intact.
+    if (play->actorCtx.lensFromLantern && (gSaveContext.magicState != MAGIC_STATE_CONSUME_LENS)) {
+        if (play->roomCtx.curRoom.lensMode != LENS_MODE_SHOW_ACTORS) {
+            invisibleActor = &invisibleActors[0];
+            for (i = 0; i < numInvisibleActors; i++) {
+                Actor_Draw(play, *(invisibleActor++));
+            }
+        }
+        return;
+    }
 
     gfxCtx = play->state.gfxCtx;
 
@@ -2977,8 +3226,9 @@ s32 Ship_CalcShouldDrawAndUpdate(PlayState* play, Actor* actor, Vec3f* projected
         return true;
     }
 
-    // Skip cutscne actors that depend on culling to hide from camera pans
-    if (actor->id == ACTOR_EN_VIEWER) {
+    // Scripted cutscene actors depend on culling during camera pans. Static
+    // scene-editor placements share this actor ID but should honor the settings.
+    if (actor->id == ACTOR_EN_VIEWER && !StaticStoryActor_IsParam(actor->params)) {
         return false;
     }
 
@@ -3039,6 +3289,10 @@ s32 Ship_CalcShouldDrawAndUpdate(PlayState* play, Actor* actor, Vec3f* projected
 // #endregion
 
 void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
+    FrameTimingSpan listSpan = FrameTiming_BeginSpan();
+    FrameTimingSpan phaseSpan = listSpan;
+    uint64_t actorsVisited = 0;
+    uint64_t actorsCulled = 0;
     s32 invisibleActorCounter;
     Actor* invisibleActors[INVISIBLE_ACTOR_MAX];
     ActorListEntry* actorListEntry;
@@ -3055,6 +3309,7 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
         actor = actorListEntry->head;
 
         while (actor != NULL) {
+            actorsVisited++;
             char* actorName = ActorDB_Retrieve(actor->id)->name;
 
             gDPNoOpString(POLY_OPA_DISP++, actorName, i);
@@ -3069,7 +3324,12 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
 
             if ((HREG(64) != 1) || ((HREG(65) != -1) && (HREG(65) != HREG(66))) || (HREG(69) == 0)) {
                 if (actor->sfx != 0) {
-                    Actor_UpdateFlaggedAudio(actor);
+                    // Suppress continuous item SFX on player when in MM form
+                    extern u8 TransformMasks_IsTransformed(void);
+                    if (!(actor->id == ACTOR_PLAYER && TransformMasks_IsTransformed() &&
+                          (actor->sfx & 0xF800) == 0x1800)) {
+                        Actor_UpdateFlaggedAudio(actor); // upstream renamed func_80030ED8
+                    }
                 }
             }
 
@@ -3096,6 +3356,12 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
                 }
             }
 
+            // Count geometric culling only; lens deferral and debug suppression are separate.
+            if (listSpan.epoch != 0 && actor->init == NULL && actor->draw != NULL &&
+                !(actor->flags & (ACTOR_FLAG_DRAW_CULLING_DISABLED | ACTOR_FLAG_INSIDE_CULLING_VOLUME)) &&
+                !shipShouldDraw) {
+                actorsCulled++;
+            }
             actor->isDrawn = false;
 
             if ((HREG(64) != 1) || ((HREG(65) != -1) && (HREG(65) != HREG(66))) || (HREG(71) == 0)) {
@@ -3105,7 +3371,7 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
                     // #endregion
                     if ((actor->flags & ACTOR_FLAG_REACT_TO_LENS) &&
                         ((play->roomCtx.curRoom.lensMode == LENS_MODE_HIDE_ACTORS) || play->actorCtx.lensActive ||
-                         (actor->room != play->roomCtx.curRoom.num))) {
+                         play->actorCtx.lensFromLantern || (actor->room != play->roomCtx.curRoom.num))) {
                         assert(invisibleActorCounter < INVISIBLE_ACTOR_MAX);
                         invisibleActors[invisibleActorCounter] = actor;
                         invisibleActorCounter++;
@@ -3122,16 +3388,27 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
         }
     }
 
+    FrameTiming_EndNamedSpan("actor_draw_all", "actor_traversal", phaseSpan);
+    phaseSpan = FrameTiming_BeginSpan();
+
     if ((HREG(64) != 1) || (HREG(73) != 0)) {
         Effect_DrawAll(play->state.gfxCtx);
     }
+
+    FrameTiming_EndNamedSpan("actor_draw_all", "effects", phaseSpan);
+    phaseSpan = FrameTiming_BeginSpan();
 
     if ((HREG(64) != 1) || (HREG(74) != 0)) {
         EffectSs_DrawAll(play);
     }
 
+    FrameTiming_EndNamedSpan("actor_draw_all", "effects_ss", phaseSpan);
+    phaseSpan = FrameTiming_BeginSpan();
+
     if ((HREG(64) != 1) || (HREG(72) != 0)) {
-        if (play->actorCtx.lensActive) {
+        // Skijer's NEI: lensFromLantern is the Poe-fire lantern's own lens; it is
+        // independent of the Lens of Truth (no magic, no lensActive) so both can be on.
+        if (play->actorCtx.lensActive || play->actorCtx.lensFromLantern) {
             Actor_DrawLensActors(play, invisibleActorCounter, invisibleActors);
             if ((play->csCtx.state != CS_STATE_IDLE) || Player_InCsMode(play)) {
                 Actor_DisableLens(play);
@@ -3139,21 +3416,40 @@ void Actor_DrawAll(PlayState* play, ActorContext* actorCtx) {
         }
     }
 
+    FrameTiming_EndNamedSpan("actor_draw_all", "lens_actors", phaseSpan);
+    phaseSpan = FrameTiming_BeginSpan();
+
+    DinFireSword_FinishDrawAll(play);
     Actor_DrawFaroresWindPointer(play);
+
+    FrameTiming_EndNamedSpan("actor_draw_all", "farores_wind", phaseSpan);
+    phaseSpan = FrameTiming_BeginSpan();
 
     if (IREG(32) == 0) {
         Lights_DrawGlow(play);
     }
 
+    FrameTiming_EndNamedSpan("actor_draw_all", "light_glow", phaseSpan);
+    phaseSpan = FrameTiming_BeginSpan();
+
     if ((HREG(64) != 1) || (HREG(75) != 0)) {
         TitleCard_Draw(play, &actorCtx->titleCtx);
     }
+
+    FrameTiming_EndNamedSpan("actor_draw_all", "title_card", phaseSpan);
+    phaseSpan = FrameTiming_BeginSpan();
 
     if ((HREG(64) != 1) || (HREG(76) != 0)) {
         CollisionCheck_DrawCollision(play, &play->colChkCtx);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
+    FrameTiming_EndNamedSpan("actor_draw_all", "collision_debug", phaseSpan);
+    if (listSpan.epoch != 0) {
+        FrameTiming_Count("actors_draw_visited", actorsVisited);
+        FrameTiming_Count("actors_draw_culled", actorsCulled);
+        FrameTiming_Count("actors_lens_queued", invisibleActorCounter);
+    }
 }
 
 void Actor_KillAllWithMissingObject(PlayState* play, ActorContext* actorCtx) {
@@ -3341,11 +3637,17 @@ Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 pos
         return NULL;
     }
 
-    objBankIndex = Object_GetIndex(&gPlayState->objectCtx, dbEntry->objectId);
-
-    if (objBankIndex < 0 && (!gMapLoading || CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0))) {
-        objBankIndex = 0;
-    }
+#ifdef COMBO_BUILD
+    // The stationary forest horse resolves named resources and needs no scene
+    // OBJECT_HORSE bank, including while authored room actors are loading.
+    objBankIndex = Ship_GetActorSpawnObjectIndex(play,
+                                                 actorId == ACTOR_EN_HORSE && params == COMBO_SOLO_FOREST_EPONA_PARAMS
+                                                     ? OBJECT_GAMEPLAY_KEEP
+                                                     : dbEntry->objectId,
+                                                 actorId);
+#else
+    objBankIndex = Ship_GetActorSpawnObjectIndex(play, dbEntry->objectId, actorId);
+#endif
 
     if ((objBankIndex < 0) ||
         ((dbEntry->category == ACTORCAT_ENEMY) && Flags_GetClear(play, play->roomCtx.curRoom.num))) {
@@ -3423,13 +3725,7 @@ Actor* Actor_SpawnAsChild(ActorContext* actorCtx, Actor* parent, PlayState* play
         return NULL;
     }
 
-    // The following enemies break when the parent actor isn't the same as what would happen in authentic gameplay.
-    // As such, don't assign a parent to them at all when spawned with Enemy Randomizer.
-    // Gohma (z_boss_goma.c) and the falling platform spawning Stalfos in
-    // Forest Temple (z_bg_mori_bigst.c) that normally rely on this behaviour are changed when
-    // Enemy Rando is on so they still work properly even without assigning a parent.
-    if (CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0) &&
-        (spawnedActor->id == ACTOR_EN_FLOORMAS || spawnedActor->id == ACTOR_EN_PEEHAT)) {
+    if (!GameInteractor_Should(VB_SET_CHILD_ACTOR_PARENT, true, spawnedActor)) {
         return spawnedActor;
     }
 
@@ -3473,11 +3769,38 @@ void Actor_SpawnTransitionActors(PlayState* play, ActorContext* actorCtx) {
 
 Actor* Actor_SpawnEntry(ActorContext* actorCtx, ActorEntry* actorEntry, PlayState* play) {
     gMapLoading = 1;
-    Actor* ret;
+    Actor* ret = NULL;
+    s32 shouldSpawn;
+    const char* progressionActorName = NULL;
 
-    if (GameInteractor_Should(VB_SPAWN_ACTOR_ENTRY, true, actorCtx, actorEntry, play, &ret)) {
+    if (actorEntry->id == ACTOR_EN_SA) {
+        progressionActorName = "Saria";
+    } else if (actorEntry->id == ACTOR_EN_MA1) {
+        progressionActorName = "ChildMalon";
+    }
+
+    if (progressionActorName != NULL) {
+        osSyncPrintf("[ProgressionActorProbe] actor=%s stage=scene-entry scene=%d params=0x%04X pos=(%d,%d,%d) "
+                     "rot=(%d,%d,%d)\n",
+                     progressionActorName, play->sceneNum, (u16)actorEntry->params, actorEntry->pos.x,
+                     actorEntry->pos.y, actorEntry->pos.z, actorEntry->rot.x, actorEntry->rot.y, actorEntry->rot.z);
+    }
+
+    shouldSpawn = GameInteractor_Should(VB_SPAWN_ACTOR_ENTRY, true, actorCtx, actorEntry, play, &ret);
+    if (progressionActorName != NULL) {
+        osSyncPrintf(
+            "[ProgressionActorProbe] actor=%s stage=spawn-hook scene=%d params=0x%04X allowed=%d override=%p\n",
+            progressionActorName, play->sceneNum, (u16)actorEntry->params, shouldSpawn, (void*)ret);
+    }
+
+    if (shouldSpawn) {
         ret = Actor_Spawn(actorCtx, play, actorEntry->id, actorEntry->pos.x, actorEntry->pos.y, actorEntry->pos.z,
                           actorEntry->rot.x, actorEntry->rot.y, actorEntry->rot.z, actorEntry->params);
+    }
+
+    if (progressionActorName != NULL) {
+        osSyncPrintf("[ProgressionActorProbe] actor=%s stage=spawn-result scene=%d params=0x%04X actor=%p\n",
+                     progressionActorName, play->sceneNum, (u16)actorEntry->params, (void*)ret);
     }
 
     gMapLoading = 0;
@@ -3497,7 +3820,7 @@ Actor* Actor_Delete(ActorContext* actorCtx, Actor* actor, PlayState* play) {
 
     if ((player != NULL) && (actor == player->focusActor)) {
         Player_ReleaseLockOn(player);
-        Camera_ChangeMode(Play_GetCamera(play, Play_GetActiveCamId(play)), 0);
+        Camera_RequestMode(Play_GetCamera(play, Play_GetActiveCamId(play)), CAM_MODE_NORMAL);
     }
 
     if (actor == actorCtx->targetCtx.arrowPointedActor) {
@@ -3611,6 +3934,14 @@ Actor* Attention_FindActor(PlayState* play, ActorContext* actorCtx, Actor** acto
     s32 i;
     u8* entry;
 
+#ifdef COMBO_BUILD
+    if (ComboBlackMarket_FairyQuiet(COMBO_GAME_OOT, play->sceneNum, SCENE_SKIEJER_MARKET)) {
+        *actorPtr = NULL;
+        actorCtx->targetCtx.bgmEnemy = NULL;
+        return NULL;
+    }
+#endif
+
     D_8015BBE8 = D_8015BBEC = NULL;
     D_8015BBF0 = sbgmEnemyDistSq = FLT_MAX;
     D_8015BBF8 = 0x7FFFFFFF;
@@ -3663,9 +3994,18 @@ Actor* Actor_Find(ActorContext* actorCtx, s32 actorId, s32 actorCategory) {
  * Play the death sound effect and flash the screen white for 4 frames.
  * While the screen flashes, the game freezes.
  */
+// Trirod kill-to-learn (Skijer's NEI): enemies teach their echo when defeated
+// with the rod drawn. Defined in expansions/trirod/trirod.c, which lives in the
+// custom_items.c unity TU — hence the extern, not an include.
+void Trirod_NotifyEnemyDown(PlayState* play, Actor* actor);
+
 void Enemy_StartFinishingBlow(PlayState* play, Actor* actor) {
+    DinFireSword_FinishFatal(play, actor);
     play->actorCtx.freezeFlashTimer = 5;
     SoundSource_PlaySfxAtFixedWorldPos(play, &actor->world.pos, 20, NA_SE_EN_LAST_DAMAGE);
+    // Nearly every enemy funnels its death through here, which makes it the one
+    // spot the Trirod can watch without touching each actor. Skijer's NEI
+    Trirod_NotifyEnemyDown(play, actor);
 }
 
 s16 FaceChange_UpdateBlinking(s16* arg0, s16 arg1, s16 arg2, s16 arg3) {
@@ -4778,34 +5118,40 @@ u8 func_800355E4(PlayState* play, Collider* collider) {
 }
 
 u8 Actor_ApplyDamage(Actor* actor) {
+    u8 swordFinishHealth = actor->colChkInfo.health;
     if (actor->colChkInfo.damage >= actor->colChkInfo.health) {
         actor->colChkInfo.health = 0;
     } else {
         actor->colChkInfo.health -= actor->colChkInfo.damage;
     }
 
+    if (swordFinishHealth != 0 && actor->colChkInfo.health == 0)
+        DinFireSword_FinishFatal(gPlayState, actor);
     return actor->colChkInfo.health;
 }
 
 void Actor_SetDropFlag(Actor* actor, ColliderInfo* colInfo, s32 freezeFlag) {
+    // A flaming sword still awards the sword's native drops. Do not classify
+    // this feature's added fire bit as an actual Fire Arrow killing blow.
+    u32 damageFlags = DinFireSword_OriginalDamageFlags(gPlayState, colInfo->acHitInfo);
     if (colInfo->acHitInfo == NULL) {
         actor->dropFlag = 0x00;
-    } else if (freezeFlag && (colInfo->acHitInfo->toucher.dmgFlags & 0x10060000)) {
+    } else if (freezeFlag && (damageFlags & 0x10060000)) {
         actor->freezeTimer = colInfo->acHitInfo->toucher.damage;
         actor->dropFlag = 0x00;
-    } else if (colInfo->acHitInfo->toucher.dmgFlags & 0x0800) {
+    } else if (damageFlags & 0x0800) {
         actor->dropFlag = 0x01;
-    } else if (colInfo->acHitInfo->toucher.dmgFlags & 0x1000) {
+    } else if (damageFlags & 0x1000) {
         actor->dropFlag = 0x02;
-    } else if (colInfo->acHitInfo->toucher.dmgFlags & 0x4000) {
+    } else if (damageFlags & 0x4000) {
         actor->dropFlag = 0x04;
-    } else if (colInfo->acHitInfo->toucher.dmgFlags & 0x8000) {
+    } else if (damageFlags & 0x8000) {
         actor->dropFlag = 0x08;
-    } else if (colInfo->acHitInfo->toucher.dmgFlags & 0x10000) {
+    } else if (damageFlags & 0x10000) {
         actor->dropFlag = 0x10;
-    } else if (colInfo->acHitInfo->toucher.dmgFlags & 0x2000) {
+    } else if (damageFlags & 0x2000) {
         actor->dropFlag = 0x20;
-    } else if (colInfo->acHitInfo->toucher.dmgFlags & 0x80000) {
+    } else if (damageFlags & 0x80000) {
         if (freezeFlag) {
             actor->freezeTimer = colInfo->acHitInfo->toucher.damage;
         }
@@ -4824,24 +5170,25 @@ void Actor_SetDropFlagJntSph(Actor* actor, ColliderJntSph* jntSph, s32 freezeFla
 
     for (i = jntSph->count - 1; i >= 0; i--) {
         curColInfo = &jntSph->elements[i].info;
+        u32 damageFlags = DinFireSword_OriginalDamageFlags(gPlayState, curColInfo->acHitInfo);
         if (curColInfo->acHitInfo == NULL) {
             flag = 0x00;
-        } else if (freezeFlag && (curColInfo->acHitInfo->toucher.dmgFlags & 0x10060000)) {
+        } else if (freezeFlag && (damageFlags & 0x10060000)) {
             actor->freezeTimer = curColInfo->acHitInfo->toucher.damage;
             flag = 0x00;
-        } else if (curColInfo->acHitInfo->toucher.dmgFlags & 0x0800) {
+        } else if (damageFlags & 0x0800) {
             flag = 0x01;
-        } else if (curColInfo->acHitInfo->toucher.dmgFlags & 0x1000) {
+        } else if (damageFlags & 0x1000) {
             flag = 0x02;
-        } else if (curColInfo->acHitInfo->toucher.dmgFlags & 0x4000) {
+        } else if (damageFlags & 0x4000) {
             flag = 0x04;
-        } else if (curColInfo->acHitInfo->toucher.dmgFlags & 0x8000) {
+        } else if (damageFlags & 0x8000) {
             flag = 0x08;
-        } else if (curColInfo->acHitInfo->toucher.dmgFlags & 0x10000) {
+        } else if (damageFlags & 0x10000) {
             flag = 0x10;
-        } else if (curColInfo->acHitInfo->toucher.dmgFlags & 0x2000) {
+        } else if (damageFlags & 0x2000) {
             flag = 0x20;
-        } else if (curColInfo->acHitInfo->toucher.dmgFlags & 0x80000) {
+        } else if (damageFlags & 0x80000) {
             if (freezeFlag) {
                 actor->freezeTimer = curColInfo->acHitInfo->toucher.damage;
             }
@@ -5108,7 +5455,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
 
     switch (arg1) {
         case 0:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                 if (Flags_GetInfTable(INFTABLE_05)) {
                     retTextId = 0x1048;
                 } else {
@@ -5136,7 +5484,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 1:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     if (Flags_GetInfTable(INFTABLE_10)) {
                         retTextId = 0x1046;
                     } else {
@@ -5183,7 +5532,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 2:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1042;
                 } else {
                     retTextId = 0x1004;
@@ -5200,7 +5550,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 3:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1043;
                 } else {
                     if (Flags_GetInfTable(INFTABLE_1E)) {
@@ -5219,7 +5570,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 4:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1042;
                 } else {
                     retTextId = 0x1007;
@@ -5236,7 +5588,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 5:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1044;
                 } else if (Flags_GetInfTable(INFTABLE_22)) {
                     retTextId = 0x1009;
@@ -5253,7 +5606,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 6:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1042;
                 } else if (Flags_GetInfTable(INFTABLE_24)) {
                     retTextId = 0x100B;
@@ -5270,7 +5624,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 7:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1043;
                 } else if (Flags_GetInfTable(INFTABLE_26)) {
                     retTextId = 0x100D;
@@ -5287,7 +5642,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 8:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1043;
                 } else if (Flags_GetInfTable(INFTABLE_28)) {
                     retTextId = 0x1019;
@@ -5306,7 +5662,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 9:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x1049;
                 } else {
                     retTextId = 0x1035;
@@ -5321,7 +5678,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 10:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x104A;
                 } else {
                     retTextId = 0x1038;
@@ -5338,7 +5696,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 11:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x104B;
                 } else {
                     retTextId = 0x103C;
@@ -5353,7 +5712,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 12:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x104C;
                 } else {
                     retTextId = 0x103D;
@@ -5368,7 +5728,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 13:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP))) {
                     retTextId = 0x104D;
                 } else {
                     retTextId = 0x103E;
@@ -5404,9 +5765,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 17:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 if (Flags_GetInfTable(INFTABLE_6C)) {
                     retTextId = 0x7008;
                 } else {
@@ -5420,9 +5784,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             retTextId = 0x702D;
             break;
         case 18:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x7006;
             } else {
                 if (Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_POCKET_EGG)) {
@@ -5453,18 +5820,24 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 24:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x7044;
             } else {
                 retTextId = 0x7015;
             }
             break;
         case 25:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x7045;
             } else {
                 Flags_GetInfTable(INFTABLE_C2);
@@ -5472,9 +5845,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 26:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x7046;
             } else {
                 Flags_GetInfTable(INFTABLE_C2);
@@ -5482,9 +5858,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 27:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x7047;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_TALON_RETURNED_FROM_CASTLE)) {
                 retTextId = 0x701A;
@@ -5499,9 +5878,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 28:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x7048;
             } else {
                 Flags_GetInfTable(INFTABLE_CA);
@@ -5509,9 +5891,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 29:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x7049;
             } else {
                 Flags_GetInfTable(INFTABLE_CC);
@@ -5519,9 +5904,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 30:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x704A;
             } else {
                 Flags_GetInfTable(INFTABLE_CE);
@@ -5529,9 +5917,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 31:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x704B;
             } else {
                 Flags_GetInfTable(INFTABLE_D0);
@@ -5539,9 +5930,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 32:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x704C;
             } else {
                 Flags_GetInfTable(INFTABLE_D2);
@@ -5549,9 +5943,12 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 33:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP) &&
-                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_GOHMA,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DEKU_TREE_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) &&
+                Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x704D;
             } else {
                 Flags_GetInfTable(INFTABLE_D4);
@@ -5574,7 +5971,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 38:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
                     retTextId = 0x3027;
                 } else if (Flags_GetEventChkInf(EVENTCHKINF_BOMBED_DODONGOS_CAVERN_ENTRANCE)) {
                     retTextId = 0x3021;
@@ -5593,7 +5991,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 39:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
                     retTextId = 0x3027;
                 } else if (Flags_GetEventChkInf(EVENTCHKINF_BOMBED_DODONGOS_CAVERN_ENTRANCE)) {
                     retTextId = 0x3026;
@@ -5610,7 +6009,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 40:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
                     retTextId = 0x3027;
                 } else if (Flags_GetEventChkInf(EVENTCHKINF_BOMBED_DODONGOS_CAVERN_ENTRANCE)) {
                     retTextId = 0x3026;
@@ -5629,7 +6029,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 41:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
                     retTextId = 0x3027;
                 } else if (Flags_GetInfTable(INFTABLE_F0)) {
                     retTextId = 0x3015;
@@ -5646,7 +6047,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 42:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
                     retTextId = 0x3027;
                 } else if (Flags_GetInfTable(INFTABLE_F4)) {
                     retTextId = 0x3017;
@@ -5663,7 +6065,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 43:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                    Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
                     retTextId = 0x3027;
                 } else if (Flags_GetInfTable(INFTABLE_F8)) {
                     retTextId = 0x3019;
@@ -5679,7 +6082,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 48:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_DODONGO,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_DODONGOS_CAVERN_BLUE_WARP))) {
                 retTextId = 0x3029;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_20) && Flags_GetEventChkInf(EVENTCHKINF_21)) {
                 retTextId = 0x301B;
@@ -5688,7 +6092,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 49:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x402D;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_SPOKE_TO_A_ZORA)) {
                 retTextId = 0x4007;
@@ -5697,7 +6102,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 50:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x402E;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_SPOKE_TO_A_ZORA)) {
                 if (Flags_GetInfTable(INFTABLE_124)) {
@@ -5710,7 +6116,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 51:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x402D;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_RUTOS_LETTER)) {
                 if (Flags_GetInfTable(INFTABLE_12A)) {
@@ -5725,7 +6132,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 52:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x402E;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_SPOKE_TO_A_ZORA)) {
                 retTextId = 0x400C;
@@ -5734,7 +6142,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 53:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x402D;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_KING_ZORA_MOVED)) {
                 retTextId = 0x4010;
@@ -5745,7 +6154,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             }
             break;
         case 54:
-            if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+            if (Combo_SOH_CrossBossLogicalClear(COMBO_BOSS_BARINADE,
+                                                Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                 retTextId = 0x402E;
             } else if (Flags_GetEventChkInf(EVENTCHKINF_SPOKE_TO_A_ZORA)) {
                 retTextId = 0x4011;
@@ -5755,7 +6165,8 @@ u32 func_80035BFC(PlayState* play, s16 arg1) {
             break;
         case 55:
             if (!LINK_IS_ADULT) {
-                if (Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP)) {
+                if (Combo_SOH_CrossBossLogicalClear(
+                        COMBO_BOSS_BARINADE, Flags_GetEventChkInf(EVENTCHKINF_USED_JABU_JABUS_BELLY_BLUE_WARP))) {
                     retTextId = 0x402B;
                 } else if (Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_RUTOS_LETTER)) {
                     if (Flags_GetInfTable(INFTABLE_138)) {
@@ -5874,8 +6285,8 @@ void func_80036E50(u16 textId, s16 arg1) {
                     Flags_SetInfTable(INFTABLE_0C);
                     return;
                 case 0x1033:
-                    Audio_PlaySoundGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     Flags_SetEventChkInf(EVENTCHKINF_SHOWED_MIDO_SWORD_SHIELD);
                     Flags_SetInfTable(INFTABLE_0E);
                     return;
@@ -6338,8 +6749,8 @@ s32 func_80037CB8(PlayState* play, Actor* actor, s16 arg2) {
         case TEXT_STATE_CHOICE:
         case TEXT_STATE_EVENT:
             if (Message_ShouldAdvance(play) && func_80037C94(play, actor, arg2)) {
-                Audio_PlaySoundGeneral(NA_SE_SY_CANCEL, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_SY_CANCEL, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 msgCtx->msgMode = MSGMODE_TEXT_CLOSING;
                 ret = true;
             }

@@ -9,7 +9,9 @@
 
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/OTRGlobals.h"
+#include "soh/Enhancements/randomizer/NeiGiPresentation.h"
 #include <assert.h>
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -388,7 +390,7 @@ s32 EnGirlA_TryChangeShopItemShip(EnGirlA* this, PlayState* play) {
     } else if (this->actor.params == SI_RANDOMIZED_ITEM) {
         ShopItemIdentity shopItemIdentity = Randomizer_IdentifyShopItem(play->sceneNum, this->randoSlotIndex);
         if (Flags_GetRandomizerInf(shopItemIdentity.identity.randomizerInf)) {
-            this->actor.params = SI_SOLD_OUT;
+            this->actor.params = this->randoOriginalShopItem >= 0 ? this->randoOriginalShopItem : SI_SOLD_OUT;
             GetItemEntry getItemEntry = Randomizer_GetItemFromKnownCheckWithoutObtainabilityCheck(
                 shopItemIdentity.identity.randomizerCheck, shopItemIdentity.ogItemId);
 
@@ -702,8 +704,7 @@ s32 EnGirlA_CanBuy_GoronTunic(PlayState* play, EnGirlA* this) {
     if (GameInteractor_Should(VB_CAN_BUY_SHOP_SHIELD_OR_TUNIC, false, &canBuy, RAND_INF_HAS_FOUND_GORON_TUNIC)) {
         return canBuy;
     }
-    if (LINK_AGE_IN_YEARS == YEARS_CHILD &&
-        (!IS_RANDO || Randomizer_GetSettingValue(RSK_SHOPSANITY) == RO_SHOPSANITY_OFF)) {
+    if (LINK_AGE_IN_YEARS == YEARS_CHILD && !IS_RANDO) {
         return CANBUY_RESULT_CANT_GET_NOW;
     }
     if (CHECK_OWNED_EQUIP_ALT(EQUIP_TYPE_TUNIC, EQUIP_INV_TUNIC_GORON)) {
@@ -723,8 +724,7 @@ s32 EnGirlA_CanBuy_ZoraTunic(PlayState* play, EnGirlA* this) {
     if (GameInteractor_Should(VB_CAN_BUY_SHOP_SHIELD_OR_TUNIC, false, &canBuy, RAND_INF_HAS_FOUND_ZORA_TUNIC)) {
         return canBuy;
     }
-    if (LINK_AGE_IN_YEARS == YEARS_CHILD &&
-        (!IS_RANDO || Randomizer_GetSettingValue(RSK_SHOPSANITY) == RO_SHOPSANITY_OFF)) {
+    if (LINK_AGE_IN_YEARS == YEARS_CHILD && !IS_RANDO) {
         return CANBUY_RESULT_CANT_GET_NOW;
     }
     if (CHECK_OWNED_EQUIP_ALT(EQUIP_TYPE_TUNIC, EQUIP_INV_TUNIC_ZORA)) {
@@ -1460,7 +1460,9 @@ void EnGirlA_Draw(Actor* thisx, PlayState* play) {
                                               shopItemIdentity.identity.randomizerCheck, shopItemIdentity.ogItemId);
 
         EnItem00_CustomItemsParticles(&this->actor, play, getItemEntry);
-        GetItemEntry_Draw(play, getItemEntry);
+        if (!NeiGi_DrawShop(play, &getItemEntry)) {
+            GetItemEntry_Draw(play, getItemEntry);
+        }
         return;
     }
 

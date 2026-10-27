@@ -3,10 +3,18 @@
 #include <ship/utils/StringHelper.h>
 #include "2s2h/GameInteractor/GameInteractor.h"
 #include <ship/resource/ResourceManager.h>
+#ifdef COMBO_BUILD
+#include "2s2h/Enhancements/Camera/ComboForestOcarina.h"
+#include "2s2h/Enhancements/Gameplay/ComboOpeningForest.h"
+#include "entrances/BlackMarketEntrance.h"
+#include "entrances/NativeForest.h"
+#include "entrances/NativeForestResourceData.h"
+#endif
 
 extern "C" {
 #include "global.h"
 extern uintptr_t gSegments[NUM_SEGMENTS];
+u8 ResourceMgr_FileExists(const char* path);
 }
 
 Ship::IResource* OTRPlay_LoadFile(PlayState* play, const char* fileName) {
@@ -15,6 +23,22 @@ Ship::IResource* OTRPlay_LoadFile(PlayState* play, const char* fileName) {
 }
 
 s32 OTRScene_ExecuteCommands(PlayState* play, SOH::Scene* scene);
+
+#ifdef COMBO_BUILD
+static void ComboBlackMarket_PrepareSpawn(PlayState* play) {
+    if (play->sceneId != COMBO_BLACK_MARKET_SCENE || !play->linkActorEntry ||
+        play->linkActorEntry->rot.y != COMBO_BLACK_MARKET_SPAWN_YAW)
+        return;
+    // The bundled market and legacy packs store OoT's raw half-turn here.
+    // MM packs degrees in the upper nine bits and a cutscene ID below them;
+    // the raw value incorrectly selects entry zero in the empty scene list.
+    // Copy after scene commands so cached resources and other scenes stay intact.
+    static ActorEntry spawn;
+    spawn = *play->linkActorEntry;
+    spawn.rot.y = (180 << 7) | 0x7F; // Half-turn, CS_ID_NONE.
+    play->linkActorEntry = &spawn;
+}
+#endif
 
 extern "C" void OTRPlay_InitScene(PlayState* play, s32 spawn) {
     play->curSpawn = spawn;
@@ -32,7 +56,16 @@ extern "C" void OTRPlay_InitScene(PlayState* play, s32 spawn) {
     Scene_ResetTransitionActorList(&play->state, &play->transitionActors);
     Room_Init(play, &play->roomCtx);
     gSaveContext.worldMapArea = 0;
+#ifdef COMBO_BUILD
+    // Private/authored headers can omit 0x1B. Bind the camera manager to this
+    // PlayState before native camera setup; a header's own list overrides it.
+    CutsceneManager_Init(play, nullptr, 0);
+#endif
     OTRScene_ExecuteCommands(play, (SOH::Scene*)play->sceneSegment);
+#ifdef COMBO_BUILD
+    ComboForestOcarina_PrepareScene(play);
+    ComboBlackMarket_PrepareSpawn(play);
+#endif
     Play_InitEnvironment(play, play->skyboxId);
 }
 
@@ -46,6 +79,11 @@ extern "C" void OTRPlay_SpawnScene(PlayState* play, s32 sceneId, s32 spawn) {
     play->sceneConfig = scene->drawConfig;
     std::string scenePath =
         StringHelper::Sprintf("scenes/nonmq/%s/%s", scene->segment.fileName, scene->segment.fileName);
+#ifdef COMBO_BUILD
+    if (const char* native = NativeForest::CombinedScene(ComboOpeningForest_IsExploration(play), ResourceMgr_FileExists,
+                                                         NativeForest::LoadDependencies))
+        scenePath = native;
+#endif
     play->sceneSegment = OTRPlay_LoadFile(play, scenePath.c_str());
     scene->unk_D = 0;
     gSegments[2] = (uintptr_t)play->sceneSegment;

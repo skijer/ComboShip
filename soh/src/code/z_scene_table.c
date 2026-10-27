@@ -1,4 +1,8 @@
+#include "rando/CrossEntranceBoss.h"
 #include "global.h"
+#ifdef COMBO_BUILD
+#include "soh/Enhancements/Gameplay/ComboSoloForest.h"
+#endif
 
 #include "scenes/overworld/spot00/spot00_scene.h"
 #include "scenes/overworld/spot00/spot00_room_0.h"
@@ -27,6 +31,7 @@
 #include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/Graphics/ZorasDomain.h"
 
 // Entrance Table definition
 #define DEFINE_ENTRANCE(_0, sceneId, spawn, continueBgm, displayTitleCard, endTransType, startTransType) \
@@ -1149,7 +1154,8 @@ void func_8009E0B8(PlayState* play) {
     } else if (gSaveContext.sceneLayer == 6) {
         spA0 = play->roomCtx.unk_74[0] + 500;
     } else if (((gSaveContext.sceneLayer < 4) || LINK_IS_ADULT) &&
-               (Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD))) {
+               (Combo_SOH_CrossBossLogicalClear(
+                   COMBO_BOSS_GOHMA, Flags_GetEventChkInf(EVENTCHKINF_OBTAINED_KOKIRI_EMERALD_DEKU_TREE_DEAD)))) {
         spA0 = 2150;
     }
 
@@ -1211,7 +1217,7 @@ void func_8009E730(PlayState* play) {
 
     gameplayFrames = play->gameplayFrames;
     var = 127 - (gameplayFrames * 1) % 128;
-    if (LINK_IS_ADULT) {
+    if (LINK_IS_ADULT && !ZorasDomain_IsAlwaysThawed(play)) {
         var = 0;
     }
     gSPSegment(POLY_OPA_DISP++, 0x0C,
@@ -1301,6 +1307,12 @@ void func_8009EE44(PlayState* play) {
     gSPSegment(POLY_XLU_DISP++, 0x09,
                Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 127 - gameplayFrames % 128, gameplayFrames % 128, 32, 32, 1,
                                   gameplayFrames % 128, gameplayFrames % 128, 32, 32, -1, 1, 1, 1));
+#ifdef COMBO_BUILD
+    // Dedicated vertical light sheets call 0x0A000001; native 08/09 keep their own motion.
+    gSPSegment(POLY_XLU_DISP++, 0x0A,
+               Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, gameplayFrames % 64, 32, 16, 1, 0, gameplayFrames % 64, 32,
+                                  16, 0, 1, 0, 1));
+#endif
 
     gDPPipeSync(POLY_XLU_DISP++);
     gDPSetEnvColor(POLY_XLU_DISP++, 128, 128, 128, 128);
@@ -1729,4 +1741,7 @@ void Scene_Draw(PlayState* play) {
     } else {
         sSceneDrawHandlers[play->sceneConfig](play);
     }
+#ifdef COMBO_BUILD
+    ComboSoloForestOot_DrawMaterials(play);
+#endif
 }

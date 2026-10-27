@@ -1,0 +1,15 @@
+{
+  "variant": "malon",
+  "bounds": [
+    -0.095,
+    0.7939999999999999,
+    0.095,
+    0.9259999999999999
+  ],
+  "source_sha256": "11d200aadce51cc51f3181c5d64ffb990392b28fed53158fc544cc92703e2fe0",
+  "panels": [
+    "half",
+    "closed"
+  ],
+  "art_method": "Source face projection; imagegen eyelid edits; source pixels preserved outside feathered eye masks"
+}

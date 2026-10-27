@@ -3,6 +3,8 @@
 
 #include <libultraship/libultra.h>
 #include "global.h"
+#include "mods/extended_inventory.h"
+#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
 extern u8 gAmmoItems[];
 extern s16 D_8082AAEC[];
@@ -20,9 +22,32 @@ extern u8 gAreaGsFlags[];
 #define AGE_REQ_CHILD LINK_AGE_CHILD
 #define AGE_REQ_NONE 9
 
-#define CHECK_AGE_REQ_EQUIP(i, j) (CVarGetInteger(CVAR_CHEAT("TimelessEquipment"), 0) || (gEquipAgeReqs[i][j] == AGE_REQ_NONE) || (gEquipAgeReqs[i][j] == ((void)0, gSaveContext.linkAge)))
-#define CHECK_AGE_REQ_SLOT(slotIndex) (CVarGetInteger(CVAR_CHEAT("TimelessEquipment"), 0) || (gSlotAgeReqs[slotIndex] == AGE_REQ_NONE) || gSlotAgeReqs[slotIndex] == ((void)0, gSaveContext.linkAge))
-#define CHECK_AGE_REQ_ITEM(itemIndex) (CVarGetInteger(CVAR_CHEAT("TimelessEquipment"), 0) || (gItemAgeReqs[itemIndex] == AGE_REQ_NONE) || (gItemAgeReqs[itemIndex] == gSaveContext.linkAge))
+// NEI resolves extended slots and transformed-form restrictions before the 9.3 hooks.
+// Passing real requirements/indices retains Timeless Equipment and adult-mask subscribers.
+#define CHECK_AGE_REQ_EQUIP(i, j)                                                                    \
+    GameInteractor_Should(VB_PLAYER_MEETS_AGE_REQ,                                                    \
+                          (ExtInv_GetEquipAgeReq(i, j) == AGE_REQ_NONE) ||                            \
+                              (ExtInv_GetEquipAgeReq(i, j) == gSaveContext.linkAge),                  \
+                          ExtInv_GetEquipAgeReq(i, j))
+
+#define CHECK_AGE_REQ_SLOT(slotIndex)                                                                \
+    GameInteractor_Should(VB_SLOT_MEETS_AGE_REQ,                                                      \
+                          (ExtInv_GetSlotAgeReq(slotIndex) == AGE_REQ_NONE) ||                        \
+                              (ExtInv_GetSlotAgeReq(slotIndex) == gSaveContext.linkAge),              \
+                          slotIndex)
+
+// ITEM_CUSTOM also aliases cor's Gyorg remains; native 9.3 Roc's Feather is
+// the one item above that boundary whose requirement is initialized by Play_Init.
+#define KALEIDO_ITEM_AGE_REQ(itemIndex)                                                              \
+    (((itemIndex) >= ITEM_CUSTOM && (itemIndex) != ITEM_ROCS_FEATHER)                                 \
+         ? ExtInv_GetItemAgeReq(itemIndex)                                                          \
+         : gItemAgeReqs[itemIndex])
+
+#define CHECK_AGE_REQ_ITEM(itemIndex)                                                                \
+    GameInteractor_Should(VB_ITEM_MEETS_AGE_REQ,                                                      \
+                          (KALEIDO_ITEM_AGE_REQ(itemIndex) == AGE_REQ_NONE) ||                        \
+                              (KALEIDO_ITEM_AGE_REQ(itemIndex) == gSaveContext.linkAge),              \
+                          itemIndex)
 
 void KaleidoScope_DrawQuestStatus(PlayState* play, GraphicsContext* gfxCtx);
 s32 KaleidoScope_UpdateQuestStatusPoint(PauseContext* pauseCtx, s32 point);

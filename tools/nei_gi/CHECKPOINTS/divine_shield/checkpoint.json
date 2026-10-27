@@ -1,0 +1,25 @@
+{
+  "resource_count": 14,
+  "vertex_records": 3805,
+  "vertex_loads": 134,
+  "slug": "divine_shield",
+  "name": "Divine Shield",
+  "entry": "objects/nei_gi_redesign/divine_shield/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 2156,
+  "bounds_author": [
+    [
+      -34.0,
+      -49.0,
+      -13.9375
+    ],
+    [
+      34.0,
+      51.0,
+      8.4375
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

@@ -8,6 +8,7 @@
 #include "objects/object_sek/object_sek.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "BenPort.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY)
 
@@ -169,6 +170,22 @@ void ObjWarpstone_Draw(Actor* thisx, PlayState* play2) {
     ObjWarpstone* this = (ObjWarpstone*)thisx;
 
     Gfx_DrawDListOpa(play, sOwlStatueDLs[this->modelIndex]);
+    // POC3 supplies a separate glow list so soft eye/page halos blend after opaque geometry.
+    // Without that optional asset, the native owl rendering path is unchanged.
+    if ((this->modelIndex == SEK_MODEL_OPENED) &&
+        ResourceMgr_FileExists("objects/owl_reconstruction_poc3/gOwlStatueGlowDL")) {
+        Gfx* glowDL = ResourceMgr_LoadGfxByName("objects/owl_reconstruction_poc3/gOwlStatueGlowDL");
+
+        if (glowDL != NULL) {
+            OPEN_DISPS(play->state.gfxCtx);
+
+            Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+            MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
+            gSPDisplayList(POLY_XLU_DISP++, glowDL);
+
+            CLOSE_DISPS(play->state.gfxCtx);
+        }
+    }
     if (this->dyna.actor.home.rot.x != 0) {
         OPEN_DISPS(play->state.gfxCtx);
 
@@ -181,8 +198,9 @@ void ObjWarpstone_Draw(Actor* thisx, PlayState* play2) {
                      MTXMODE_APPLY);
         Matrix_Push();
         gDPPipeSync(POLY_XLU_DISP++);
-        gDPSetPrimColor(POLY_XLU_DISP++, 128, 128, 255, 255, 200, this->dyna.actor.home.rot.x);
-        gDPSetEnvColor(POLY_XLU_DISP++, 100, 200, 0, 255);
+        // Match the reconstructed 3DS-style owl: pale cyan #B8F8F8 over reference blue #72B0FA.
+        gDPSetPrimColor(POLY_XLU_DISP++, 128, 128, 184, 248, 248, this->dyna.actor.home.rot.x);
+        gDPSetEnvColor(POLY_XLU_DISP++, 114, 176, 250, 255);
         Matrix_RotateZF(BINANG_TO_RAD_ALT2((play->gameplayFrames * 1500) & 0xFFFF), MTXMODE_APPLY);
         MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
         gSPDisplayList(POLY_XLU_DISP++, gEffFlash1DL);

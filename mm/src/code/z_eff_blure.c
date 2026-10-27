@@ -327,19 +327,29 @@ void EffectBlure_GetComputedValues(EffectBlure* this, s32 index, f32 ratio, Vec3
                     this == (EffectBlure*)Effect_GetByIndex(player->meleeWeaponEffectIndex[i])) {
                     if (player->transformation == PLAYER_FORM_FIERCE_DEITY)
                         cosmeticId = COSMETIC_ID("Trails.FierceDeitySwordTrail");
-                    else if (player->transformation == PLAYER_FORM_ZORA)
-                        cosmeticId = (player->meleeWeaponAnimation == PLAYER_MWA_ZORA_PUNCH_KICK ||
-                                      player->meleeWeaponAnimation == PLAYER_MWA_ZORA_JUMPKICK_START ||
-                                      player->meleeWeaponAnimation == PLAYER_MWA_ZORA_JUMPKICK_FINISH)
-                                         ? COSMETIC_ID("Trails.ZoraKickTrail")
-                                         : COSMETIC_ID("Trails.ZoraPunchTrail");
-                    else if (player->transformation == PLAYER_FORM_DEKU)
+                    else if (player->transformation == PLAYER_FORM_ZORA) {
+                        // Swimming reuses the two forearm effect slots. The last
+                        // punch animation can remain set while the fins swim.
+                        if (i < 2 && player->meleeWeaponState == PLAYER_MELEE_WEAPON_STATE_0 &&
+                            (BEN_ANIM_EQUAL(player->skelAnime.animation, gPlayerAnim_pz_waterroll) ||
+                             BEN_ANIM_EQUAL(player->skelAnime.animation, gPlayerAnim_pz_fishswim) ||
+                             BEN_ANIM_EQUAL(player->skelAnime.animation, gPlayerAnim_pz_swimtowait))) {
+                            cosmeticId = COSMETIC_ID("Trails.ZoraFinTrail");
+                        } else {
+                            cosmeticId = (player->meleeWeaponAnimation == PLAYER_MWA_ZORA_PUNCH_KICK ||
+                                          player->meleeWeaponAnimation == PLAYER_MWA_ZORA_JUMPKICK_START ||
+                                          player->meleeWeaponAnimation == PLAYER_MWA_ZORA_JUMPKICK_FINISH)
+                                             ? COSMETIC_ID("Trails.ZoraKickTrail")
+                                             : COSMETIC_ID("Trails.ZoraPunchTrail");
+                        }
+                    } else if (player->transformation == PLAYER_FORM_DEKU)
                         cosmeticId = COSMETIC_ID("Trails.DekuSpinTrail");
                     else if (player->heldItemAction == PLAYER_IA_SWORD_KOKIRI)
                         cosmeticId = COSMETIC_ID("Trails.KokiriSwordTrail");
                     else if (player->heldItemAction == PLAYER_IA_SWORD_RAZOR)
                         cosmeticId = COSMETIC_ID("Trails.RazorSwordTrail");
-                    else if (player->heldItemAction == PLAYER_IA_SWORD_GILDED)
+                    else if (player->heldItemAction == PLAYER_IA_SWORD_GILDED ||
+                             player->heldItemAction == PLAYER_IA_SWORD_MASTER) // NEI: Master reuses Gilded trail
                         cosmeticId = COSMETIC_ID("Trails.GildedSwordTrail");
                     else if (player->heldItemAction == PLAYER_IA_SWORD_TWO_HANDED)
                         cosmeticId = COSMETIC_ID("Trails.GreatFairySwordTrail");

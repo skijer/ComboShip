@@ -22,7 +22,7 @@ std::map<RandoOptionId, RandoStaticOption> Options = {
     RO(RO_ACCESS_MAJORA_REMAINS_COUNT, 0),
     RO(RO_ACCESS_MOON_MASKS_COUNT,     0),
     RO(RO_ACCESS_MOON_REMAINS_COUNT,   4),
-    RO(RO_ACCESS_TRIALS,               RO_ACCESS_TRIALS_20_MASKS),
+    RO(RO_ACCESS_TRIALS,               RO_ACCESS_TRIALS_VANILLA),
     RO(RO_CLOCK_SHUFFLE_PROGRESSIVE,   RO_CLOCK_SHUFFLE_RANDOM),
     RO(RO_CLOCK_SHUFFLE,               RO_GENERIC_OFF),
     RO(RO_CLOCK_TERMINAL_TIME,         350), // Default: 05:50 (10 "minutes" before crash)
@@ -31,6 +31,7 @@ std::map<RandoOptionId, RandoStaticOption> Options = {
     RO(RO_HINTS_GOSSIP_STONE_STRENGTH, 50),
     RO(RO_HINTS_GOSSIP_STONES,         RO_GENERIC_OFF),
     RO(RO_HINTS_HOOKSHOT,              RO_GENERIC_OFF),
+    RO(RO_HINTS_MOON_GOSSIP_STONES,    RO_GENERIC_OFF),
     RO(RO_HINTS_OATH_TO_ORDER,         RO_GENERIC_OFF),
     RO(RO_HINTS_PURCHASEABLE,          RO_GENERIC_OFF),
     RO(RO_HINTS_SONG_OF_SOARING,       RO_GENERIC_OFF),
@@ -43,7 +44,7 @@ std::map<RandoOptionId, RandoStaticOption> Options = {
     RO(RO_PLENTIFUL_ITEMS,             RO_GENERIC_OFF),
     RO(RO_PURCHASE_INFINITE_RUPEES,    RO_GENERIC_OFF),
     RO(RO_SHUFFLE_BARREL_DROPS,        RO_GENERIC_OFF),
-    RO(RO_SHUFFLE_BOSS_REMAINS,        RO_GENERIC_OFF),
+    RO(RO_SHUFFLE_BOSS_REMAINS,        RO_REMAINS_SHUFFLE_VANILLA),
     RO(RO_SHUFFLE_BOSS_SOULS,          RO_GENERIC_OFF),
     RO(RO_SHUFFLE_BUTTERFLIES,         RO_GENERIC_OFF),
     RO(RO_SHUFFLE_COWS,                RO_GENERIC_OFF),
@@ -61,6 +62,7 @@ std::map<RandoOptionId, RandoStaticOption> Options = {
     RO(RO_SHUFFLE_SHOPS,               RO_GENERIC_OFF),
     RO(RO_SHUFFLE_SKELETON_KEY,        RO_GENERIC_OFF),
     RO(RO_SHUFFLE_SNOWBALL_DROPS,      RO_GENERIC_OFF),
+    RO(RO_SHUFFLE_SONGS,               RO_SONG_SHUFFLE_ANYWHERE),
     RO(RO_SHUFFLE_SONG_DOUBLE_TIME,    RO_GENERIC_OFF),
     RO(RO_SHUFFLE_SONG_INVERTED_TIME,  RO_GENERIC_OFF),
     RO(RO_SHUFFLE_SONG_SARIA,          RO_GENERIC_OFF),
@@ -83,6 +85,24 @@ std::map<RandoOptionId, RandoStaticOption> Options = {
     RO(RO_TRAP_AMOUNT,                 5),
     RO(RO_TRIFORCE_PIECES_MAX,         DEFAULT_TRIFORCE_PIECES_MAX),
     RO(RO_TRIFORCE_PIECES_REQUIRED,    DEFAULT_TRIFORCE_PIECES_MAX),
+    // Skijer's NEI. RO_SHUFFLE_NEI_ITEMS defaults OFF because until now NO RI_OOT_NEI_* item was
+    // ever added to the pool — turning it on by default would silently change every existing seed.
+    RO(RO_SHUFFLE_MAGIC_MIRROR,        RO_GENERIC_OFF),
+    RO(RO_SHUFFLE_NEI_ITEMS,           RO_GENERIC_OFF),
+    RO(RO_SHUFFLE_BOMB_ARROWS,         RO_BOMB_ARROWS_OFF),
+    RO(RO_ELEMENTAL_WAND_SHUFFLE,      RO_WAND_MEDALLIONS),
+    // 2026-08-06 cross-game categories — all default OFF (turning any on silently changes seeds).
+    RO(RO_SHUFFLE_OOT_GEAR,            RO_GENERIC_OFF),
+    RO(RO_SHUFFLE_OOT_EQUIPMENT,       RO_GENERIC_OFF),
+    RO(RO_SHUFFLE_OOT_QUEST,           RO_GENERIC_OFF),
+    RO(RO_SHUFFLE_OOT_MASKS,           RO_GENERIC_OFF),
+    RO(RO_CROSSOVER_POKEBALL,          RO_GENERIC_OFF),
+    RO(RO_CROSSOVER_MARIO_MASK,        RO_GENERIC_OFF),
+    RO(RO_HYLIAS_GRACE,               RO_GRACE_OFF),
+    RO(RO_HYLIAS_GRACE_REWARDS,        4),
+    RO(RO_ROD_OF_SEASONS,             NEI_SEASONS_INDIVIDUAL),
+    RO(RO_STARTING_ROD_OF_SEASONS,    RO_GENERIC_OFF),
+    RO(RO_MAPS_COMPASSES_GIVE_INFORMATION, RO_GENERIC_OFF),
 };
 // clang-format on
 

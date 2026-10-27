@@ -7,6 +7,10 @@
 #include "2s2h/BenPort.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
 #include <libultraship/bridge/consolevariablebridge.h>
+#ifdef COMBO_BUILD
+#include "entrances/BlackMarketEntrance.h"
+#include "2s2h/Enhancements/Gameplay/BlackMarket.h"
+#endif
 
 #define DYNA_RAYCAST_FLOORS 1
 #define DYNA_RAYCAST_WALLS 2
@@ -70,6 +74,10 @@ typedef struct {
 
 BgCheckSceneMemEntry sSceneMemList[] = {
     { SCENE_00KEIKOKU, 0xC800 },
+#ifdef COMBO_BUILD
+    // The authored market needs more static lookup nodes than the native budget.
+    { COMBO_BLACK_MARKET_SCENE, 0x30000 },
+#endif
 };
 
 BgCheckSceneSubdivisionEntry sSceneSubdivisionList[] = {
@@ -1914,8 +1922,15 @@ s32 BgCheck_CheckWallImpl(CollisionContext* colCtx, u16 xpFlags, Vec3f* posResul
     dy = posNext->y - posPrev->y;
     dz = posNext->z - posPrev->z;
 
-    if (CVarGetInteger("gCheats.NoClip", 0) && actor != NULL && actor->id == ACTOR_PLAYER) {
-        return false;
+    // Skijer's NEI switchhook: during the position swap (+ a few settle frames) the player gets the
+    // SAME full collision bypass as the gCheats.NoClip cheat (z_arms_hook.c SwitchHook_PlayerNoClip).
+    {
+        extern s32 SwitchHook_PlayerNoClip(void);
+        extern s32 HGrace_WantsNoClip(void);
+        if ((CVarGetInteger("gCheats.NoClip", 0) || SwitchHook_PlayerNoClip() || HGrace_WantsNoClip()) &&
+            actor != NULL && actor->id == ACTOR_PLAYER) {
+            return false;
+        }
     }
 
     // if there's movement on the xz plane, and argA flag is 0,
@@ -4205,8 +4220,29 @@ WallType SurfaceType_GetWallType(CollisionContext* colCtx, CollisionPoly* poly, 
     return SurfaceType_GetData(colCtx, poly, bgId, 0) >> 21 & 0x1F;
 }
 
+// Skijer's NEI: the Mogma Mitts grant "climb everywhere" — they set this flag (defined in
+// mods/items/logic/item_mitts.c, C linkage, unity-built into the z_player.c TU). Honor it here the
+// same way the ClimbAnywhere cheat drives VB_BE_CLIMBABLE_SURFACE: force WALL_FLAG_3 (climbable)
+// onto every wall poly while the mitts are active. Was a dead flag — nothing read it.
+extern u8 gMogmaMittsClimbActive;
+
+// Skijer's NEI — a body held by the Sheikah Slate's Stasis rune becomes climbable, but ONLY that
+// body: the check is against its own bgId, so nothing else in the scene is affected and the surface
+// reverts by itself the moment the stasis ends. This is deliberately done here rather than by
+// editing surfaceTypeList — collision headers are shared, cached resources, so writing to one would
+// make every instance of that collision climbable for the rest of the session.
+extern u8 Slate_IsClimbableBgId(s32 bgId); // Stasis and Cryonis, aggregated in item_sheikah_slate.c
+
 s32 SurfaceType_GetWallFlags(CollisionContext* colCtx, CollisionPoly* poly, s32 bgId) {
-    if (GameInteractor_Should(VB_BE_CLIMBABLE_SURFACE, false)) {
+#ifdef COMBO_BUILD
+    // This owned invisible boundary separates the customer aisle from the
+    // shop's counter. Powers and cheats must not make it a climbable ladder.
+    if (ComboBlackMarket_IsCounterBarrier(colCtx, bgId)) {
+        return sWallFlags[SurfaceType_GetWallType(colCtx, poly, bgId)];
+    }
+#endif
+    if (gMogmaMittsClimbActive || Slate_IsClimbableBgId(bgId) ||
+        GameInteractor_Should(VB_BE_CLIMBABLE_SURFACE, false)) {
         return sWallFlags[SurfaceType_GetWallType(colCtx, poly, bgId)] | WALL_FLAG_3;
     }
     return sWallFlags[SurfaceType_GetWallType(colCtx, poly, bgId)];

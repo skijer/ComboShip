@@ -87,8 +87,9 @@ void DummyPlayer_Init(Actor* actor, PlayState* play) {
     gSaveContext.linkAge = originalAge;
 
     bool isGlobalRoom = (std::string("soh-global") == CVarGetString(CVAR_REMOTE_ANCHOR("RoomId"), ""));
+    bool hideNameTags = CVarGetInteger(CVAR_REMOTE_ANCHOR("HideNameTags"), 0);
 
-    if (!isGlobalRoom) {
+    if (!isGlobalRoom && !hideNameTags) {
 #ifdef COMBO_BUILD
         // ComboShip: use the client's Anchor color instead of the dark default so remote name tags
         // are readable and match the roster.

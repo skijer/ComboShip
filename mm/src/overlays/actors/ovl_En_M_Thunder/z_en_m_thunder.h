@@ -2,6 +2,7 @@
 #define Z_EN_M_THUNDER_H
 
 #include "global.h"
+#include "../../../../../combo/gameplay/SpinAttackState.h"
 
 struct EnMThunder;
 
@@ -35,6 +36,7 @@ typedef struct EnMThunder {
     /* 0x1C0 */ u8 chargingAlpha;
     /* 0x1C1 */ u8 scaleTarget;
     /* 0x1C2 */ u8 isCharging;
+    CwSpinAttackState spinStyle;
 } EnMThunder; // size = 0x1C4
 
 #endif // Z_EN_M_THUNDER_H

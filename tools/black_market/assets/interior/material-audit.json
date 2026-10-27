@@ -1,0 +1,1089 @@
+{
+  "atlas_rects_512px": {
+    "counter_atlas": {
+      "bronze": [
+        416,
+        184,
+        512,
+        512
+      ],
+      "ceramic": [
+        [
+          0,
+          0,
+          512,
+          174
+        ],
+        [
+          220,
+          272,
+          414,
+          414
+        ],
+        [
+          316,
+          174,
+          382,
+          272
+        ]
+      ],
+      "leather": [
+        188,
+        416,
+        412,
+        512
+      ]
+    },
+    "fittings_atlas": {
+      "ceramic": [
+        [
+          0,
+          332,
+          480,
+          512
+        ]
+      ],
+      "glass": [
+        0,
+        0,
+        320,
+        122
+      ]
+    },
+    "walltrim_atlas": {
+      "paper": [
+        0,
+        188,
+        250,
+        316
+      ],
+      "wicker": [
+        0,
+        318,
+        512,
+        512
+      ]
+    }
+  },
+  "audit": "Actual retained room call graph, native triangle connectivity and S/T islands; visual group isolation against the user reference",
+  "curio_uv_changes": {
+    "method": "Connected component native S/T range affine-mapped into padded paper/leather/bone/glass quadrant, original positions/colors/faces unchanged",
+    "vertex_suffixes": {
+      "5": "books",
+      "8": "jars/skull/papers",
+      "12": "skull details/posters"
+    }
+  },
+  "materials": {
+    "0": {
+      "active": true,
+      "bounds": [
+        [
+          49,
+          37,
+          24
+        ],
+        [
+          97,
+          37,
+          72
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_0"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop00",
+      "role": "front-right cauldron liquid",
+      "surface": "liquid",
+      "texture": "custom/skiejer_market/texture/baseline_liquid",
+      "triangles": 36,
+      "uv_bounds": [
+        [
+          25,
+          -16
+        ],
+        [
+          1991,
+          2032
+        ]
+      ]
+    },
+    "1": {
+      "active": true,
+      "bounds": [
+        [
+          -160,
+          0,
+          108
+        ],
+        [
+          160,
+          8,
+          458
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_23"
+      ],
+      "logical_uv_period": 32,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop01",
+      "role": "entry floor and threshold",
+      "surface": "slate",
+      "texture": "custom/skiejer_market/texture/baseline_slate",
+      "triangles": 62,
+      "uv_bounds": [
+        [
+          4,
+          -794
+        ],
+        [
+          5329,
+          7705
+        ]
+      ]
+    },
+    "2": {
+      "active": true,
+      "bounds": [
+        [
+          -110,
+          163,
+          160
+        ],
+        [
+          98,
+          213,
+          369
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_15"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop02",
+      "role": "overhead hanging supports",
+      "surface": "bronze",
+      "texture": "custom/skiejer_market/texture/baseline_bronze",
+      "triangles": 42,
+      "uv_bounds": [
+        [
+          25,
+          25
+        ],
+        [
+          1991,
+          2032
+        ]
+      ]
+    },
+    "3": {
+      "active": true,
+      "bounds": [
+        [
+          -160,
+          0,
+          -291
+        ],
+        [
+          160,
+          204,
+          458
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_22"
+      ],
+      "logical_uv_period": 32,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop03",
+      "role": "ceiling and structural panels",
+      "surface": "timber",
+      "texture": "custom/skiejer_market/texture/baseline_timber",
+      "triangles": 175,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          9180,
+          6108
+        ]
+      ]
+    },
+    "4": {
+      "active": true,
+      "bounds": [
+        [
+          -137,
+          118,
+          362
+        ],
+        [
+          -128,
+          137,
+          376
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_1"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop04",
+      "role": "hanging bulb/root cluster",
+      "surface": "herbs",
+      "texture": "custom/skiejer_market/texture/baseline_herbs",
+      "triangles": 612,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          988,
+          2012
+        ]
+      ]
+    },
+    "5": {
+      "active": true,
+      "bounds": [
+        [
+          -160,
+          0,
+          -199
+        ],
+        [
+          160,
+          127,
+          350
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_14"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop05",
+      "role": "small bottles, basins and cabinet face",
+      "surface": "fittings_atlas",
+      "texture": "custom/skiejer_market/texture/baseline_fittings_atlas",
+      "triangles": 370,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          4060,
+          2012
+        ]
+      ]
+    },
+    "6": {
+      "active": true,
+      "bounds": [
+        [
+          -158,
+          41,
+          86
+        ],
+        [
+          -158,
+          139,
+          132
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_9"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop06",
+      "role": "left wall hanging panel",
+      "surface": "cloth",
+      "texture": "custom/skiejer_market/texture/baseline_cloth",
+      "triangles": 16,
+      "uv_bounds": [
+        [
+          -6,
+          -16
+        ],
+        [
+          998,
+          2032
+        ]
+      ]
+    },
+    "7": {
+      "active": true,
+      "bounds": [
+        [
+          -158,
+          0,
+          -50
+        ],
+        [
+          158,
+          191,
+          -31
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_19"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop07",
+      "role": "rear draped curtain",
+      "surface": "cloth",
+      "texture": "custom/skiejer_market/texture/baseline_cloth",
+      "triangles": 78,
+      "uv_bounds": [
+        [
+          -16,
+          -16
+        ],
+        [
+          2032,
+          2032
+        ]
+      ]
+    },
+    "8": {
+      "active": true,
+      "bounds": [
+        [
+          131,
+          66,
+          194
+        ],
+        [
+          160,
+          85,
+          358
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_25"
+      ],
+      "logical_uv_period": 32,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop08",
+      "role": "right wall ledges",
+      "surface": "timber",
+      "texture": "custom/skiejer_market/texture/baseline_timber",
+      "triangles": 22,
+      "uv_bounds": [
+        [
+          -16,
+          -6
+        ],
+        [
+          2032,
+          496
+        ]
+      ]
+    },
+    "9": {
+      "active": true,
+      "bounds": [
+        [
+          -182,
+          0,
+          -291
+        ],
+        [
+          183,
+          204,
+          458
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_21"
+      ],
+      "logical_uv_period": 32,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop09",
+      "role": "wall infill panels",
+      "surface": "plaster",
+      "texture": "custom/skiejer_market/texture/baseline_plaster",
+      "triangles": 131,
+      "uv_bounds": [
+        [
+          -364,
+          4
+        ],
+        [
+          13276,
+          10183
+        ]
+      ]
+    },
+    "10": {
+      "active": true,
+      "bounds": [
+        [
+          -128,
+          103,
+          144
+        ],
+        [
+          109,
+          181,
+          387
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_17"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop10",
+      "role": "seven hanging herb baskets",
+      "surface": "wicker",
+      "texture": "custom/skiejer_market/texture/baseline_wicker",
+      "triangles": 1488,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          2012,
+          2012
+        ]
+      ]
+    },
+    "11": {
+      "active": true,
+      "bounds": [
+        [
+          -175,
+          0,
+          -34
+        ],
+        [
+          180,
+          183,
+          395
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_11"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop11",
+      "role": "wall panels, upper bundles/trim and small inserts",
+      "surface": "walltrim_atlas",
+      "texture": "custom/skiejer_market/texture/baseline_walltrim_atlas",
+      "triangles": 1554,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          2012,
+          2012
+        ]
+      ]
+    },
+    "12": {
+      "active": true,
+      "bounds": [
+        [
+          -168,
+          8,
+          97
+        ],
+        [
+          159,
+          120,
+          383
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_8"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop12",
+      "role": "small jars, bone curio and paper/label islands",
+      "surface": "curios",
+      "texture": "custom/skiejer_market/texture/baseline_curios",
+      "triangles": 510,
+      "uv_bounds": [
+        [
+          -16,
+          -16
+        ],
+        [
+          2032,
+          2032
+        ]
+      ]
+    },
+    "13": {
+      "active": true,
+      "bounds": [
+        [
+          112,
+          12,
+          186
+        ],
+        [
+          155,
+          67,
+          382
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_7"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop13",
+      "role": "three right-side lattice screens",
+      "surface": "wicker",
+      "texture": "custom/skiejer_market/texture/baseline_wicker",
+      "triangles": 24,
+      "uv_bounds": [
+        [
+          25,
+          25
+        ],
+        [
+          3281,
+          4817
+        ]
+      ]
+    },
+    "14": {
+      "active": true,
+      "bounds": [
+        [
+          -160,
+          104,
+          353
+        ],
+        [
+          -129,
+          148,
+          393
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_3"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop14",
+      "role": "long hanging herb leaves",
+      "surface": "herbs",
+      "texture": "custom/skiejer_market/texture/baseline_herbs",
+      "triangles": 72,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          988,
+          2012
+        ]
+      ]
+    },
+    "15": {
+      "active": true,
+      "bounds": [
+        [
+          -144,
+          101,
+          62
+        ],
+        [
+          135,
+          162,
+          97
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_26"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop15",
+      "role": "three faceted celestial star ornaments",
+      "surface": "celestial",
+      "texture": "custom/skiejer_market/texture/baseline_celestial",
+      "triangles": 218,
+      "uv_bounds": [
+        [
+          148,
+          15
+        ],
+        [
+          977,
+          977
+        ]
+      ]
+    },
+    "16": {
+      "active": true,
+      "bounds": [
+        [
+          -114,
+          45,
+          2
+        ],
+        [
+          137,
+          51,
+          261
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_18"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop16",
+      "role": "middle-right and left cauldron liquids",
+      "surface": "liquid",
+      "texture": "custom/skiejer_market/texture/baseline_liquid",
+      "triangles": 72,
+      "uv_bounds": [
+        [
+          -16,
+          25
+        ],
+        [
+          2032,
+          2032
+        ]
+      ]
+    },
+    "17": {
+      "active": false,
+      "bounds": [],
+      "geometry": [],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop17",
+      "role": "inactive retained material; no default draw owner",
+      "surface": "celestial",
+      "texture": "custom/skiejer_market/texture/baseline_celestial",
+      "triangles": 0,
+      "uv_bounds": []
+    },
+    "18": {
+      "active": true,
+      "bounds": [
+        [
+          -142,
+          27,
+          86
+        ],
+        [
+          -61,
+          56,
+          128
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_5"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop18",
+      "role": "open book pages and standing leather books",
+      "surface": "curios",
+      "texture": "custom/skiejer_market/texture/baseline_curios",
+      "triangles": 122,
+      "uv_bounds": [
+        [
+          -16,
+          -6
+        ],
+        [
+          2032,
+          988
+        ]
+      ]
+    },
+    "19": {
+      "active": true,
+      "bounds": [
+        [
+          -182,
+          -7,
+          -291
+        ],
+        [
+          183,
+          204,
+          420
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_6",
+        "custom/skiejer_market/geometry/room_boundary_repairs"
+      ],
+      "logical_uv_period": 32,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop19",
+      "role": "room framing, cabinet wood and boundary repairs",
+      "surface": "timber",
+      "texture": "custom/skiejer_market/texture/baseline_timber",
+      "triangles": 940,
+      "uv_bounds": [
+        [
+          -98,
+          -1634
+        ],
+        [
+          5729,
+          13665
+        ]
+      ]
+    },
+    "20": {
+      "active": true,
+      "bounds": [
+        [
+          -147,
+          107,
+          360
+        ],
+        [
+          -126,
+          131,
+          384
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_4"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop20",
+      "role": "short hanging herb leaves",
+      "surface": "herbs",
+      "texture": "custom/skiejer_market/texture/baseline_herbs",
+      "triangles": 36,
+      "uv_bounds": [
+        [
+          -221,
+          4
+        ],
+        [
+          1039,
+          2012
+        ]
+      ]
+    },
+    "21": {
+      "active": true,
+      "bounds": [
+        [
+          -181,
+          0,
+          -19
+        ],
+        [
+          180,
+          184,
+          400
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_2"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop21",
+      "role": "four cauldron bodies, bronze torch stands and counter fittings",
+      "surface": "counter_atlas",
+      "texture": "custom/skiejer_market/texture/baseline_counter_atlas",
+      "triangles": 1001,
+      "uv_bounds": [
+        [
+          -16,
+          -16
+        ],
+        [
+          2032,
+          2032
+        ]
+      ]
+    },
+    "22": {
+      "active": true,
+      "bounds": [
+        [
+          -65,
+          1,
+          121
+        ],
+        [
+          45,
+          1,
+          393
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_13"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop22",
+      "role": "floor runner",
+      "surface": "cloth",
+      "texture": "custom/skiejer_market/texture/baseline_cloth",
+      "triangles": 32,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          4060,
+          2012
+        ]
+      ]
+    },
+    "23": {
+      "active": true,
+      "bounds": [
+        [
+          138,
+          84,
+          121
+        ],
+        [
+          155,
+          109,
+          174
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_24"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop23",
+      "role": "three capped ceramic canisters",
+      "surface": "ceramic",
+      "texture": "custom/skiejer_market/texture/baseline_ceramic",
+      "triangles": 174,
+      "uv_bounds": [
+        [
+          25,
+          455
+        ],
+        [
+          1889,
+          1745
+        ]
+      ]
+    },
+    "24": {
+      "active": true,
+      "bounds": [
+        [
+          -160,
+          0,
+          -132
+        ],
+        [
+          160,
+          0,
+          120
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_20",
+        "custom/skiejer_market/geometry/room_boundary_repairs"
+      ],
+      "logical_uv_period": 32,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop24",
+      "role": "main floor and boundary floor repair",
+      "surface": "slate",
+      "texture": "custom/skiejer_market/texture/baseline_slate",
+      "triangles": 41,
+      "uv_bounds": [
+        [
+          4,
+          3916
+        ],
+        [
+          10204,
+          11228
+        ]
+      ]
+    },
+    "25": {
+      "active": true,
+      "bounds": [
+        [
+          -26,
+          0,
+          70
+        ],
+        [
+          153,
+          148,
+          199
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_10"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop25",
+      "role": "right-side hanging leaves and small retained insert",
+      "surface": "herbs",
+      "texture": "custom/skiejer_market/texture/baseline_herbs",
+      "triangles": 13,
+      "uv_bounds": [
+        [
+          -36,
+          4
+        ],
+        [
+          2237,
+          2012
+        ]
+      ]
+    },
+    "26": {
+      "active": true,
+      "bounds": [
+        [
+          91,
+          36,
+          -221
+        ],
+        [
+          151,
+          135,
+          194
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_12"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop26",
+      "role": "paper panels and bone/curio display islands",
+      "surface": "curios",
+      "texture": "custom/skiejer_market/texture/baseline_curios",
+      "triangles": 42,
+      "uv_bounds": [
+        [
+          4,
+          4
+        ],
+        [
+          2012,
+          3036
+        ]
+      ]
+    },
+    "27": {
+      "active": true,
+      "bounds": [
+        [
+          99,
+          39,
+          315
+        ],
+        [
+          137,
+          40,
+          352
+        ]
+      ],
+      "geometry": [
+        "custom/skiejer_market/geometry/mahouya_room_0DL_006548_tri_16"
+      ],
+      "logical_uv_period": 64,
+      "material": "custom/skiejer_market/geometry/mat_mahouya_room_0DL_006548_GranmaShop27",
+      "role": "entry-right cauldron liquid",
+      "surface": "liquid",
+      "texture": "custom/skiejer_market/texture/baseline_liquid",
+      "triangles": 36,
+      "uv_bounds": [
+        [
+          -16,
+          -16
+        ],
+        [
+          2032,
+          2032
+        ]
+      ]
+    }
+  },
+  "ownership_note": "Material17 has no default draw owner. Active celestial material15 owns tri26; tri27 is a retained unused duplicate mesh, not material27. Material27 owns liquid tri16.",
+  "prepared_resources": 140,
+  "retained_resources": 125,
+  "routing": "All original render/combine/alpha/cull commands preserved; every uploaded pixel opaque. Native TEX_EDGE materials remain TEX_EDGE, with no added XLU routing.",
+  "source_png_sha256": {
+    "bronze": "c5d17c93cb7c79a2d5fdda77cd5791220bef417fae24b85881d9427e2176ec62",
+    "celestial": "da370b831378ac8cdea60c3e7890324e80e6c72a6a1f4143e17c05db0aa1356f",
+    "ceramic": "a01ed02e1ea1c108c3a74790bbf6e8481c590e7c26be106a811b60ad0f1ef6be",
+    "cloth": "93ecac406f9238a7756a0a901619f3b9f5173b2f4217bc7fac0a5172a87d73bf",
+    "curios": "2ffe56c06fa7f81cd94ad3e0dd302c6e8cc5b56f3fbd5cafb1c46f10f8be3c90",
+    "herbs": "8d5e3c2f546745b171cf8f48a3a9d82f90613fa01106ba8ff6f1b5ca2f1e66f7",
+    "liquid": "22ab45941f50f8963e24cf1fd34fb2f4b9bd3d36336a4998a0f304e76b59df32",
+    "plaster": "aef51704902f9144fb88d3492667fc143ee77c976a192bae2a7cdb0d76688b84",
+    "slate": "e91d3c7ef5d1e78dabaadf138d76db2cd6b74c3ca7e3dca0890fd2b4d4e408db",
+    "timber": "62dc29aef9b2e4b0194a5c2ce25e1bff79139deb2ab3e9a74642555d9207ec7c",
+    "wicker": "52cd841c267cfcfc41598c1122b4de32c854aa68f90e8cdf5135e53665079ea8"
+  },
+  "source_poc14_sha256": "3ac1432d0e8f75e51f08892739a13e16762bb4d820a2bbc7a35469af1db872e2",
+  "texture_resources": [
+    "custom/skiejer_market/texture/arcane_stone",
+    "custom/skiejer_market/texture/baseline_bronze",
+    "custom/skiejer_market/texture/baseline_celestial",
+    "custom/skiejer_market/texture/baseline_ceramic",
+    "custom/skiejer_market/texture/baseline_cloth",
+    "custom/skiejer_market/texture/baseline_counter_atlas",
+    "custom/skiejer_market/texture/baseline_curios",
+    "custom/skiejer_market/texture/baseline_fittings_atlas",
+    "custom/skiejer_market/texture/baseline_herbs",
+    "custom/skiejer_market/texture/baseline_liquid",
+    "custom/skiejer_market/texture/baseline_plaster",
+    "custom/skiejer_market/texture/baseline_slate",
+    "custom/skiejer_market/texture/baseline_timber",
+    "custom/skiejer_market/texture/baseline_walltrim_atlas",
+    "custom/skiejer_market/texture/baseline_wicker"
+  ],
+  "torch_stand_translations": [
+    {
+      "bounds": [
+        [
+          111,
+          0,
+          -19
+        ],
+        [
+          145,
+          83,
+          13
+        ]
+      ],
+      "delta": [
+        -55,
+        0,
+        213
+      ],
+      "vertices": 78
+    },
+    {
+      "bounds": [
+        [
+          -156,
+          0,
+          -19
+        ],
+        [
+          -122,
+          83,
+          13
+        ]
+      ],
+      "delta": [
+        29,
+        0,
+        213
+      ],
+      "vertices": 73
+    }
+  ],
+  "version": 1
+}

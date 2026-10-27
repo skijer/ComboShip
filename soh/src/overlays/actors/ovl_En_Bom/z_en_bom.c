@@ -9,6 +9,7 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/ShipUtils.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
@@ -388,6 +389,12 @@ void EnBom_Update(Actor* thisx, PlayState* play2) {
 void EnBom_Draw(Actor* thisx, PlayState* play) {
     s32 pad;
     EnBom* this = (EnBom*)thisx;
+
+    // NEI: when this bomb is a dropped Power Keg, draw the real MM keg barrel instead of the OOT bomb.
+    extern u8 PowerKeg_DrawKegModel(Actor * thisx, PlayState * play);
+    if (PowerKeg_DrawKegModel(thisx, play)) {
+        return;
+    }
 
     OPEN_DISPS(play->state.gfxCtx);
 

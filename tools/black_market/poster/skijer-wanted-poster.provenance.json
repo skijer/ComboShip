@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-10-19",
+  "tool": "built-in image_gen.imagegen",
+  "use_case": "precise-object-edit",
+  "profile_url": "https://github.com/skijer",
+  "avatar_url": "https://avatars.githubusercontent.com/u/124228042?s=460&v=4",
+  "avatar_decoded_rgba_sha256": "19a43f0f7580906ba94848954fbaade5db0a28ff40f28a3a49ebae274efcfe2c",
+  "user_instruction": "just use his github avatar for the wanted poster graphic instead of the gold boy image",
+  "rights_status": "User selected this existing GitHub avatar for reuse. Origin, artist and reuse license remain unidentified; this record does not assert that the avatar is cleared, public-domain, or copyright-free.",
+  "inputs": {
+    "edit_target": "/workspace/scratch/3d150fa31882/wanted-poster/original-wanted-poster.png",
+    "edit_target_dimensions": [
+      768,
+      512
+    ],
+    "supporting_insert": "skijer-github-avatar.png",
+    "supporting_insert_dimensions": [
+      460,
+      460
+    ]
+  },
+  "output": "skijer-wanted-poster.png",
+  "output_dimensions": [
+    1536,
+    1024
+  ],
+  "output_mode": "RGB",
+  "visual_qa": {
+    "old_gold_haired_portrait": "Removed from portrait area; no visible remnants.",
+    "avatar": "Complete recognizable pink/white/green/yellow pixel character on black; no visible clipping. Imagegen introduced slight pixel-cell/texture/proportion variation; not a pixel-exact paste.",
+    "lettering": "WANTED, SKEIJER, and FOR EXCESSIVE MODDING all retained and spelled correctly.",
+    "surrounding_design": "Landscape 3:2 composition, parchment, burgundy framing, ornamentation and layout retained visually. Full image was re-rendered; surrounding pixels are not identical to the original.",
+    "manual_painting": false
+  },
+  "prompt": "Use case: precise-object-edit.\nAsset type: existing in-game wanted-poster texture.\nInput images: Image 1 is the edit target, an existing 768x512 landscape parchment wanted poster. Image 2 is the exact supporting insert, Skijer's GitHub pixel-art avatar.\n\nReplace ONLY the central gold-haired character portrait inside the existing burgundy portrait frame in Image 1 with Image 2. Remove all of the previous gold-haired portrait. Insert the supplied avatar as faithfully as a copy: preserve its exact pink, white, dark green, pale yellow and black square shapes, square proportions, hard pixel edges, eye shape, clothing pattern, and its black background. Do not reinterpret, redraw, beautify, smooth, shade, or restyle the avatar. Center it wholly inside the existing portrait opening, with enough black padding that no part of the pink gills, feet, head or body is clipped. Fill the entire portrait opening with the black background; no old portrait pixels remain.\n\nKeep EVERYTHING outside the portrait opening exactly unchanged: the original aged parchment texture, tears and stains, ornate burgundy frame and corners, original landscape composition, spacing, border layout, and all lettering. Preserve text verbatim and in its existing typography and positions:\n\"WANTED\"\n\"SKEIJER\"\n\"FOR EXCESSIVE MODDING\"\n\nRetain the original 768x512 dimensions if possible, otherwise the exact 3:2 landscape aspect ratio. Do not add any words, decorations, people, logos, watermark, or visual elements. This is a precise portrait replacement only."
+}

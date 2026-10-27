@@ -6,6 +6,8 @@
 extern "C" {
 #include "macros.h"
 #include "functions.h"
+#include "mods/extended_equipment.h"
+#include "src/overlays/actors/ovl_En_Box/z_en_box.h"
 extern PlayState* gPlayState;
 extern PlayState* sCamPlayState;
 extern f32 Camera_ScaledStepToCeilF(f32 target, f32 cur, f32 stepScale, f32 minDiff);
@@ -41,9 +43,14 @@ void UpdateFreeLookState(Camera* camera) {
         case CAM_MODE_HANGZ:
         case CAM_MODE_DEKUFLYZ:
         case CAM_MODE_BOOMERANG:
-        case CAM_MODE_CHARGEZ:
         case CAM_MODE_ZORAFINZ:
             sCanFreeLook = false;
+            break;
+        case CAM_MODE_CHARGEZ:
+            if (!Trident_AllowsChargeFreeLook()) {
+                sCanFreeLook = false;
+            }
+            break;
     }
 }
 
@@ -162,7 +169,14 @@ bool Camera_CanFreeLook(Camera* camera) {
     }
     // Reset camera during cutscenes
     if (gPlayState != nullptr && Player_InCsMode(gPlayState)) {
-        sCanFreeLook = false;
+        // Unless kicking a chest open
+        Actor* interactRangeActor = GET_PLAYER(gPlayState)->interactRangeActor;
+        if (interactRangeActor != NULL && interactRangeActor->id == ACTOR_EN_BOX &&
+            ((EnBox*)interactRangeActor)->unk_1EC == -1) {
+            sCanFreeLook = true;
+        } else {
+            sCanFreeLook = false;
+        }
     }
     // Disable freecam during bombchu control
     if (IsBombchuFocused()) {
@@ -191,7 +205,10 @@ void RegisterCameraFreeLook() {
                 }
                 break;
             case CAM_FUNC_PARALLEL1:
-                if (camera->mode == CAM_MODE_HANG) {
+                if ((camera->mode == CAM_MODE_HANG) || (camera->mode == CAM_MODE_FREEFALL) ||
+                    (camera->mode == CAM_MODE_ZORAFINZ) ||
+                    ((camera->mode == CAM_MODE_CHARGE) && Trident_AllowsChargeFreeLook()) ||
+                    ((camera->mode == CAM_MODE_CHARGEZ) && Trident_AllowsChargeFreeLook())) {
                     if (Camera_CanFreeLook(camera)) {
                         Camera_FreeLook(camera);
                         *should = false;

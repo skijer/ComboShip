@@ -1,0 +1,242 @@
+ComboShip merge audit — October 8, 2026 (America/Chicago)
+
+This is a recovery and integration handoff. It is not a merged branch or a new game build.
+The audit covers work completed or carried forward into today's merge, and distinguishes
+implemented source from prepared assets that still need implementation.
+
+CURRENT BASELINE
+
+Repository: https://github.com/marsh6487/ComboShip
+Current develop: a82852a3a02c8cabc541cce7c124da71c5755efb
+PR #38 is already merged. It landed October 7 at 7:48 p.m. Chicago time
+(2026-10-08T00:48:18Z).
+
+That baseline already contains yesterday's bottle recipes/palettes, native MM boss rigs,
+gold equipment effects, previous sword framing/Alt fixes, initial autumn work,
+earlier complete-pass tunic/Ikana repairs, map/song/junk/key receipts, Cape Show/Hide persistence,
+Sand/Storm behavior, Shadow Crystal and elemental arrow GIs, and the carpet
+culling-segment crash repair. Those older fixes should be retained, not added again
+solely because their older draft PRs remain open.
+
+TEN PENDING WORK STREAMS
+
+1. Combined seasonal / sword / trade / Farore source
+   PR: https://github.com/marsh6487/ComboShip/pull/39
+   Branch: bridge/combined-recovery-20261008
+   Current head: 35ce5f22f11c845a4ef0b28228880547e14ee92d
+   Delivered: source/01-combined/PR39-current-from-develop.patch
+   Scope:
+   - Daytime summer cottonwood/dandelion fluff, nighttime fireflies, transitions,
+     scene/pause/reset handling; optional sunbeams remain off by default.
+   - Authored held swords, upright custom pickups, proportional presentation,
+     preserved shop shelf transforms, and MM-owned Ikana fallback.
+   - All 96 autumn leaf slots distributed through the view, sustained visibility
+     in downward views, and Alt foliage/grass/ground coverage.
+   - Disable legacy trade-sidecar ownership import/export in Combo saves.
+     This addresses that specific phantom Moon's Tear path.
+   - Farore's Wind outdoor activation, slot-scoped game-owned point, same-game
+     recall and both cross-game handoffs with destination age/form/progress.
+   - Latest diagnostic fixture corrections.
+   Status: implemented, published draft, unmerged.
+   CI: run 37752757393 passed gate, Windows build/package, Linux build/packages,
+   and Linux seed smoke. Configuration-specific in-game acceptance remains pending.
+   The older Combined Recovery ZIP stopped at 8276c870. The supplied CURRENT
+   patch already includes the later corrections; do not add them a second time.
+
+2. Later sword / Room Key / receipt follow-up
+   PR: https://github.com/marsh6487/ComboShip/pull/40
+   Branch: poc/sword-held-upright-polish-20261008
+   Head: d4e6c36d91801aee4707ad5649deb2d90fd80e55
+   Delivered: checkpoints/02-sword-room-key-receipts/
+              ComboShip_Sword_Held_Ikana_GI_POC_20261008.zip
+              source/02-pr40-followup/PR40-followup-from-shared-base.patch
+   Scope: held-hand priority/native carrier and Four Sword shelf fixes; authored
+   MM3D Room Key and native import alias; shared random rupee-name pools in MM;
+   preserve map/compass information with Skip Junk/Junk Only.
+   Status: implemented, published draft, unmerged.
+   PR #39 and #40 diverge at 3cee3121. #40 has four unique commits and lacks
+   three later #39 diagnostic commits. Its full candidate.patch contains
+   overlapping cumulative work. Use the supplied incremental FOLLOW-UP patch
+   when starting with current #39.
+   CI: run 37747595956 failed in the key-receipt fixture:
+   tests/item_receipts/run_key_receipt_tests.py links ItemReceiptText.cpp,
+   whose RandomRupeeReceipt references unresolved CVarGetInteger.
+   Windows/Linux builds were skipped. This remains an integration prerequisite.
+
+3. Equipment / pause / ownership / Four Sword recovery
+   Candidate: 0e9aeb05cc67771ce6a62c31abff6968b7a63e12
+   Base: current PR #39 (35ce5f22).
+   Delivered: checkpoints/03-equipment/ComboShip-Equipment-Bridge-Recovery-20261008.zip
+   Scope: cursor entry onto empty MM inventory pages; L cycling; full u16
+   scepter/Rod of Seasons C/D-button transfers in both hosts; acquired-only
+   equipment icons/names; native starter ownership and shield sync preservation;
+   authored Four Sword pickup/held graph, compound/clone routing and fixture adapters.
+   Status: source recovery candidate; not pushed or merged.
+   Recorded checks: 83/83 canonical NEI commands, 373 ownership checks,
+   six shared-item/grant/reward commands, eight production syntax entrypoints,
+   and nine follow-up commands. No linked platform build/runtime acceptance.
+   This supersedes the older MM-Pause-Equipment-Recovery ZIP.
+   Merge conflicts confirmed in BOTH hosts' mods/items/logic/weapon_upgrades.c
+   when combined with #40. Preserve the later #40 held/shelf logic AND the
+   equipment candidate's ownership/Four Sword routing; do not replace whole files.
+
+4. Elemental wand live titles and wand/Slate tutorials
+   Candidate: f991d7865d7738a92a21002f2a20198e8a90b2c7
+   Base: PR #40.
+   Delivered: checkpoints/04-wand-titles/
+              ComboShip-elemental-wand-titles-receipts-20261008.zip
+   Apply its two patches in order.
+   Scope: titles refresh as the owned power wheel cycles in both pause hosts;
+   preserve locked-power/wrap behavior; specific effect/control descriptions
+   for six rods, universal wand modes, medallions, Slate and five rune pickups.
+   English/German/French tutorials preserve native medallion message endings.
+   Status: implemented source candidate; not merged.
+   Recorded production fixtures/syntax/review pass; platform builds and live
+   textbox/controller/pack acceptance remain pending.
+
+5. Authored Lantern GI routing repair
+   Candidate: bb6a1b283300e85e1769d18e47d60ec17f2691da
+   Base: PR #40.
+   Delivered: checkpoints/05-lantern/ComboShip-Lantern-GI-Fix-20261008.zip
+   Scope: prevent the generic Poe lantern replacement from suppressing the
+   authored Lantern GI. Dedicated authored overrides and missing-pass fallback
+   remain; held behavior and all ten authored resources are unchanged.
+   Status: implemented source candidate; not merged.
+   Recorded normal/sanitized GI/held/grip checks and resource audit pass.
+   Matching executable/port archives and actual Alt/pack acceptance are pending.
+
+6. Rod cast POC6
+   Delivered: checkpoints/06-rod-cast/ComboShip_Rod_Cast_POC6_Merge_Recovery.zip
+   Scope: Fire charge/release and Ice release with the provisionally accepted
+   natural-flame/fractured-ice textures. Ice charge, falling icicles/shards,
+   Light effects, trails, impacts and Time Gate are protected.
+   Use patches/from-original-baseline.patch when POC5 is absent, or
+   patches/update-existing-poc5.patch when it is already present; never both.
+   The original route applies to current #39 and the audited #39/#40 combination.
+   Includes both native RGBA32 resources and the optional matching texture O2R.
+   Status: source/material recovery candidate; not pushed or merged.
+   Recorded patch/rollback, texture, policy and 180-frame preservation checks pass.
+   Fresh full engine-dispatch testing, full build and runtime appearance remain pending.
+   Regenerate soh.o2r with the matching code/resource bindings.
+
+7. MM song GIs and bottle-content composer POC2
+   Candidate: 2ce9283f63db977e301a15e9cf38994b73559d93
+   Base: saved combined source 8276c870.
+   Delivered: checkpoints/07-songs-bottle-routing/MM_Song_Bottle_GI_POC2_20261008.zip
+   Use changes.patch for the complete delta; revision-from-poc1.patch is only
+   for a checkout that already has the prior POC1.
+   Scope:
+   - Healing hearts/spirit trails; Sonata leaves/seeds; red varied notation
+     for Lullaby Intro/full Lullaby; Bossa bubbles and a third staggered wave.
+   - Elegy amber falling dust and #FF6200 shimmer; Oath sparse violet glints
+     and #620062 shimmer; Inverted/Double Time clock/hourglass motifs.
+   - Preserve the native clef and earlier protected song decisions.
+   - Filled mushroom/Princess/gold-dust routing, content composer and default
+     TP/Peyron casing in both port archives; animated fairy host/resource handling.
+   Status: implemented source candidate; not merged.
+   POC2 song checks/patch replay are recorded. Broad bottle/fairy/syntax evidence
+   is inherited from POC1 and is not a newly rerun full-build claim.
+   Both hosts, receipts/shops/placed items and actual bottle/fairy visuals need runtime checks.
+   This is the GAME CODE base for item 9; it does not already install item 9's
+   new mushroom, 3DS mesh replacements or exact shimmer policies.
+
+8. Summer visibility polish
+   Candidate: e0ccb47c2c32c87dc0ac7d6d5c2a7a06e361624d
+   Base: current #39; also checked against the equipment recovery.
+   Delivered: checkpoints/08-summer-visibility/ComboShip-Summer-Visibility-20261008.zip
+   Scope: approximately 41% larger cottonwood tufts with clearer opacity;
+   fireflies 40 -> 56, 20% wider halos, existing peak brightness/pulse retained.
+   Status: implemented source candidate; no remote change or new build.
+   Recorded sanitizer/parity/native/weather checks pass. Real visibility,
+   occlusion/performance and pack/Alt appearance still need the supplied scene comparison.
+
+9. Accepted bottle mesh polish and requested hex shimmer — PREPARED, NOT IN GAME CODE
+   Delivered: pending-integration/09-bottle-models-shimmer/
+              2Ship_Bottle_Shimmer_POC2_20261008.zip
+   The latest package preserves the accepted POC1 model bytes:
+   new 512px mushroom; 3DS Princess at 66% scale; seahorse at 71% scale/profile
+   orientation; native fairy at 2x size with its glow seam repaired.
+   Shimmer profiles:
+     Deku Princess  #80D846 (Woodfall green)
+     Fairy          #FFA0EB (pink), plus four faint local motes
+     Seahorse       #FFE66D (yellow)
+     Gold dust      #FFD45A (gold)
+     Mushroom       #DE64F5 (purple)
+   Includes mesh/texture files, C/C++ policy, casing/native resource subset,
+   verified previews and reproduction tools. POC1 authoring tools are preserved
+   separately as reference material.
+   Status: accepted mesh direction and prepared shimmer policy/offline previews.
+   Game call-site/resource/matrix/state integration is still pending.
+   This ZIP is not an installable replacement pack. 3DS animation retargeting
+   was not implemented; the Princess/seahorse donor poses remain static.
+   Both-host build/runtime proof and final visual acceptance remain pending.
+
+10. Late missing-tunic GI priority and material-state correction
+   Source fix: 551d23add853ba731dc5eb0f1498d86204e19596
+   Checkpoint: d09d0e77c32f66997bbee26109277981b9c3c9e7
+   Baseline: a82852a3 (after PR #38).
+   Delivered: checkpoints/10-late-tunic-rendering/
+              ComboShip-tunic-rendering-checkpoint-20261008.zip
+   Scope: Champion's Tunic, Sage's Tunic and Spirit Breastplate.
+   - Remove the three generic object_gi_clothes replacement-priority rows that
+     could suppress their dedicated authored GIs; item-specific replacements remain.
+   - Initialize neutral opaque primitive/environment material before their
+     legacy fallback geometry in BOTH native draw paths. This prevents inherited
+     black or zero-alpha state from making the fallback invisible.
+   - Preserve all 46 model/texture/authoring files byte-for-byte.
+   Status: implemented source checkpoint, push held, not in develop/#39/#40.
+   Recorded verification: old-code failure controls, native/Combo production
+   fixtures and material sanitizers, 80 regression commands in staged runs,
+   three actual C++ translation-unit compiles and independent source review.
+   Full application linking/platform packages and real pack/Alt visibility
+   remain unverified. The old merged complete-pass guard was a DIFFERENT repair.
+   Correction: the first audit omitted this distinct post-#38 checkpoint. It is
+   now included in this revised handoff as its own pending integration.
+
+RECOMMENDED SOURCE INTEGRATION ORDER
+
+Start with current #39 / 35ce5f22 (or apply its current-from-develop patch on a82852a3).
+Then carry the PR40 follow-up, wand patches 1/2, Lantern, Rod POC6 original route,
+song/bottle changes.patch, summer visibility and the late tunic candidate.patch.
+The equipment patch can be appended
+with deliberate resolution of the two weapon_upgrades.c conflicts. Integrate the
+prepared item-9 bottle work only after its code/resource bindings are implemented.
+
+This order was checked in temporary Git indexes. The pre-existing source sequence
+and the added late tunic delta apply using three-way application. The prior
+equipment conflict check produced exactly the
+two sword-source conflicts listed above. A clean patch application is not compilation
+or behavior verification. No live branch was changed and no push or merge was performed.
+
+Keep current #39's CI corrections. Do not apply both complete cumulative PR patches,
+both rod routes, both song routes, or the older equipment ZIP. The reference folder's
+full #40 and late-#39 patches are alternatives/recovery aids, not additional steps.
+
+OUTSTANDING WORK BEFORE A FINISHED CUMULATIVE BUILD
+
+- Resolve the two weapon_upgrades.c conflicts while retaining both scopes.
+- Repair the #40 key-receipt fixture's CVarGetInteger link dependency and rerun gates.
+- Implement the prepared bottle mesh/shimmer game integration if it is included.
+- Build matching Windows/Linux applications and soh.o2r/2ship.o2r.
+- Run targeted runtime acceptance with the actual packs/Alt settings.
+- Newly reported starting Moon's Tear + Pendant of Memories remains under
+  investigation in the inventory-title chat. Screenshots and fresh save/sidecar
+  evidence were supplied today. No completed fix checkpoint was found at the
+  audit cutoff; the earlier legacy-sidecar fix is not proof this new report is solved.
+
+AUDIT VERIFICATION
+
+Freshly checked: current remote refs and PR/CI state; integrity/hashes of all 19
+recovered ZIPs; current #39/#40 full binary patches reproduce their exact Git trees;
+incremental #40 and late-#39 exports reproduce their stated trees; equipment patch
+reproduces its exact recorded tree and all 34 source hashes; song/bottle POC2
+reproduces all 94 recorded source/asset hashes; source-sequence application and
+actual conflict paths; the late tunic patch reproduces its exact checkpoint tree
+and all 10 changed source hashes, and applies onto current #39 and the audited
+source sequence. Existing checkpoint tests/CI are identified above as recorded
+evidence. This audit did not rerun every engine suite, compile the cumulative candidate,
+or claim configuration-specific gameplay proof.
+
+The bundle contains the latest relevant checkpoints, exact current-source exports,
+this audit, integration evidence and hashes. Older superseded ZIPs are catalogued
+in audit/recovered-archive-inventory.json rather than presented as extra merge steps.

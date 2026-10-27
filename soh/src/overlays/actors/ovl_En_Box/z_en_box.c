@@ -6,6 +6,7 @@
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/Enhancements/randomizer/item_category_adj.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS 0
 
@@ -78,6 +79,15 @@ static InitChainEntry sInitChain[] = {
 
 static UNK_TYPE sUnused;
 
+static bool EnBox_IsTimeGateChest(EnBox* this, PlayState* play) {
+    // Authored adult Zelda/Lullaby chest in Hyrule Field (R3/R4). Keep its
+    // switch 32, treasure flag 5 and original heart-container params intact.
+    Actor* actor = &this->dyna.actor;
+    return LINK_IS_ADULT && play->sceneNum == SCENE_HYRULE_FIELD && actor->room == 0 && (u16)actor->params == 0xB7A5 &&
+           this->switchFlag == 32 && actor->home.pos.x == -1582.0f && actor->home.pos.y == 220.0f &&
+           actor->home.pos.z == 1961.0f;
+}
+
 static Gfx* EnBox_LoadChestDL(const char* dlName, const char* fallbackName) {
     Gfx* dl = ResourceMgr_LoadGfxByName(dlName);
 
@@ -86,6 +96,15 @@ static Gfx* EnBox_LoadChestDL(const char* dlName, const char* fallbackName) {
     }
 
     return dl;
+}
+
+static void EnBox_LoadChestPair(EnBox* this, const char* bodyName, const char* lidName) {
+    Gfx* body = ResourceMgr_LoadGfxByName(bodyName);
+    Gfx* lid = ResourceMgr_LoadGfxByName(lidName);
+    if (body != NULL && lid != NULL) {
+        this->boxBodyDL = body;
+        this->boxLidDL = lid;
+    }
 }
 
 void EnBox_SetupAction(EnBox* this, EnBoxActionFunc actionFunc) {
@@ -135,7 +154,8 @@ void EnBox_Init(Actor* thisx, PlayState* play2) {
 
     if (play) {} // helps the compiler store play2 into s1
 
-    if (Flags_GetTreasure(play, this->dyna.actor.params & 0x1F)) {
+    if (GameInteractor_Should(VB_CHEST_CONSIDER_CHEST_OPEN, Flags_GetTreasure(play, this->dyna.actor.params & 0x1F),
+                              this)) {
         this->alpha = 255;
         this->iceSmokeTimer = 100;
         EnBox_SetupAction(this, EnBox_Open);
@@ -191,7 +211,9 @@ void EnBox_Init(Actor* thisx, PlayState* play2) {
     Animation_Change(&this->skelanime, anim, 1.5f, animFrameStart, endFrame, ANIMMODE_ONCE, 0.0f);
 
     this->getItemEntry = ItemTable_RetrieveEntry(MOD_NONE, this->dyna.actor.params >> 5 & 0x7F);
-    if (IS_RANDO) {
+    if (EnBox_IsTimeGateChest(this, play)) {
+        this->getItemEntry = ItemTable_RetrieveEntry(MOD_RANDOMIZER, RG_TIME_GATE);
+    } else if (IS_RANDO) {
         RandomizerCheck rc = Randomizer_GetCheckFromActor(this->dyna.actor.id, play->sceneNum, this->dyna.actor.params);
         if (rc != RC_UNKNOWN_CHECK) {
             this->getItemEntry = Randomizer_GetItemFromKnownCheck(rc, this->dyna.actor.params >> 5 & 0x7F);
@@ -210,8 +232,6 @@ void EnBox_Destroy(Actor* thisx, PlayState* play) {
     EnBox* this = (EnBox*)thisx;
 
     DynaPoly_DeleteBgActor(play, &play->colCtx.dyna, this->dyna.bgId);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelanime);
 }
 
 void EnBox_RandomDustKinematic(EnBox* this, Vec3f* pos, Vec3f* velocity, Vec3f* accel) {
@@ -274,8 +294,8 @@ void EnBox_Fall(EnBox* this, PlayState* play) {
                 OnePointCutscene_EndCutscene(play, this->subCamId);
             }
         }
-        Audio_PlaySoundGeneral(NA_SE_EV_COFFIN_CAP_BOUND, &this->dyna.actor.projectedPos, 4,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_COFFIN_CAP_BOUND, &this->dyna.actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         EnBox_SpawnDust(this, play);
     }
     yDiff = this->dyna.actor.world.pos.y - this->dyna.actor.floorHeight;
@@ -384,8 +404,8 @@ void EnBox_AppearInit(EnBox* this, PlayState* play) {
         this->unk_1A8 = 0;
         Actor_Spawn(&play->actorCtx, play, ACTOR_DEMO_KANKYO, this->dyna.actor.home.pos.x, this->dyna.actor.home.pos.y,
                     this->dyna.actor.home.pos.z, 0, 0, 0, 0x0011);
-        Audio_PlaySoundGeneral(NA_SE_EV_TRE_BOX_APPEAR, &this->dyna.actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_TRE_BOX_APPEAR, &this->dyna.actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 }
 
@@ -425,31 +445,34 @@ void EnBox_WaitOpen(EnBox* this, PlayState* play) {
         frameCount = Animation_GetLastFrame(anim);
         Animation_Change(&this->skelanime, anim, 1.5f, 0, frameCount, ANIMMODE_ONCE, 0.0f);
         EnBox_SetupAction(this, EnBox_Open);
-        if (this->unk_1F4 > 0) {
-            switch (this->type) {
-                case ENBOX_TYPE_SMALL:
-                case ENBOX_TYPE_6:
-                case ENBOX_TYPE_ROOM_CLEAR_SMALL:
-                case ENBOX_TYPE_SWITCH_FLAG_FALL_SMALL:
-                    break;
-                default:
-                    Actor_SpawnAsChild(&play->actorCtx, &this->dyna.actor, play, ACTOR_DEMO_TRE_LGT,
-                                       this->dyna.actor.world.pos.x, this->dyna.actor.world.pos.y,
-                                       this->dyna.actor.world.pos.z, this->dyna.actor.shape.rot.x,
-                                       this->dyna.actor.shape.rot.y, this->dyna.actor.shape.rot.z, 0xFFFF);
-                    Audio_PlayFanfare(NA_BGM_OPEN_TRE_BOX | 0x900);
-            }
+        if (this->unk_1F4 > 0 && this->dyna.actor.scale.x > 0.005f) {
+            Actor_SpawnAsChild(&play->actorCtx, &this->dyna.actor, play, ACTOR_DEMO_TRE_LGT,
+                               this->dyna.actor.world.pos.x, this->dyna.actor.world.pos.y, this->dyna.actor.world.pos.z,
+                               this->dyna.actor.shape.rot.x, this->dyna.actor.shape.rot.y, this->dyna.actor.shape.rot.z,
+                               0xFFFF);
+            Audio_PlayFanfare(NA_BGM_OPEN_TRE_BOX | 0x900);
         }
         osSyncPrintf("Actor_Environment_Tbox_On() %d\n", this->dyna.actor.params & 0x1F);
-        Flags_SetTreasure(play, this->dyna.actor.params & 0x1F);
+        if (GameInteractor_Should(VB_CHEST_SET_TREASURE_FLAG, true, this)) {
+            Flags_SetTreasure(play, this->dyna.actor.params & 0x1F);
+        }
     } else {
         player = GET_PLAYER(play);
         Actor_WorldToActorCoords(&this->dyna.actor, &sp4C, &player->actor.world.pos);
         if (sp4C.z > -50.0f && sp4C.z < 0.0f && fabsf(sp4C.y) < 10.0f && fabsf(sp4C.x) < 20.0f &&
             Player_IsFacingActor(&this->dyna.actor, 0x3000, play)) {
-            Actor_OfferGetItemNearby(&this->dyna.actor, play, -(this->dyna.actor.params >> 5 & 0x7F));
+            if (EnBox_IsTimeGateChest(this, play)) {
+                GetItemEntry entry = this->getItemEntry;
+                // The native chest handoff negates this again before giving it.
+                entry.getItemId = -entry.getItemId;
+                entry.getItemFrom = ITEM_FROM_CHEST;
+                GiveItemEntryFromActorWithFixedRange(&this->dyna.actor, play, entry);
+            } else {
+                Actor_OfferGetItemNearby(&this->dyna.actor, play, -(this->dyna.actor.params >> 5 & 0x7F));
+            }
         }
-        if (Flags_GetTreasure(play, this->dyna.actor.params & 0x1F)) {
+        if (GameInteractor_Should(VB_CHEST_CONSIDER_CHEST_OPEN, Flags_GetTreasure(play, this->dyna.actor.params & 0x1F),
+                                  this)) {
             EnBox_SetupAction(this, EnBox_Open);
         }
     }
@@ -488,8 +511,8 @@ void EnBox_Open(EnBox* this, PlayState* play) {
         }
 
         if (sfxId != 0) {
-            Audio_PlaySoundGeneral(sfxId, &this->dyna.actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(sfxId, &this->dyna.actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
 
         if (this->skelanime.jointTable[3].z > 0) {
@@ -514,8 +537,7 @@ void EnBox_SpawnIceSmoke(EnBox* this, PlayState* play) {
     if (Rand_ZeroOne() < 0.3f) {
         f0 = 2.0f * Rand_ZeroOne() - 1.0f;
         pos = this->dyna.actor.world.pos;
-        if (this->type == ENBOX_TYPE_SMALL || this->type == ENBOX_TYPE_6 || this->type == ENBOX_TYPE_ROOM_CLEAR_SMALL ||
-            this->type == ENBOX_TYPE_SWITCH_FLAG_FALL_SMALL) {
+        if (this->dyna.actor.scale.x <= 0.005f) {
             pos.x += f0 * 10.0f * Math_SinS(this->dyna.actor.world.rot.y + 0x4000);
             pos.z += f0 * 10.0f * Math_CosS(this->dyna.actor.world.rot.y + 0x4000);
             f0 = 2.0f * Rand_ZeroOne() - 1.0f;
@@ -551,16 +573,8 @@ void EnBox_Update(Actor* thisx, PlayState* play) {
         Actor_UpdateBgCheckInfo(play, &this->dyna.actor, 0.0f, 0.0f, 0.0f, 0x1C);
     }
 
-    switch (this->type) {
-        case ENBOX_TYPE_SMALL:
-        case ENBOX_TYPE_6:
-        case ENBOX_TYPE_ROOM_CLEAR_SMALL:
-        case ENBOX_TYPE_SWITCH_FLAG_FALL_SMALL:
-            Actor_SetFocus(&this->dyna.actor, 20.0f);
-            break;
-        default:
-            Actor_SetFocus(&this->dyna.actor, 40.0f);
-    }
+    // Update focus after movement without overwriting content-based sizing.
+    Actor_SetFocus(&this->dyna.actor, this->dyna.actor.scale.x > 0.005f ? 40.0f : 20.0f);
 
     if (GameInteractor_Should(VB_CHEST_USE_ICE_EFFECT,
                               (this->dyna.actor.params >> 5 & 0x7F) == GI_ICE_TRAP && this->actionFunc == EnBox_Open &&
@@ -570,47 +584,93 @@ void EnBox_Update(Actor* thisx, PlayState* play) {
     }
 }
 
+static void EnBox_UpdateSizePosition(EnBox* this, PlayState* play, bool matchSize) {
+    Actor* actor = &this->dyna.actor;
+    bool isLarge = actor->scale.x > 0.005f;
+
+    // Restore legacy reachability corrections at the known native coordinates
+    // on each affected axis. Reverse our own offset when the option is disabled.
+    if (play->sceneNum == SCENE_INSIDE_GANONS_CASTLE && actor->room == 9 && (actor->params & 0xF000) == 0x8000 &&
+        actor->home.pos.z == -952.0f && (actor->world.pos.z == -952.0f || actor->world.pos.z == -962.0f)) {
+        actor->world.pos.z = matchSize && isLarge ? -962.0f : -952.0f;
+    }
+    if (play->sceneNum == SCENE_DEKU_TREE && actor->room == 5 && actor->params == 0x5AA0 &&
+        actor->home.pos.x == -1376.0f && (actor->world.pos.x == -1376.0f || actor->world.pos.x == -1380.0f)) {
+        actor->world.pos.x = matchSize && isLarge ? -1380.0f : -1376.0f;
+    }
+    if (play->sceneNum == SCENE_INSIDE_GANONS_CASTLE && actor->room == 12 && actor->params == 0x36C5 &&
+        actor->home.pos.x == 1757.0f && actor->home.pos.z == -3595.0f &&
+        ((actor->world.pos.x == 1757.0f && actor->world.pos.z == -3595.0f) ||
+         (actor->world.pos.x == 1777.0f && actor->world.pos.z == -3626.0f))) {
+        actor->world.pos.x = matchSize && !isLarge ? 1777.0f : 1757.0f;
+        actor->world.pos.z = matchSize && !isLarge ? -3626.0f : -3595.0f;
+    }
+    if (play->sceneNum == SCENE_SPIRIT_TEMPLE && actor->room == 14 && actor->params == 0x3804 &&
+        actor->home.pos.x == 358.0f && (actor->world.pos.x == 358.0f || actor->world.pos.x == 400.0f)) {
+        actor->world.pos.x = matchSize && !isLarge ? 400.0f : 358.0f;
+    }
+}
+
 void EnBox_UpdateTexture(EnBox* this, PlayState* play) {
     bool csmc = CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0);
+    bool matchSize = CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeMatchesContents"), 0);
     int requiresStoneAgony = CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeDependsStoneOfAgony"), 0);
-    GetItemCategory getItemCategory;
+    GetItemCategory getItemCategory = ITEM_CATEGORY_JUNK;
     GetItemEntry chestItem = this->getItemEntry;
 
-    int isVanilla = !csmc || (requiresStoneAgony && !CHECK_QUEST_ITEM(QUEST_STONE_OF_AGONY)) ||
-                    (play->sceneNum == SCENE_TREASURE_BOX_SHOP &&
-                     this->dyna.actor.room != 6); // Exclude treasure game chests except for the final room
+    // Conceal intermediate vanilla chest-game contents; shuffled checks use normal chest cosmetics.
+    bool concealContents = play->sceneNum == SCENE_TREASURE_BOX_SHOP && this->dyna.actor.room != 6 &&
+                           !(IS_RANDO && Randomizer_GetSettingValue(RSK_SHUFFLE_CHEST_MINIGAME));
+    int isVanilla = !csmc || (requiresStoneAgony && !CHECK_QUEST_ITEM(QUEST_STONE_OF_AGONY)) || concealContents;
+    matchSize = matchSize && !concealContents;
 
-    if (!isVanilla) {
+    if (matchSize || !isVanilla) {
         getItemCategory = Randomizer_AdjustItemCategory(chestItem);
     }
 
-    switch (this->type) {
-        case ENBOX_TYPE_SMALL:
-        case ENBOX_TYPE_6:
-        case ENBOX_TYPE_ROOM_CLEAR_SMALL:
-        case ENBOX_TYPE_SWITCH_FLAG_FALL_SMALL:
-            Actor_SetScale(&this->dyna.actor, 0.005f);
-            Actor_SetFocus(&this->dyna.actor, 20.0f);
-            break;
-        default:
-            Actor_SetScale(&this->dyna.actor, 0.01f);
-            Actor_SetFocus(&this->dyna.actor, 40.0f);
+    if (matchSize) {
+        // Classic CSMC categories. Keep actor params/type intact: they also
+        // control switch, room-clear, song, falling and Lens of Truth behavior.
+        bool small = getItemCategory == ITEM_CATEGORY_JUNK || getItemCategory == ITEM_CATEGORY_SMALL_KEY ||
+                     getItemCategory == ITEM_CATEGORY_SKULLTULA_TOKEN;
+        Actor_SetScale(&this->dyna.actor, small ? 0.005f : 0.01f);
+        Actor_SetFocus(&this->dyna.actor, small ? 20.0f : 40.0f);
+    } else {
+        switch (this->type) {
+            case ENBOX_TYPE_SMALL:
+            case ENBOX_TYPE_6:
+            case ENBOX_TYPE_ROOM_CLEAR_SMALL:
+            case ENBOX_TYPE_SWITCH_FLAG_FALL_SMALL:
+                Actor_SetScale(&this->dyna.actor, 0.005f);
+                Actor_SetFocus(&this->dyna.actor, 20.0f);
+                break;
+            default:
+                Actor_SetScale(&this->dyna.actor, 0.01f);
+                Actor_SetFocus(&this->dyna.actor, 40.0f);
+        }
+    }
+    EnBox_UpdateSizePosition(this, play, matchSize);
+
+    // Start from the active native pack, so partial optional models cannot mix body and lid styles.
+    if (this->type != ENBOX_TYPE_DECORATED_BIG) {
+        this->boxBodyDL = EnBox_LoadChestDL(gTreasureChestChestFrontDL, NULL);
+        this->boxLidDL = EnBox_LoadChestDL(gTreasureChestChestSideAndLidDL, NULL);
+    } else {
+        this->boxBodyDL = EnBox_LoadChestDL(gTreasureChestBossKeyChestFrontDL, gTreasureChestChestFrontDL);
+        this->boxLidDL = EnBox_LoadChestDL(gTreasureChestBossKeyChestSideAndTopDL, gTreasureChestChestSideAndLidDL);
     }
 
     // Change model/texture
     if (!isVanilla) {
         switch (getItemCategory) {
             case ITEM_CATEGORY_MAJOR:
-                this->boxBodyDL = EnBox_LoadChestDL(gChestBodyMajorDL, gTreasureChestChestFrontDL);
-                this->boxLidDL = EnBox_LoadChestDL(gChestLidMajorDL, gTreasureChestChestSideAndLidDL);
+                EnBox_LoadChestPair(this, gChestBodyMajorDL, gChestLidMajorDL);
                 break;
             case ITEM_CATEGORY_SKULLTULA_TOKEN:
-                this->boxBodyDL = EnBox_LoadChestDL(gChestBodyTokenDL, gTreasureChestChestFrontDL);
-                this->boxLidDL = EnBox_LoadChestDL(gChestLidTokenDL, gTreasureChestChestSideAndLidDL);
+                EnBox_LoadChestPair(this, gChestBodyTokenDL, gChestLidTokenDL);
                 break;
             case ITEM_CATEGORY_SMALL_KEY:
-                this->boxBodyDL = EnBox_LoadChestDL(gChestBodySmallKeyDL, gTreasureChestChestFrontDL);
-                this->boxLidDL = EnBox_LoadChestDL(gChestLidSmallKeyDL, gTreasureChestChestSideAndLidDL);
+                EnBox_LoadChestPair(this, gChestBodySmallKeyDL, gChestLidSmallKeyDL);
                 break;
             case ITEM_CATEGORY_BOSS_KEY:
                 this->boxBodyDL = EnBox_LoadChestDL(gTreasureChestBossKeyChestFrontDL, gTreasureChestChestFrontDL);
@@ -618,26 +678,16 @@ void EnBox_UpdateTexture(EnBox* this, PlayState* play) {
                     EnBox_LoadChestDL(gTreasureChestBossKeyChestSideAndTopDL, gTreasureChestChestSideAndLidDL);
                 break;
             case ITEM_CATEGORY_HEALTH:
-                this->boxBodyDL = EnBox_LoadChestDL(gChestBodyHeartDL, gTreasureChestChestFrontDL);
-                this->boxLidDL = EnBox_LoadChestDL(gChestLidHeartDL, gTreasureChestChestSideAndLidDL);
+                EnBox_LoadChestPair(this, gChestBodyHeartDL, gChestLidHeartDL);
                 break;
             case ITEM_CATEGORY_LESSER:
-                this->boxBodyDL = EnBox_LoadChestDL(gChestBodyMinorDL, gTreasureChestChestFrontDL);
-                this->boxLidDL = EnBox_LoadChestDL(gChestLidMinorDL, gTreasureChestChestSideAndLidDL);
+                EnBox_LoadChestPair(this, gChestBodyMinorDL, gChestLidMinorDL);
                 break;
             case ITEM_CATEGORY_JUNK:
-            default:
-                this->boxBodyDL = EnBox_LoadChestDL(gChestBodyJunkDL, gTreasureChestChestFrontDL);
-                this->boxLidDL = EnBox_LoadChestDL(gChestLidJunkDL, gTreasureChestChestSideAndLidDL);
+                EnBox_LoadChestPair(this, gChestBodyJunkDL, gChestLidJunkDL);
                 break;
-        }
-    } else {
-        if (this->type != ENBOX_TYPE_DECORATED_BIG) {
-            this->boxBodyDL = EnBox_LoadChestDL(gTreasureChestChestFrontDL, NULL);
-            this->boxLidDL = EnBox_LoadChestDL(gTreasureChestChestSideAndLidDL, NULL);
-        } else {
-            this->boxBodyDL = EnBox_LoadChestDL(gTreasureChestBossKeyChestFrontDL, gTreasureChestChestFrontDL);
-            this->boxLidDL = EnBox_LoadChestDL(gTreasureChestBossKeyChestSideAndTopDL, gTreasureChestChestSideAndLidDL);
+            default:
+                break;
         }
     }
 }

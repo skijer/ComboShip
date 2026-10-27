@@ -1,9 +1,11 @@
 #pragma once
 #ifdef __cplusplus
 #include <map>
+#include <memory>
 #include <string>
 #include <set>
 #include <cstdint>
+#include <vector>
 
 enum SeqType {
     SEQ_NOSHUFFLE = 0,

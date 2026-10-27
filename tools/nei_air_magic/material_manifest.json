@@ -1,0 +1,12 @@
+{
+  "silver_wisp": {
+    "source": "soh/assets/custom/objects/nei_used_magic/fire_wisp",
+    "sha256": "43e978dfc1b57d4816e55aa1fc28201a055835cdceb69541b9f9411ba30f38d9",
+    "method": "Byte-identical approved medallion material; color, shape and animation supplied by item-local geometry."
+  },
+  "lightning_filament": {
+    "source": "soh/assets/custom/objects/nei_used_magic/light_rays",
+    "sha256": "a07c9777fcbc880f9a35d228fedcff46b2fcc8fa62ee1f9187817caf4c565749",
+    "method": "Byte-identical approved medallion material; color, shape and animation supplied by item-local geometry."
+  }
+}

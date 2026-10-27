@@ -1,7 +1,13 @@
+#ifdef COMBO_BUILD
+extern "C" int Combo_MM_CrossDungeonEntranceFromRegion(int index, int region);
+#endif
 #include "2s2h/GameInteractor/GameInteractor.h"
 #include "2s2h/ShipInit.hpp"
 
 #include "Logic.h"
+#ifdef COMBO_BUILD
+#include "rando/CrossEntranceMmCatalogue.h"
+#endif
 
 namespace Rando {
 
@@ -31,6 +37,18 @@ uint64_t gCurrentRegionTime = 0;
 // ENTRANCE(GROTTOS, 31) = RR_ROAD_TO_IKANA_GROTTO
 
 RandoRegionId GetRegionIdFromEntrance(s32 entrance) {
+#ifdef COMBO_BUILD
+    if (auto region = ComboCrossMmCatalogue::RegionForGrottoReturn(entrance); region != RR_MAX)
+        return region;
+    if (auto region = ComboCrossMmCatalogue::RegionForGrottoEntry(entrance); region != RR_MAX)
+        return region;
+    // A composed boss-only Goht warp may arrive at this previously source-only endpoint.
+    if (entrance == ENTRANCE(MOUNTAIN_VILLAGE_SPRING, 7))
+        return RR_MOUNTAIN_VILLAGE;
+    // Gyorg's first completion uses spawn 8; repeat warps use the indexed spawn 9.
+    if (entrance == ENTRANCE(ZORA_CAPE, 8))
+        return RR_ZORA_CAPE;
+#endif
     static std::map<s32, RandoRegionId> entranceToRegionId;
     if (entranceToRegionId.empty()) {
         for (auto& [randoRegionId, randoRegion] : Regions) {
@@ -207,8 +225,16 @@ void FindReachableRegions(RandoRegionId currentRegion, std::set<RandoRegionId>& 
         // Set global time for check evaluation
         gCurrentRegionTime = currentTime;
 
-        RandoRegionId connectedRegionId = GetRegionIdFromEntrance(exitId);
-        if (regionExit.condition()) {
+        s32 destination = exitId;
+#ifdef COMBO_BUILD
+        if (Combo_IsCombinedGame()) {
+            destination = Combo_MM_CrossDungeonEntranceFromRegion(exitId, currentRegion);
+            if (destination < 0)
+                continue;
+        }
+#endif
+        RandoRegionId connectedRegionId = GetRegionIdFromEntrance(destination);
+        if (connectedRegionId != RR_MAX && regionExit.condition()) {
             auto& targetRegion = Regions[connectedRegionId];
             RegionTimeState incomingState = { .timeSlices = currentTime,
                                               .canStayOverTime = targetRegion.canStayOverTime };

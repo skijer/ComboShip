@@ -1,11 +1,22 @@
 #include "Rando/Rando.h"
 #include "Rando/ActorBehavior/Souls.h"
 #include "Rando/MiscBehavior/ClockShuffle.h"
+#include "mods/nei_save.h" // ootHookshotLevel (FC 3-level hookshot chain obtainability)
+#include "mods/combo_rpg.h"
+extern "C" {
+#include "mods/items/logic/item_cane_of_somaria.h"
+}
+// Needed by the OoT progressive chains below: they resolve to their concrete tier and degrade to
+// junk at the top, reading the SAME state their gives write. Skijer's NEI
+#include "2s2h/FleetShipCombo/FleetComboIds.h" // FC_OOT_SWORD_MASTER / FC_OOT_SWORD_BIGGORON
+#include "mods/extended_inventory.h"           // SLOT_ROCS
+#include "mods/items/logic/weapon_upgrades.h"  // WeaponUpgrade_Has* (hammer / master / BGS tops)
 #include "2s2h/ShipUtils.h"
 #include "2s2h/ShipInit.hpp"
 #include <cassert>
 #ifdef COMBO_BUILD
 #include "Rando/MiscBehavior/MiscBehavior.h" // ComboShip: MM_LookupForeign for foreign container art
+extern "C" int Combo_MM_BombchuBagShared(void);
 #endif
 
 // Copied from z_player.c, we could instead move this to a header file, idk
@@ -80,6 +91,20 @@ static std::vector<RandoItemId> junkItems = {
     RI_RECOVERY_HEART,
     RI_NONE,
 };
+
+#ifdef COMBO_BUILD
+// ComboShip: the rotation pool, so the combo generator can bake cross-placed junk from the same set
+// MM itself would draw. RI_NONE is dropped: a cross check that grants nothing has nothing to show.
+std::vector<RandoItemId> Rando::ComboJunkPool() {
+    std::vector<RandoItemId> out;
+    for (RandoItemId id : junkItems) {
+        if (id != RI_NONE) {
+            out.push_back(id);
+        }
+    }
+    return out;
+}
+#endif
 
 static std::vector<RandoItemId> obtainableJunkItems;
 static std::vector<RandoItemId> obtainableTrapItems;
@@ -223,6 +248,45 @@ bool Rando::IsItemObtainable(RandoItemId randoItemId, RandoCheckId randoCheckId)
     switch (randoItemId) {
         case RI_UNKNOWN:
             return false;
+        // Stone of Agony is a 2-level progressive: 1st copy = the stone (quest
+        // bit), 2nd = the Quartz of Motion. A third copy has nothing left to
+        // give, so it degrades to junk like every other maxed progressive.
+        case RI_OOT_STONE_OF_AGONY:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !(Nei_Save()->quartzOwned);
+        // The other OoT chains, same rule as every MM progressive: once the top tier is owned there
+        // is nothing left to give, so the check degrades to junk. Each reads the SAME state its
+        // give writes, so obtainability and the give can never disagree. Skijer's NEI
+        case RI_OOT_PROGRESSIVE_HAMMER:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !WeaponUpgrade_HasHammerAxe();
+        case RI_OOT_PROGRESSIVE_MASTER_SWORD:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !WeaponUpgrade_HasTrueMaster();
+        case RI_OOT_PROGRESSIVE_BGS:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return !WeaponUpgrade_HasGreatFairy();
+        case RI_OOT_PROGRESSIVE_STRENGTH: {
+            if (hasObtainedCheck) {
+                return false;
+            }
+            u8 lvl = Nei_StrengthLevel();
+            u8 native = (u8)CUR_UPG_VALUE(UPG_STRENGTH);
+            return ((native > lvl) ? native : lvl) < NEI_STRENGTH_MAX;
+        }
+        case RI_OOT_PROGRESSIVE_ROC:
+            if (hasObtainedCheck) {
+                return false;
+            }
+            return Nei_GetOwnedItem(SLOT_ROCS) != ITEM_ROCS_CAPE;
         case RI_PROGRESSIVE_WALLET:
             if (hasObtainedCheck) {
                 return false;
@@ -329,15 +393,17 @@ bool Rando::IsItemObtainable(RandoItemId randoItemId, RandoCheckId randoCheckId)
         case RI_PROGRESSIVE_MAGIC:
             if (hasObtainedCheck) {
                 return false;
-            } else if (gSaveContext.save.saveInfo.playerData.isMagicAcquired &&
-                       gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
+            } else if (ComboRpg_NativeMagicTier(gSaveContext.save.saveInfo.playerData.isMagicAcquired +
+                                                gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) >= 2) {
                 return false;
             }
             return true;
         case RI_DOUBLE_MAGIC:
-            return !gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired;
+            return ComboRpg_NativeMagicTier(gSaveContext.save.saveInfo.playerData.isMagicAcquired +
+                                            gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) < 2;
         case RI_SINGLE_MAGIC:
-            return !gSaveContext.save.saveInfo.playerData.isMagicAcquired;
+            return ComboRpg_NativeMagicTier(gSaveContext.save.saveInfo.playerData.isMagicAcquired +
+                                            gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) == 0;
         case RI_MAGIC_JAR_SMALL:
         case RI_MAGIC_JAR_BIG:
             return gSaveContext.save.saveInfo.playerData.isMagicAcquired;
@@ -383,14 +449,35 @@ bool Rando::IsItemObtainable(RandoItemId randoItemId, RandoCheckId randoCheckId)
                 return false;
             }
             break;
-        case RI_BOMBCHU:
-        case RI_BOMBCHU_5:
-        case RI_BOMBCHU_10:
         case RI_BOMBS_5:
         case RI_BOMBS_10:
             if (CUR_UPG_VALUE(UPG_BOMB_BAG) == 0) {
                 return false;
             }
+            break;
+        case RI_HOOKSHOT: {
+            // FC 3-level chain (FCI_HOOKSHOT, count 3): copies stay obtainable until Ultrashot
+            // (ootHookshotLevel 3). Without this, the vanilla GIFIELD_20 dedupe below junks every
+            // copy after the first (the native hookshot item exists from copy 1 on) and the
+            // Longshot/Ultrashot tiers would be unreachable in MM.
+            int hookLvl = Nei_Save()->ootHookshotLevel;
+            if (hookLvl == 0 && INV_CONTENT(ITEM_HOOKSHOT) == ITEM_HOOKSHOT) {
+                hookLvl = 1; // pre-chain native hookshot with no level recorded
+            }
+            return hookLvl < 3;
+        }
+        case RI_BOMBCHU:
+        case RI_BOMBCHU_5:
+        case RI_BOMBCHU_10:
+            if (CUR_UPG_VALUE(UPG_BOMB_BAG) == 0) {
+                return false;
+            }
+#ifdef COMBO_BUILD
+            // Shared Bombchu Bag family effective and not yet owned: chu ammo is not a valid source.
+            if (Combo_MM_BombchuBagShared() && INV_CONTENT(ITEM_BOMBCHU) == ITEM_NONE) {
+                return false;
+            }
+#endif
             break;
         case RI_SHIELD_HERO:
             if (GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_NONE) {
@@ -675,6 +762,21 @@ bool Rando::IsItemObtainable(RandoItemId randoItemId, RandoCheckId randoCheckId)
     return true;
 }
 
+static RandoItemId ResolveCanePresentation() {
+    static constexpr u8 skills[] = {
+        CANE_SKILL_SOMARIA_STATUE, CANE_SKILL_PACCI_FLIP,       CANE_SKILL_SOMARIA_BLOCK,
+        CANE_SKILL_PACCI_STONE,    CANE_SKILL_SOMARIA_PLATFORM, CANE_SKILL_PACCI_ULTRAHAND
+    };
+    static constexpr RandoItemId items[] = { RI_OOT_NEI_CANE_OF_SOMARIA,       RI_OOT_NEI_CANE_PACCI_FLIP,
+                                             RI_OOT_NEI_CANE_SOMARIA_BLOCK,    RI_OOT_NEI_CANE_PACCI_STONE,
+                                             RI_OOT_NEI_CANE_SOMARIA_PLATFORM, RI_OOT_NEI_CANE_PACCI_ULTRAHAND };
+    for (int i = 0; i < 6; ++i)
+        if (!Cane_HasSkill(skills[i]))
+            return items[i];
+    // All-owned copies preserve the existing no-op grant.
+    return RI_OOT_NEI_CANE_OF_SOMARIA;
+}
+
 RandoItemId Rando::ConvertItem(RandoItemId randoItemId, RandoCheckId randoCheckId) {
     if (IsItemObtainable(randoItemId, randoCheckId)) {
         switch (randoItemId) {
@@ -714,6 +816,32 @@ RandoItemId Rando::ConvertItem(RandoItemId randoItemId, RandoCheckId randoCheckI
                 // Shouldn't happen, just in case
                 assert(false);
                 return RI_JUNK;
+            // OoT chains -> their concrete tier, so the NAME, textbox and model are the tier's and
+            // the give freezes it in CUSTOM_ITEM_PARAM (no more guessing from live state at draw
+            // time). Mirrors RI_PROGRESSIVE_BOW right below. Skijer's NEI
+            case RI_OOT_PROGRESSIVE_HAMMER:
+                return Nei_Save()->ootHammerOwned ? RI_OOT_IRON_KNUCKLE_AXE : RI_OOT_HAMMER;
+            case RI_OOT_PROGRESSIVE_MASTER_SWORD:
+                return (Nei_Save()->comboObtained[FC_OOT_SWORD_MASTER] != 0) ? RI_OOT_TRUE_MASTER_SWORD
+                                                                             : RI_OOT_MASTER_SWORD;
+            case RI_OOT_PROGRESSIVE_BGS:
+                return (Nei_Save()->comboObtained[FC_OOT_SWORD_BIGGORON] != 0) ? RI_GREAT_FAIRY_SWORD
+                                                                               : RI_OOT_BIGGORON_SWORD;
+            case RI_OOT_STONE_OF_AGONY:
+                return Nei_Save()->quartzOwned ? RI_OOT_QUARTZ_OF_MOTION : RI_OOT_STONE_OF_AGONY;
+            case RI_OOT_NEI_CANE_OF_SOMARIA:
+                return ResolveCanePresentation();
+            case RI_OOT_PROGRESSIVE_ROC:
+                return (Nei_GetOwnedItem(SLOT_ROCS) == ITEM_NONE) ? RI_OOT_NEI_ROCS_FEATHER : RI_OOT_NEI_ROCS_CAPE;
+            case RI_OOT_PROGRESSIVE_STRENGTH: {
+                u8 lvl = Nei_StrengthLevel();
+                u8 native = (u8)CUR_UPG_VALUE(UPG_STRENGTH);
+                if (native > lvl) {
+                    lvl = native;
+                }
+                return (lvl == 0) ? RI_OOT_GORONS_BRACELET
+                                  : ((lvl == 1) ? RI_OOT_SILVER_GAUNTLETS : RI_OOT_GOLDEN_GAUNTLETS);
+            }
             case RI_PROGRESSIVE_BOW:
                 if (CUR_UPG_VALUE(UPG_QUIVER) == 0) {
                     return RI_BOW;
@@ -737,9 +865,11 @@ RandoItemId Rando::ConvertItem(RandoItemId randoItemId, RandoCheckId randoCheckI
                 assert(false);
                 return RI_JUNK;
             case RI_PROGRESSIVE_MAGIC:
-                if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
+                if (ComboRpg_NativeMagicTier(gSaveContext.save.saveInfo.playerData.isMagicAcquired +
+                                             gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) == 0) {
                     return RI_SINGLE_MAGIC;
-                } else if (!gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
+                } else if (ComboRpg_NativeMagicTier(gSaveContext.save.saveInfo.playerData.isMagicAcquired +
+                                                    gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) < 2) {
                     return RI_DOUBLE_MAGIC;
                 }
                 // Shouldn't happen, just in case

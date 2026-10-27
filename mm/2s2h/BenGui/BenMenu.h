@@ -10,6 +10,10 @@
 
 namespace BenGui {
 
+// The Sheikah Sensor rune's five wish slots. Drawn from both the NEI and the Randomizer menus, so
+// it lives on its own instead of being written twice. Skijer's NEI
+void DrawSensorDesirePicker();
+
 class BenMenu : public Ship::Menu {
   public:
     BenMenu(const std::string& consoleVariable, const std::string& name);
@@ -25,6 +29,8 @@ class BenMenu : public Ship::Menu {
     void AddSettings();
     void AddEnhancements();
     void AddDevTools();
+    void AddNetwork();
+    void AddNEI();
 
     // ComboShip: C-ABI menu export (see combo/menu/ComboMenuExport.h). Builds (once, cached) the flat
     // CwMenu describing the whole BenMenu tree and returns a pointer stable for this instance's
@@ -36,6 +42,8 @@ class BenMenu : public Ship::Menu {
     int32_t DrawWidgetByIndex(int32_t i, int32_t width); // draws widget i via real MenuDrawItem; 1 if changed
 
   private:
+    void AddFleetComboSection(WidgetPath& path);
+
     bool mMenuElementsInitialized = false;
 
     // ComboShip menu-export backing storage (combo-owned serializer; see ComboMenuExport.h).

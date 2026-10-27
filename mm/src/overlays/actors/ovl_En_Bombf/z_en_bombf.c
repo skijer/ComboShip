@@ -414,6 +414,7 @@ void EnBombf_Update(Actor* thisx, PlayState* play) {
 
                 play->envCtx.adjLightSettings.light1Color[0] = play->envCtx.adjLightSettings.light1Color[1] =
                     play->envCtx.adjLightSettings.light1Color[2] = 250;
+                Environment_ClearNativeLightningAmbient();
                 play->envCtx.adjLightSettings.ambientColor[0] = play->envCtx.adjLightSettings.ambientColor[1] =
                     play->envCtx.adjLightSettings.ambientColor[2] = 250;
 

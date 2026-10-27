@@ -343,13 +343,6 @@ RANDO_ENUM_ITEM(RO_STARTING_BGS_GIANTS_KNIFE)
 RANDO_ENUM_ITEM(RO_STARTING_BGS_BIGGORON_SWORD)
 RANDO_ENUM_END(RandoOptionStartingBiggoronSword)
 
-// Mask Quest Settings (vanilla, completed, shuffle)
-RANDO_ENUM_BEGIN(RandoOptionMaskQuest)
-RANDO_ENUM_ITEM(RO_MASK_QUEST_VANILLA)
-RANDO_ENUM_ITEM(RO_MASK_QUEST_COMPLETED)
-RANDO_ENUM_ITEM(RO_MASK_QUEST_SHUFFLE)
-RANDO_ENUM_END(RandoOptionMaskQuest)
-
 // Item Pool Settings
 RANDO_ENUM_BEGIN(RandoOptionItemPool)
 RANDO_ENUM_ITEM(RO_ITEM_POOL_PLENTIFUL)
@@ -365,6 +358,14 @@ RANDO_ENUM_ITEM(RO_ICE_TRAPS_NORMAL)
 RANDO_ENUM_ITEM(RO_ICE_TRAPS_COUNT)
 RANDO_ENUM_ITEM(RO_ICE_TRAPS_PERCENT)
 RANDO_ENUM_END(RandoOptionIceTraps)
+
+RANDO_ENUM_BEGIN(RandoIceTrapNames)
+RANDO_ENUM_ITEM(RO_ICE_TRAP_NAMES_IDENTICAL)
+RANDO_ENUM_ITEM(RO_ICE_TRAP_NAMES_SIMILAR)
+RANDO_ENUM_ITEM(RO_ICE_TRAP_NAMES_MISSPELLED_CHANGED_VOWEL)
+RANDO_ENUM_ITEM(RO_ICE_TRAP_NAMES_MISSPELLED_DUPLICATED_LETTER)
+RANDO_ENUM_ITEM(RO_ICE_TRAP_NAMES_REVEALED)
+RANDO_ENUM_END(RandoIceTrapNames)
 
 // Gossip Stone Hint Settings (no hints, needs nothing,
 // needs mask of truth, needs stone of agony)
@@ -423,6 +424,14 @@ RANDO_ENUM_ITEM(RO_SHUFFLE_WONDER_ITEMS_OVERWORLD)
 RANDO_ENUM_ITEM(RO_SHUFFLE_WONDER_ITEMS_ALL)
 RANDO_ENUM_END(RandoOptionWonderItems)
 
+// Shuffle Silver settings (off, on, wallet, start with)
+RANDO_ENUM_BEGIN(RandoOptionSilver)
+RANDO_ENUM_ITEM(RO_SHUFFLE_SILVER_OFF)
+RANDO_ENUM_ITEM(RO_SHUFFLE_SILVER_ON)
+RANDO_ENUM_ITEM(RO_SHUFFLE_SILVER_WALLET)
+RANDO_ENUM_ITEM(RO_SHUFFLE_SILVER_STARTWITH)
+RANDO_ENUM_END(RandoOptionSilver)
+
 // Shuffle Pots settings (off, dungeons, overworld, all)
 RANDO_ENUM_BEGIN(RandoOptionShufflePots)
 RANDO_ENUM_ITEM(RO_SHUFFLE_POTS_OFF)
@@ -479,12 +488,6 @@ RANDO_ENUM_ITEM(RO_LINKS_POCKET_ANY_MEDALLION)
 RANDO_ENUM_ITEM(RO_LINKS_POCKET_LIGHT_MEDALLION)
 RANDO_ENUM_END(RandoOptionLinksPocketReward)
 
-// Logic (glitchless/no logic)
-RANDO_ENUM_BEGIN(RandoOptionLogic)
-RANDO_ENUM_ITEM(RO_LOGIC_GLITCHLESS)
-RANDO_ENUM_ITEM(RO_LOGIC_NO_LOGIC)
-RANDO_ENUM_END(RandoOptionLogic)
-
 // Damage Multiplier
 RANDO_ENUM_BEGIN(RandoOptionDamageMultiplier)
 RANDO_ENUM_ITEM(RO_DAMAGE_MULTIPLIER_HALF)
@@ -516,17 +519,27 @@ RANDO_ENUM_ITEM(RO_LOCATION_INCLUDE)
 RANDO_ENUM_ITEM(RO_LOCATION_EXCLUDE)
 RANDO_ENUM_END(RandoOptionLocationInclusion)
 
-RANDO_ENUM_BEGIN(RandoOptionChestGame)
-RANDO_ENUM_ITEM(RO_CHEST_GAME_OFF)
-RANDO_ENUM_ITEM(RO_CHEST_GAME_SINGLE_KEYS)
-RANDO_ENUM_ITEM(RO_CHEST_GAME_PACK)
-RANDO_ENUM_END(RandoOptionChestGame)
-
 RANDO_ENUM_BEGIN(RandoOptionMQSet)
 RANDO_ENUM_ITEM(RO_MQ_SET_VANILLA)
 RANDO_ENUM_ITEM(RO_MQ_SET_MQ)
 RANDO_ENUM_ITEM(RO_MQ_SET_RANDOM)
 RANDO_ENUM_END(RandoOptionMQSet)
+
+// Bomb Arrows treatment (Skijer's NEI). Bomb Arrows is the 7th value of the bow's element flag and
+// has no inventory cell; this is only about how you come by it.
+RANDO_ENUM_BEGIN(RandoOptionBombArrows)
+RANDO_ENUM_ITEM(RO_BOMB_ARROWS_OFF)      // never granted on its own (Twilight Upgrade still works)
+RANDO_ENUM_ITEM(RO_BOMB_ARROWS_BOMB_BAG) // auto-granted with any bomb bag (the old AutoGrantOnBag)
+RANDO_ENUM_ITEM(RO_BOMB_ARROWS_SHUFFLED) // a real randomizer item
+RANDO_ENUM_END(RandoOptionBombArrows)
+
+// Elemental Wand treatment (Skijer's NEI). All three grant the SAME page-2 slot; they differ only in
+// what unlocks an individual rod and therefore in how many items the pool carries.
+RANDO_ENUM_BEGIN(RandoOptionElementalWand)
+RANDO_ENUM_ITEM(RO_WAND_MEDALLIONS)        // 1 pool item; rod N works iff you own medallion N
+RANDO_ENUM_ITEM(RO_WAND_SINGLE_ITEM)       // 1 pool item; finding it unlocks all six rods
+RANDO_ENUM_ITEM(RO_WAND_ELEMENTAL_SHUFFLE) // 6 pool items, one per rod
+RANDO_ENUM_END(RandoOptionElementalWand)
 
 #ifdef RANDO_ENUM_BEGIN_CLEANUP
 #undef RANDO_ENUM_BEGIN

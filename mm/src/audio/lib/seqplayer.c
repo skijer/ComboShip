@@ -33,6 +33,8 @@ u8 AudioScript_GetInstrument(SequenceChannel* channel, u8 instId, Instrument** i
 
 SequenceData ResourceMgr_LoadSeqByName(const char* path);
 extern char** gSequenceMap;
+extern size_t gSequenceMapSize;
+extern size_t gFontMapSize;
 
 /**
  * sSeqInstructionArgsTable is a table for each sequence instruction
@@ -1193,6 +1195,27 @@ void AudioScript_SequenceChannelSetVolume(SequenceChannel* channel, u8 volume) {
     channel->volume = (s32)volume / 127.0f;
 }
 
+static void AudioScript_SelectChannelFont(SequenceChannel* channel, u8 operand) {
+    SequencePlayer* seqPlayer = channel->seqPlayer;
+    s32 fontId = operand;
+
+    if (seqPlayer->defaultFont != AUDIO_FONT_NONE) {
+        if ((size_t)seqPlayer->seqId >= gSequenceMapSize + 0xF || gSequenceMap[seqPlayer->seqId] == NULL) {
+            return;
+        }
+        SequenceData sequence = ResourceMgr_LoadSeqByName(gSequenceMap[seqPlayer->seqId]);
+        if (sequence.numFonts < 1 || sequence.numFonts > 16 || operand >= sequence.numFonts) {
+            return;
+        }
+        fontId = AudioSequence_GetFont(&sequence, sequence.numFonts - operand - 1);
+    }
+
+    if (fontId >= 0 && (size_t)fontId < gFontMapSize &&
+        AudioHeap_SearchCaches(FONT_TABLE, CACHE_EITHER, fontId) != NULL) {
+        channel->fontId = fontId;
+    }
+}
+
 void AudioScript_SequenceChannelProcessScript(SequenceChannel* channel) {
     s32 i;
     u8* data;
@@ -1289,24 +1312,7 @@ void AudioScript_SequenceChannelProcessScript(SequenceChannel* channel) {
                     break;
 
                 case 0xEB: { // channel: set soundFont and instrument
-                    // #region 2S2H [Port] Custom sequences
-                    uint8_t result = (uint8_t)cmdArgs[0];
-                    cmd = (u8)cmdArgs[0];
-
-                    if (seqPlayer->defaultFont != 0xFF) {
-                        if (gAudioCtx.seqReplaced[seqPlayer->playerIndex]) {
-                            seqPlayer->seqId = gAudioCtx.seqToPlay[seqPlayer->playerIndex];
-                            gAudioCtx.seqReplaced[seqPlayer->playerIndex] = 0;
-                        }
-                        u16 seqId = AudioEditor_GetReplacementSeq(seqPlayer->seqId);
-                        SequenceData sDat = ResourceMgr_LoadSeqByName(gSequenceMap[seqId]);
-                        cmd = sDat.fonts[sDat.numFonts - result - 1];
-                    }
-                    // #end region
-                    if (AudioHeap_SearchCaches(FONT_TABLE, CACHE_EITHER, cmd)) {
-                        channel->fontId = cmd;
-                    }
-
+                    AudioScript_SelectChannelFont(channel, (u8)cmdArgs[0]);
                     cmdArgs[0] = cmdArgs[1];
                 }
                     // fallthrough
@@ -1425,27 +1431,7 @@ void AudioScript_SequenceChannelProcessScript(SequenceChannel* channel) {
                     break;
 
                 case 0xC6: // channel: set soundFont
-                    cmd = (u8)cmdArgs[0];
-                    // #region 2S2H [Port] Audio assets in the archive and custom sequences
-                    if (seqPlayer->defaultFont != 0xFF) {
-                        if (gAudioCtx.seqReplaced[seqPlayer->playerIndex]) {
-                            seqPlayer->seqId = gAudioCtx.seqToPlay[seqPlayer->playerIndex];
-                            gAudioCtx.seqReplaced[seqPlayer->playerIndex] = 0;
-                        }
-                        u16 seqId = AudioEditor_GetReplacementSeq(seqPlayer->seqId);
-                        SequenceData sDat = ResourceMgr_LoadSeqByName(gSequenceMap[seqId]);
-
-                        // The game apparantely would sometimes do negative array lookups, the result of which would get
-                        // rejected by AudioHeap_SearchCaches, never changing the actual fontid.
-                        if (cmd > sDat.numFonts)
-                            break;
-                        // #end region
-                        cmd = sDat.fonts[(sDat.numFonts - cmd - 1)];
-                    }
-
-                    if (AudioHeap_SearchCaches(FONT_TABLE, CACHE_EITHER, cmd)) {
-                        channel->fontId = cmd;
-                    }
+                    AudioScript_SelectChannelFont(channel, (u8)cmdArgs[0]);
                     break;
 
                 case 0xC7: // channel: write into sequence script

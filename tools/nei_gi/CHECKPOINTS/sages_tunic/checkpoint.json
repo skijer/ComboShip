@@ -1,0 +1,30 @@
+{
+  "resource_count": 16,
+  "vertex_records": 8760,
+  "vertex_loads": 292,
+  "slug": "sages_tunic",
+  "name": "Sages' Tunic",
+  "entry": "objects/nei_gi_redesign/sages_tunic/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 9084,
+  "bounds_author": [
+    [
+      -43.25,
+      -51.9375,
+      -15.0625
+    ],
+    [
+      43.25,
+      43.0625,
+      15.8125
+    ]
+  ],
+  "markers": {},
+  "notes": [
+    "Canonical Sages Tunic is white with gold fittings, empowered by the six colored medallions.",
+    "New long woven robe with hollow cuffs/neck, folds, V collar, six mounted enamel seals, and a stitched six-color hem.",
+    "GI author span fitted to 61.75\u201379.95 effective units; final quantization winding checked. Runtime untested."
+  ],
+  "runtime_tested": false
+}

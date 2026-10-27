@@ -1,0 +1,16 @@
+{
+  "variant": "young-malon",
+  "bounds": [
+    -0.095,
+    0.768,
+    0.095,
+    0.9199999999999999
+  ],
+  "source_sha256": "3160899f85770bcd86f664ed73fd7d12277eea2905f42933e79be150e0d2cd3b",
+  "panels": [
+    "half",
+    "closed"
+  ],
+  "art_method": "Source face projection; imagegen eyelid edits; source pixels preserved outside feathered eye masks",
+  "neutral_revision": "two cheek specks only; eye artwork preserved"
+}

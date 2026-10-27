@@ -8,7 +8,8 @@
 // instance across the exe and every DLL, so the sync is plain reads/writes with no IPC. The launcher
 // drives it through the exports at the bottom (sync, its gate, and the per-seed gen-roll latch).
 #include <libultraship/libultraship.h> // CVar bridge
-#include <ship/Context.h>              // SaveConsoleVariablesNextFrame (persist the writes)
+#include "ComboExport.h"
+#include <ship/Context.h> // SaveConsoleVariablesNextFrame (persist the writes)
 #include <spdlog/spdlog.h>
 #include "ComboMenuModel.h" // cached MM_MenuApplyCVarChange resolver
 // RANDOMIZE_ON_RANDO_GEN_ONLY. Relative path on purpose: enhancementTypes.h is a zero-include enum
@@ -45,6 +46,7 @@ const CosmeticPair kPairs[] = {
     { "Consumable.Hearts", false, { "HUD.Hearts" } },
     { "Consumable.Magic", false, { "HUD.Magic" } },
     { "HUD.Minimap", false, { "HUD.Minimap" } },
+    { "World.BlackMarketShelves", false, { "World.BlackMarketShelves" } },
     // Deliberate: OOT's Kokiri tunic drives all four MM forms. OOT's Goron/Zora tunic rolls are
     // equipment colors with no MM equivalent, so they are intentionally not mirrored.
     { "Link.KokiriTunic", false, { "Player.HumanTunic", "Player.DekuTunic", "Player.GoronTunic", "Player.ZoraTunic" } },
@@ -57,6 +59,35 @@ const CosmeticPair kPairs[] = {
     { "Arrows.IceSecondary", true, { "Effects.IceArrowSec" } },
     { "Arrows.LightPrimary", false, { "Effects.LightArrowPrim" } },
     { "Arrows.LightSecondary", true, { "Effects.LightArrowSec" } },
+    // The added spell and Din equipment palettes participate in the existing opt-in generation sync.
+    { "Custom.DinFireShieldCore", false, { "Custom.DinFireShieldCore" } },
+    { "Custom.DinFireShieldOuter", false, { "Custom.DinFireShieldOuter" } },
+    { "Custom.DinFireSwordCore", false, { "Custom.DinFireSwordCore" } },
+    { "Custom.DinFireSwordOuter", false, { "Custom.DinFireSwordOuter" } },
+    { "Arrows.MedallionFirePrimary", false, { "Arrows.MedallionFirePrimary" } },
+    { "Arrows.MedallionFireSecondary", false, { "Arrows.MedallionFireSecondary" } },
+    { "Arrows.MedallionWaterPrimary", false, { "Arrows.MedallionWaterPrimary" } },
+    { "Arrows.MedallionWaterSecondary", false, { "Arrows.MedallionWaterSecondary" } },
+    { "Arrows.MedallionForestPrimary", false, { "Arrows.MedallionForestPrimary" } },
+    { "Arrows.MedallionForestSecondary", false, { "Arrows.MedallionForestSecondary" } },
+    { "Arrows.MedallionShadowPrimary", false, { "Arrows.MedallionShadowPrimary" } },
+    { "Arrows.MedallionShadowSecondary", false, { "Arrows.MedallionShadowSecondary" } },
+    { "Arrows.MedallionLightPrimary", false, { "Arrows.MedallionLightPrimary" } },
+    { "Arrows.MedallionLightSecondary", false, { "Arrows.MedallionLightSecondary" } },
+    { "Arrows.MedallionSpiritPrimary", false, { "Arrows.MedallionSpiritPrimary" } },
+    { "Arrows.MedallionSpiritSecondary", false, { "Arrows.MedallionSpiritSecondary" } },
+    { "Magic.DinsPrimary", false, { "Magic.DinsPrimary" } },
+    { "Magic.DinsSecondary", true, { "Magic.DinsSecondary" } },
+    { "Magic.FaroresPrimary", false, { "Magic.FaroresPrimary" } },
+    { "Magic.FaroresSecondary", true, { "Magic.FaroresSecondary" } },
+    { "Magic.NayrusPrimary", false, { "Magic.NayrusPrimary" } },
+    { "Magic.NayrusSecondary", true, { "Magic.NayrusSecondary" } },
+    { "Magic.MedallionFirePrimary", false, { "Magic.MedallionFirePrimary" } },
+    { "Magic.MedallionFireSecondary", false, { "Magic.MedallionFireSecondary" } },
+    { "Magic.MedallionWaterPrimary", false, { "Magic.MedallionWaterPrimary" } },
+    { "Magic.MedallionWaterSecondary", false, { "Magic.MedallionWaterSecondary" } },
+    { "Magic.MedallionForestPrimary", false, { "Magic.MedallionForestPrimary" } },
+    { "Magic.MedallionForestSecondary", false, { "Magic.MedallionForestSecondary" } },
     // The Primaries are advanced, but OOT derives them from the (non-advanced) Secondary roll, so both
     // sides of each pair are populated even for default users.
     { "SpinAttack.Level1Primary", true, { "Effects.SpinSlashCharge" } },
@@ -67,6 +98,7 @@ const CosmeticPair kPairs[] = {
     { "Trails.KokiriSword", false, { "Trails.KokiriSwordTrail" } },
     { "Trails.Stick", true, { "Trails.DekuStickTrail" } },
     { "Trails.Boomerang", true, { "Trails.ZoraBoomerangTrail" } },
+    { "Trails.ZoraFinTrail", false, { "Trails.ZoraFinTrail" } },
 };
 
 // MM's live apply (ShipInit re-run). ComboMenuModel already caches it and retries until 2ship.dll
@@ -145,7 +177,7 @@ bool AnyOotGenRollEnabled() {
 
 // Gate: the combo toggle plus BOTH games' randomize-on-generation options. The File-Load randomize
 // modes deliberately don't count — they re-roll OOT after the sync and would drift the games apart.
-extern "C" __declspec(dllexport) int ComboUI_CosmeticsSyncGateEnabled(void) {
+extern "C" COMBO_EXPORT int ComboUI_CosmeticsSyncGateEnabled(void) {
     if (CVarGetInteger("gCombo.Rando.SyncCosmetics", 0) != 1) {
         return 0;
     }
@@ -155,7 +187,7 @@ extern "C" __declspec(dllexport) int ComboUI_CosmeticsSyncGateEnabled(void) {
     return CVarGetInteger("gCosmetics.RandomizeOnSeedGen", 0) == 1 ? 1 : 0;
 }
 
-extern "C" __declspec(dllexport) void ComboUI_SyncRandomizedCosmetics(void) {
+extern "C" COMBO_EXPORT void ComboUI_SyncRandomizedCosmetics(void) {
     if (!ComboUI_CosmeticsSyncGateEnabled()) {
         return;
     }
@@ -195,7 +227,7 @@ extern "C" __declspec(dllexport) void ComboUI_SyncRandomizedCosmetics(void) {
 // else the silent auto-load on every boot would re-roll over the user's manual cosmetic edits.
 // Returns 1 (and claims the seed) only when this seed is not among the last kGenRollSeedsKept claimed
 // and some subscriber is actually enabled to roll. Hex strings, not int CVars: the int store is 32-bit.
-extern "C" __declspec(dllexport) int ComboUI_ClaimGenRollSeed(unsigned long long seed) {
+extern "C" COMBO_EXPORT int ComboUI_ClaimGenRollSeed(unsigned long long seed) {
     // Claiming with every option off would burn the seed, so enabling them mid-seed would do nothing.
     if (!AnyOotGenRollEnabled()) {
         return 0;

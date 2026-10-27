@@ -1,0 +1,545 @@
+{
+  "status": "Asset publication complete; source/build-preparation verified candidate. Configured gameplay acceptance pending.",
+  "original_recovery_commit": "2a2a82233f7b1aeafbdcc8bcc27c605e07a97d89",
+  "textures_expected": 11,
+  "completed": [
+    {
+      "path": "tools/black_market/assets/interior/bronze.png",
+      "sha": "56ba6d036110f7a86823bafddc0ccd471f57ec85",
+      "bytes": 482566
+    },
+    {
+      "path": "tools/black_market/assets/interior/timber.png",
+      "sha": "2425e9fbb5c3a7e563f6b1f145c8fe945f3c107d",
+      "bytes": 364669
+    },
+    {
+      "path": "tools/black_market/assets/interior/slate.png",
+      "sha": "46a36b78364d03735673ef77c100e047ca52725e",
+      "bytes": 452068
+    },
+    {
+      "path": "tools/black_market/assets/interior/plaster.png",
+      "sha": "6c2b7e8cc521b4a0396f1bec728dbfa4927cf7d2",
+      "bytes": 413592
+    },
+    {
+      "path": "tools/black_market/assets/interior/ceramic.png",
+      "sha": "15597c72dc851e2e3db1ab1963c345e5e57f0e1c",
+      "bytes": 516208
+    },
+    {
+      "path": "tools/black_market/assets/interior/wicker.png",
+      "sha": "cffc3febdd98464da4952e4f0dee7c2cb2cffcc7",
+      "bytes": 446168
+    },
+    {
+      "path": "tools/black_market/assets/interior/celestial.png",
+      "sha": "e7043d0cd9ff49dfc61d7bfc4e44d1ed9dc725a0",
+      "bytes": 523563
+    },
+    {
+      "path": "tools/black_market/assets/interior/herbs.png",
+      "sha": "a6fad616790a4244213f19cb6199f6687a75f1f1",
+      "bytes": 628417
+    },
+    {
+      "path": "tools/black_market/assets/interior/curios.png",
+      "sha": "bcf1219a13fb6ce693237f48e391fa25c2f524d7",
+      "bytes": 513861
+    },
+    {
+      "path": "tools/black_market/assets/interior/liquid.png",
+      "sha": "1ea1ababffcb1a11b089d0e10549ec6c570717e2",
+      "bytes": 457982
+    },
+    {
+      "path": "tools/black_market/assets/interior/cloth.png",
+      "sha": "f13ae028fcd2f899b531880083011185d22530dc",
+      "bytes": 532268
+    }
+  ],
+  "source_format": "512x512 RGB PNGs; lossless PNG compression after the existing LANCZOS runtime-size conversion. Original built-in imagegen outputs are preserved separately.",
+  "publication": "Sequential per-file uploads. Verify every returned Git blob SHA before advancing. Runtime bundles will use small individually verified compressed parts.",
+  "preservation": "Geometry, UV layout, actor behavior, render routing and native title/door code remain unchanged.",
+  "remaining": [
+    "Configured native/Alt gameplay and appearance smoke tests",
+    "Full executable linking not run"
+  ],
+  "bundle_parts_expected": [
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.001.b64",
+      "bytes": 131072,
+      "sha": "df9bbad1c833a0efb60d8a8cdf6713d40b892169"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.002.b64",
+      "bytes": 131072,
+      "sha": "4e5125ae15b07caf5a97a7816adf85db197234b8"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.003.b64",
+      "bytes": 131072,
+      "sha": "b047327d82d88b93ec226964ff4860d54dea5c02"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.004.b64",
+      "bytes": 131072,
+      "sha": "3d17db734f912e1349ac78c0b71081814c54bc80"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.005.b64",
+      "bytes": 131072,
+      "sha": "5688f0278041c4632efeddac880f10f80fb381ea"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.006.b64",
+      "bytes": 131072,
+      "sha": "65c0b3c0ed2de31c9f4f71efd142c10292cdca32"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.007.b64",
+      "bytes": 131072,
+      "sha": "0baa86e84fcaab56ee0ff0d49a9f18f7fe3ac2fd"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.008.b64",
+      "bytes": 131072,
+      "sha": "e8ea18e45c230e7cff53fe79e13fafdca86bf9f7"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.009.b64",
+      "bytes": 131072,
+      "sha": "b451ff6a465626521e2e6dbdf0a0f5118aac3e54"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.010.b64",
+      "bytes": 131072,
+      "sha": "71b3bea43b0ac87269598b8c0b20d5a9d0a09f12"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.011.b64",
+      "bytes": 131072,
+      "sha": "62c08a23bf42c39667b63d610823df3399873778"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.012.b64",
+      "bytes": 131072,
+      "sha": "9c085b62d0bee54e19ce39c07fe0c14cfa9e4528"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.013.b64",
+      "bytes": 131072,
+      "sha": "14741917fa0bc66dbd8573c456c1eb651ecc5bb9"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.014.b64",
+      "bytes": 131072,
+      "sha": "b6d56a4124df3128cb1b8595ef214ae1f5304cb7"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.015.b64",
+      "bytes": 131072,
+      "sha": "663d9419a6181e7f586f002ab80555758d714a06"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.016.b64",
+      "bytes": 131072,
+      "sha": "934524f31732f84ab484ecfee2034380858d570c"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.017.b64",
+      "bytes": 131072,
+      "sha": "2e62dfb63d2aba4cc8738fd7d5cbc1d73984a36c"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.018.b64",
+      "bytes": 131072,
+      "sha": "0b9fab54a8789ebc7677530d51e745dbdf6d6f17"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.019.b64",
+      "bytes": 131072,
+      "sha": "dbf5c6ce863c85128dda29e6689145d4ccdedfd7"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.020.b64",
+      "bytes": 131072,
+      "sha": "b59172f3405e6a84fbb3aa960bc0222628009cba"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.021.b64",
+      "bytes": 131072,
+      "sha": "f51c33f872e28fdcb2757af4e3ce7f44c7209b4e"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.022.b64",
+      "bytes": 131072,
+      "sha": "491dfa678adaec010632cafa59337de72bb8200b"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.023.b64",
+      "bytes": 131072,
+      "sha": "4f55e02f0b9e0ca9a847c6a934e022992d3de724"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.024.b64",
+      "bytes": 131072,
+      "sha": "3c57431a5bc1784770a7f0ed56c09a69a29d6845"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.025.b64",
+      "bytes": 131072,
+      "sha": "dace66daf46fedabc69941731b4eece6ab52defc"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.026.b64",
+      "bytes": 131072,
+      "sha": "704e77482b5295b72256ef9230772bd21a5e74f8"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.027.b64",
+      "bytes": 131072,
+      "sha": "e8485a2fba482376225e60782ce0aed113bf5415"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.028.b64",
+      "bytes": 131072,
+      "sha": "cc72f21c919bef68cbd8c2fd564d8e8ee7eea1b3"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.029.b64",
+      "bytes": 131072,
+      "sha": "148b6c327715e68a1f2b8f39259ae2e929c95fa7"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.030.b64",
+      "bytes": 131072,
+      "sha": "be8049b64268dbeced5e03b5352266aa11cc8e6b"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.031.b64",
+      "bytes": 131072,
+      "sha": "6317d0bba6dfbd5401f1a3ded0a1f6716a8d6af6"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.032.b64",
+      "bytes": 131072,
+      "sha": "ec173f3ba9215031aebc6f770183f9bf8296c318"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.033.b64",
+      "bytes": 131072,
+      "sha": "674ea712fb579b6a543ff2f68e1c2049cd8d6e7a"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.034.b64",
+      "bytes": 131072,
+      "sha": "6c23dfe2863bf2b3f38501fef8f5a1759baed647"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.035.b64",
+      "bytes": 131072,
+      "sha": "4b3615ac2daea3d6f3d90d1bb8be2849f7997ec4"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.036.b64",
+      "bytes": 131072,
+      "sha": "9d337db9eb47c5d121477b8abef47bf0769a44ed"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.037.b64",
+      "bytes": 131072,
+      "sha": "ea6ab7efbc8430394a29a50c4a76825f0abfb609"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.038.b64",
+      "bytes": 131072,
+      "sha": "82f5a6542d1ff2153177e03a7240c3ef12fc0eed"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.039.b64",
+      "bytes": 131072,
+      "sha": "4d339c63b7a66eb69f1dcd5560d8c4ec52b83ee0"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.040.b64",
+      "bytes": 131072,
+      "sha": "84bd1255315eaf117bccf866c28a015250f460fa"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.041.b64",
+      "bytes": 131072,
+      "sha": "d434edd4b7b02464fc500c97d20d8c508e3004f9"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.042.b64",
+      "bytes": 131072,
+      "sha": "3cc4fcdd4a468d4ccf06e97a392bc60c4599d245"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.043.b64",
+      "bytes": 131072,
+      "sha": "7b77803b9b4d0d8302affca03416eb75b38328fa"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.044.b64",
+      "bytes": 131072,
+      "sha": "e6ab38c0bcdb95da30516323f7c9a1700c485b3c"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.045.b64",
+      "bytes": 131072,
+      "sha": "96ee6dc9ddde7decf25721b7390358abdc514085"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.046.b64",
+      "bytes": 131072,
+      "sha": "3d9ea450207a07c3945be87eca723e1556be07dd"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.047.b64",
+      "bytes": 131072,
+      "sha": "f6096873608662c40880a7c68a50e15a97085391"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.048.b64",
+      "bytes": 131072,
+      "sha": "6b17141a98ec29fbe210b80da9ca0924d1578fe0"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.049.b64",
+      "bytes": 131072,
+      "sha": "0d4799db66047fd9a325c6986570eba464269554"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.050.b64",
+      "bytes": 131072,
+      "sha": "0bdd262ee601335add32105287dccf974a1031b6"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.051.b64",
+      "bytes": 131072,
+      "sha": "7137f0a1ce457ed60d5e8e0c3d9bf7e8f769ecfc"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.052.b64",
+      "bytes": 131072,
+      "sha": "4a943bb5a46a8a8cd8b983101ade0c912c081288"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.053.b64",
+      "bytes": 131072,
+      "sha": "b5d70d993920071fdff86f60230a7686be4c8def"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.054.b64",
+      "bytes": 131072,
+      "sha": "c5a831829416cbabd6fe8084a8209949e357eae7"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.055.b64",
+      "bytes": 131072,
+      "sha": "80230e4d6d04180c695ad11dced0046c61db6642"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.056.b64",
+      "bytes": 131072,
+      "sha": "efae7f4ebe118d6616d28b82311ff880329d36b0"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.057.b64",
+      "bytes": 131072,
+      "sha": "e4d2301def3d50d9969eb593ff0463306529b4c5"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.058.b64",
+      "bytes": 131072,
+      "sha": "ff32cdff86f6cf5ddfd6bf6edf148725f912cfed"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.059.b64",
+      "bytes": 131072,
+      "sha": "889d1bece5520a4f2a61502fee95cae53640ff0e"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.060.b64",
+      "bytes": 131072,
+      "sha": "ec6ffbedab821a7002e3adb3d10ba5cbba3eeb1c"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.061.b64",
+      "bytes": 131072,
+      "sha": "ccabc73167e344b7a12550a4df249f3b20509857"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.062.b64",
+      "bytes": 131072,
+      "sha": "0f69ab62efbb26f4295bae226ea440ffdcf39fe6"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.063.b64",
+      "bytes": 131072,
+      "sha": "20319e041aa9670c37d71c43cb920022f15cf04b"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.064.b64",
+      "bytes": 131072,
+      "sha": "77de5647692ae7e114b35cbae0cceab37b54b67a"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.065.b64",
+      "bytes": 131072,
+      "sha": "5d61c703037ef82af753847f0bcaeff1612cb2d1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.066.b64",
+      "bytes": 131072,
+      "sha": "72e687dc098bbcf58ec0be8f84ea82baae3df3b2"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.067.b64",
+      "bytes": 131072,
+      "sha": "37c7377d46cbae5c12b73350339a990fc7e2ae4d"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.068.b64",
+      "bytes": 131072,
+      "sha": "1140840685e917a968ab045a5bcfbc67ce6d1b0e"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.069.b64",
+      "bytes": 131072,
+      "sha": "d5b44c432cc9f360cf2f9f684f4c23a236efeb72"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.070.b64",
+      "bytes": 131072,
+      "sha": "32b09518398a64134f01d1fc72dd0596acabdc3d"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.071.b64",
+      "bytes": 131072,
+      "sha": "1f216fe0ca4f2f35d9b2dea22c7ffe38927db64b"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.072.b64",
+      "bytes": 131072,
+      "sha": "cfe7f7e33bce4626d7c91ade99c78b6c2f24811f"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.073.b64",
+      "bytes": 131072,
+      "sha": "1b246c67168a84e8fc7702f271b4f9bb98fb4695"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.074.b64",
+      "bytes": 131072,
+      "sha": "789956e4271dfcbe013eb43e2fc2965c1ef514ea"
+    },
+    {
+      "path": "tools/black_market/assets/interior/props.zlib.075.b64",
+      "bytes": 4296,
+      "sha": "0f973f7a794ad35038e3a53f7eee0d560801f57c"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.001.b64",
+      "bytes": 131072,
+      "sha": "7a31b1f831df0977961a78050c8c9619bf647819"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.002.b64",
+      "bytes": 131072,
+      "sha": "64e22f3a36bafa4a799e29f5276e9fa4b3aef02d"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.003.b64",
+      "bytes": 131072,
+      "sha": "6842e3d0aa397e8886bbb683345147e5e7957bd1"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.004.b64",
+      "bytes": 131072,
+      "sha": "fc8c55afcbb60860ddf815655a791126b1469e96"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.005.b64",
+      "bytes": 131072,
+      "sha": "27b239ff22607bdb3d09c37bff786ae8e5d21ba0"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.006.b64",
+      "bytes": 131072,
+      "sha": "7ad4dbe943c929c4af0646bec9b1153a451473f7"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.007.b64",
+      "bytes": 131072,
+      "sha": "0ff1954be48feb05e9ea16d59bb3700ebb056139"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.008.b64",
+      "bytes": 131072,
+      "sha": "92e1c44cda742e340985409ba1ee3002a1ee7c65"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.009.b64",
+      "bytes": 131072,
+      "sha": "b7aed8754738e5febb26724fe6f5daf8dc4040ef"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.010.b64",
+      "bytes": 131072,
+      "sha": "93de09eaceff4e7e55a4cffb8db0d35240619cc9"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.011.b64",
+      "bytes": 131072,
+      "sha": "fdaf8162e3ee57accbb285725d9a0c635910216b"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.012.b64",
+      "bytes": 131072,
+      "sha": "3f5f14d2e4306de7353d2af2ca9146f581ee97c8"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.013.b64",
+      "bytes": 131072,
+      "sha": "3d126dedfed0bf1381ae95b05cf50fa3236fcce5"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.014.b64",
+      "bytes": 131072,
+      "sha": "36d2564cbdf28c7dcb6b323e33d0c06476b40969"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.015.b64",
+      "bytes": 131072,
+      "sha": "a7cb2dd3949e66b0591b0d16a52a6f767d74364d"
+    },
+    {
+      "path": "tools/black_market/assets/interior/textures.zlib.016.b64",
+      "bytes": 41380,
+      "sha": "c861548b8b8216f2db32fe3e22c60040c98267ae"
+    }
+  ],
+  "bundle_parts_uploaded": 91,
+  "validation": {
+    "asset_tests": 28,
+    "result": "pass",
+    "command": "python3 -B -m unittest discover -s tests/native_market -p 'test_*.py'",
+    "real_cmake_asset_target": "pass",
+    "prepared_resources_per_host": 141,
+    "stdlib_only_preparation": "pass",
+    "deterministic_rebake": "all 91 parts and both manifests unchanged",
+    "protected_market_functions_and_constants": "unchanged",
+    "configured_gameplay": "untested",
+    "full_executable": "not built"
+  },
+  "asset_sizes": {
+    "original_pending_bytes": 48556154,
+    "reconstructed_png_bytes": 5331362,
+    "packed_source_bytes": 11711084,
+    "max_packed_file_bytes": 131072
+  }
+}

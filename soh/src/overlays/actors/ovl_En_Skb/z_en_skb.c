@@ -2,7 +2,7 @@
 #include "overlays/actors/ovl_En_Encount1/z_en_encount1.h"
 #include "objects/object_skb/object_skb.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -187,8 +187,6 @@ void EnSkb_Destroy(Actor* thisx, PlayState* play) {
         }
     }
     Collider_DestroyJntSph(play, &this->collider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void func_80AFCD60(EnSkb* this) {
@@ -425,6 +423,13 @@ void func_80AFD7B4(EnSkb* this, PlayState* play) {
 
 void func_80AFD880(EnSkb* this, PlayState* play) {
     if (BodyBreak_SpawnParts(&this->actor, &this->bodyBreak, play, 1)) {
+        // Captain's Hat sentinel: guaranteed 50 rupee drop
+        if (this->actor.home.rot.z == 0x7FFF) {
+            Item_DropCollectible(play, &this->actor.world.pos, ITEM00_RUPEE_PURPLE);
+            this->breakFlags |= 8;
+            Actor_Kill(&this->actor);
+            return;
+        }
         if (this->actor.scale.x == 0.01f) {
             Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0x10);
         } else if (this->actor.scale.x <= 0.015f) {

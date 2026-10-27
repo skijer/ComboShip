@@ -31,13 +31,13 @@
 #define ARRAY_COUNT_2D(arr) (s32)(sizeof(arr) / sizeof(arr[0][0]))
 
 #define PHYSICAL_TO_VIRTUAL(addr) (void*)((uintptr_t)(addr) + 0x80000000)
-#define VIRTUAL_TO_PHYSICAL(addr) (uintptr_t)((u8*)(addr) - 0x80000000)
+#define VIRTUAL_TO_PHYSICAL(addr) (uintptr_t)((u8*)(addr)-0x80000000)
 // Upstream TODO: Document reasoning for change
 //#define SEGMENTED_TO_VIRTUAL(addr) PHYSICAL_TO_VIRTUAL(gSegments[SEGMENT_NUMBER(addr)] + SEGMENT_OFFSET(addr))
 #define SEGMENTED_TO_VIRTUAL(addr) addr
 
 #ifndef SQ
-#define SQ(x) ((x)*(x))
+#define SQ(x) ((x) * (x))
 #endif
 #ifndef ABS
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
@@ -47,7 +47,7 @@
 #define CLAMP_MAX(x, max) ((x) > (max) ? (max) : (x))
 #define CLAMP_MIN(x, min) ((x) < (min) ? (min) : (x))
 
-#define RGBA8(r, g, b, a) ((((r) & 0xFF) << 24) | (((g) & 0xFF) << 16) | (((b) & 0xFF) << 8) | (((a) & 0xFF) << 0))
+#define RGBA8(r, g, b, a) ((((r)&0xFF) << 24) | (((g)&0xFF) << 16) | (((b)&0xFF) << 8) | (((a)&0xFF) << 0))
 
 #define GET_PLAYER(play) ((Player*)(play)->actorCtx.actorLists[ACTORCAT_PLAYER].head)
 
@@ -60,7 +60,7 @@
 #define YEARS_ADULT 17
 #define LINK_AGE_IN_YEARS (!LINK_IS_ADULT ? YEARS_CHILD : YEARS_ADULT)
 
-#define CLOCK_TIME(hr, min) ((s32)(((hr) * 60 + (min)) * (f32)0x10000 / (24 * 60) + 0.5f))
+#define CLOCK_TIME(hr, min) ((s32)(((hr)*60 + (min)) * (f32)0x10000 / (24 * 60) + 0.5f))
 
 #define IS_DAY (gSaveContext.nightFlag == 0)
 #define IS_NIGHT (gSaveContext.nightFlag == 1)
@@ -75,12 +75,12 @@
 #define OWNED_EQUIP_FLAG(equip, value) (gBitFlags[value] << gEquipShifts[equip])
 #define OWNED_EQUIP_FLAG_ALT(equip, value) ((1 << (value)) << gEquipShifts[equip])
 #define CHECK_OWNED_EQUIP(equip, value) (OWNED_EQUIP_FLAG(equip, value) & gSaveContext.inventory.equipment)
-#define CHECK_OWNED_EQUIP_ALT(equip, value) (gBitFlags[(value) + (equip) * 4] & gSaveContext.inventory.equipment)
+#define CHECK_OWNED_EQUIP_ALT(equip, value) (gBitFlags[(value) + (equip)*4] & gSaveContext.inventory.equipment)
 
 #define SWORD_EQUIP_TO_PLAYER(swordEquip) (swordEquip)
 #define SHIELD_EQUIP_TO_PLAYER(shieldEquip) (shieldEquip)
-#define TUNIC_EQUIP_TO_PLAYER(tunicEquip) ((tunicEquip) - 1)
-#define BOOTS_EQUIP_TO_PLAYER(bootsEquip) ((bootsEquip) - 1)
+#define TUNIC_EQUIP_TO_PLAYER(tunicEquip) ((tunicEquip)-1)
+#define BOOTS_EQUIP_TO_PLAYER(bootsEquip) ((bootsEquip)-1)
 
 #define CUR_UPG_VALUE(upg) ((s32)(gSaveContext.inventory.upgrades & gUpgradeMasks[upg]) >> gUpgradeShifts[upg])
 #define CAPACITY(upg, value) gUpgradeCapacities[upg][value]
@@ -90,37 +90,40 @@
 #define CHECK_DUNGEON_ITEM(item, dungeonIndex) (gSaveContext.inventory.dungeonItems[dungeonIndex] & gBitFlags[item])
 
 #define GET_GS_FLAGS(index) \
-    ((gSaveContext.gsFlags[(index) >> 2] & gGsFlagsMasks[(index) & 3]) >> gGsFlagsShifts[(index) & 3])
-#define SET_GS_FLAGS(index, value) \
-    (gSaveContext.gsFlags[(index) >> 2] |= (value) << gGsFlagsShifts[(index) & 3])
+    ((gSaveContext.gsFlags[(index) >> 2] & gGsFlagsMasks[(index)&3]) >> gGsFlagsShifts[(index)&3])
+#define SET_GS_FLAGS(index, value) (gSaveContext.gsFlags[(index) >> 2] |= (value) << gGsFlagsShifts[(index)&3])
 
 #define HIGH_SCORE(score) (gSaveContext.highScores[score])
 
-#define GET_EVENTCHKINF(flag) (gSaveContext.eventChkInf[(flag) >> 4] & (1 << ((flag) & 0xF)))
-#define SET_EVENTCHKINF(flag) (gSaveContext.eventChkInf[(flag) >> 4] |= (1 << ((flag) & 0xF)))
-#define CLEAR_EVENTCHKINF(flag) (gSaveContext.eventChkInf[(flag) >> 4] &= ~(1 << ((flag) & 0xF)))
+#define GET_EVENTCHKINF(flag) (gSaveContext.eventChkInf[(flag) >> 4] & (1 << ((flag)&0xF)))
+#define SET_EVENTCHKINF(flag) (gSaveContext.eventChkInf[(flag) >> 4] |= (1 << ((flag)&0xF)))
+#define CLEAR_EVENTCHKINF(flag) (gSaveContext.eventChkInf[(flag) >> 4] &= ~(1 << ((flag)&0xF)))
 
-#define GET_ITEMGETINF(flag) (gSaveContext.itemGetInf[(flag) >> 4] & (1 << ((flag) & 0xF)))
-#define SET_ITEMGETINF(flag) (gSaveContext.itemGetInf[(flag) >> 4] |= (1 << ((flag) & 0xF)))
-#define CLEAR_ITEMGETINF(flag) (gSaveContext.itemGetInf[(flag) >> 4] &= ~(1 << ((flag) & 0xF)))
+#define GET_ITEMGETINF(flag) (gSaveContext.itemGetInf[(flag) >> 4] & (1 << ((flag)&0xF)))
+#define SET_ITEMGETINF(flag) (gSaveContext.itemGetInf[(flag) >> 4] |= (1 << ((flag)&0xF)))
+#define CLEAR_ITEMGETINF(flag) (gSaveContext.itemGetInf[(flag) >> 4] &= ~(1 << ((flag)&0xF)))
 
-#define GET_INFTABLE(flag) (gSaveContext.infTable[(flag) >> 4] & (1 << ((flag) & 0xF)))
-#define SET_INFTABLE(flag) (gSaveContext.infTable[(flag) >> 4] |= (1 << ((flag) & 0xF)))
-#define CLEAR_INFTABLE(flag) (gSaveContext.infTable[(flag) >> 4] &= ~(1 << ((flag) & 0xF)))
+#define GET_INFTABLE(flag) (gSaveContext.infTable[(flag) >> 4] & (1 << ((flag)&0xF)))
+#define SET_INFTABLE(flag) (gSaveContext.infTable[(flag) >> 4] |= (1 << ((flag)&0xF)))
+#define CLEAR_INFTABLE(flag) (gSaveContext.infTable[(flag) >> 4] &= ~(1 << ((flag)&0xF)))
 
-#define GET_EVENTINF(flag) (gSaveContext.eventInf[(flag) >> 4] & (1 << ((flag) & 0xF)))
-#define SET_EVENTINF(flag) (gSaveContext.eventInf[(flag) >> 4] |= (1 << ((flag) & 0xF)))
-#define CLEAR_EVENTINF(flag) (gSaveContext.eventInf[(flag) >> 4] &= ~(1 << ((flag) & 0xF)))
+#define GET_EVENTINF(flag) (gSaveContext.eventInf[(flag) >> 4] & (1 << ((flag)&0xF)))
+#define SET_EVENTINF(flag) (gSaveContext.eventInf[(flag) >> 4] |= (1 << ((flag)&0xF)))
+#define CLEAR_EVENTINF(flag) (gSaveContext.eventInf[(flag) >> 4] &= ~(1 << ((flag)&0xF)))
 
-#define B_BTN_ITEM ((gSaveContext.buttonStatus[0] == ITEM_NONE)                    \
-                        ? ITEM_NONE                                                \
-                        : (gSaveContext.equips.buttonItems[0] == ITEM_SWORD_KNIFE) \
-                            ? ITEM_SWORD_BGS                                       \
-                            : gSaveContext.equips.buttonItems[0])
+#define B_BTN_ITEM                                                               \
+    ((gSaveContext.buttonStatus[0] == ITEM_NONE)                ? ITEM_NONE      \
+     : (gSaveContext.equips.buttonItems[0] == ITEM_SWORD_KNIFE) ? ITEM_SWORD_BGS \
+                                                                : gSaveContext.equips.buttonItems[0])
 
-#define C_BTN_ITEM(button) ((gSaveContext.buttonStatus[(button) + 1] != BTN_DISABLED) \
-                                ? gSaveContext.equips.buttonItems[(button) + 1]       \
-                                : ITEM_NONE)
+// A native zero is a stick only when its C/D slot is assigned. Keep raw custom
+// markers in the native engine boundary; full u16 IDs belong to ExtButton_GetItem.
+#define C_BTN_ITEM(button)                                            \
+    ((gSaveContext.buttonStatus[(button) + 1] != BTN_DISABLED &&      \
+      (gSaveContext.equips.buttonItems[(button) + 1] != ITEM_STICK || \
+       gSaveContext.equips.cButtonSlots[(button)] != SLOT_NONE))      \
+         ? gSaveContext.equips.buttonItems[(button) + 1]              \
+         : ITEM_NONE)
 
 #define CHECK_BTN_ALL(state, combo) (~((state) | ~(combo)) == 0)
 #define CHECK_BTN_ANY(state, combo) (((state) & (combo)) != 0)
@@ -130,9 +133,9 @@
 // #region SOH [General]
 // Logging changes
 #ifndef NDEBUG
-#define LOG(exp, value, format)         \
+#define LOG(exp, value, format)                     \
     do {                                            \
-        LogUtils_LogThreadId(__FILE__, __FILE__);           \
+        LogUtils_LogThreadId(__FILE__, __FILE__);   \
         osSyncPrintf(exp " = " format "\n", value); \
     } while (0)
 #else
@@ -159,8 +162,8 @@
 #ifndef NDEBUG
 #define LOG_POINTER(val, max, ptr, name) LogUtils_LogPointer(val, max, ptr, name, __FILE__, __LINE__)
 #define LOG_CHECK_BOUNDARY(name, value, unk) LogUtils_CheckBoundary(name, value, unk, __FILE__, __LINE__)
-#define LOG_CHECK_NULL_POINTER(exp, ptr) LogUtils_CheckNullPointer(exp, ptr,__FILE__, __LINE__)
-#define LOG_CHECK_VALID_POINTER(exp, ptr) LogUtils_CheckValidPointer(exp, ptr,__FILE__, __LINE__)
+#define LOG_CHECK_NULL_POINTER(exp, ptr) LogUtils_CheckNullPointer(exp, ptr, __FILE__, __LINE__)
+#define LOG_CHECK_VALID_POINTER(exp, ptr) LogUtils_CheckValidPointer(exp, ptr, __FILE__, __LINE__)
 #define LOG_THREAD_ID() LogUtils_LogThreadId(__FILE__, __LINE__)
 #define LOG_HUNGUP_THREAD() LogUtils_HungupThread(__FILE__, __LINE__)
 #else
@@ -172,7 +175,6 @@
 #define LOG_HUNGUP_THREAD() ((void)0)
 #endif
 // #endregion
-
 
 #define SET_NEXT_GAMESTATE(curState, newInit, newStruct) \
     do {                                                 \
@@ -193,48 +195,52 @@
 
 extern GraphicsContext* __gfxCtx;
 
-#define WORK_DISP          __gfxCtx->work.p
-#define POLY_OPA_DISP      __gfxCtx->polyOpa.p
-#define POLY_XLU_DISP      __gfxCtx->polyXlu.p
-#define OVERLAY_DISP       __gfxCtx->overlay.p
+#define WORK_DISP __gfxCtx->work.p
+#define POLY_OPA_DISP __gfxCtx->polyOpa.p
+#define POLY_XLU_DISP __gfxCtx->polyXlu.p
+#define OVERLAY_DISP __gfxCtx->overlay.p
 
 // __gfxCtx shouldn't be used directly.
 // Use the DISP macros defined above when writing to display buffers.
 // #region SOH [General]
 // Augmented to provide debug information in debug build and support interpolation
 #ifndef NDEBUG
-#define OPEN_DISPS(gfxCtx) \
-    { \
+#define OPEN_DISPS(gfxCtx)                                             \
+    {                                                                  \
         void FrameInterpolation_RecordOpenChild(const void* a, int b); \
-        FrameInterpolation_RecordOpenChild(__FILE__, __LINE__); \
-        GraphicsContext* __gfxCtx; \
-        Gfx* dispRefs[4]; \
-        __gfxCtx = gfxCtx; \
-        (void)__gfxCtx; \
+        FrameInterpolation_RecordOpenChild(__FILE__, __LINE__);        \
+        GraphicsContext* __gfxCtx;                                     \
+        Gfx* dispRefs[4];                                              \
+        __gfxCtx = gfxCtx;                                             \
+        (void)__gfxCtx;                                                \
         Graph_OpenDisps(dispRefs, gfxCtx, __FILE__, __LINE__)
 #else
-#define OPEN_DISPS(gfxCtx) \
-    { \
+#define OPEN_DISPS(gfxCtx)                                             \
+    {                                                                  \
         void FrameInterpolation_RecordOpenChild(const void* a, int b); \
-        FrameInterpolation_RecordOpenChild(__FILE__, __LINE__); \
-        GraphicsContext* __gfxCtx; \
-        __gfxCtx = gfxCtx; \
+        FrameInterpolation_RecordOpenChild(__FILE__, __LINE__);        \
+        GraphicsContext* __gfxCtx;                                     \
+        __gfxCtx = gfxCtx;                                             \
         (void)__gfxCtx;
 #endif
 
 #ifndef NDEBUG
-#define CLOSE_DISPS(gfxCtx) \
-    {void FrameInterpolation_RecordCloseChild(void); \
-    FrameInterpolation_RecordCloseChild();} \
+#define CLOSE_DISPS(gfxCtx)                                 \
+    {                                                       \
+        void FrameInterpolation_RecordCloseChild(void);     \
+        FrameInterpolation_RecordCloseChild();              \
+    }                                                       \
     Graph_CloseDisps(dispRefs, gfxCtx, __FILE__, __LINE__); \
-    } \
+    }                                                       \
     (void)0
 #else
-#define CLOSE_DISPS(gfxCtx) \
-    {void FrameInterpolation_RecordCloseChild(void); \
-    FrameInterpolation_RecordCloseChild();} \
-    (void)0; \
-    } \
+#define CLOSE_DISPS(gfxCtx)                             \
+    {                                                   \
+        void FrameInterpolation_RecordCloseChild(void); \
+        FrameInterpolation_RecordCloseChild();          \
+    }                                                   \
+    (void)0;                                            \
+    }                                                   \
     (void)0
 #endif
 // #endregion
@@ -250,9 +256,21 @@ extern GraphicsContext* __gfxCtx;
  * `cbnz` blue component of color vertex, or z component of normal vertex
  * `a` alpha
  */
-#define VTX(x,y,z,s,t,crnx,cgny,cbnz,a) { { { x, y, z }, 0, { s, t }, { crnx, cgny, cbnz, a } } }
+#define VTX(x, y, z, s, t, crnx, cgny, cbnz, a) \
+    {                                           \
+        {                                       \
+            { x, y, z }, 0, { s, t }, {         \
+                crnx, cgny, cbnz, a             \
+            }                                   \
+        }                                       \
+    }
 
-#define VTX_T(x,y,z,s,t,cr,cg,cb,a) { { x, y, z }, 0, { s, t }, { cr, cg, cb, a } }
+#define VTX_T(x, y, z, s, t, cr, cg, cb, a) \
+    {                                       \
+        { x, y, z }, 0, { s, t }, {         \
+            cr, cg, cb, a                   \
+        }                                   \
+    }
 
 #define gDPSetTileCustom(pkt, fmt, siz, width, height, pal, cms, cmt, masks, maskt, shifts, shiftt)                    \
     do {                                                                                                               \
@@ -268,7 +286,7 @@ extern GraphicsContext* __gfxCtx;
     } while (0)
 
 // #region SOH [General]
-#define OFFSETOF(structure, member) ((size_t)&(((structure*)0)->member))
+#define OFFSETOF(structure, member) ((size_t) & (((structure*)0)->member))
 
 #define MEDIAN3(a1, a2, a3)                                                    \
     (((a2) >= (a1)) ? (((a3) >= (a2)) ? (a2) : (((a1) >= (a3)) ? (a1) : (a3))) \
@@ -310,9 +328,12 @@ extern GraphicsContext* __gfxCtx;
 #define SYSTEM_ARENA_FREE(ptr, file, line) SystemArena_FreeDebug(ptr, __FILE__, __LINE__)
 // #endregion
 
-#define DPAD_ITEM(button) ((gSaveContext.buttonStatus[(button) + 5] != BTN_DISABLED) \
-                                ? gSaveContext.equips.buttonItems[(button) + 4]       \
-                                : ITEM_NONE)
+#define DPAD_ITEM(button)                                             \
+    ((gSaveContext.buttonStatus[(button) + 5] != BTN_DISABLED &&      \
+      (gSaveContext.equips.buttonItems[(button) + 4] != ITEM_STICK || \
+       gSaveContext.equips.cButtonSlots[(button) + 3] != SLOT_NONE))  \
+         ? gSaveContext.equips.buttonItems[(button) + 4]              \
+         : ITEM_NONE)
 // #endregion
 
 // #region SOH [Randomizer]
@@ -321,10 +342,10 @@ extern GraphicsContext* __gfxCtx;
 #define NUM_SCRUBS 46
 
 #ifdef __cplusplus
-#define DUNGEON_ITEMS_CAN_BE_OUTSIDE_DUNGEON(rsk) \
-    (OTRGlobals::Instance->gRandoContext->GetOption(rsk).IsNot(RO_DUNGEON_ITEM_LOC_STARTWITH) && \
-    OTRGlobals::Instance->gRandoContext->GetOption(rsk).IsNot(RO_DUNGEON_ITEM_LOC_VANILLA) && \
-    OTRGlobals::Instance->gRandoContext->GetOption(rsk).IsNot(RO_DUNGEON_ITEM_LOC_OWN_DUNGEON))
+#define DUNGEON_ITEMS_CAN_BE_OUTSIDE_DUNGEON(rsk)                 \
+    (RAND_GET_OPTION(rsk).IsNot(RO_DUNGEON_ITEM_LOC_STARTWITH) && \
+     RAND_GET_OPTION(rsk).IsNot(RO_DUNGEON_ITEM_LOC_VANILLA) &&   \
+     RAND_GET_OPTION(rsk).IsNot(RO_DUNGEON_ITEM_LOC_OWN_DUNGEON))
 #endif
 // #endregion
 

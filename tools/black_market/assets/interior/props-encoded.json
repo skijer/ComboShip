@@ -1,0 +1,489 @@
+{
+  "atlas_rects": {
+    "counter_atlas": {
+      "bronze": [
+        416,
+        184,
+        512,
+        512
+      ],
+      "ceramic": [
+        [
+          0,
+          0,
+          512,
+          174
+        ],
+        [
+          220,
+          272,
+          414,
+          414
+        ],
+        [
+          316,
+          174,
+          382,
+          272
+        ]
+      ],
+      "leather": [
+        188,
+        416,
+        412,
+        512
+      ]
+    },
+    "fittings_atlas": {
+      "ceramic": [
+        [
+          0,
+          332,
+          480,
+          512
+        ]
+      ],
+      "glass": [
+        0,
+        0,
+        320,
+        122
+      ]
+    },
+    "walltrim_atlas": {
+      "paper": [
+        0,
+        188,
+        250,
+        316
+      ],
+      "wicker": [
+        0,
+        318,
+        512,
+        512
+      ]
+    }
+  },
+  "authoring_pillow_version": "12.3.0",
+  "encoding": "base64 parts of one zlib stream; ordered 512x512 RGBA8 uploads",
+  "names": [
+    "ceramic",
+    "bronze",
+    "wicker",
+    "celestial",
+    "herbs",
+    "curios",
+    "liquid",
+    "cloth",
+    "counter_atlas",
+    "fittings_atlas",
+    "walltrim_atlas"
+  ],
+  "packed_sha256": "690ff7b8f18a992e36778c16bd0492f0fd0bb6dac6a6cab980afcaa1ffa65735",
+  "parts": [
+    {
+      "bytes": 98304,
+      "name": "props.zlib.001.b64",
+      "sha256": "e06de8ea5373625065c95aa0f66b466b88666d09f3eba87a012eff654a2bfcb4"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.002.b64",
+      "sha256": "c83fc26c7a76a4872ece31008b901b2de81fa0e8bd79c0769c2c3c02adfe9508"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.003.b64",
+      "sha256": "66bd45a67fe54a5e310de2b4054ef4b8b8b73e1a0e998cf48f2c0e605ceb6c15"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.004.b64",
+      "sha256": "8f1c952610ac65e14e75c7b713f6dc9b135af477456db63adc0d8a0e14b7c131"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.005.b64",
+      "sha256": "2c6268269892d29c3677b6090f8ca77b46bf6ed85eb4164d44a432ec40be377f"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.006.b64",
+      "sha256": "a96faaae1d7fde9d5b843d01688376ec2561af9d98ce33c882f5f080d24ddc39"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.007.b64",
+      "sha256": "3bc24f2803283a9f0a5727f24cbdb7bbeb0069c35287259a335ecbad521fb2c4"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.008.b64",
+      "sha256": "ff6e8f46396771392bc03b32e47e25af7e720fb6e8fb65259709f5a50aab298b"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.009.b64",
+      "sha256": "309e33bbe5265ff91c7850e16ef83344ff61ca72202b21e17f485df61cb285a0"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.010.b64",
+      "sha256": "256f89c56f081cf788d4efd7d499bd90d35b4306956fc633ddf3a807863bf1ff"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.011.b64",
+      "sha256": "d054bb1689ec5a48cdeb10776ba9bde73507c714d3909c276f1ddd324862b986"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.012.b64",
+      "sha256": "bd81de3eaa3b74009da2f15dc7f5ea7aea9e6009c00f56f3583d598eb7580c10"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.013.b64",
+      "sha256": "1465f8e6496792cca8589ae42a76150a2df776b6893b6de7395a2ef6223b6e18"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.014.b64",
+      "sha256": "a2bf706f882a9ca574384ad80848d77110523fb2edd29f7a2cea7166c50351fa"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.015.b64",
+      "sha256": "0006c435083a0d436c4fbdcf9d1522bd8597a07ffc9af26b1e926df49dcd8fe1"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.016.b64",
+      "sha256": "7e7e482d3e1add6f56cb30797803e8d4fc6f4deacf9b455168dc6fd1f512c534"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.017.b64",
+      "sha256": "1a15783e98ab8b5c21d3d6f841145eaa04948ce99bc85638f10e60a70b8b4c94"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.018.b64",
+      "sha256": "e53999322b0c4dbdf158f37994df760ca1c7e9cbecba15aa55965b888533c467"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.019.b64",
+      "sha256": "755e12039238463a5cfc983a731a6d1e951f864adc04cd3fafcbb4e13c79568d"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.020.b64",
+      "sha256": "f30e0c31e942b550565bd61ccca0afe00114ddf21ad991fa83121d8d556279ca"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.021.b64",
+      "sha256": "95ddc4756f7d1ec37c6f6862f388cf14b9f2b324079d15e3df42bba11768336a"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.022.b64",
+      "sha256": "b4aa126f6c0e31a8d5c5b4471bf3b75bd98a2c34fe3252775f5a4701c971dc23"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.023.b64",
+      "sha256": "47d44691b3595f8ac2aa71ce3ff6ecd64c66e9028cad21a93f86fff56386691d"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.024.b64",
+      "sha256": "d7cf3509c62089584034979a977859073cacbbb6beee025ad8ff5cc1bba0dabd"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.025.b64",
+      "sha256": "2fbde6586c387846611bab64fca016a525a5858d356021b493ef817ede27836d"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.026.b64",
+      "sha256": "011d5d43e767de281491fc2b16ec8b1dbd85e3a6b635d415358508984a89d061"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.027.b64",
+      "sha256": "3f450ebde6411f50e3779456703aa770538576588185cf8574ab974bfe2d6687"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.028.b64",
+      "sha256": "ea11f3f98459bb5346fd8e991f8bc710c822bb17fc8c09afabbaa20991ba91bc"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.029.b64",
+      "sha256": "ef5fa7d253e0d8535951c4cc99c5e71671bcd4e2711a56fd3bb0ba26bbd90c65"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.030.b64",
+      "sha256": "6e2e75072532a4046063f04abd27d10ec7c47c0d6ff0a8bfe299a4b12d1e76bc"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.031.b64",
+      "sha256": "22c2df4d3f93eda47086f0d34d8a67f0fba4d4664ddcacff9d4cf5a3ee9a646e"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.032.b64",
+      "sha256": "a3b7a5ff9372d21fe634ca3c0c22f72e5c8f95d9e765b58391aba0ddf98332e2"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.033.b64",
+      "sha256": "85663c530ffb5ae69948c0cd1b1ffae72ee531c4af9fd33e6d35ea3cc0a97ae1"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.034.b64",
+      "sha256": "340740c417b1b95dc046b2b2ed6615e7d002b119741a54caacf8228b8faf1735"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.035.b64",
+      "sha256": "837aa784612510c3442b68e9e960fe4e9b7e14969cefdaab53b1346f8129b861"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.036.b64",
+      "sha256": "cab1d84a74f938043a52f8f69ca4949c2e8fb8fa7e6cb1587704c811bea16aa9"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.037.b64",
+      "sha256": "e17fd99dab6c08ac3f04635051d226e3b3c12684e69295d64e6ba801d8c9a503"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.038.b64",
+      "sha256": "b1d5ef99543a2caabc64280bf8ccd6d7a0c9275640413bb7f4d770f771febddf"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.039.b64",
+      "sha256": "dca9775d42dc58608e7937ac54234c7e23306b782c8a3beedc6d9d1d095683fd"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.040.b64",
+      "sha256": "3c3562e58ced92a22c28400ac4a4a668986d971f44ef4273fb716638c975f7f5"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.041.b64",
+      "sha256": "5956de487575ea08f1708c0b0b252e31e3b6c5b4e02136444287b2784a45c8ed"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.042.b64",
+      "sha256": "2f7e9f89d8a0e94ba8af04697b6bfa87d686ca69d0ce4973624356075572f4a5"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.043.b64",
+      "sha256": "125d01e6ebada1744ec45563a793ca7cf81823ef4223967b7947c81a6eed780a"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.044.b64",
+      "sha256": "4fede1c3476c1ef6a5bbafeadacce84e479e3750b4652a7343cedbfe62e8cbe7"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.045.b64",
+      "sha256": "b557f95cf4c72e0a062e009587d7a7d674a551201d51e87fd778635ba1b416a2"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.046.b64",
+      "sha256": "af3768d51d3be0abb96b3192509bafd62a65f55a263350f86b31ef6973bfd5d3"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.047.b64",
+      "sha256": "728a511b7dc24880b2c04a00f27d444f6120bcf7869c57273d274567386ed886"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.048.b64",
+      "sha256": "c6f3adb6a8a47f1fea7ad95e387b26f45151031e787ad4cc75aef524f322b146"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.049.b64",
+      "sha256": "d9cb3df85bfe8323bfaf4b39add712e6f522cd72fde5812c2509d6a6c3949889"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.050.b64",
+      "sha256": "99b2ff6056418018b662fc5ee962c9767b30897c057c282360932ef898ad393a"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.051.b64",
+      "sha256": "bd0b1aaff99b49f2faf614bb52ba5abcb29fe177ec033533fffce09818ef0e7e"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.052.b64",
+      "sha256": "3637ab331ca83e79f914f6088c817f35c3919235ee8af0fcc444811d8d87bc18"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.053.b64",
+      "sha256": "a28e150e405e44f971f667e8e0cccc29de482862149144cefe5ec575d0ca6ffb"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.054.b64",
+      "sha256": "a4fe50232dc884e81be834f9fc239a7b3b99a3da767f19430ab4d89001641165"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.055.b64",
+      "sha256": "4e8ff3f504a760a6fd7c0bdc56852bd68ba4a56aeb8f9745dbdff073174f6042"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.056.b64",
+      "sha256": "250ff941a705f4c8af3259b0223060d5feeda16738bea43ee92f608da09e6e95"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.057.b64",
+      "sha256": "f5f628850fdb0fa4dff9ea2fd31c3050b0bb90a88b847158344b0723c1fe4163"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.058.b64",
+      "sha256": "bb4e96e06c5f143134963f7800228e7e493542997016f2348a6acc16aea41cd3"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.059.b64",
+      "sha256": "c1f28b8060eb6f14a0f03dfcdecf0136c0117bf8b83ee72d657aa2ebfea26763"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.060.b64",
+      "sha256": "b0d8ae1ae4ed8a65655ccc8fb4b74c0567fe9672d84330e5ee18e8f4930db507"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.061.b64",
+      "sha256": "f550ae14ffd970076a3e5ae000d3a87e2602acd59f0b860efd18759da23943ac"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.062.b64",
+      "sha256": "d683a87666fcce45d9263976e4b1977522d106df3caf27942c528b956ce5492b"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.063.b64",
+      "sha256": "a20eb384027c1394baf09ec4b24b324203ce072e532a10f423c95f4f4d21d868"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.064.b64",
+      "sha256": "510216c7c8ee14a3670c2daa363e446cac2ae601cf241db6f039f5a685d58e88"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.065.b64",
+      "sha256": "487c217993e1eba2d510259c35888aa26d992a321a377c4abc8254ab2000e9fa"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.066.b64",
+      "sha256": "829f0fe632222f8fd7788bdee19382a9e12137feed4a3c3a08128580d7adef99"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.067.b64",
+      "sha256": "c3bd865c51614f32e289f10bb0dccd3ce2bc9aaf549dbc3ccec160c6accc8289"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.068.b64",
+      "sha256": "38c8ddb0f4ecfc11ee1ceb0eb06645e47c9deadd236eeea6e35290fd600de91d"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.069.b64",
+      "sha256": "99ba16a12257983186a936933a2f0185a1d1244815ec6c700ac7605ee8de5f43"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.070.b64",
+      "sha256": "c1d1e37c66e13aa9edd81631eb59f07d57bae64a9e529930e12f6ee374c6129c"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.071.b64",
+      "sha256": "ac32d4a26ff3549e42524fd95349ea182abbe60fcc7f5cbca43dbd26327863ee"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.072.b64",
+      "sha256": "22d30fac857c7dc46104a2117731d54f6ca12cf318e1e2a0c9a955116984b5f1"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.073.b64",
+      "sha256": "6d4b3771d79c4c41fe59dba52d0b492baa9de4f903547fc746e9d68e65daf39d"
+    },
+    {
+      "bytes": 98304,
+      "name": "props.zlib.074.b64",
+      "sha256": "8d451f3e5d8fac4b18f563b3756ee4d34212be6fd81eafe3c7272dc8195efef0"
+    },
+    {
+      "bytes": 3220,
+      "name": "props.zlib.075.b64",
+      "sha256": "967752b60967c9c99ddae66a8816cfdd0c85277fe58aacb308eb7a32a1edaa85"
+    }
+  ],
+  "pixels_sha256": {
+    "bronze": "0261e46efc12c4064136ac603ecfa0cec64f5a754609fc5c45dffaf0adaf9b7a",
+    "celestial": "6246815fe346fadea98c2109510908edfc03d717ed52b8ed519fb3ff79dad2f4",
+    "ceramic": "7e03ac52966bb47dcd6b936ce338190c50a3efe231685fa03e52044055ab8647",
+    "cloth": "44ecdeaf3b3a0a1fc1dc19e3f997843b882f8faf0a1950e210b02a6073629d3a",
+    "counter_atlas": "1c21a267ad755694266914746797a8f3b92164dbc853cf6d73f079bd81719b34",
+    "curios": "ade2663af3612940ada10b559406e930148e54488f6fe51ee3eb4b6c69d4b1f0",
+    "fittings_atlas": "5680addf56763a78d7a6489f6732482ff6764bad23444f50cb8cb0fbf014f4ad",
+    "herbs": "0971cb5f6bf4d88ee045a45390264affda7943c90c4a4d7076c3bffa622b7eab",
+    "liquid": "e591d5af44dfd7b9c8d0be954349b8669b71793e4122915b7c8290f9a95580c8",
+    "walltrim_atlas": "b360f19a700df4c4d5d620bf0b23ce576117f27da38c41aa281e1ce0285d2b51",
+    "wicker": "74e9685c96c2cc0c6e3c9b96c568236d4cb768ab5aaa454d3fb9a100e9b1076e"
+  },
+  "processing": "Lossless RGBA encoding and existing UV atlas packing of the recorded source PNGs",
+  "source_sha256": {
+    "bronze": "c5d17c93cb7c79a2d5fdda77cd5791220bef417fae24b85881d9427e2176ec62",
+    "celestial": "da370b831378ac8cdea60c3e7890324e80e6c72a6a1f4143e17c05db0aa1356f",
+    "ceramic": "a01ed02e1ea1c108c3a74790bbf6e8481c590e7c26be106a811b60ad0f1ef6be",
+    "cloth": "93ecac406f9238a7756a0a901619f3b9f5173b2f4217bc7fac0a5172a87d73bf",
+    "curios": "2ffe56c06fa7f81cd94ad3e0dd302c6e8cc5b56f3fbd5cafb1c46f10f8be3c90",
+    "herbs": "8d5e3c2f546745b171cf8f48a3a9d82f90613fa01106ba8ff6f1b5ca2f1e66f7",
+    "liquid": "22ab45941f50f8963e24cf1fd34fb2f4b9bd3d36336a4998a0f304e76b59df32",
+    "plaster": "aef51704902f9144fb88d3492667fc143ee77c976a192bae2a7cdb0d76688b84",
+    "slate": "e91d3c7ef5d1e78dabaadf138d76db2cd6b74c3ca7e3dca0890fd2b4d4e408db",
+    "timber": "62dc29aef9b2e4b0194a5c2ce25e1bff79139deb2ab3e9a74642555d9207ec7c",
+    "wicker": "52cd841c267cfcfc41598c1122b4de32c854aa68f90e8cdf5135e53665079ea8"
+  },
+  "version": 1
+}

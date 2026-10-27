@@ -1,0 +1,2290 @@
+{
+  "kokiri_sword": {
+    "source": "objects/nei_gi_redesign/kokiri_sword/gi_dl",
+    "author_grip_y": -14.5,
+    "author_tip_y": 61.0,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/kokiri_sword/bronze_tex": "d655803bd62e4ef449a2728d2dbaa454028f915249b07d709100b15e5165ad75",
+      "objects/nei_gi_redesign/kokiri_sword/brown_leather_tex": "0139c1798707054172e3aa16e06790b383dde997a74d7634118ab825abe476a1",
+      "objects/nei_gi_redesign/kokiri_sword/brown_wrap_tex": "2ea68ef40a720bff017ddad602e703a57dd9ad04de7f3e90fc8fd93c0b1eacc1",
+      "objects/nei_gi_redesign/kokiri_sword/edge_tex": "8c9b5b1548288588aece01a8e76afda8722485d75ab049ebe9f59b0978dc55a7",
+      "objects/nei_gi_redesign/kokiri_sword/gi_dl": "33bc634ba47fe9ba3702b1c108282149038565dfff80b7527842b3a7b5e64c70",
+      "objects/nei_gi_redesign/kokiri_sword/mesh_opa_vtx": "4e8cae38ebec10e9d643c93318267700c503ef397fc4c8059b86b01c29f59a7f",
+      "objects/nei_gi_redesign/kokiri_sword/ruby_tex": "977178ae17f8942bb63ac277bfe9c09c4990cbd8458f8e76fad18e9a601d35f7",
+      "objects/nei_gi_redesign/kokiri_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/kokiri_sword/steel_tex": "5ba49cfb20429ebcf49f5b76c0f464e1e83db89fc23e245062e96c9c5d1bd45f",
+      "objects/nei_gi_redesign/kokiri_sword/walnut_tex": "43886406c78bbbe561170d3e6e5825ece427c1a8a471c25003c39a05e01e26fd"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 3000.0,
+        "author_to_held": 39.735099337748345,
+        "gi_native_to_held_uniform": 60.212714349765896,
+        "row_matrix": [
+          [
+            0.0,
+            -60.212714349765896,
+            0.0,
+            0.0
+          ],
+          [
+            60.212714349765896,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            60.212714349765896,
+            0.0
+          ],
+          [
+            576.158940397351,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -60.21270751953125,
+            0.0,
+            0.0
+          ],
+          [
+            60.21270751953125,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            60.21270751953125,
+            0.0
+          ],
+          [
+            576.158935546875,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 3000.0,
+        "author_to_held": 39.735099337748345,
+        "gi_native_to_held_uniform": 60.212714349765896,
+        "row_matrix": [
+          [
+            0.0,
+            -60.212714349765896,
+            0.0,
+            0.0
+          ],
+          [
+            60.212714349765896,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            60.212714349765896,
+            0.0
+          ],
+          [
+            576.158940397351,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -60.21270751953125,
+            0.0,
+            0.0
+          ],
+          [
+            60.21270751953125,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            60.21270751953125,
+            0.0
+          ],
+          [
+            576.158935546875,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 3000.0,
+        "author_to_held": 39.735099337748345,
+        "gi_native_to_held_uniform": 60.212714349765896,
+        "row_matrix": [
+          [
+            0.0,
+            -60.212714349765896,
+            0.0,
+            0.0
+          ],
+          [
+            60.212714349765896,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            60.212714349765896,
+            0.0
+          ],
+          [
+            576.158940397351,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -60.21270751953125,
+            0.0,
+            0.0
+          ],
+          [
+            60.21270751953125,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            60.21270751953125,
+            0.0
+          ],
+          [
+            576.158935546875,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "mm_kokiri_sword": {
+    "source": "objects/nei_gi_redesign/mm_kokiri_sword/gi_dl",
+    "author_grip_y": -13.5,
+    "author_tip_y": 63.0,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/mm_kokiri_sword/brass_edge_tex": "b06c0cd24de2f847665dfe1f4ac43c7c9da474fa0f660bfd47c4e7ad6554c3c5",
+      "objects/nei_gi_redesign/mm_kokiri_sword/brass_tex": "f91dcc0c5c49a429e2bad5a41fcc4c43f47093f02fea4d5acf37c01ce47ef099",
+      "objects/nei_gi_redesign/mm_kokiri_sword/edge_tex": "8c9b5b1548288588aece01a8e76afda8722485d75ab049ebe9f59b0978dc55a7",
+      "objects/nei_gi_redesign/mm_kokiri_sword/gi_dl": "aa25afbea89b9ca66a38d7d576337ac1d12f36cca3f1ac56361a83f5c85334ce",
+      "objects/nei_gi_redesign/mm_kokiri_sword/mesh_opa_vtx": "6d1d44d45f8d43cf356ad33e399b0adf70522cb837bce67762de0c015a7cdfea",
+      "objects/nei_gi_redesign/mm_kokiri_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/mm_kokiri_sword/steel_tex": "5ba49cfb20429ebcf49f5b76c0f464e1e83db89fc23e245062e96c9c5d1bd45f",
+      "objects/nei_gi_redesign/mm_kokiri_sword/violet_tex": "6c1d1fdf0353b6ba9379f79c511607e66c55955ec2f01649e7a43c3d36f88205",
+      "objects/nei_gi_redesign/mm_kokiri_sword/white_leather_tex": "b345559ef03ccbb86c46b5fb0a5a90347fe0822b16ad4042eee36d45c585e878",
+      "objects/nei_gi_redesign/mm_kokiri_sword/white_wrap_tex": "79cf04e8a3ee3721d4040d974e3335c7ca54163ad327daa4227ff7191d19a579"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 3000.0,
+        "author_to_held": 39.21568627450981,
+        "gi_native_to_held_uniform": 59.4256200445402,
+        "row_matrix": [
+          [
+            0.0,
+            -59.4256200445402,
+            0.0,
+            0.0
+          ],
+          [
+            59.4256200445402,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            59.4256200445402,
+            0.0
+          ],
+          [
+            529.4117647058824,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -59.42561340332031,
+            0.0,
+            0.0
+          ],
+          [
+            59.42561340332031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            59.42561340332031,
+            0.0
+          ],
+          [
+            529.4117584228516,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 3000.0,
+        "author_to_held": 39.21568627450981,
+        "gi_native_to_held_uniform": 59.4256200445402,
+        "row_matrix": [
+          [
+            0.0,
+            -59.4256200445402,
+            0.0,
+            0.0
+          ],
+          [
+            59.4256200445402,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            59.4256200445402,
+            0.0
+          ],
+          [
+            529.4117647058824,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -59.42561340332031,
+            0.0,
+            0.0
+          ],
+          [
+            59.42561340332031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            59.42561340332031,
+            0.0
+          ],
+          [
+            529.4117584228516,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 3000.0,
+        "author_to_held": 39.21568627450981,
+        "gi_native_to_held_uniform": 59.4256200445402,
+        "row_matrix": [
+          [
+            0.0,
+            -59.4256200445402,
+            0.0,
+            0.0
+          ],
+          [
+            59.4256200445402,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            59.4256200445402,
+            0.0
+          ],
+          [
+            529.4117647058824,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -59.42561340332031,
+            0.0,
+            0.0
+          ],
+          [
+            59.42561340332031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            59.42561340332031,
+            0.0
+          ],
+          [
+            529.4117584228516,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "razor_sword": {
+    "source": "objects/nei_gi_redesign/razor_sword/gi_dl",
+    "author_grip_y": -33.5,
+    "author_tip_y": 56.5,
+    "source_author_to_gi_native": 0.64990234375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/razor_sword/blade_edge_tex": "58722d09db22ff8f66ce169f1c69518643121a2d2d4265b6708b48338b70ec2d",
+      "objects/nei_gi_redesign/razor_sword/gi_dl": "e52a101f012d700f622acf8c2e7de463027a21980a773551a1936eab9f86a61c",
+      "objects/nei_gi_redesign/razor_sword/grip_seam_tex": "1f9b24179ced1329cb33a60e435d0094b5650d7259dfd447016998e9ba0d1498",
+      "objects/nei_gi_redesign/razor_sword/grip_tex": "8cf31850fb751836fe3be81558345b625bbc481bb454318ed448133b8e27674f",
+      "objects/nei_gi_redesign/razor_sword/mesh_opa_vtx": "ac0d5aae2c5a3c6c3c1686041a5045fd2828dc61d451413a2de94ec0b40dbbde",
+      "objects/nei_gi_redesign/razor_sword/plum_enamel_tex": "364eb85c419bcded8eb7438636daeeb9629a0305afe97397eaa4e692920bfee5",
+      "objects/nei_gi_redesign/razor_sword/scale_mtx": "9806b5a7c17c1c95ad4036ce4e6cbf5e93fdc09f24c0d9d28a5ea4dabbf1bc5d",
+      "objects/nei_gi_redesign/razor_sword/steel_shadow_tex": "abca06ca2b18c4c221e2cca5c41919f528a6c293486f69de50658c092a9a1b56",
+      "objects/nei_gi_redesign/razor_sword/steel_tex": "4b385fabf88d286f1f43edd44e600e25a96f71fcaae3d1643204c062c9c8f23c"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 44.44444444444444,
+        "gi_native_to_held_uniform": 68.38634276650805,
+        "row_matrix": [
+          [
+            0.0,
+            -68.38634276650805,
+            0.0,
+            0.0
+          ],
+          [
+            68.38634276650805,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            68.38634276650805,
+            0.0
+          ],
+          [
+            1488.888888888889,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -68.38633728027344,
+            0.0,
+            0.0
+          ],
+          [
+            68.38633728027344,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            68.38633728027344,
+            0.0
+          ],
+          [
+            1488.8888854980469,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 44.44444444444444,
+        "gi_native_to_held_uniform": 68.38634276650805,
+        "row_matrix": [
+          [
+            0.0,
+            -68.38634276650805,
+            0.0,
+            0.0
+          ],
+          [
+            68.38634276650805,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            68.38634276650805,
+            0.0
+          ],
+          [
+            1488.888888888889,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -68.38633728027344,
+            0.0,
+            0.0
+          ],
+          [
+            68.38633728027344,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            68.38633728027344,
+            0.0
+          ],
+          [
+            1488.8888854980469,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 3000.0,
+        "author_to_held": 33.333333333333336,
+        "gi_native_to_held_uniform": 51.289757074881045,
+        "row_matrix": [
+          [
+            0.0,
+            -51.289757074881045,
+            0.0,
+            0.0
+          ],
+          [
+            51.289757074881045,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            51.289757074881045,
+            0.0
+          ],
+          [
+            1116.6666666666667,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -51.289764404296875,
+            0.0,
+            0.0
+          ],
+          [
+            51.289764404296875,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            51.289764404296875,
+            0.0
+          ],
+          [
+            1116.6666717529297,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "gilded_sword": {
+    "source": "objects/nei_gi_redesign/gilded_sword/gi_dl",
+    "author_grip_y": -18.75,
+    "author_tip_y": 93.625,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/gilded_sword/four_sword_sheen_tex": "e587740b8fdf5516484bab7804d83092b8712c87bddf682cf65f92f4a047b08d",
+      "objects/nei_gi_redesign/gilded_sword/gi_dl": "8d3a0b594565416d5bf9581e312b9201a42679207f0695d56aae4a67b1ef8575",
+      "objects/nei_gi_redesign/gilded_sword/mesh_opa_vtx": "480e91ffb59d460abf1a11410aa5f1670e2c8013c96b3dea196f2cf888e40d36",
+      "objects/nei_gi_redesign/gilded_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/gilded_sword/tp_blade_tex": "d3d518ecf6074fb4929038a3e146c285d8bc823c38ed27d04f18c5d591a609f2",
+      "objects/nei_gi_redesign/gilded_sword/tp_hilt_tex": "d92b091b73904dc0f641bc3c27c5a82aec00627bed5fb36a092aabcb9d38418c",
+      "objects/nei_gi_redesign/gilded_sword/tp_red_grip_tex": "1bf5025c19ccd7372826fa89c6aa184bf3476a9f3ab7bcc68b551f826bdf5524"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 35.595105672969964,
+        "gi_native_to_held_uniform": 53.93916124176285,
+        "row_matrix": [
+          [
+            0.0,
+            -53.93916124176285,
+            0.0,
+            0.0
+          ],
+          [
+            53.93916124176285,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            53.93916124176285,
+            0.0
+          ],
+          [
+            667.4082313681869,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -53.93916320800781,
+            0.0,
+            0.0
+          ],
+          [
+            53.93916320800781,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            53.93916320800781,
+            0.0
+          ],
+          [
+            667.4082336425781,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 35.595105672969964,
+        "gi_native_to_held_uniform": 53.93916124176285,
+        "row_matrix": [
+          [
+            0.0,
+            -53.93916124176285,
+            0.0,
+            0.0
+          ],
+          [
+            53.93916124176285,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            53.93916124176285,
+            0.0
+          ],
+          [
+            667.4082313681869,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -53.93916320800781,
+            0.0,
+            0.0
+          ],
+          [
+            53.93916320800781,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            53.93916320800781,
+            0.0
+          ],
+          [
+            667.4082336425781,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 35.595105672969964,
+        "gi_native_to_held_uniform": 53.93916124176285,
+        "row_matrix": [
+          [
+            0.0,
+            -53.93916124176285,
+            0.0,
+            0.0
+          ],
+          [
+            53.93916124176285,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            53.93916124176285,
+            0.0
+          ],
+          [
+            667.4082313681869,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -53.93916320800781,
+            0.0,
+            0.0
+          ],
+          [
+            53.93916320800781,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            53.93916320800781,
+            0.0
+          ],
+          [
+            667.4082336425781,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "master_sword": {
+    "source": "objects/nei_gi_redesign/master_sword/gi_dl",
+    "author_grip_y": -18.75,
+    "author_tip_y": 106.375,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/master_sword/four_sword_sheen_tex": "e587740b8fdf5516484bab7804d83092b8712c87bddf682cf65f92f4a047b08d",
+      "objects/nei_gi_redesign/master_sword/gi_dl": "66ce8e1bd09ca7212d88af416ff12dc094879a57adb035e7abdfb37309581e41",
+      "objects/nei_gi_redesign/master_sword/mesh_opa_vtx": "ce89895bb75f26aab33178d64d045cbdaccec181aba1e2569705c77876580336",
+      "objects/nei_gi_redesign/master_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/master_sword/tp_blade_tex": "4742fd3ce78a39d79fca0dff6b22c86a1acd026fa2bf1f1a5959750e6dfca859",
+      "objects/nei_gi_redesign/master_sword/tp_hilt_tex": "a7f9ffc92ba8c6cd1acb675c017ba69cd54e1eb367df0609a4ad1ca655ed3aa8"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 31.96803196803197,
+        "gi_native_to_held_uniform": 48.44286309325155,
+        "row_matrix": [
+          [
+            0.0,
+            -48.44286309325155,
+            0.0,
+            0.0
+          ],
+          [
+            48.44286309325155,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44286309325155,
+            0.0
+          ],
+          [
+            599.4005994005994,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -48.44285583496094,
+            0.0,
+            0.0
+          ],
+          [
+            48.44285583496094,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44285583496094,
+            0.0
+          ],
+          [
+            599.4006042480469,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 31.96803196803197,
+        "gi_native_to_held_uniform": 48.44286309325155,
+        "row_matrix": [
+          [
+            0.0,
+            -48.44286309325155,
+            0.0,
+            0.0
+          ],
+          [
+            48.44286309325155,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44286309325155,
+            0.0
+          ],
+          [
+            599.4005994005994,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -48.44285583496094,
+            0.0,
+            0.0
+          ],
+          [
+            48.44285583496094,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44285583496094,
+            0.0
+          ],
+          [
+            599.4006042480469,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 31.96803196803197,
+        "gi_native_to_held_uniform": 48.44286309325155,
+        "row_matrix": [
+          [
+            0.0,
+            -48.44286309325155,
+            0.0,
+            0.0
+          ],
+          [
+            48.44286309325155,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44286309325155,
+            0.0
+          ],
+          [
+            599.4005994005994,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -48.44285583496094,
+            0.0,
+            0.0
+          ],
+          [
+            48.44285583496094,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44285583496094,
+            0.0
+          ],
+          [
+            599.4006042480469,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "true_master_sword": {
+    "source": "objects/nei_gi_redesign/true_master_sword/gi_dl",
+    "author_grip_y": -18.75,
+    "author_tip_y": 106.375,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/true_master_sword/blue_jewel_tex": "72421640b6b9bb6e3c596596fc9d301bdd7d55766179e72038537ba3662d608c",
+      "objects/nei_gi_redesign/true_master_sword/four_sword_sheen_tex": "7082f409f15a3c92d82f81ea4247489b3ffe8fead36ff7ab360951a67759a761",
+      "objects/nei_gi_redesign/true_master_sword/gi_dl": "5cdc4a5cc04effad558f64ad7529b49f3aac2588ad189c78b373242e59a923e2",
+      "objects/nei_gi_redesign/true_master_sword/mesh_opa_vtx": "349643779eae1ac1553de986c64d1cf3181b11408e596d8bc68b1a22e7be526a",
+      "objects/nei_gi_redesign/true_master_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/true_master_sword/tp_blade_tex": "8c55fb306f75193e9f97b04d20a41975fe34de3b3860f78f45d4204e74a06bb5",
+      "objects/nei_gi_redesign/true_master_sword/tp_hilt_tex": "14614224f47a00cb9a76f7cc93080997b17f54e25f94a3e0e539da9f7288ce66"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 31.96803196803197,
+        "gi_native_to_held_uniform": 48.44286309325155,
+        "row_matrix": [
+          [
+            0.0,
+            -48.44286309325155,
+            0.0,
+            0.0
+          ],
+          [
+            48.44286309325155,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44286309325155,
+            0.0
+          ],
+          [
+            599.4005994005994,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -48.44285583496094,
+            0.0,
+            0.0
+          ],
+          [
+            48.44285583496094,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44285583496094,
+            0.0
+          ],
+          [
+            599.4006042480469,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 31.96803196803197,
+        "gi_native_to_held_uniform": 48.44286309325155,
+        "row_matrix": [
+          [
+            0.0,
+            -48.44286309325155,
+            0.0,
+            0.0
+          ],
+          [
+            48.44286309325155,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44286309325155,
+            0.0
+          ],
+          [
+            599.4005994005994,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -48.44285583496094,
+            0.0,
+            0.0
+          ],
+          [
+            48.44285583496094,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44285583496094,
+            0.0
+          ],
+          [
+            599.4006042480469,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 4000.0,
+        "author_to_held": 31.96803196803197,
+        "gi_native_to_held_uniform": 48.44286309325155,
+        "row_matrix": [
+          [
+            0.0,
+            -48.44286309325155,
+            0.0,
+            0.0
+          ],
+          [
+            48.44286309325155,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44286309325155,
+            0.0
+          ],
+          [
+            599.4005994005994,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -48.44285583496094,
+            0.0,
+            0.0
+          ],
+          [
+            48.44285583496094,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            48.44285583496094,
+            0.0
+          ],
+          [
+            599.4006042480469,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "biggoron_sword": {
+    "source": "objects/nei_gi_redesign/biggoron_sword/gi_dl",
+    "author_grip_y": -25.75,
+    "author_tip_y": 166.0,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/biggoron_sword/fittings_tex": "6d08a2936484a2bcf7fee31d4eeaecad06d7fc25e4e7e6fe16de12536de363b3",
+      "objects/nei_gi_redesign/biggoron_sword/four_sword_sheen_tex": "545ba6fcf1522bb098b2943c83653162f43f8ef59cf6d4589d692e9833cf2bd9",
+      "objects/nei_gi_redesign/biggoron_sword/gi_dl": "5b6af91e206a53d836712510e1955aed64678c909078194eb7e48f456c0c4136",
+      "objects/nei_gi_redesign/biggoron_sword/groove_tex": "3757c2bcec537bdba761d20a53f1e8f44d4f89827c8600ee014effb0f40c6622",
+      "objects/nei_gi_redesign/biggoron_sword/leather_tex": "a8380112884acec3e5a539cc4412f975ae00f5b412822a2e49770c0b8862e750",
+      "objects/nei_gi_redesign/biggoron_sword/mesh_opa_vtx": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "objects/nei_gi_redesign/biggoron_sword/ordon_steel_tex": "e182a2bcec09676417975ccf3d65c82764093902eb91d64885d74ea7b18932fa",
+      "objects/nei_gi_redesign/biggoron_sword/rim_tex": "695258c394ce1ae31b2237e03990339406b7008bd71c619fd2e47131b65a55d2",
+      "objects/nei_gi_redesign/biggoron_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/biggoron_sword/wrap_tex": "72a2ecc60cb08a8082c5ead056b2ffe0dca7495cb64db33fbacfb74431308e9f"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 28.683181225554108,
+        "gi_native_to_held_uniform": 43.465153644050915,
+        "row_matrix": [
+          [
+            0.0,
+            -43.465153644050915,
+            0.0,
+            0.0
+          ],
+          [
+            43.465153644050915,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.465153644050915,
+            0.0
+          ],
+          [
+            738.5919165580183,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -43.46514892578125,
+            0.0,
+            0.0
+          ],
+          [
+            43.46514892578125,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.46514892578125,
+            0.0
+          ],
+          [
+            738.5919189453125,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 28.683181225554108,
+        "gi_native_to_held_uniform": 43.465153644050915,
+        "row_matrix": [
+          [
+            0.0,
+            -43.465153644050915,
+            0.0,
+            0.0
+          ],
+          [
+            43.465153644050915,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.465153644050915,
+            0.0
+          ],
+          [
+            738.5919165580183,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -43.46514892578125,
+            0.0,
+            0.0
+          ],
+          [
+            43.46514892578125,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.46514892578125,
+            0.0
+          ],
+          [
+            738.5919189453125,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 28.683181225554108,
+        "gi_native_to_held_uniform": 43.465153644050915,
+        "row_matrix": [
+          [
+            0.0,
+            -43.465153644050915,
+            0.0,
+            0.0
+          ],
+          [
+            43.465153644050915,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.465153644050915,
+            0.0
+          ],
+          [
+            738.5919165580183,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -43.46514892578125,
+            0.0,
+            0.0
+          ],
+          [
+            43.46514892578125,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.46514892578125,
+            0.0
+          ],
+          [
+            738.5919189453125,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "great_fairy_sword": {
+    "source": "objects/nei_gi_redesign/great_fairy_sword/gi_dl",
+    "author_grip_y": -21.90625,
+    "author_tip_y": 154.5,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/great_fairy_sword/gi_dl": "cd3ca964688e60f2aaccd2d7f6bb2e712014204eacc8a9d81a9cb2540f5b46b4",
+      "objects/nei_gi_redesign/great_fairy_sword/gold_edge_tex": "d499b1a4d2f97541a6805df075e60932c1a08eecee2110c1cf0a695830e8b406",
+      "objects/nei_gi_redesign/great_fairy_sword/green_leather_tex": "538b5e1709ac4ebf1a06fd7f211fde057e775436b3c646a2339894229519a28b",
+      "objects/nei_gi_redesign/great_fairy_sword/jade_edge_tex": "0625fc019defd9fb62e45ea87044639a23483312761e17e4eddccdeb4923d838",
+      "objects/nei_gi_redesign/great_fairy_sword/jade_tex": "0c959cf2bde5589753cbf68f24fd1dd4c1816f28fce80fcd566eabd280493ac1",
+      "objects/nei_gi_redesign/great_fairy_sword/mesh_opa_vtx": "9d0d79353354e82f22abbe35dc00df8470d187757560d7c8425af0620c1718ea",
+      "objects/nei_gi_redesign/great_fairy_sword/rose_edge_tex": "02bb3e14419ad4cab65d6cb8ea88cd9348f321b2b78190ecd3b6caa879955fa7",
+      "objects/nei_gi_redesign/great_fairy_sword/rose_tex": "dd2dc652a89b76656e3e9b6b8ade4262e273fb265dfb1c474463516dcd11fda4",
+      "objects/nei_gi_redesign/great_fairy_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/great_fairy_sword/violet_edge_tex": "c3a807d4ae7b3b3e471dae1ba2768dde0bb9331ba956ae21497d52317fa99866",
+      "objects/nei_gi_redesign/great_fairy_sword/violet_tex": "6c1d1fdf0353b6ba9379f79c511607e66c55955ec2f01649e7a43c3d36f88205"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 31.178033658104518,
+        "gi_native_to_held_uniform": 47.24573653851132,
+        "row_matrix": [
+          [
+            0.0,
+            -47.24573653851132,
+            0.0,
+            0.0
+          ],
+          [
+            47.24573653851132,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.24573653851132,
+            0.0
+          ],
+          [
+            682.9937998228521,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.24574279785156,
+            0.0,
+            0.0
+          ],
+          [
+            47.24574279785156,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.24574279785156,
+            0.0
+          ],
+          [
+            682.9938049316406,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 31.178033658104518,
+        "gi_native_to_held_uniform": 47.24573653851132,
+        "row_matrix": [
+          [
+            0.0,
+            -47.24573653851132,
+            0.0,
+            0.0
+          ],
+          [
+            47.24573653851132,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.24573653851132,
+            0.0
+          ],
+          [
+            682.9937998228521,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.24574279785156,
+            0.0,
+            0.0
+          ],
+          [
+            47.24574279785156,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.24574279785156,
+            0.0
+          ],
+          [
+            682.9938049316406,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 31.178033658104518,
+        "gi_native_to_held_uniform": 47.24573653851132,
+        "row_matrix": [
+          [
+            0.0,
+            -47.24573653851132,
+            0.0,
+            0.0
+          ],
+          [
+            47.24573653851132,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.24573653851132,
+            0.0
+          ],
+          [
+            682.9937998228521,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.24574279785156,
+            0.0,
+            0.0
+          ],
+          [
+            47.24574279785156,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.24574279785156,
+            0.0
+          ],
+          [
+            682.9938049316406,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "four_sword": {
+    "source": "objects/nei_gi_redesign/four_sword/gi_dl",
+    "author_grip_y": -15.40625,
+    "author_tip_y": 78.0,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/four_sword/edge_tex": "8c9b5b1548288588aece01a8e76afda8722485d75ab049ebe9f59b0978dc55a7",
+      "objects/nei_gi_redesign/four_sword/gi_dl": "591c6d49c609dcad58afa185f3283d26b8279bb93e88cc2107f70be529f03a4d",
+      "objects/nei_gi_redesign/four_sword/gold_edge_tex": "d499b1a4d2f97541a6805df075e60932c1a08eecee2110c1cf0a695830e8b406",
+      "objects/nei_gi_redesign/four_sword/gold_tex": "4e5b29e2944e2fe09421c00f401fa6c938d6cec6f5a41d9071d1025c12ea9698",
+      "objects/nei_gi_redesign/four_sword/guard_groove_tex": "f8ec402c9c5db2a271aaa5f896c0bfa15812a8e297ce7969266dbc06429abe2f",
+      "objects/nei_gi_redesign/four_sword/ivory_cloth_tex": "b88fc44bd3a6fafc795e43e1e4c128191cd2e3485a25a1bdaa4171b2b0fb6e35",
+      "objects/nei_gi_redesign/four_sword/mesh_opa_vtx": "b579c23726302d48ebc986155944ead61db2f5c8a1e3c7df44400d9a338f3d20",
+      "objects/nei_gi_redesign/four_sword/pommel_blue_tex": "c1355e75c29ed7e9242151f6eac0de73af446bcd4675fcb3cf59fae5923925bd",
+      "objects/nei_gi_redesign/four_sword/ruby_tex": "f1312863f0566109d575bca6cad118a25d4bf53e1bc7cc18b1e5ce5e8522f267",
+      "objects/nei_gi_redesign/four_sword/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/four_sword/steel_tex": "5ba49cfb20429ebcf49f5b76c0f464e1e83db89fc23e245062e96c9c5d1bd45f"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 3389.0,
+        "author_to_held": 36.28236868517899,
+        "gi_native_to_held_uniform": 54.98060752293494,
+        "row_matrix": [
+          [
+            0.0,
+            -54.98060752293494,
+            0.0,
+            0.0
+          ],
+          [
+            54.98060752293494,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            54.98060752293494,
+            0.0
+          ],
+          [
+            558.9752425560388,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -54.98060607910156,
+            0.0,
+            0.0
+          ],
+          [
+            54.98060607910156,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            54.98060607910156,
+            0.0
+          ],
+          [
+            558.9752349853516,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 3389.0,
+        "author_to_held": 36.28236868517899,
+        "gi_native_to_held_uniform": 54.98060752293494,
+        "row_matrix": [
+          [
+            0.0,
+            -54.98060752293494,
+            0.0,
+            0.0
+          ],
+          [
+            54.98060752293494,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            54.98060752293494,
+            0.0
+          ],
+          [
+            558.9752425560388,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -54.98060607910156,
+            0.0,
+            0.0
+          ],
+          [
+            54.98060607910156,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            54.98060607910156,
+            0.0
+          ],
+          [
+            558.9752349853516,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 3389.0,
+        "author_to_held": 36.28236868517899,
+        "gi_native_to_held_uniform": 54.98060752293494,
+        "row_matrix": [
+          [
+            0.0,
+            -54.98060752293494,
+            0.0,
+            0.0
+          ],
+          [
+            54.98060752293494,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            54.98060752293494,
+            0.0
+          ],
+          [
+            558.9752425560388,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -54.98060607910156,
+            0.0,
+            0.0
+          ],
+          [
+            54.98060607910156,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            54.98060607910156,
+            0.0
+          ],
+          [
+            558.9752349853516,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "giants_knife": {
+    "source": "objects/nei_gi_redesign/giants_knife/gi_dl",
+    "author_grip_y": -23.25,
+    "author_tip_y": 152.0,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/giants_knife/fittings_tex": "716a1639b52e3fc2a8700f656fa3e4aded199fbd90c6b87154d738519b620739",
+      "objects/nei_gi_redesign/giants_knife/four_sword_sheen_tex": "ebea8c792669fe90f3c090c63d2fcb4fda442298f0be9bf9177824894bb3bf63",
+      "objects/nei_gi_redesign/giants_knife/gi_dl": "d3f71637ad60aa344f66683f2a3ff8c092e1217a267b9a99a8d3a197fabc9805",
+      "objects/nei_gi_redesign/giants_knife/leather_tex": "0e1f7142ee1b8f70824c53dd719893aa2d3bcbb15a3f4e7c78ab264f429fc90a",
+      "objects/nei_gi_redesign/giants_knife/mesh_opa_vtx": "aac2027bc348aed3dde6e3c37751dcf5e150047fbc99b7012e656d3d79f31ae9",
+      "objects/nei_gi_redesign/giants_knife/ordon_steel_tex": "b643f1b80ccd817f7c3ea1aa5f767db0fc16fe332ad6f1efae5c93a0e49c73b8",
+      "objects/nei_gi_redesign/giants_knife/rim_tex": "a0c831fa25e06c1148b765465ce946e39d153f884e74aecbcb212875273f1831",
+      "objects/nei_gi_redesign/giants_knife/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "objects/nei_gi_redesign/giants_knife/wrap_tex": "d18cb25283108da233c6f31ea33706d1f9c6d4577cfbe52401a295df846ea0f5"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 31.38373751783167,
+        "gi_native_to_held_uniform": 47.55745056346227,
+        "row_matrix": [
+          [
+            0.0,
+            -47.55745056346227,
+            0.0,
+            0.0
+          ],
+          [
+            47.55745056346227,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55745056346227,
+            0.0
+          ],
+          [
+            729.6718972895864,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.55744934082031,
+            0.0,
+            0.0
+          ],
+          [
+            47.55744934082031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55744934082031,
+            0.0
+          ],
+          [
+            729.6718902587891,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 31.38373751783167,
+        "gi_native_to_held_uniform": 47.55745056346227,
+        "row_matrix": [
+          [
+            0.0,
+            -47.55745056346227,
+            0.0,
+            0.0
+          ],
+          [
+            47.55745056346227,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55745056346227,
+            0.0
+          ],
+          [
+            729.6718972895864,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.55744934082031,
+            0.0,
+            0.0
+          ],
+          [
+            47.55744934082031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55744934082031,
+            0.0
+          ],
+          [
+            729.6718902587891,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 5500.0,
+        "author_to_held": 31.38373751783167,
+        "gi_native_to_held_uniform": 47.55745056346227,
+        "row_matrix": [
+          [
+            0.0,
+            -47.55745056346227,
+            0.0,
+            0.0
+          ],
+          [
+            47.55745056346227,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55745056346227,
+            0.0
+          ],
+          [
+            729.6718972895864,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.55744934082031,
+            0.0,
+            0.0
+          ],
+          [
+            47.55744934082031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55744934082031,
+            0.0
+          ],
+          [
+            729.6718902587891,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  },
+  "broken_giants_knife": {
+    "source": "objects/nei_held_swords/broken_giants_knife/model/gi_dl",
+    "author_grip_y": -23.25,
+    "author_tip_y": 56.375,
+    "source_author_to_gi_native": 0.659912109375,
+    "source_sha256": {
+      "objects/nei_gi_redesign/giants_knife/fittings_tex": "716a1639b52e3fc2a8700f656fa3e4aded199fbd90c6b87154d738519b620739",
+      "objects/nei_gi_redesign/giants_knife/four_sword_sheen_tex": "ebea8c792669fe90f3c090c63d2fcb4fda442298f0be9bf9177824894bb3bf63",
+      "objects/nei_gi_redesign/giants_knife/leather_tex": "0e1f7142ee1b8f70824c53dd719893aa2d3bcbb15a3f4e7c78ab264f429fc90a",
+      "objects/nei_gi_redesign/giants_knife/ordon_steel_tex": "b643f1b80ccd817f7c3ea1aa5f767db0fc16fe332ad6f1efae5c93a0e49c73b8",
+      "objects/nei_gi_redesign/giants_knife/rim_tex": "a0c831fa25e06c1148b765465ce946e39d153f884e74aecbcb212875273f1831",
+      "objects/nei_gi_redesign/giants_knife/wrap_tex": "d18cb25283108da233c6f31ea33706d1f9c6d4577cfbe52401a295df846ea0f5",
+      "objects/nei_held_swords/broken_giants_knife/model/gi_dl": "9f08a1bbeec8c85a69a77a109a2abc0676ef9a0513e059d1541745baaa67cc6b",
+      "objects/nei_held_swords/broken_giants_knife/model/mesh_opa_vtx": "f1d151afd18c26e19bc45f83f384d685b54f34aac7ed0c96c19984a16fe69754",
+      "objects/nei_held_swords/broken_giants_knife/model/scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad"
+    },
+    "frames": {
+      "oot_adult": {
+        "socket": [
+          0.0,
+          328.0,
+          -77.0
+        ],
+        "tip_x": 2498.9300998573467,
+        "author_to_held": 31.38373751783167,
+        "gi_native_to_held_uniform": 47.55745056346227,
+        "row_matrix": [
+          [
+            0.0,
+            -47.55745056346227,
+            0.0,
+            0.0
+          ],
+          [
+            47.55745056346227,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55745056346227,
+            0.0
+          ],
+          [
+            729.6718972895864,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.55744934082031,
+            0.0,
+            0.0
+          ],
+          [
+            47.55744934082031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55744934082031,
+            0.0
+          ],
+          [
+            729.6718902587891,
+            328.0,
+            -77.0,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "oot_child": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 2498.9300998573467,
+        "author_to_held": 31.38373751783167,
+        "gi_native_to_held_uniform": 47.55745056346227,
+        "row_matrix": [
+          [
+            0.0,
+            -47.55745056346227,
+            0.0,
+            0.0
+          ],
+          [
+            47.55745056346227,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55745056346227,
+            0.0
+          ],
+          [
+            729.6718972895864,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.55744934082031,
+            0.0,
+            0.0
+          ],
+          [
+            47.55744934082031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55744934082031,
+            0.0
+          ],
+          [
+            729.6718902587891,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      },
+      "mm_human": {
+        "socket": [
+          0.0,
+          216.22,
+          4.5
+        ],
+        "tip_x": 2498.9300998573467,
+        "author_to_held": 31.38373751783167,
+        "gi_native_to_held_uniform": 47.55745056346227,
+        "row_matrix": [
+          [
+            0.0,
+            -47.55745056346227,
+            0.0,
+            0.0
+          ],
+          [
+            47.55745056346227,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55745056346227,
+            0.0
+          ],
+          [
+            729.6718972895864,
+            216.22,
+            4.5,
+            1.0
+          ]
+        ],
+        "serialized_row_matrix": [
+          [
+            0.0,
+            -47.55744934082031,
+            0.0,
+            0.0
+          ],
+          [
+            47.55744934082031,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            47.55744934082031,
+            0.0
+          ],
+          [
+            729.6718902587891,
+            216.22000122070312,
+            4.5,
+            1.0
+          ]
+        ],
+        "runtime_tested": false
+      }
+    }
+  }
+}

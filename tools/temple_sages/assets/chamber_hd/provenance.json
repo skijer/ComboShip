@@ -1,0 +1,77 @@
+{
+  "runtime_verified": false,
+  "scope": "Only the private Temple annex center: scrolling blue floor, six-emblem atlas, and central Triforce/floor atlas. Original Sages resource paths are not emitted.",
+  "textures": {
+    "rm_kja_mark_01_C000": {
+      "active_material": "custom/temple_sages/chamber/mat_kenjyanoma_room_0DL_001608_ChamberSage10",
+      "file": "rm_kja_mark_01_C000.resource",
+      "flags": 1,
+      "h_byte_scale": 8.0,
+      "logical_dimensions": [
+        32,
+        64
+      ],
+      "payload_sha256": "a2a4c0709b695ba4b418ecb33cd15df0c2b6a27b676dd3293af07c8c5088c27e",
+      "payload_size_bytes": 131072,
+      "physical_dimensions": [
+        128,
+        256
+      ],
+      "resource_sha256": "3675f4755ad531081cbfc0b142f9286b771930ad00b86f8470b24074fa95bfa4",
+      "resource_size_bytes": 131164,
+      "resource_version": 1,
+      "source_path": "alt/scenes/shared/kenjyanoma_scene/rm_kja_mark_01_C000",
+      "texture_type": 2,
+      "v_pixel_scale": 4.0
+    },
+    "rm_kja_water_02_13C00": {
+      "active_material": "custom/temple_sages/chamber/mat_kenjyanoma_room_0DL_001608_ChamberSage01",
+      "file": "rm_kja_water_02_13C00.resource",
+      "flags": 1,
+      "h_byte_scale": 8.0,
+      "logical_dimensions": [
+        32,
+        32
+      ],
+      "payload_sha256": "d7787ed6b9de4d5ee4bb78ed24985f75ec5e5e53262daa94229e47e0291c30c2",
+      "payload_size_bytes": 65536,
+      "physical_dimensions": [
+        128,
+        128
+      ],
+      "resource_sha256": "3c494ee4c0337786d8824a656ec59978a8548244faacbc50184f3a24f07a4a19",
+      "resource_size_bytes": 65628,
+      "resource_version": 1,
+      "source_path": "alt/scenes/shared/kenjyanoma_scene/rm_kja_water_02_13C00",
+      "texture_type": 2,
+      "v_pixel_scale": 4.0
+    },
+    "rm_kja_yuka_01_16C00": {
+      "active_material": "custom/temple_sages/chamber/mat_kenjyanoma_room_0DL_010CD8_ChamberSage05",
+      "file": "rm_kja_yuka_01_16C00.resource",
+      "flags": 1,
+      "h_byte_scale": 8.0,
+      "logical_dimensions": [
+        64,
+        64
+      ],
+      "payload_sha256": "a10b763f654fed1944ffdb8f12d7cadd106aa599642a1199dad7089330dfd6bb",
+      "payload_size_bytes": 262144,
+      "physical_dimensions": [
+        256,
+        256
+      ],
+      "resource_sha256": "83ec24507977fc7a9d0a42a50084635d2204fd1148787a6e850573a792cdea63",
+      "resource_size_bytes": 262236,
+      "resource_version": 1,
+      "source_path": "alt/scenes/shared/kenjyanoma_scene/rm_kja_yuka_01_16C00",
+      "texture_type": 2,
+      "v_pixel_scale": 4.0
+    }
+  },
+  "transformation": "None: complete source resource blobs copied byte-for-byte; existing material state and UVs are unchanged.",
+  "version": 1,
+  "source": {
+    "kind": "resource-checksums"
+  }
+}

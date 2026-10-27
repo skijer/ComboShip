@@ -11,6 +11,11 @@
 
 #include "2s2h/BenGui/CosmeticEditor.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "mods/extended_equipment.h"
+#include "sword_element.h"
+#include <libultraship/bridge/consolevariablebridge.h>
+#define CW_SPIN_HOST_MM
+#include "../../../../../combo/render/SpinAttackDraw.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -99,6 +104,37 @@ void EnMThunder_UnkType_Setup(EnMThunder* this, PlayState* play) {
     this->actor.child = NULL;
 }
 
+static void EnMThunder_InitStyle(EnMThunder* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
+    int eligible = SwordElement_IsRegularSword(play, player) && gSaveContext.save.saveInfo.playerData.isMagicAcquired &&
+                   ENMTHUNDER_GET_TYPE(&this->actor) < ENMTHUNDER_TYPE_MAX &&
+                   (this->actor.parent == NULL || this->actor.parent == &player->actor);
+    CwSpinAttack_Init(&this->spinStyle, CVarGetInteger(CW_SPIN_STYLE_CVAR, 0),
+                      CVarGetInteger(CW_SPIN_ELEMENT_EFFECTS_CVAR, 1), eligible, (uintptr_t)player, (uintptr_t)play,
+                      play->sceneId);
+    CwSpinAttack_Preview(&this->spinStyle, SwordElement_Active(play, player), eligible, 0);
+}
+
+static void EnMThunder_PreviewStyle(EnMThunder* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
+    int eligible = this->spinStyle.owner == (uintptr_t)player && this->spinStyle.context == (uintptr_t)play &&
+                   this->spinStyle.scene == play->sceneId && SwordElement_IsRegularSword(play, player) &&
+                   (this->actor.parent == NULL || this->actor.parent == &player->actor);
+    CwSpinAttack_Preview(&this->spinStyle, SwordElement_Active(play, player), eligible,
+                         play->pauseCtx.state != 0 || play->pauseCtx.debugEditor != 0);
+}
+
+static void EnMThunder_ReleaseStyle(EnMThunder* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
+    int eligible = this->spinStyle.owner == (uintptr_t)player && this->spinStyle.context == (uintptr_t)play &&
+                   this->spinStyle.scene == play->sceneId && SwordElement_IsRegularSword(play, player) &&
+                   this->subtype <= ENMTHUNDER_SUBTYPE_SPIN_REGULAR &&
+                   (this->actor.parent == NULL || this->actor.parent == &player->actor);
+    this->collider.elem.atDmgInfo.dmgFlags =
+        CwSpinAttack_Release(&this->spinStyle, SwordElement_Active(play, player), eligible,
+                             this->collider.elem.atDmgInfo.dmgFlags, DMG_FIRE_ARROW, DMG_ICE_ARROW, DMG_LIGHT_ARROW);
+}
+
 void EnMThunder_Init(Actor* thisx, PlayState* play) {
     s32 pad;
     EnMThunder* this = (EnMThunder*)thisx;
@@ -106,6 +142,7 @@ void EnMThunder_Init(Actor* thisx, PlayState* play) {
 
     Collider_InitCylinder(play, &this->collider);
     Collider_SetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
+    EnMThunder_InitStyle(this, play);
     this->type = ENMTHUNDER_GET_TYPE(&this->actor);
     Lights_PointNoGlowSetInfo(&this->lightInfo, this->actor.world.pos.x, this->actor.world.pos.y,
                               this->actor.world.pos.z, 255, 255, 255, 0);
@@ -131,9 +168,14 @@ void EnMThunder_Init(Actor* thisx, PlayState* play) {
     this->isCharging = false;
 
     if (player->stateFlags2 & PLAYER_STATE2_20000) {
-        if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired || (gSaveContext.magicState != MAGIC_STATE_IDLE) ||
-            ((ENMTHUNDER_GET_MAGIC_COST(&this->actor) != 0) &&
-             !Magic_Consume(play, ENMTHUNDER_GET_MAGIC_COST(&this->actor), MAGIC_CONSUME_NOW))) {
+        // Skijer's NEI: the free OoT Master Sword full-HP beam bypasses the magic-acquired /
+        // magic-state self-kill gate (it costs no magic and needs no magic meter). z_player.c sets
+        // gNeiMasterBeamFree true for exactly this spawn.
+        extern u8 gNeiMasterBeamFree;
+        if (!gNeiMasterBeamFree &&
+            (!gSaveContext.save.saveInfo.playerData.isMagicAcquired || (gSaveContext.magicState != MAGIC_STATE_IDLE) ||
+             ((ENMTHUNDER_GET_MAGIC_COST(&this->actor) != 0) &&
+              !Magic_Consume(play, ENMTHUNDER_GET_MAGIC_COST(&this->actor), MAGIC_CONSUME_NOW)))) {
             AudioSfx_PlaySfx(NA_SE_IT_ROLLING_CUT, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
                              &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
             AudioSfx_PlaySfx(NA_SE_IT_SWORD_SWING_HARD, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
@@ -179,6 +221,7 @@ void EnMThunder_Init(Actor* thisx, PlayState* play) {
         } else {
             this->actionFunc = EnMThunder_Spin_Attack;
             this->timer = 8;
+            EnMThunder_ReleaseStyle(this, play);
         }
 
         AudioSfx_PlaySfx(NA_SE_IT_ROLLING_CUT_LV1, &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
@@ -199,6 +242,9 @@ void EnMThunder_Destroy(Actor* thisx, PlayState* play) {
         Magic_Reset(play);
     }
 
+    this->collider.elem.atDmgInfo.dmgFlags =
+        CwSpinAttack_Original(&this->spinStyle, this->collider.elem.atDmgInfo.dmgFlags);
+    CwSpinAttack_Reset(&this->spinStyle);
     Collider_DestroyCylinder(play, &this->collider);
     EnMThunder_AdjustLights(play, 0.0f);
     LightContext_RemoveLight(play, &play->lightCtx, this->lightNode);
@@ -230,6 +276,7 @@ void EnMThunder_Spin_AttackNoMagic(EnMThunder* this, PlayState* play) {
 void EnMThunder_Charge(EnMThunder* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
     Actor* child = this->actor.child;
+    EnMThunder_PreviewStyle(this, play);
 
     this->unk1B0 = player->unk_B08;
     this->actor.world.pos = player->bodyPartsPos[PLAYER_BODYPART_WAIST];
@@ -304,6 +351,7 @@ void EnMThunder_Charge(EnMThunder* this, PlayState* play) {
         } else {
             this->actionFunc = EnMThunder_Spin_Attack;
             this->timer = 8;
+            EnMThunder_ReleaseStyle(this, play);
         }
 
         AudioSfx_PlaySfx(sChargingSfxIds[this->subtype], &player->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
@@ -480,6 +528,22 @@ void EnMThunder_UnkType_Update(Actor* thisx, PlayState* play) {
                               this->lightColorFrac * 100.0f, this->lightColorFrac * 800.0f);
 }
 
+static CwSpinVisualSelection EnMThunder_VisualStyle(EnMThunder* thunder, PlayState* play) {
+    int eligible = thunder->spinStyle.eligible && thunder->spinStyle.owner == (uintptr_t)GET_PLAYER(play) &&
+                   thunder->spinStyle.context == (uintptr_t)play && thunder->spinStyle.scene == play->sceneId &&
+                   thunder->type != ENMTHUNDER_TYPE_UNK && thunder->subtype <= ENMTHUNDER_SUBTYPE_SPIN_REGULAR;
+    return CwSpinStyle_Resolve(thunder->spinStyle.style, thunder->spinStyle.effectsEnabled, thunder->spinStyle.element,
+                               eligible);
+}
+
+static int EnMThunder_DrawChargeStyle(EnMThunder* thunder, PlayState* play) {
+    CwSpinVisualSelection visual = EnMThunder_VisualStyle(thunder, play);
+    if (thunder->spinStyle.released)
+        visual.accentElement = 0;
+    return CwSpinDraw_Charge(play, visual, thunder->unk1B0 >= 0.85f, thunder->chargingAlpha / 255.0f,
+                             gSpinAttackChargingDL);
+}
+
 void EnMThunder_Draw(Actor* thisx, PlayState* play2) {
     PlayState* play = play2;
     EnMThunder* this = (EnMThunder*)thisx;
@@ -518,15 +582,21 @@ void EnMThunder_Draw(Actor* thisx, PlayState* play2) {
         case ENMTHUNDER_SUBTYPE_SPIN_GREAT:
             gDPSetPrimColorOverride(POLY_XLU_DISP++, 0, 0x80, 255, 255, 170, (u16)(this->alphaFrac * 255.0f),
                                     COSMETIC_ID("Effects.GreatSpinBurst"));
-            gSPDisplayList(POLY_XLU_DISP++, gGreatSpinAttackDiskDL);
-            gSPDisplayList(POLY_XLU_DISP++, gGreatSpinAttackCylinderDL);
+            if (!CwSpinDraw_Burst(play, EnMThunder_VisualStyle(this, play), 1, this->alphaFrac, gGreatSpinAttackDiskDL,
+                                  gGreatSpinAttackCylinderDL)) {
+                gSPDisplayList(POLY_XLU_DISP++, gGreatSpinAttackDiskDL);
+                gSPDisplayList(POLY_XLU_DISP++, gGreatSpinAttackCylinderDL);
+            }
             break;
 
         case ENMTHUNDER_SUBTYPE_SPIN_REGULAR:
             gDPSetPrimColorOverride(POLY_XLU_DISP++, 0, 0x80, 170, 255, 255, (u16)(this->alphaFrac * 255.0f),
                                     COSMETIC_ID("Effects.SpinSlashBurst"));
-            gSPDisplayList(POLY_XLU_DISP++, gSpinAttackDiskDL);
-            gSPDisplayList(POLY_XLU_DISP++, gSpinAttackCylinderDL);
+            if (!CwSpinDraw_Burst(play, EnMThunder_VisualStyle(this, play), 0, this->alphaFrac, gSpinAttackDiskDL,
+                                  gSpinAttackCylinderDL)) {
+                gSPDisplayList(POLY_XLU_DISP++, gSpinAttackDiskDL);
+                gSPDisplayList(POLY_XLU_DISP++, gSpinAttackCylinderDL);
+            }
             break;
 
         case ENMTHUNDER_SUBTYPE_SWORDBEAM_REGULAR:
@@ -545,9 +615,13 @@ void EnMThunder_Draw(Actor* thisx, PlayState* play2) {
             break;
     }
 
+    if (this->spinStyle.released) {
+        CwSpinDraw_Accents(play, EnMThunder_VisualStyle(this, play), this->subtype == ENMTHUNDER_SUBTYPE_SPIN_GREAT,
+                           this->scroll, this->alphaFrac);
+    }
     Matrix_Mult(&player->leftHandMf, MTXMODE_NEW);
 
-    if (GameInteractor_Should(VB_TRANSFORM_THUNDER_MATRIX, true, this)) {
+    if (!ExtEquip_TridentThunderTransform() && GameInteractor_Should(VB_TRANSFORM_THUNDER_MATRIX, true, this)) {
         if (this->type == ENMTHUNDER_TYPE_GILDED_SWORD) {
             Matrix_Translate(0.0f, 220.0f, 0.0f, MTXMODE_APPLY);
             Matrix_Scale(-1.2f, -0.8f, -0.6f, MTXMODE_APPLY);
@@ -580,7 +654,9 @@ void EnMThunder_Draw(Actor* thisx, PlayState* play2) {
                Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, (play->gameplayFrames * 5) & 0xFF, 0, 32, 32, 1,
                                   (play->gameplayFrames * 20) & 0xFF, (play->gameplayFrames * y2Scroll) & 0xFF, 8, 8, 5,
                                   0, 20, y2Scroll));
-    gSPDisplayList(POLY_XLU_DISP++, gSpinAttackChargingDL);
+    if (!EnMThunder_DrawChargeStyle(this, play)) {
+        gSPDisplayList(POLY_XLU_DISP++, gSpinAttackChargingDL);
+    }
 
     CLOSE_DISPS(play->state.gfxCtx);
 }

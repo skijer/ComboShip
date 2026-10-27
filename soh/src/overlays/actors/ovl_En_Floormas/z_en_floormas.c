@@ -5,9 +5,9 @@
  */
 
 #include "z_en_floormas.h"
+#include "din_fire_sword.h"
 #include "objects/object_wallmaster/object_wallmaster.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_HOOKSHOT_PULLS_PLAYER)
 
@@ -181,8 +181,6 @@ void EnFloormas_Destroy(Actor* thisx, PlayState* play) {
     EnFloormas* this = (EnFloormas*)thisx;
     ColliderCylinder* col = &this->collider;
     Collider_DestroyCylinder(play, col);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void EnFloormas_MakeInvulnerable(EnFloormas* this) {
@@ -395,7 +393,7 @@ void EnFloormas_SetupSmWait(EnFloormas* this) {
 
 void EnFloormas_SetupTakeDamage(EnFloormas* this) {
     Animation_MorphToPlayOnce(&this->skelAnime, &gWallmasterDamageAnim, -3.0f);
-    if (this->collider.info.acHitInfo->toucher.dmgFlags & 0x1F824) {
+    if (DinFireSword_OriginalDamageFlags(gPlayState, this->collider.info.acHitInfo) & 0x1F824) {
         this->actor.world.rot.y = this->collider.base.ac->world.rot.y;
     } else {
         this->actor.world.rot.y = Actor_WorldYawTowardActor(&this->actor, this->collider.base.ac) + 0x8000;
@@ -759,8 +757,8 @@ void EnFloormas_JumpAtLink(EnFloormas* this, PlayState* play) {
         this->actor.speedXZ = 0.0f;
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_FLOORMASTER_SM_LAND);
         EnFloormas_SetupLand(this);
-    } else if ((this->actor.yDistToPlayer < -10.0f) && (this->collider.base.ocFlags1 & OC1_HIT) &&
-               (&player->actor == this->collider.base.oc)) {
+    } else if (GameInteractor_Should(VB_ENEMY_GRAB_PLAYER, true, this) && (this->actor.yDistToPlayer < -10.0f) &&
+               (this->collider.base.ocFlags1 & OC1_HIT) && (&player->actor == this->collider.base.oc)) {
         play->grabPlayer(play, player);
         EnFloormas_SetupGrabLink(this, player);
     }

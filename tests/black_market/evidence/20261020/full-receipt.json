@@ -1,0 +1,306 @@
+{
+  "archive_boundary": "actual files are decoded and indexed by a test adapter; application archive mounting/load order is not executed",
+  "authored_forest_sha256": "9097583c896a11c204e4950bd9a80aa8e69fb2a42307f55f50e75d4195f30e42",
+  "base_resources_consumed": 235,
+  "base_sha256": "2f44bafe1a00f44ddaf7eb5e5c99e73a3d23771038529d6d1748819ad575dc80",
+  "boundary": "production-controller executable; no game loop",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "tests/black_market/run_resource_entry_tests.py",
+    "--include",
+    "/workspace/scratch/593f6dd85762/analysis/dependencies/nlohmann_json/include",
+    "--mm-base",
+    "/workspace/scratch/4589f3b809b8/upload/mm(1).o2r",
+    "--authored-forest",
+    "/workspace/scratch/4589f3b809b8/inputs/zzzz_MM3D_Lost_Woods_FINAL_avatar_POC19.prelude.o2r",
+    "--market-pack",
+    "/workspace/scratch/4589f3b809b8/inputs/zzzz_Skiejer_Black_Market_POC14_EntranceOrientation.o2r",
+    "--output-dir",
+    "/workspace/scratch/9dcd75c38e6f/market-entry-evidence"
+  ],
+  "destinations": {
+    "mm": {
+      "collision": "scenes/nonmq/skiejer_market/collision",
+      "collision_sha256": "382b641d48d0f84f1a31b5a8660808cec2401344a520d0179c0758bc715a6f48",
+      "room": "scenes/nonmq/skiejer_market/skiejer_market_room_0",
+      "room_sha256": "1bfb6e74fbe2d5fb12ada806eaa12c444292e3b5d686f2889ce24145383b8dcf",
+      "scene": "scenes/nonmq/skiejer_market/skiejer_market",
+      "scene_sha256": "fb36e03401c1fd9354820aeff3fec8e5c1df71b75add2751815b67ae05791387",
+      "spawn": [
+        0,
+        -11,
+        0,
+        381,
+        0,
+        -32768,
+        0,
+        3839
+      ]
+    },
+    "oot": {
+      "collision": "scenes/nonmq/skiejer_market/collision",
+      "collision_sha256": "382b641d48d0f84f1a31b5a8660808cec2401344a520d0179c0758bc715a6f48",
+      "room": "scenes/shared/skiejer_market_oot/skiejer_market_oot_room_0",
+      "room_sha256": "9f6ed19c3a65ace5aee1493b80608479648c3ff0f5096f12cc389a7a2401100a",
+      "scene": "scenes/shared/skiejer_market_oot/skiejer_market_oot",
+      "scene_sha256": "18625a52ae343771c4276033a602bee2a0d41e7caee6c0169ddd873d503b665b",
+      "spawn": [
+        0,
+        -11,
+        0,
+        381,
+        0,
+        -32768,
+        0,
+        3583
+      ]
+    }
+  },
+  "executables": [
+    {
+      "binary_sha256": "2bb1bf2e6b2d52c610639b10a2b5fc51f3131e3ba6ee247feec0143190603e1b",
+      "generated_fixture_sha256": "647c8a749d6fc1bae95360ef9d95189bb5b5df25992a8c2e67c6e4619263eafc",
+      "host": "mm",
+      "log_sha256": "ff91c6e629fe9f1be919debe4acfc6b7b80b832e388b52689487fa6e56d0ccf8",
+      "sanitizers": "address,undefined"
+    },
+    {
+      "binary_sha256": "9906a51e9b0938d1b2e1b48d6658efd3eb40f61ce176a0dde47a5fcba144b890",
+      "generated_fixture_sha256": "4718411054e3e0fb0f259c50ef5838adbedf72d8075e7600946c3e2648193a3b",
+      "host": "oot",
+      "log_sha256": "28881b4b13e537a99c6085311749a90d8cef7138d93cdf894414bd4e6f12dfae",
+      "sanitizers": "address,undefined"
+    }
+  ],
+  "external_resource_status": "actual supplied base owner",
+  "forests": {
+    "authored_mm": {
+      "bounds": [
+        -2097,
+        -38,
+        -2097,
+        3088,
+        3529,
+        2097
+      ],
+      "collision_sha256": "c00ee0ac86c0829aa981b284d251442ffd4212b6aa802e57d2f8db317529bb85",
+      "scene_sha256": "88a8a7e307bc17d3fb6b41c05afd6db98c72e915d681f5aadff1d43805b62883",
+      "transitions": [
+        [
+          1,
+          -1,
+          0,
+          -1,
+          24,
+          800,
+          0,
+          0,
+          -30849,
+          127
+        ],
+        [
+          0,
+          -1,
+          0,
+          -1,
+          5,
+          -680,
+          0,
+          72,
+          13695,
+          0
+        ]
+      ]
+    },
+    "authored_oot": {
+      "bounds": [
+        -2097,
+        -38,
+        -2097,
+        3088,
+        3529,
+        2097
+      ],
+      "collision_sha256": "c00ee0ac86c0829aa981b284d251442ffd4212b6aa802e57d2f8db317529bb85",
+      "scene_sha256": "42ec63aa991c9f933684852037c0e79b0a2c870951ae4ba4110e968f71c51a85",
+      "transitions": [
+        [
+          1,
+          -1,
+          0,
+          -1,
+          35,
+          800,
+          0,
+          0,
+          -16384,
+          256
+        ],
+        [
+          0,
+          -1,
+          0,
+          -1,
+          9,
+          -680,
+          0,
+          72,
+          19296,
+          0
+        ]
+      ]
+    },
+    "combined": {
+      "bounds": [
+        -2097,
+        -38,
+        -2097,
+        3088,
+        3529,
+        2097
+      ],
+      "collision_sha256": "d98991a03ff914e651f7f0e276fa86faa6060636716500e25e7f7627dbe807ad",
+      "scene_sha256": "4c7bb769fc2f86661b8ff7a13773c002fe27901c514e8266e98e8822feb87b32",
+      "transitions": [
+        [
+          1,
+          -1,
+          0,
+          -1,
+          24,
+          800,
+          0,
+          0,
+          -30849,
+          127
+        ],
+        [
+          0,
+          -1,
+          0,
+          -1,
+          5,
+          -680,
+          0,
+          72,
+          13695,
+          0
+        ]
+      ]
+    },
+    "mm": {
+      "bounds": [
+        -2097,
+        -38,
+        -2097,
+        3088,
+        3529,
+        2097
+      ],
+      "collision_sha256": "d98991a03ff914e651f7f0e276fa86faa6060636716500e25e7f7627dbe807ad",
+      "scene_sha256": "151f2223b596105960e09dc6d1e0aa8b0209011781b22475b6bccacc223fdfe8",
+      "transitions": [
+        [
+          1,
+          -1,
+          0,
+          -1,
+          24,
+          800,
+          0,
+          0,
+          -30849,
+          127
+        ],
+        [
+          0,
+          -1,
+          0,
+          -1,
+          5,
+          -680,
+          0,
+          72,
+          13695,
+          0
+        ]
+      ]
+    },
+    "oot": {
+      "bounds": [
+        -2097,
+        -38,
+        -2097,
+        3088,
+        3529,
+        2097
+      ],
+      "collision_sha256": "d98991a03ff914e651f7f0e276fa86faa6060636716500e25e7f7627dbe807ad",
+      "scene_sha256": "8e5e0b109119908a22a6e1927c6618f03ee9f4588e36dd1a9f049f1b55dea8c7",
+      "transitions": [
+        [
+          1,
+          -1,
+          0,
+          -1,
+          35,
+          800,
+          0,
+          0,
+          -16384,
+          256
+        ],
+        [
+          0,
+          -1,
+          0,
+          -1,
+          9,
+          -680,
+          0,
+          72,
+          19296,
+          0
+        ]
+      ]
+    }
+  },
+  "full_real_inputs": true,
+  "market_pack_sha256": "3ac1432d0e8f75e51f08892739a13e16762bb4d820a2bbc7a35469af1db872e2",
+  "native_forest_bundle_sha256": "7b21d19512a48b2363247b9276426ff6ba7afa4f10130f98513c22a90d0c6730",
+  "native_market_decoded_sha256": "1b75185882cacd214b18a74e9aecc8bad19df0eb0aae72aad483cd38c6fddba9",
+  "native_resources": 164,
+  "optional_visual_resources": 187,
+  "production_unit_sha256": {
+    "combo/BlackMarketEntry.h": "6f626760b8ae88db9c31e85d9d32afab0417715848c8358cb538482a04aabf7c",
+    "combo/BlackMarketKeeperAssets.h": "5c6c0c9de5cc00709de67be46823992c3c5f794e5e1256cda056049894cf416f",
+    "combo/BlackMarketNativeResources.h": "9f0396c64dd3d929a76323028d6f04bfe2bd0e28e21ea4f8cfaea6f6ab4f2d7d",
+    "combo/entrances/BlackMarketEntrance.h": "0b754a9d16d9a897bbe3f9be3f2e3f9da58f4e726a8895fd94f9c30df528f210",
+    "combo/entrances/NativeForest.h": "9daa412b62407b07287dcb058751029e5be08620c1b5b66b2524bf448da0a4da",
+    "combo/entrances/NativeForestDependencies.h": "b46e68a85673d44897ad53231cbe3ac69d66a9171f7f9b955753947086fdb22d",
+    "combo/entrances/NativeForestResources.h": "4db5e4ba3bab63a97aadc16e79ce7269d2723135e28361acb7dca7bdc7b5a681",
+    "mm/2s2h/Enhancements/Gameplay/BlackMarket.cpp": "cdc02e0e16c50636f4f79dbf758d571ff6dd70aa973946e189862512f1274b3c",
+    "mm/2s2h/Enhancements/Gameplay/BlackMarketDoorNative.h": "1d53a77826330124bc67382d55edc8b0d99fff34edd19a175c4d523cc2e1d8c8",
+    "mm/src/code/sys_math3d.c": "7d19dde244fef45c6575bad2e456434cc9e08e6d9f8c7989e4a0d7465223ed93",
+    "mm/src/code/z_play.c": "9b1f36c1ccf80993296d40221fc7faee757cdafdd52e35a8de2661791ebdb6c5",
+    "mm/src/overlays/actors/ovl_En_Door/z_en_door.c": "94e69c115f85972a62b238c964f7bd3f1bedadcd382a70e48f40683a5b07936d",
+    "mm/src/overlays/actors/ovl_player_actor/z_player.c": "7dfeb4d4b114f808df8122c49897f5a0b6e873c36180397b8915fcb58d583a72",
+    "soh/include/tables/entrance_table.h": "6bbe52331a75a936dd6769ad3a3ae5d3a62880cfb43dccdd0184e4eaaff4953a",
+    "soh/include/tables/scene_table.h": "d81a35049115a715ef199dbe7da3277ff451e9ab42810a5e3a10e088427a5d65",
+    "soh/mods/transformation_masks/assets/mm_display_list_patch.cpp": "a7bf202036f100ef3b77758c34c4f78a8d3c72407771e776e463fc4cbf3de3db",
+    "soh/soh/Enhancements/Gameplay/ComboBlackMarketNative.cpp": "6d03bafd72996c3d6f8741c05b57a6eb1cd86b131380621705e86a97a8b37762",
+    "soh/soh/Enhancements/Gameplay/OotBlackMarketDoorNative.h": "bb4830c3a227d080c5c1ac554a636884939d46d12095565393a4a708728faae8",
+    "soh/src/code/sys_math3d.c": "4cb4718303215d7645871c42961ddc8cbb474aa405a935500790167e41974b57",
+    "soh/src/code/z_play.c": "f7cd95d747fc9bee8bfc83c7f194aabd67e3bb3a784ad2e0d99981d316447b0f",
+    "soh/src/overlays/actors/ovl_player_actor/z_player.c": "1daa0785056b6d7199983a61b1aaf00cf4c929accb7475fe7a81fd9f11163b74"
+  },
+  "result": "PASS production-controller routes with actual supplied resources; configured gameplay untested",
+  "source_head": "498a6e5c7975e80933defedd9905e509dafe998a",
+  "test_unit_sha256": {
+    "tests/black_market/resource_entry_fixture.h": "ec26d6012803d7ad0c9eca27234c0bb3dfb1d802ce5197cd75018d26d71c4b61",
+    "tests/black_market/resource_entry_test.inc": "f13c2a3960499beb037ee31e40af4e8623b1525149d2d11050cf90b4eefe4eb8",
+    "tests/black_market/run_native_tests.py": "78d0b3a39d2109841ec0c8de0e4cb1ba547fc458871ffd59c07c6b6a878f4563",
+    "tests/black_market/run_oot_native_tests.py": "e3dc40cc7b1d15488a6a686048939caeecb314127fc7802893e86f1a44289fa4",
+    "tests/black_market/run_resource_entry_tests.py": "8f28dcd837e58c708029879f79826676e6c9875eb5399f08448707fccfd7b021"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "room": 0,
+  "eye": [
+    -100,
+    150,
+    300
+  ],
+  "target": [
+    -470,
+    75,
+    120
+  ],
+  "source_meshes": 20,
+  "output_sha256": "23764bde1724471f13cccf919496148c0e4e56fde52ac942392ab6c12d4ff931",
+  "rendering": "Actual packed room geometry, UVs and textures with current native sign UVs; neutral Mesa asset lighting; no HUD",
+  "saria": {
+    "source": "Reference-derived silhouette sprite; no native actor is spawned",
+    "sprite_sha256": "0d8f650ab85f4cac8f3658d9ffe59c7da4aac5dfb21515605d578dab2559fa8a",
+    "position": [
+      -630.0,
+      0.0,
+      -156.0
+    ],
+    "height": 62.0
+  },
+  "omitted_effects": [
+    "Runtime particles; animated material scroll frozen at its source phase"
+  ],
+  "status": "Fixed scene view, not a live reflection or gameplay screenshot"
+}

@@ -1,0 +1,192 @@
+{
+  "resource_count": 10,
+  "vertex_records": 2069,
+  "vertex_loads": 85,
+  "slug": "kokiri_sword",
+  "name": "Kokiri Sword (OoT)",
+  "entry": "objects/nei_gi_redesign/kokiri_sword/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 1538,
+  "bounds_author": [
+    [
+      -13.0,
+      -32.0,
+      -4.1875
+    ],
+    [
+      13.0,
+      61.0,
+      4.1875
+    ]
+  ],
+  "markers": {
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "imported_approved_model": false,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "OoT Kokiri forged blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Carved walnut Kokiri crossguard",
+        "factor": 1.2
+      },
+      {
+        "part": "Carved walnut Kokiri crossguard",
+        "factor": 1.2
+      },
+      {
+        "part": "Kokiri central bronze gemstone mount",
+        "factor": 1.2
+      },
+      {
+        "part": "Faceted inset gemstone",
+        "factor": 1.2
+      },
+      {
+        "part": "Faceted inset gemstone",
+        "factor": 1.2
+      },
+      {
+        "part": "Shaped oval leather grip",
+        "factor": 1.0
+      },
+      {
+        "part": "Raised diagonal leather wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Kokiri bronze upper ferrule",
+        "factor": 1.0
+      },
+      {
+        "part": "Kokiri bronze pommel collar",
+        "factor": 1.0
+      },
+      {
+        "part": "Walnut flared Kokiri pommel",
+        "factor": 1.2
+      },
+      {
+        "part": "Pommel bronze lip",
+        "factor": 1.2
+      },
+      {
+        "part": "Pommel bronze lip",
+        "factor": 1.2
+      }
+    ]
+  },
+  "notes": [
+    "OoT Kokiri identity: short steel blade, solid brown guard, red jewel, leather grip and flared wooden pommel.",
+    "Clean walnut guard without added wire ornament; mirrored bevel faces point outward and the blade tang extends through its central mount.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "bronze_tex": "d655803bd62e4ef449a2728d2dbaa454028f915249b07d709100b15e5165ad75",
+      "brown_leather_tex": "0139c1798707054172e3aa16e06790b383dde997a74d7634118ab825abe476a1",
+      "brown_wrap_tex": "2ea68ef40a720bff017ddad602e703a57dd9ad04de7f3e90fc8fd93c0b1eacc1",
+      "edge_tex": "8c9b5b1548288588aece01a8e76afda8722485d75ab049ebe9f59b0978dc55a7",
+      "gi_dl": "33bc634ba47fe9ba3702b1c108282149038565dfff80b7527842b3a7b5e64c70",
+      "mesh_opa_vtx": "4e8cae38ebec10e9d643c93318267700c503ef397fc4c8059b86b01c29f59a7f",
+      "ruby_tex": "977178ae17f8942bb63ac277bfe9c09c4990cbd8458f8e76fad18e9a601d35f7",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "steel_tex": "5ba49cfb20429ebcf49f5b76c0f464e1e83db89fc23e245062e96c9c5d1bd45f",
+      "walnut_tex": "43886406c78bbbe561170d3e6e5825ece427c1a8a471c25003c39a05e01e26fd"
+    },
+    "glb_sha256": "fb649d3e0e37240fabb96e026ce6233865d2b478ebb56a4a340d026bf5c6a753",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  },
+  "depth_parent": {
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "glb_path": "tools/nei_gi/CHECKPOINTS/kokiri_sword/kokiri_sword.glb",
+    "preserved": "X/Y positions, topology, UVs, materials, texture resources, display lists and scale matrix"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "resource_count": 12,
+  "vertex_records": 3212,
+  "vertex_loads": 114,
+  "slug": "sheikah_shield",
+  "name": "Sheikah Shield / Kite Shield / gameplay sheikah_shield",
+  "entry": "objects/nei_held_redesign/sheikah_shield/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.045379638671875,
+  "triangles": 2046,
+  "bounds_author": [
+    [
+      -15.75,
+      -45.5,
+      -18.8125
+    ],
+    [
+      5.6875,
+      70.1875,
+      31.1875
+    ]
+  ],
+  "markers": {
+    "legacy_frame": "object_nei_divine_shield / object_nei_kite_shield",
+    "normal_native": [
+      -1,
+      0,
+      0
+    ],
+    "up_native": [
+      0,
+      1,
+      0
+    ]
+  },
+  "notes": [
+    "Approved shell/embossing/rear straps in native custom-shield frame. Existing hand/back/surf transforms retained."
+  ],
+  "runtime_tested": false
+}

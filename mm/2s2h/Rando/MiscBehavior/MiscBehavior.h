@@ -15,6 +15,20 @@ void OnFileLoad();
 
 void CheckQueue();
 void CheckQueueReset();
+
+// An overflow deposit can unlock a bank check while another item is being
+// received. Keep the normal item message/toast and identify that check's source.
+inline std::string BankRewardSourceSuffix(RandoCheckId rc) {
+    switch (rc) {
+        case RC_CLOCK_TOWN_WEST_BANK_ADULTS_WALLET:
+        case RC_CLOCK_TOWN_WEST_BANK_INTEREST:
+        case RC_CLOCK_TOWN_WEST_BANK_PIECE_OF_HEART:
+            return " (Clock Town Bank reward)";
+        default:
+            return "";
+    }
+}
+
 #ifdef COMBO_BUILD
 // ComboShip: Returns the ForeignItem metadata for an MM check that holds a foreign OOT item,
 // or nullptr if the check is not foreign. Keyed by Checks[].name (RC_*), NOT CheckNames[rc].

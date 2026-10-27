@@ -1,3 +1,4 @@
+#include "../../../../combo/ComboGameMode.h"
 /*
  * Much of the code here was borrowed from https://github.com/gamestabled/OoT3D_Randomizer/blob/main/code/src/grotto.c
  * It's been adapted for SoH to use our gPlayState vs their gGlobalContext and slightly different named properties.
@@ -6,9 +7,14 @@
 #include "randomizer_grotto.h"
 #include "soh/OTRGlobals.h"
 
-#include "global.h"
+#include "variables.h"
 
 extern PlayState* gPlayState;
+#ifdef COMBO_BUILD
+extern int32_t Combo_SOH_CrossDungeonRoute(int32_t index, int beforeNative);
+extern int Combo_SOH_CrossDungeonRuntimeEnabled(void);
+extern int32_t Combo_SOH_CrossDungeonGrottoId(void);
+#endif
 
 // Information necessary for entering each grotto
 static const GrottoLoadInfo grottoLoadTable[NUM_GROTTOS] = {
@@ -114,6 +120,28 @@ void Grotto_InitExitAndLoadLists(void) {
     grottoEnteredViaDoorAna = false;
 }
 
+#ifdef COMBO_BUILD
+// Query synthetic identity without materializing respawns or applying either permutation.
+int32_t Combo_SOH_GrottoScene(int32_t index) {
+    s16 nativeIndex;
+    if (index >= ENTRANCE_GROTTO_LOAD_START && index < ENTRANCE_GROTTO_LOAD_START + NUM_GROTTOS)
+        nativeIndex = grottoLoadTable[index - ENTRANCE_GROTTO_LOAD_START].entranceIndex;
+    else if (index >= ENTRANCE_GROTTO_EXIT_START && index < ENTRANCE_GROTTO_EXIT_START + NUM_GROTTOS)
+        nativeIndex = grottoReturnTable[index - ENTRANCE_GROTTO_EXIT_START].entranceIndex;
+    else
+        return -1;
+    return nativeIndex >= 0 && nativeIndex < ENTR_MAX ? gEntranceTable[nativeIndex].scene : -1;
+}
+#endif
+
+static bool Grotto_CrossRoutingEnabled(void) {
+#ifdef COMBO_BUILD
+    return Combo_IsCombinedGame() && Combo_SOH_CrossDungeonRuntimeEnabled() != 0;
+#else
+    return false;
+#endif
+}
+
 static bool Grotto_ShouldSetLastEntrance(void) {
     return Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) &&
            (Randomizer_GetSettingValue(RSK_MIX_GROTTO_ENTRANCES) ||
@@ -138,7 +166,8 @@ static void Grotto_SetupReturnInfo(GrottoReturnInfo grotto, RespawnMode respawnM
     gSaveContext.respawn[respawnMode].yaw = grotto.angle;
     gSaveContext.respawn[respawnMode].pos = grotto.pos;
     // If Mixed Entrance Pools or decoupled entrances are active, set these flags to 0 instead of restoring them
-    if (Randomizer_GetSettingValue(RSK_MIX_GROTTO_ENTRANCES) || Randomizer_GetSettingValue(RSK_DECOUPLED_ENTRANCES)) {
+    if (Grotto_CrossRoutingEnabled() || Randomizer_GetSettingValue(RSK_MIX_GROTTO_ENTRANCES) ||
+        Randomizer_GetSettingValue(RSK_DECOUPLED_ENTRANCES)) {
         gSaveContext.respawn[respawnMode].tempSwchFlags = 0;
         gSaveContext.respawn[respawnMode].tempCollectFlags = 0;
     } else {
@@ -150,16 +179,22 @@ static void Grotto_SetupReturnInfo(GrottoReturnInfo grotto, RespawnMode respawnM
 // Get the next entrance value while handling conversion of grotto rando IDs to real entrance values.
 // This method doesn't change player respawn data, so only use this if you are querying an entrance index.
 s16 Grotto_GetEntranceValueHandlingGrottoRando(s16 nextEntranceIndex) {
-    // Don't change anything unless grotto shuffle has been enabled
+    // Native or cross routing may name a synthetic grotto endpoint.
     if (!Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) &&
         !Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) &&
-        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS)) {
+        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS) && !Grotto_CrossRoutingEnabled()) {
         return nextEntranceIndex;
     }
 
     // If Link hits a grotto exit, load the entrance index from the grotto exit list
     // based on the current grotto ID
     if (nextEntranceIndex == ENTR_RETURN_GROTTO) {
+#ifdef COMBO_BUILD
+        if (grottoId < 0 || grottoId >= NUM_GROTTOS)
+            grottoId = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonGrottoId() : -1;
+#endif
+        if (grottoId < 0 || grottoId >= NUM_GROTTOS)
+            return nextEntranceIndex;
         nextEntranceIndex = grottoExitList[grottoId];
     }
 
@@ -194,23 +229,50 @@ s16 Grotto_GetEntranceValueHandlingGrottoRando(s16 nextEntranceIndex) {
 // Translates and overrides the passed in entrance index if it corresponds to a
 // special grotto entrance (grotto load or return point) and updates player respawn data correctly.
 s16 Grotto_OverrideSpecialEntrance(s16 nextEntranceIndex) {
-    // Don't change anything unless grotto shuffle has been enabled
+    // Native or cross routing may name a synthetic grotto endpoint.
     if (!Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) &&
         !Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) &&
-        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS)) {
+        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS) && !Grotto_CrossRoutingEnabled()) {
         return nextEntranceIndex;
     }
 
     // ENTR_RETURN_GROTTO means Link physically left a grotto. Any other way (warp song / owl / spawn)
     // arrives as a concrete grotto-exit index.
     bool grottoExit = nextEntranceIndex == ENTR_RETURN_GROTTO;
+    bool crossRoutedExit = false;
 
     // If Link hits a grotto exit, load the entrance index from the grotto exit list
     // based on the current grotto ID
     if (grottoExit) {
-        Entrance_SetEntranceDiscovered(ENTRANCE_GROTTO_EXIT_START + grottoId, false);
-        EntranceTracker_SetLastEntranceOverride(ENTRANCE_GROTTO_EXIT_START + grottoId);
-        nextEntranceIndex = grottoExitList[grottoId];
+#ifdef COMBO_BUILD
+        if (grottoId < 0 || grottoId >= NUM_GROTTOS)
+            grottoId = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonGrottoId() : -1;
+#endif
+        if (grottoId < 0 || grottoId >= NUM_GROTTOS)
+            return nextEntranceIndex;
+        const s16 originalExit = ENTRANCE_GROTTO_EXIT_START + grottoId;
+        Entrance_SetEntranceDiscovered(originalExit, false);
+        EntranceTracker_SetLastEntranceOverride(originalExit);
+#ifdef COMBO_BUILD
+        // A physical exit is a before-native endpoint. If composed here, its target is
+        // already final and must not pass through the native exit list or another cross leg.
+        int32_t composed = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonRoute(originalExit, true) : -1;
+        if (composed >= 0) {
+            nextEntranceIndex = composed;
+            crossRoutedExit = true;
+        } else
+#endif
+        {
+            nextEntranceIndex = grottoExitList[grottoId];
+#ifdef COMBO_BUILD
+            // Native mixed pools may resolve this exit to a different selected pool's mouth.
+            int32_t composed = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonRoute(nextEntranceIndex, false) : -1;
+            if (composed >= 0) {
+                nextEntranceIndex = composed;
+                crossRoutedExit = true;
+            }
+#endif
+        }
     }
 
     // Get the new grotto id from the next entrance
@@ -226,7 +288,8 @@ s16 Grotto_OverrideSpecialEntrance(s16 nextEntranceIndex) {
         // Door_Ana (grottoExit && grottoEnteredViaDoorAna): only then does RESPAWN_MODE_RETURN hold
         // valid pre-grotto data. A warp song or spawn shuffled onto a grotto load point enters without
         // Door_Ana (so RETURN is stale), those must set up the grotto's own return data to position Link.
-        bool normalGrottoExit = !Grotto_ShouldSetLastEntrance() && grottoExit && grottoEnteredViaDoorAna;
+        bool normalGrottoExit =
+            !Grotto_ShouldSetLastEntrance() && grottoExit && grottoEnteredViaDoorAna && !crossRoutedExit;
 
         if (!normalGrottoExit) {
             Grotto_SetupReturnInfo(grotto, RESPAWN_MODE_RETURN);
@@ -279,7 +342,7 @@ void Grotto_OverrideActorEntrance(Actor* thisx) {
     // Vanilla Behavior if there's no possibility of ending up in a grotto randomly
     if (!Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) &&
         !Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) &&
-        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS)) {
+        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS) && !Grotto_CrossRoutingEnabled()) {
         return;
     }
 
@@ -294,6 +357,12 @@ void Grotto_OverrideActorEntrance(Actor* thisx) {
             Entrance_SetEntranceDiscovered(ENTRANCE_GROTTO_LOAD_START + index, false);
             EntranceTracker_SetLastEntranceOverride(ENTRANCE_GROTTO_LOAD_START + index);
             index = grottoLoadList[index];
+#ifdef COMBO_BUILD
+            // This native list lookup bypasses Entrance_OverrideNextIndex. Compose once here.
+            int32_t composed = Combo_IsCombinedGame() ? Combo_SOH_CrossDungeonRoute(index, false) : -1;
+            if (composed >= 0)
+                index = composed;
+#endif
 
             // Run the index through the special entrances override check
             lastEntranceType = GROTTO_LOAD;
@@ -306,9 +375,10 @@ void Grotto_OverrideActorEntrance(Actor* thisx) {
 
 // Set necessary flags for when warp songs/overworld spawns are shuffled to grotto return points
 void Grotto_ForceGrottoReturnOnSpecialEntrance(void) {
-    if (lastEntranceType == GROTTO_RETURN && (Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
-                                              Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
-                                              Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS))) {
+    if (lastEntranceType == GROTTO_RETURN &&
+        (Grotto_CrossRoutingEnabled() || Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
+         Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
+         Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS))) {
         gSaveContext.respawnFlag = 2;
         gSaveContext.respawn[RESPAWN_MODE_RETURN].playerParams = 0x04FF;
         gSaveContext.respawn[RESPAWN_MODE_RETURN].pos = grottoReturnTable[grottoId].pos;
@@ -321,9 +391,10 @@ void Grotto_ForceGrottoReturnOnSpecialEntrance(void) {
 // Set the respawn flag for when we want to return from a grotto entrance
 // Used for Sun's Song and Game Over, which usually don't restore saved position data
 void Grotto_ForceGrottoReturn(void) {
-    if (lastEntranceType == GROTTO_RETURN && (Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
-                                              Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
-                                              Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS))) {
+    if (lastEntranceType == GROTTO_RETURN &&
+        (Grotto_CrossRoutingEnabled() || Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
+         Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
+         Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS))) {
         gSaveContext.respawnFlag = 2;
         gSaveContext.respawn[RESPAWN_MODE_RETURN].playerParams = 0x0DFF;
         gSaveContext.respawn[RESPAWN_MODE_RETURN].pos = grottoReturnTable[grottoId].pos;
@@ -335,9 +406,10 @@ void Grotto_ForceGrottoReturn(void) {
 
 // Used for the DMT special voids, which usually don't restore saved position data
 void Grotto_ForceRegularVoidOut(void) {
-    if (lastEntranceType == GROTTO_RETURN && (Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
-                                              Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
-                                              Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS))) {
+    if (lastEntranceType == GROTTO_RETURN &&
+        (Grotto_CrossRoutingEnabled() || Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
+         Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
+         Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS))) {
         gSaveContext.respawn[RESPAWN_MODE_DOWN] = gSaveContext.respawn[RESPAWN_MODE_RETURN];
         gSaveContext.respawn[RESPAWN_MODE_DOWN].playerParams = 0x0DFF;
         gSaveContext.respawn[RESPAWN_MODE_DOWN].pos = grottoReturnTable[grottoId].pos;
@@ -348,7 +420,9 @@ void Grotto_ForceRegularVoidOut(void) {
 // If returning to a FW point saved at a grotto exit, copy the FW data to the Grotto Return Point
 // so that Sun's Song and Game Over will behave correctly
 void Grotto_SetupReturnInfoOnFWReturn(void) {
-    if (Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
+    const bool crossGrottoReturn = Grotto_CrossRoutingEnabled() && grottoId >= 0 && grottoId < NUM_GROTTOS &&
+                                   gSaveContext.fw.playerParams == 0x04FF;
+    if (crossGrottoReturn || Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
         Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
         Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS) && gSaveContext.fw.playerParams == 0x04FF) {
         gSaveContext.respawn[RESPAWN_MODE_RETURN] = gSaveContext.respawn[RESPAWN_MODE_TOP];
@@ -381,7 +455,11 @@ s16 Grotto_GetRenamedGrottoIndexFromOriginal(s8 content, s8 scene) {
 }
 
 s8 Grotto_CurrentGrotto() {
-    if (Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
+#ifdef COMBO_BUILD
+    if (Grotto_CrossRoutingEnabled() && (grottoId < 0 || grottoId >= NUM_GROTTOS))
+        return Combo_SOH_CrossDungeonGrottoId();
+#endif
+    if (Grotto_CrossRoutingEnabled() || Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) ||
         Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) ||
         Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS)) {
         return grottoId;

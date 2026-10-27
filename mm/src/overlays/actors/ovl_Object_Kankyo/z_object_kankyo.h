@@ -5,6 +5,13 @@
 
 struct ObjectKankyo;
 
+// Autumn shares the native allocation, but owns its spatial distribution.
+#define OBJECT_KANKYO_AUTUMN_NEAR_COUNT 16
+#define OBJECT_KANKYO_AUTUMN_MIDDLE_COUNT 32
+#define OBJECT_KANKYO_AUTUMN_FAR_COUNT 48
+#define OBJECT_KANKYO_AUTUMN_COUNT \
+    (OBJECT_KANKYO_AUTUMN_NEAR_COUNT + OBJECT_KANKYO_AUTUMN_MIDDLE_COUNT + OBJECT_KANKYO_AUTUMN_FAR_COUNT)
+
 typedef void (*ObjectKankyoActionFunc)(struct ObjectKankyo*, PlayState*);
 
 typedef struct {

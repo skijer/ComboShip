@@ -5,6 +5,7 @@
  */
 
 #include "z_en_viewer.h"
+#include "2s2h/Enhancements/Gameplay/ComboSaria.h"
 
 #define FLAGS                                                                \
     (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED | \
@@ -42,6 +43,12 @@ void EnViewer_SetupAction(EnViewer* this, EnViewerActionFunc actionFunc) {
 }
 
 void EnViewer_Init(Actor* thisx, PlayState* play) {
+#ifdef COMBO_BUILD
+    if (ComboSaria_IsParam(thisx->params)) {
+        ComboSaria_Init(thisx, play);
+        return;
+    }
+#endif
     EnViewer* this = (EnViewer*)thisx;
 
     this->unk_154 = D_8089F3E0;
@@ -72,6 +79,12 @@ void EnViewer_Init(Actor* thisx, PlayState* play) {
 }
 
 void EnViewer_Destroy(Actor* thisx, PlayState* play) {
+#ifdef COMBO_BUILD
+    if (ComboSaria_IsParam(thisx->params)) {
+        ComboSaria_Destroy(thisx, play);
+        return;
+    }
+#endif
     D_8089F3E0--;
 }
 
@@ -152,6 +165,12 @@ void func_8089F2C4(EnViewer* this, PlayState* play) {
 }
 
 void EnViewer_Update(Actor* thisx, PlayState* play2) {
+#ifdef COMBO_BUILD
+    if (ComboSaria_IsParam(thisx->params)) {
+        ComboSaria_Update(thisx, play2);
+        return;
+    }
+#endif
     PlayState* play = play2;
     EnViewer* this = (EnViewer*)thisx;
 
@@ -164,4 +183,10 @@ void EnViewer_Update(Actor* thisx, PlayState* play2) {
 }
 
 void EnViewer_Draw(Actor* thisx, PlayState* play) {
+#ifdef COMBO_BUILD
+    if (ComboSaria_IsParam(thisx->params)) {
+        ComboSaria_Draw(thisx, play);
+        return;
+    }
+#endif
 }

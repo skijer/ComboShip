@@ -123,6 +123,8 @@ typedef struct {
 } PriorityEntrance;
 // primary,          secondary
 using EntranceInfoPair = std::pair<EntranceLinkInfo, EntranceLinkInfo>;
+const std::vector<EntranceInfoPair>& GetEntranceShuffleTable();
+void SetAllEntrancesData();
 using EntrancePair = std::pair<Entrance*, Entrance*>;
 using EntrancePools = std::map<EntranceType, std::vector<Entrance*>>;
 

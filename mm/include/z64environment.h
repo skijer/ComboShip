@@ -45,20 +45,20 @@ struct View;
 #define LIGHT_BLEND_OVERRIDE_FULL_CONTROL 2
 
 typedef enum {
-    /* 0 */ LIGHT_MODE_TIME, // environment lights use `lightConfig` and change based on time of day
+    /* 0 */ LIGHT_MODE_TIME,    // environment lights use `lightConfig` and change based on time of day
     /* 1 */ LIGHT_MODE_SETTINGS // environment lights use `lightSetting`
 } LightMode;
 
 typedef enum {
     /* 0 */ LIGHTNING_OFF, // no lightning
-    /* 1 */ LIGHTNING_ON, // request ligtning strikes at random intervals
+    /* 1 */ LIGHTNING_ON,  // request ligtning strikes at random intervals
     /* 2 */ LIGHTNING_LAST // request one lightning strike before turning off
 } LightningState;
 
 typedef enum {
-    /* 0 */ LIGHTNING_STRIKE_WAIT, // wait between lightning strikes. request bolts when timer hits 0
+    /* 0 */ LIGHTNING_STRIKE_WAIT,  // wait between lightning strikes. request bolts when timer hits 0
     /* 1 */ LIGHTNING_STRIKE_START, // fade in the flash. note: bolts are requested in the previous state
-    /* 2 */ LIGHTNING_STRIKE_END // fade out the flash and go back to wait
+    /* 2 */ LIGHTNING_STRIKE_END    // fade out the flash and go back to wait
 } LightningStrikeState;
 
 typedef enum {
@@ -121,7 +121,7 @@ typedef enum {
     /* 1 */ PRECIP_RAIN_CUR, // current number of rain drops being drawn on screen
     /* 2 */ PRECIP_SNOW_CUR, // current number of snowflakes being drawn on screen
     /* 3 */ PRECIP_SNOW_MAX, // max number of snowflakes that can draw
-    /* 4 */ PRECIP_SOS_MAX, // max number of rain drops requested from song of storms specifically
+    /* 4 */ PRECIP_SOS_MAX,  // max number of rain drops requested from song of storms specifically
     /* 5 */ PRECIP_MAX
 } PrecipitationData;
 
@@ -189,18 +189,19 @@ typedef struct {
     /* 0x09 */ s8 light2Dir[3];
     /* 0x0C */ u8 light2Color[3];
     /* 0x0F */ u8 fogColor[3];
-    /* 0x12 */ s16 fogNear; // ranges from 0-1000 (0: starts immediately, 1000: no fog), but is clamped to ENV_FOGNEAR_MAX
+    /* 0x12 */ s16
+        fogNear;         // ranges from 0-1000 (0: starts immediately, 1000: no fog), but is clamped to ENV_FOGNEAR_MAX
     /* 0x14 */ s16 zFar; // Max depth (render distance) of the view as a whole. fogFar will always match zFar
 } CurrentEnvLightSettings; // size = 0x16
 
 // `EnvLightSettings` is very similar to `CurrentEnvLightSettings` with one key difference.
 // The light settings data in the scene packs blend rate information with the fog near value.
-// The blendRate determines how fast the current light settings fade to the next one 
-// (under LIGHT_MODE_SETTINGS, otherwise unused). 
+// The blendRate determines how fast the current light settings fade to the next one
+// (under LIGHT_MODE_SETTINGS, otherwise unused).
 
 // Get blend rate from `EnvLightSettings.blendRateAndFogNear` in 0-255 range
 #define ENV_LIGHT_SETTINGS_BLEND_RATE_U8(blendRateAndFogNear) (((blendRateAndFogNear) >> 10) * 4)
-#define ENV_LIGHT_SETTINGS_FOG_NEAR(blendRateAndFogNear) ((blendRateAndFogNear) & 0x3FF)
+#define ENV_LIGHT_SETTINGS_FOG_NEAR(blendRateAndFogNear) ((blendRateAndFogNear)&0x3FF)
 
 typedef struct {
     /* 0x00 */ u8 ambientColor[3];
@@ -209,7 +210,7 @@ typedef struct {
     /* 0x09 */ s8 light2Dir[3];
     /* 0x0C */ u8 light2Color[3];
     /* 0x0F */ u8 fogColor[3];
-    /* 0x12 */ s16 blendRateAndFogNear; 
+    /* 0x12 */ s16 blendRateAndFogNear;
     /* 0x14 */ s16 zFar;
 } EnvLightSettings; // size = 0x16
 
@@ -254,8 +255,8 @@ typedef struct EnvironmentContext {
     /* 0xB4 */ f32 windSpeed;
     /* 0xB8 */ u8 numLightSettings;
     /* 0xBC */ EnvLightSettings* lightSettingsList; // list of light settings from the scene file
-    /* 0xC0 */ u8 lightBlendEnabled; // only used with `LIGHT_MODE_SETTINGS` or on override
-    /* 0xC1 */ u8 lightSetting; // only used with `LIGHT_MODE_SETTINGS` or on override
+    /* 0xC0 */ u8 lightBlendEnabled;                // only used with `LIGHT_MODE_SETTINGS` or on override
+    /* 0xC1 */ u8 lightSetting;                     // only used with `LIGHT_MODE_SETTINGS` or on override
     /* 0xC2 */ u8 prevLightSetting;
     /* 0xC3 */ u8 lightSettingOverride;
     /* 0xC4 */ CurrentEnvLightSettings lightSettings; // settings for the currently "live" lights
@@ -286,13 +287,22 @@ void Environment_UpdateSkybox(u8 skyboxId, EnvironmentContext* envCtx, struct Sk
 void Environment_EnableUnderwaterLights(struct PlayState* play, s32 waterLightsIndex);
 void Environment_DisableUnderwaterLights(struct PlayState* play);
 void Environment_Update(struct PlayState* play, EnvironmentContext* envCtx, struct LightContext* lightCtx,
-                        struct PauseContext* pauseCtx, struct MessageContext* msgCtx, struct GameOverContext* gameOverCtx,
-                        struct GraphicsContext* gfxCtx);
-void Environment_DrawSunLensFlare(struct PlayState* play, EnvironmentContext* envCtx, struct View* view, struct GraphicsContext* gfxCtx, Vec3f vec);
-void Environment_DrawLensFlare(struct PlayState* play, EnvironmentContext* envCtx, struct View* view, struct GraphicsContext* gfxCtx, Vec3f pos, f32 scale, f32 colorIntensity, s16 glareStrength, u8 isSun);
+                        struct PauseContext* pauseCtx, struct MessageContext* msgCtx,
+                        struct GameOverContext* gameOverCtx, struct GraphicsContext* gfxCtx);
+void Environment_DrawSunLensFlare(struct PlayState* play, EnvironmentContext* envCtx, struct View* view,
+                                  struct GraphicsContext* gfxCtx, Vec3f vec);
+void Environment_DrawLensFlare(struct PlayState* play, EnvironmentContext* envCtx, struct View* view,
+                               struct GraphicsContext* gfxCtx, Vec3f pos, f32 scale, f32 colorIntensity,
+                               s16 glareStrength, u8 isSun);
 void Environment_DrawRain(struct PlayState* play, struct View* view, struct GraphicsContext* gfxCtx);
 void Environment_ChangeLightSetting(struct PlayState* play, u8 lightSetting);
 void Environment_AddLightningBolts(struct PlayState* play, u8 num);
+// Sidecar for shared ambient writes and transformation snapshots; raw light
+// adjustments and native lightning state remain authoritative.
+void Environment_ClearNativeLightningAmbient(void);
+void Environment_GetNativeLightningAmbient(s16 contribution[3]);
+void Environment_RestoreNativeLightningAmbient(const s16 contribution[3]);
+void Environment_DrawLightningFlash(struct PlayState* play, u8 red, u8 green, u8 blue, u8 alpha);
 void Environment_PlaySceneSequence(struct PlayState* play);
 void Environment_DrawCustomLensFlare(struct PlayState* play);
 void Environment_InitGameOverLights(struct PlayState* play);

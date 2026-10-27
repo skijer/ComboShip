@@ -1,3 +1,4 @@
+#include "../../../../../combo/ComboGameMode.h"
 /*
  * File: z_en_mag.c
  * Overlay: ovl_En_Mag
@@ -159,8 +160,8 @@ void EnMag_Update(Actor* thisx, PlayState* play) {
                 CHECK_BTN_ALL(play->state.input[0].press.button, BTN_A) ||
                 CHECK_BTN_ALL(play->state.input[0].press.button, BTN_B)) {
 
-                Audio_PlaySoundGeneral(NA_SE_SY_PIECE_OF_HEART, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_SY_PIECE_OF_HEART, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 
                 this->mainAlpha = 210;
                 this->subAlpha = 255;
@@ -198,8 +199,8 @@ void EnMag_Update(Actor* thisx, PlayState* play) {
                     if (play->transitionTrigger != TRANS_TRIGGER_START) {
                         Audio_SetCutsceneFlag(0);
 
-                        Audio_PlaySoundGeneral(NA_SE_SY_PIECE_OF_HEART, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_SY_PIECE_OF_HEART, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 
                         gSaveContext.gameMode = GAMEMODE_FILE_SELECT;
                         play->transitionTrigger = TRANS_TRIGGER_START;
@@ -544,7 +545,7 @@ void EnMag_DrawInner(Actor* thisx, PlayState* play, Gfx** gfxP) {
 #ifdef COMBO_BUILD
     // ComboShip: draw dual-game logos + flame effects (OOT left, MM right) instead of the original
     // block below, which is kept untouched for upstream merges. See combo/title/ComboTitleLogos.h
-    if (ComboTitle_DrawLogos(&gfx, this, isMQ)) {
+    if (Combo_IsCombinedGame() && ComboTitle_DrawLogos(&gfx, this, isMQ)) {
         goto comboSkipOriginalLogoBlock;
     }
 #endif

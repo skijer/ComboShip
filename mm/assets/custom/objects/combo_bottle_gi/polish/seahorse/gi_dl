@@ -1,0 +1,375 @@
+<DisplayList Version="0">
+<PipeSync/>
+<Matrix Path="objects/combo_bottle_gi/polish/seahorse/scale_mtx" Param="G_MTX_PUSH"/>
+<SetCycleType G_CYC_2CYCLE="1"/>
+<SetAlphaCompare Mode="0"/>
+<SetTextureLUT Mode="G_TT_NONE"/>
+<ClearGeometryMode G_CULL_FRONT="1" G_TEXTURE_GEN="1" G_TEXTURE_GEN_LINEAR="1" G_FOG="1"/>
+<SetGeometryMode G_ZBUFFER="1" G_SHADE="1" G_SHADING_SMOOTH="1" G_LIGHTING="1" G_CULL_BACK="1"/>
+<PipeSync/>
+<SetRenderMode Mode1="G_RM_PASS" Mode2="G_RM_AA_ZB_OPA_SURF2"/>
+<SetCombineLERP A0="G_CCMUX_TEXEL0" B0="G_CCMUX_0" C0="G_CCMUX_SHADE" D0="G_CCMUX_0" Aa0="G_ACMUX_TEXEL0" Ab0="G_ACMUX_0" Ac0="G_ACMUX_PRIMITIVE" Ad0="G_ACMUX_0" A1="G_CCMUX_0" B1="G_CCMUX_0" C1="G_CCMUX_0" D1="G_CCMUX_COMBINED" Aa1="G_ACMUX_0" Ab1="G_ACMUX_0" Ac1="G_ACMUX_0" Ad1="G_ACMUX_COMBINED"/>
+<SetPrimColor M="0" L="0" R="255" G="255" B="255" A="255"/>
+<Texture S="65535" T="65535" Level="0" Tile="0" On="1"/>
+<LoadTextureBlock Path="objects/combo_bottle_gi/polish/seahorse/material3_tex" Format="0" Size="3" Width="32" Height="32" MaskS="5" MaskT="5" ShiftS="0" ShiftT="0" CMS_TXNoMirror="1" CMS_TXWrap="1" CMT_TXNoMirror="1" CMT_TXWrap="1"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="0" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="30" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="60" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="90" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="120" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="150" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="180" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="210" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="240" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="270" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="300" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="330" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="360" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="390" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="420" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="450" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="480" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="510" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="540" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="570" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="600" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="630" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="660" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="690" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="720" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="750" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="780" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="810" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="840" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="870" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="900" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="930" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="960" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="990" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1020" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1050" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1080" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1110" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1140" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1170" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1200" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1230" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1260" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1290" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1320" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1350" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1380" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1410" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1440" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1470" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1500" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1530" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1560" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1590" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1620" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1650" Count="12"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<PipeSync/>
+<SetRenderMode Mode1="G_RM_PASS" Mode2="G_RM_AA_ZB_OPA_SURF2"/>
+<SetCombineLERP A0="G_CCMUX_TEXEL0" B0="G_CCMUX_0" C0="G_CCMUX_SHADE" D0="G_CCMUX_0" Aa0="G_ACMUX_TEXEL0" Ab0="G_ACMUX_0" Ac0="G_ACMUX_PRIMITIVE" Ad0="G_ACMUX_0" A1="G_CCMUX_0" B1="G_CCMUX_0" C1="G_CCMUX_0" D1="G_CCMUX_COMBINED" Aa1="G_ACMUX_0" Ab1="G_ACMUX_0" Ac1="G_ACMUX_0" Ad1="G_ACMUX_COMBINED"/>
+<SetPrimColor M="0" L="0" R="255" G="255" B="255" A="255"/>
+<Texture S="65535" T="65535" Level="0" Tile="0" On="1"/>
+<LoadTextureBlock Path="objects/combo_bottle_gi/polish/seahorse/material2_tex" Format="0" Size="3" Width="32" Height="32" MaskS="5" MaskT="5" ShiftS="0" ShiftT="0" CMS_TXNoMirror="1" CMS_TXWrap="1" CMT_TXNoMirror="1" CMT_TXWrap="1"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1662" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1692" Count="30"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<Triangles2 V00="12" V01="13" V02="14" Flag0="0" V10="15" V11="16" V12="17" Flag1="0"/>
+<Triangles2 V00="18" V01="19" V02="20" Flag0="0" V10="21" V11="22" V12="23" Flag1="0"/>
+<Triangles2 V00="24" V01="25" V02="26" Flag0="0" V10="27" V11="28" V12="29" Flag1="0"/>
+<LoadVertices Path="objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx" VertexBufferIndex="0" VertexOffset="1722" Count="12"/>
+<Triangles2 V00="0" V01="1" V02="2" Flag0="0" V10="3" V11="4" V12="5" Flag1="0"/>
+<Triangles2 V00="6" V01="7" V02="8" Flag0="0" V10="9" V11="10" V12="11" Flag1="0"/>
+<PipeSync/>
+<SetRenderMode Mode1="G_RM_PASS" Mode2="G_RM_AA_ZB_OPA_SURF2"/>
+<Texture S="0" T="0" Level="0" Tile="0" On="0"/>
+<SetPrimColor M="0" L="0" R="255" G="255" B="255" A="255"/>
+<PopMatrix Param="G_MTX_MODELVIEW"/>
+<EndDisplayList/>
+</DisplayList>

@@ -1,0 +1,26 @@
+{
+  "user_statement": "ok, I approve those models",
+  "preview_commit": "48308c553619265a548ab7d2dfa142ef43232e83",
+  "preview": "https://github.com/marsh6487/ComboShip/blob/48308c553619265a548ab7d2dfa142ef43232e83/tools/nei_gi/PREVIEWS/swords_tuned_group_2.gif",
+  "resource_set_hash_recipe": "SHA-256 of each sorted filename followed by its bytes, concatenated across all installed resource files",
+  "models": {
+    "master_sword": {
+      "visual_approval": "Approved in latest reply",
+      "glb_sha256": "532728001c667ea3568c88ec27d2e1d1bfd25a1a34e7434556680d7f30d4a2e5",
+      "installed_resource_set_sha256": "c85a2b4c58078cd3ae7d9e9a44b8167d3483eaf35cffb6f0bec04d2c403d7965",
+      "in_game_visual_verified": false
+    },
+    "gilded_sword": {
+      "visual_approval": "Approved in latest reply",
+      "glb_sha256": "bb7291c2e40b03b2ae622ee629ed8fb4600b9be33ada7f26e757c2638d7ed41c",
+      "installed_resource_set_sha256": "4736394ffa1e55c2372e664a9c19cc23d104379f9dfeae08575d7f88f2b34cfb",
+      "in_game_visual_verified": false
+    },
+    "true_master_sword": {
+      "visual_approval": "Accepted before final two-sword adjustment; unchanged",
+      "glb_sha256": "86eb15acd183d082dbee2ea1144eb21733d9b6a3d5292a0f296a8a2091b4600e",
+      "installed_resource_set_sha256": "e6909ac20ace877e62a3f21b3b49962526210afc4e585fd99bb994d80932a9f6",
+      "in_game_visual_verified": false
+    }
+  }
+}

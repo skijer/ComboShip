@@ -1,6 +1,7 @@
 #include "global.h"
 #include <libultraship/bridge/resourcebridge.h>
 #include "2s2h/mixer.h"
+#include "../../../../combo/audio/MMAudioTraceBridge.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 
 // DMEM Addresses for the RSP
@@ -193,6 +194,35 @@ void AudioSynth_AddReverbBufferEntry(s32 numSamples, s32 updateIndex, s32 reverb
     }
 }
 
+#ifdef COMBO_BUILD
+// Capture ownership with each sub-update, before later sequencer updates can
+// reuse a note for another player. No game structures or ABI fields are added.
+static MMAudioTraceNote sAudioTraceContexts[1024];
+static MMAudioTraceNote AudioSynth_TraceContext(s32 noteIndex, NoteSampleState* sampleState) {
+    Note* note = &gAudioCtx.notes[noteIndex];
+    const Sample* traceSample =
+        !sampleState->bitField1.isSyntheticWave && sampleState->tunedSample ? sampleState->tunedSample->sample : NULL;
+    SequenceLayer* traceLayer = note->playbackState.parentLayer;
+    SequencePlayer* tracePlayer =
+        traceLayer && traceLayer != NO_LAYER && traceLayer->channel ? traceLayer->channel->seqPlayer : NULL;
+    MMAudioTraceNote traceNote = { .note = noteIndex,
+                                   .player = tracePlayer ? tracePlayer->playerIndex : -1,
+                                   .sequence = tracePlayer ? tracePlayer->seqId : -1,
+                                   .font = note->playbackState.fontId,
+                                   .codec = traceSample ? (int)traceSample->codec : -1,
+                                   .gain = sampleState->gain,
+                                   .pitch = sampleState->frequencyFixedPoint,
+                                   .filter = sampleState->filter != NULL,
+                                   .samples = 0,
+                                   .comb = sampleState->combFilterGain,
+                                   .sample = (uintptr_t)traceSample,
+                                   .sequenceData = tracePlayer ? (uintptr_t)tracePlayer->seqData : 0,
+                                   .bytes = traceSample ? traceSample->size : 0,
+                                   .tuning = traceSample ? sampleState->tunedSample->tuning : 0.0f };
+    return traceNote;
+}
+#endif
+
 /**
  * Sync the sample states between the notes and the list
  */
@@ -206,6 +236,10 @@ void AudioSynth_SyncSampleStates(s32 updateIndex) {
     for (i = 0; i < gAudioCtx.numNotes; i++) {
         noteSampleState = &gAudioCtx.notes[i].sampleState;
         sampleState = &gAudioCtx.sampleStateList[sampleStateBaseIndex + i];
+#ifdef COMBO_BUILD
+        if (MM_AudioTraceEnabled() && sampleStateBaseIndex + i >= 0 && sampleStateBaseIndex + i < 1024)
+            sAudioTraceContexts[sampleStateBaseIndex + i] = AudioSynth_TraceContext(i, sampleState);
+#endif
         if (noteSampleState->bitField0.enabled) {
             noteSampleState->bitField0.needsInit = false;
         } else {
@@ -936,6 +970,16 @@ Acmd* AudioSynth_ProcessSample(s32 noteIndex, NoteSampleState* sampleState, Note
     s16 sampleDataDmemAddr;
 
     note = &gAudioCtx.notes[noteIndex];
+#ifdef COMBO_BUILD
+    if (MM_AudioTraceEnabled()) {
+        const ptrdiff_t traceIndex = sampleState - gAudioCtx.sampleStateList;
+        MMAudioTraceNote traceNote = { .note = -1 };
+        if (traceIndex >= 0 && traceIndex < 1024)
+            traceNote = sAudioTraceContexts[traceIndex];
+        traceNote.samples = numSamplesPerUpdate;
+        MM_AudioTraceSetNote(&traceNote);
+    }
+#endif
     flags = A_CONTINUE;
 
     // Initialize the synthesis state
@@ -1157,6 +1201,15 @@ Acmd* AudioSynth_ProcessSample(s32 noteIndex, NoteSampleState* sampleState, Note
                         numSamplesProcessed += numSamplesToLoadAdj;
                         dmemUncompressedAddrOffset1 = numSamplesToLoadAdj;
 
+                        // Custom samples decode asynchronously. Keep the cleared
+                        // buffer silent while pending, or if decoding failed.
+                        if (sampleAddr == NULL) {
+#ifdef COMBO_BUILD
+                            MM_AudioTraceEvent("stream-pending-or-failed", numSamplesToLoadAdj, 0);
+#endif
+                            goto skip;
+                        }
+
                         if (((synthState->samplePosInt * 2) + (numSamplesToLoadAdj)*SAMPLE_SIZE) < sample->size) {
                             bytesToRead = (numSamplesToLoadAdj)*SAMPLE_SIZE;
                         } else {
@@ -1167,8 +1220,8 @@ Acmd* AudioSynth_ProcessSample(s32 noteIndex, NoteSampleState* sampleState, Note
                             aOPUSdecImpl(sampleAddr, DMEM_UNCOMPRESSED_NOTE, bytesToRead, &synthState->opusFile,
                                          synthState->samplePosInt, sample->fileSize);
                         } else {
-                            aLoadBuffer(cmd++, sampleAddr + (synthState->samplePosInt * 2), DMEM_UNCOMPRESSED_NOTE,
-                                        bytesToRead);
+                            aLoadBufferExactImpl(sampleAddr + (synthState->samplePosInt * 2), DMEM_UNCOMPRESSED_NOTE,
+                                                 bytesToRead);
                         }
 
                         goto skip;
@@ -1433,6 +1486,9 @@ Acmd* AudioSynth_ProcessSample(s32 noteIndex, NoteSampleState* sampleState, Note
     }
 
     // Determine the behavior of the audio processing that leads to the haas effect
+#ifdef COMBO_BUILD
+    aAudioTraceDMemImpl(MM_TRACE_PROCESSED, DMEM_TEMP, numSamplesPerUpdate);
+#endif
     if ((sampleState->haasEffectLeftDelaySize != 0) || (synthState->prevHaasEffectLeftDelaySize != 0)) {
         haasEffectDelaySide = HAAS_EFFECT_DELAY_LEFT;
     } else if ((sampleState->haasEffectRightDelaySize != 0) || (synthState->prevHaasEffectRightDelaySize != 0)) {

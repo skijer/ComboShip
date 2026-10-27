@@ -1,0 +1,15 @@
+EXPORTS
+    FrameTiming_BeginFrame
+    FrameTiming_IsActive
+    FrameTiming_BeginSpan
+    FrameTiming_AddDuration
+    FrameTiming_EndSpan
+    FrameTiming_EndFrame
+    FrameTiming_Shutdown
+    FrameTiming_LogRenderCost
+    FrameTiming_RecordAttempt
+    FrameTiming_RecordConfiguration
+    FrameTiming_TickId
+    FrameTiming_EndNamedSpan
+    FrameTiming_Count
+    FrameTiming_NeedsConfiguration

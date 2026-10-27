@@ -378,6 +378,7 @@ void EnTest6_Destroy(Actor* thisx, PlayState* play2) {
     EnTest6* this = (EnTest6*)thisx;
     s32 i;
 
+    Environment_ClearNativeLightningAmbient();
     play->envCtx.adjLightSettings.ambientColor[0] = 0;
     play->envCtx.adjLightSettings.ambientColor[1] = 0;
     play->envCtx.adjLightSettings.ambientColor[2] = 0;

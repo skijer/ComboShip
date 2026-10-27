@@ -9,6 +9,8 @@
 #include "soh/Enhancements/randomizer/randomizer_entrance.h"
 #include "soh/Enhancements/randomizer/randomizer_grotto.h"
 #include "soh/OTRGlobals.h"
+#include "soh/FleetShipCombo/FleetSync.h" // Fleet Ship Combo cross-game hole intercept
+#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
 #define FLAGS ACTOR_FLAG_UPDATE_DURING_OCARINA
 
@@ -120,8 +122,8 @@ void DoorAna_WaitClosed(DoorAna* this, PlayState* play) {
     if (openGrotto) {
         this->actor.params &= ~0x0300;
         DoorAna_SetupAction(this, DoorAna_WaitOpen);
-        Audio_PlaySoundGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
     Actor_SetClosestSecretDistance(&this->actor, play);
 }
@@ -132,6 +134,23 @@ void DoorAna_WaitOpen(DoorAna* this, PlayState* play) {
     s32 destinationIdx;
 
     player = GET_PLAYER(play);
+
+    // Fleet Ship Combo: the cross-game hole. Falling in (Link steps over it -> floor disabled ->
+    // he SINKS into the hole = the "entering a grotto" feel) triggers the cross-game fade + flip
+    // (FleetSync_OnHoleFall). It NEVER runs the vanilla grotto warp (that reloaded the scene and
+    // trapped the player). The flip happens under the fade; the arrival is owned by FleetWarpBoot.
+    if (this->actor.params & FLEET_HOLE_PARAM) {
+        Math_StepToF(&this->actor.scale.x, 0.01f, 0.001f);
+        if (!Player_InCsMode(play) && !(player->stateFlags1 & (PLAYER_STATE1_ON_HORSE | PLAYER_STATE1_IN_WATER)) &&
+            this->actor.xzDistToPlayer <= 15.0f && -50.0f <= this->actor.yDistToPlayer &&
+            this->actor.yDistToPlayer <= 15.0f) {
+            player->stateFlags1 |= PLAYER_STATE1_FLOOR_DISABLED; // sink into the hole
+            FleetSync_OnHoleFall();
+        }
+        Actor_SetScale(&this->actor, this->actor.scale.x);
+        return;
+    }
+
     if (Math_StepToF(&this->actor.scale.x, 0.01f, 0.001f)) {
         if ((this->actor.targetMode != 0) && (play->transitionTrigger == TRANS_TRIGGER_OFF) &&
             (player->stateFlags1 & PLAYER_STATE1_FLOOR_DISABLED) && (player->av1.actionVar1 == 0)) {
@@ -152,9 +171,11 @@ void DoorAna_WaitOpen(DoorAna* this, PlayState* play) {
 
             DoorAna_SetupAction(this, DoorAna_GrabPlayer);
         } else {
-            if (!Player_InCsMode(play) && !(player->stateFlags1 & (PLAYER_STATE1_ON_HORSE | PLAYER_STATE1_IN_WATER)) &&
-                this->actor.xzDistToPlayer <= 15.0f && -50.0f <= this->actor.yDistToPlayer &&
-                this->actor.yDistToPlayer <= 15.0f) {
+            if (GameInteractor_Should(VB_DOOR_ANA_GRAB_PLAYER,
+                                      !Player_InCsMode(play) &&
+                                          !(player->stateFlags1 & (PLAYER_STATE1_ON_HORSE | PLAYER_STATE1_IN_WATER)) &&
+                                          this->actor.xzDistToPlayer <= 15.0f && -50.0f <= this->actor.yDistToPlayer &&
+                                          this->actor.yDistToPlayer <= 15.0f)) {
                 player->stateFlags1 |= PLAYER_STATE1_FLOOR_DISABLED;
                 this->actor.targetMode = 1;
             } else {

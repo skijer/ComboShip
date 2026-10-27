@@ -1,0 +1,263 @@
+{
+  "baseline": "613802447cf8a4fbc3e058ba084f9e3dd7b9f7ae",
+  "checks": {
+    "bugfix-integrated-result.json": {
+      "command": "bash scripts/diagnostics/run_oct20_bugfix_regressions.sh",
+      "log": "/workspace/scratch/9dcd75c38e6f/verification/bugfix-integrated.log",
+      "returncode": 0,
+      "source_head": "4fabc710e62f3326de31024732636dff9a1c44ed"
+    },
+    "elemental-integrated-result.json": {
+      "command": "bash scripts/diagnostics/run_elemental_sword_regressions.sh",
+      "log": "/workspace/scratch/9dcd75c38e6f/verification/elemental-integrated.log",
+      "returncode": 0,
+      "source_head": "bc278c274e86e2024c3844463d0daf9b91bd9aea"
+    },
+    "final-controls-results.json": [
+      {
+        "command": [
+          "python",
+          "-B",
+          "tests/magic_mirror/run_tests.py"
+        ],
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/final-controls-0.log",
+        "returncode": 0
+      },
+      {
+        "command": [
+          "python",
+          "-B",
+          "tests/magic_mirror/run_integration_tests.py"
+        ],
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/final-controls-1.log",
+        "returncode": 0
+      },
+      {
+        "command": [
+          "python",
+          "-B",
+          "scripts/check-asset-collisions.py"
+        ],
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/final-controls-2.log",
+        "returncode": 0
+      }
+    ],
+    "ice-native-integrated-result.json": {
+      "command": [
+        "python",
+        "-B",
+        "scripts/diagnostics/run_mm_ice_arrows_tests.py",
+        "--include",
+        "/workspace/scratch/593f6dd85762/analysis/dependencies/nlohmann_json/include",
+        "--sanitize"
+      ],
+      "dependency_include_roots": [
+        "/workspace/scratch/593f6dd85762/analysis/dependencies/nlohmann_json/include",
+        "/workspace/scratch/593f6dd85762/analysis/deps-src/spdlog/include",
+        "/workspace/scratch/593f6dd85762/analysis/deps-src/imgui",
+        "/workspace/scratch/593f6dd85762/analysis/deps-src/SDL/include",
+        "/workspace/scratch/593f6dd85762/analysis/deps-src/SDL_net",
+        "/workspace/scratch/593f6dd85762/analysis/deps-src/thread-pool/include",
+        "/workspace/scratch/593f6dd85762/analysis/deps-include"
+      ],
+      "log": "/workspace/scratch/9dcd75c38e6f/verification/ice-native-integrated.log",
+      "returncode": 0
+    },
+    "inherited-results.json": [
+      {
+        "command": "python -B tests/reward_gi/run_asset_packaging_tests.py",
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/inherited-0.log",
+        "returncode": 0
+      },
+      {
+        "command": "python -B scripts/diagnostics/run_oot_native_transformation_tests.py --sanitize",
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/inherited-1.log",
+        "returncode": 0
+      },
+      {
+        "command": "python -B scripts/diagnostics/run_shield_particle_lifetime_tests.py --sanitize",
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/inherited-2.log",
+        "returncode": 0
+      },
+      {
+        "command": "python -B scripts/diagnostics/run_saria_palette_tests.py",
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/inherited-3.log",
+        "returncode": 0
+      }
+    ],
+    "market-replay-result.json": [
+      {
+        "binary": "mm-binary/test",
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/replay-mm-binary-test.log",
+        "returncode": 0,
+        "sha256": "2bb1bf2e6b2d52c610639b10a2b5fc51f3131e3ba6ee247feec0143190603e1b"
+      },
+      {
+        "binary": "oot-binary/test",
+        "log": "/workspace/scratch/9dcd75c38e6f/verification/replay-oot-binary-test.log",
+        "returncode": 0,
+        "sha256": "9906a51e9b0938d1b2e1b48d6658efd3eb40f61ce176a0dde47a5fcba144b890"
+      }
+    ]
+  },
+  "code_checkpoint": "39c52ee7dc0d74b65c1fce7c84cbd0585788c481",
+  "code_tree": "3b78b1c99c384f8e3ac4e4a62710e3ba151ca10f",
+  "dependency_sources": {
+    "SDL": {
+      "commit": "8acf7cfc0f88717e5c036f60f0314bfcafe39189",
+      "origin": "https://github.com/libsdl-org/SDL.git"
+    },
+    "SDL_net": {
+      "commit": "bec0e57de5f188c97b4762a52b59994ceb931ce1",
+      "origin": "https://github.com/libsdl-org/SDL_net.git"
+    },
+    "imgui": {
+      "commit": "4806a1924ff6181180bf5e4b8b79ab4394118875",
+      "origin": "https://github.com/ocornut/imgui.git"
+    },
+    "spdlog": {
+      "commit": "486b55554f11c9cccc913e11a87085b2a91f706f",
+      "origin": "https://github.com/gabime/spdlog.git"
+    },
+    "thread-pool": {
+      "commit": "097aa718f25d44315cadb80b407144ad455ee4f9",
+      "origin": "https://github.com/bshoshany/thread-pool.git"
+    }
+  },
+  "elemental_input_paths_unchanged": 95,
+  "entry_bundled_cycles": 18,
+  "entry_full_cycles": 66,
+  "forest_unittest_count": 31,
+  "forest_unittest_skips": 2,
+  "format": {
+    "ci_selected_changed_files": 85,
+    "returncode": 0,
+    "version": "clang-format version 14.0.6 (https://github.com/ssciwr/clang-format-wheel e79d44a98fc6eeb3e9751220e441da03812564c1)"
+  },
+  "full_game_build": "held for requested live entry proof; not started",
+  "game_runtime": "unavailable; live entry, mount/load order, drawing, sound and configured acceptance unproven",
+  "log_archive_sha256": "ddf4ed51b6ec59762786108d6b8d16cf16559df2f423d7e6977a41f4392ca319",
+  "logs": [
+    {
+      "bytes": 911246,
+      "entry": "verification/elemental-integrated.log",
+      "sha256": "6b7c3d770966a9fdd94fc6f587699352247877a1c35fc41bd26c42aaf4e052fd"
+    },
+    {
+      "bytes": 24790,
+      "entry": "verification/bugfix-integrated.log",
+      "sha256": "d4dbe88a2ec1169bd472d76b01109d27bdff55f8975234435b676eb833fd8e6a"
+    },
+    {
+      "bytes": 170,
+      "entry": "verification/ice-native-integrated.log",
+      "sha256": "dcce9c0649830827cc3a0b660e9bd48488921d0757a166177904cd4fd273ea05"
+    },
+    {
+      "bytes": 845,
+      "entry": "verification/inherited-0.log",
+      "sha256": "ad07f457947c48894e3235bdc2a9ddb54b3c8a10eb6a0f81f5c65c19d346b524"
+    },
+    {
+      "bytes": 3653,
+      "entry": "verification/inherited-1.log",
+      "sha256": "214f23fa91c1488a19d779743b9ff28bdc7e0ffe8f74b2c5ac56a82cffdb870d"
+    },
+    {
+      "bytes": 241,
+      "entry": "verification/inherited-2.log",
+      "sha256": "92724d14bdf09721567a3289eb7bc6801d61736207df4af16d45f3bae79a16b4"
+    },
+    {
+      "bytes": 95,
+      "entry": "verification/inherited-3.log",
+      "sha256": "ee76b71322f0dea080a3ec4c2e5829bd0f96cc4201c44a59bf0a24e83a22ca13"
+    },
+    {
+      "bytes": 1292,
+      "entry": "verification/final-controls-0.log",
+      "sha256": "05bc4f9d5d5cbe06fe53391837e9cf17b717ad1f65b0aa0c93cf70d69ac8ebdb"
+    },
+    {
+      "bytes": 101,
+      "entry": "verification/final-controls-1.log",
+      "sha256": "199ba496f288116d36c62f29346d4fbf0bd75745a1c893abfcbdaa4c6d5b1033"
+    },
+    {
+      "bytes": 102,
+      "entry": "verification/final-controls-2.log",
+      "sha256": "7283fb554a4f9b2d12fc1f15029572b31c2a2505eb2e28038f74a4f2a85fcf23"
+    },
+    {
+      "bytes": 2637,
+      "entry": "verification/replay-mm-binary-test.log",
+      "sha256": "ff91c6e629fe9f1be919debe4acfc6b7b80b832e388b52689487fa6e56d0ccf8"
+    },
+    {
+      "bytes": 1560,
+      "entry": "verification/replay-oot-binary-test.log",
+      "sha256": "28881b4b13e537a99c6085311749a90d8cef7138d93cdf894414bd4e6f12dfae"
+    },
+    {
+      "bytes": 0,
+      "entry": "verification/final-ci-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 20602,
+      "entry": "gi-particle-validation/focused-final.log",
+      "sha256": "677ab570d25afa58deb1648630741ec1d733ff4943c7096c045a1fe5f8d47ba6"
+    },
+    {
+      "bytes": 184288,
+      "entry": "gi-particle-validation/forest-actors-final.log",
+      "sha256": "e78593ec3d9924ec3c48e30388ae10aba91a14e844eae40fc3f78d325f3ce2f5"
+    },
+    {
+      "bytes": 155,
+      "entry": "gi-particle-validation/native-actors-final.log",
+      "sha256": "233c763baadec0e3f9f68ffdb5e4d8606d7cb98c4bd508d48bc2f90e4365e659"
+    },
+    {
+      "bytes": 225,
+      "entry": "gi-particle-validation/native-portals-final.log",
+      "sha256": "ff1eef4ae3c34aa73b64459952533cdef38e4218666d7795f5aa4de55af55ed6"
+    },
+    {
+      "bytes": 736,
+      "entry": "gi-particle-validation/baseline-expected-failure.log",
+      "sha256": "3f95fe2d7448fe64e78e5525c67b29e8ff29a61225eaac791415e7e52882f996"
+    },
+    {
+      "bytes": 4102,
+      "entry": "gi-particle-validation/mm-gi-renderer-command.json",
+      "sha256": "d3cc92a0bda588903e7281762962834cd2c7888b15c5d6b7a58954f3c1f6ca3e"
+    },
+    {
+      "bytes": 4233,
+      "entry": "gi-particle-validation/soh-gi-renderer-command.json",
+      "sha256": "185bb5c06afccf56ca3cbe5119c025dc97d66ed4247b7bb6be825359c1ca91f6"
+    },
+    {
+      "bytes": 6745,
+      "entry": "gi-particle-validation/mm-gi-renderer-native.log",
+      "sha256": "cebb7b0459943a1b10222d8aa39b597c2dda7c0f6fa73bbba6ba8d5d196496c1"
+    },
+    {
+      "bytes": 2665,
+      "entry": "gi-particle-validation/soh-gi-renderer-native.log",
+      "sha256": "0eef126d2305d235b7ae17a20d6821e1ece2ef4960d09fa9eeb47b2c6a84e520"
+    },
+    {
+      "bytes": 95261,
+      "entry": "dialogue-mirror-verify/commands.json",
+      "sha256": "2ce2c8a511df46b7d0b35f44e9bc6c73dde1364bced0b7b14c419e20e9449a86"
+    },
+    {
+      "bytes": 26457,
+      "entry": "dialogue-mirror-verify/final-adapter-commands.json",
+      "sha256": "3fdbd105b93d2c3c315cd108edd39e41763b27da8edeb941ace8161a8fb86738"
+    }
+  ],
+  "promotion": false
+}

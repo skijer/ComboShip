@@ -1,0 +1,94 @@
+{
+  "baseline": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+  "sources": {
+    "geld_00_600": {
+      "name": "tex1_128x128_C146422CF70C04F1_13_mip0.png",
+      "sha256": "6fef7b40561d1d3f37ec6454d23a9385cb5f45166d5fab6b5574265b5ca365a5",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "geld_01_4600": {
+      "name": "tex1_128x64_9E707002742B4A45_12_mip0.png",
+      "sha256": "25bc628d362e9d1131e3ab849a51220df6e546f14f701c58c4ed24026dc7932f",
+      "size": [
+        512,
+        256
+      ]
+    },
+    "open": {
+      "name": "tex1_32x32_8174C47B15759209_12_mip0.png",
+      "sha256": "4c0f2adee026ef0c5fdcc6ba1d00c59a067b992317d90347ba8363eb5e9e38ff",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "half": {
+      "name": "tex1_32x32_8405073A0CD4B017_12_mip0.png",
+      "sha256": "1286572a55a89f95f8afab0563347c71aed25266dbb4a69b68a53a4a20f5faa7",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "closed": {
+      "name": "tex1_32x32_C02A490608A19B53_12_mip0.png",
+      "sha256": "5a7755ce8106541b27296b69134ccfc85c1a2cca345281f5ed72695d38d9e699",
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "gi": {
+    "sourceBounds": [
+      [
+        -587.0,
+        -259.0,
+        -701.0
+      ],
+      [
+        587.0,
+        1422.0,
+        1516.0
+      ]
+    ],
+    "scale": 0.034503271861986914,
+    "center": [
+      0.0,
+      581.5,
+      407.5
+    ],
+    "vertices": 410
+  },
+  "notes": [
+    "Henriko pixels imported without repainting or resampling",
+    "Full Henriko clothing and veil use fixed source purple instead of a tunic tint",
+    "Only five outer ankle cuff tips per leg are tucked in; rig and UVs preserved",
+    "Sphere-mapped metallic highlights, not world-space ray-traced reflections"
+  ],
+  "cuffs": {
+    "objects/forms/gerudo/object_link_boy/bone004_gLinkAdultRightLegLimb_mesh_layer_Opaque_vtx_1": {
+      "tips": 5,
+      "seamVertices": 12,
+      "remainingFlare": 0.35
+    },
+    "objects/forms/gerudo/object_link_boy/bone007_gLinkAdultLeftLegLimb_mesh_layer_Opaque_vtx_1": {
+      "tips": 5,
+      "seamVertices": 12,
+      "remainingFlare": 0.35
+    },
+    "objects/forms/gerudo/object_link_child/bone004_gLinkChildRightShinLimb_mesh_layer_Opaque_vtx_1": {
+      "tips": 5,
+      "seamVertices": 12,
+      "remainingFlare": 0.35
+    },
+    "objects/forms/gerudo/object_link_child/bone007_gLinkChildLeftShinLimb_mesh_layer_Opaque_vtx_1": {
+      "tips": 5,
+      "seamVertices": 12,
+      "remainingFlare": 0.35
+    }
+  }
+}

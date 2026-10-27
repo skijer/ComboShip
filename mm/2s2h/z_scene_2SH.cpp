@@ -1,5 +1,8 @@
 ﻿#include "BenPort.h"
 #include "global.h"
+#include "2s2h/Enhancements/Gameplay/ComboOpeningForest.h"
+#include "2s2h/Enhancements/Gameplay/ComboWoodfallPassage.h"
+#include "2s2h/Enhancements/Gameplay/ComboRegionalPassages.h"
 #include <ship/resource/type/Blob.h>
 #include <memory>
 #include <cassert>
@@ -48,6 +51,11 @@ void Scene_CommandSpawnList(PlayState* play, SOH::ISceneCommand* cmd) {
     void* objectPtr;
 
     play->linkActorEntry = &entries[play->setupEntranceList[play->curSpawn].spawn];
+#ifdef COMBO_BUILD
+    ComboOpeningForest_PrepareSpawn(play);
+    ComboWoodfallPassage_ReadSpawns(play, entries, list->numStartPositions);
+    ComboRegionalPassagesMm_ReadSpawns(play, entries, list->numStartPositions);
+#endif
 
     if ((PLAYER_GET_START_MODE(play->linkActorEntry) == PLAYER_START_MODE_TELESCOPE) ||
         ((gSaveContext.respawnFlag == 2) && (gSaveContext.respawn[RESPAWN_MODE_RETURN].playerParams ==
@@ -106,6 +114,9 @@ void Scene_CommandEntranceList(PlayState* play, SOH::ISceneCommand* cmd) {
     SOH::SetEntranceList* list = (SOH::SetEntranceList*)cmd;
 
     play->setupEntranceList = (EntranceEntry*)list->GetRawPointer();
+#ifdef COMBO_BUILD
+    ComboRegionalPassagesMm_ReadEntrances(play, list->numEntrances);
+#endif
 }
 
 void Scene_CommandSpecialFiles(PlayState* play, SOH::ISceneCommand* cmd) {
@@ -282,7 +293,11 @@ void Scene_CommandEnvLightSettings(PlayState* play, SOH::ISceneCommand* cmd) {
 void Scene_CommandTimeSettings(PlayState* play, SOH::ISceneCommand* cmd) {
     SOH::SetTimeSettings* settings = (SOH::SetTimeSettings*)cmd;
 
-    if ((settings->settings.hour != 0xFF) && (settings->settings.minute != 0xFF)) {
+    if (
+#ifdef COMBO_BUILD
+        !ComboOpeningForest_IsExploration(play) &&
+#endif
+        (settings->settings.hour != 0xFF) && (settings->settings.minute != 0xFF)) {
         gSaveContext.skyboxTime = gSaveContext.save.time =
             CLOCK_TIME_ALT2_F(settings->settings.hour, settings->settings.minute);
     }

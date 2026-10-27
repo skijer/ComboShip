@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "resource": "custom/skiejer_market/title",
+  "text": "Skiejer's Black Market",
+  "logical_width": 192,
+  "logical_height": 24,
+  "format": "IA8",
+  "encoding": "native high intensity nibble, low alpha nibble",
+  "authoring": "Original built-in imagegen lettering; no external font or modpack pixels",
+  "source": {
+    "file": "black-market-wordmark-original.png"
+  },
+  "prompts": [
+    {
+      "mode": "generate",
+      "prompt": "Use case: logo-brand. Asset type: original fantasy game location-title wordmark, to be packed into a 192 by 24 pixel native IA8 monochrome title-card sprite for an Ocarina of Time-style location reveal. Generate brand-new original LETTERING ONLY on a truly transparent background. Exact text in ONE single horizontal line: \"Skiejer's Black Market\". Spell Skiejer's exactly S-k-i-e-j-e-r apostrophe s. Typography: charismatic, hand-lettered fantasy italic serif calligraphy, clear heavy strokes and subtly crooked tapered terminals; dignified secret apothecary atmosphere. Large expressive capitals S, B, M, with restrained long sweeping serif tails, integrated into the letters. Maintain excellent legibility after reducing to a very small game sprite. White or near-white monochrome letter faces with solid bright interiors and clean soft antialiased alpha edges. Do not add glows, outlines, dropshadows, crests, symbols, decorative border lines, scenery, banners or other art. Every letter must be separated and legible, no overlap between words. Composition: the entire exact phrase centered across almost the full width of a wide horizontal transparent canvas; all letterforms and flourishes fully within frame with a modest transparent margin. One line only, consistent baseline; no second line and no extra text. Original lettering, not a copied game logo or a commercial font specimen."
+    },
+    {
+      "mode": "edit",
+      "reference_sha256": "f6509fe16acd703419144bbd7cbd1b08e087086274c7bfe4572000ce1cef59ad",
+      "prompt": "Edit target: the attached original white fantasy location-title wordmark. Keep the exact one-line text \"Skiejer's Black Market\" and its broad horizontal composition. Targeted correction: turn it into CLEAN, SMOOTH, SOLID-WHITE calligraphic letter shapes for a very small video-game title sprite. Remove ALL distressed texture, hatching, speckles, scratches, random pixels and debris from both the letters and the transparent background. Simplify the fine flourishes. Each glyph should have a fully filled solid white face and a crisp antialiased alpha edge, with proper empty counters, no internal hairline outlines. Keep the expressive fantasy italic-serif personality, but favor clearly readable separated letters and simple thick strokes over ornate embellishment. The exact spelling Skiejer's must be obvious, and separate the three words clearly. Single line. No glow, shadow, black fill, backdrop, border, symbols or other imagery. True transparent background completely empty outside the letters. Entire phrase fully visible with comfortable transparent margin. It must remain legible at 192 by 24 pixels."
+    }
+  ],
+  "packing": "Alpha-only crop and Lanczos fit to 188x20, centered in 192x24; white face over one-native-pixel black keyline, independently quantized 4-bit intensity/alpha; clear outer perimeter",
+  "authoring_tool": "Version: ImageMagick 6.9.12-98 Q16 x86_64 18038 https://legacy.imagemagick.org",
+  "files": {
+    "black-market-wordmark-original.png": {
+      "bytes": 410017,
+      "sha256": "3ca1ef3b70b2aeb5faefe2596dee242a9c1d0f758893d3c9ba5f6c11575dda35",
+      "crc32": "54a33e6d"
+    },
+    "black-market-wordmark.png": {
+      "bytes": 2354,
+      "sha256": "ad9d78ba0c1bdd65648b2594ecea1b2fdcc1be31daf446d2b336e8ce428e6cde",
+      "crc32": "09dea5fc"
+    },
+    "black-market-title.ia8": {
+      "bytes": 4608,
+      "sha256": "5991dcef52bd5817b06ceb142e3274ff278f3e740b6a40558c03a3992a688fac",
+      "crc32": "113380eb"
+    }
+  },
+  "ordinary_build": "Consumes checked-in raw bytes with the standard library; no ImageMagick or font dependency"
+}

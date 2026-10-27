@@ -5,6 +5,7 @@
  */
 
 #include "z_en_ma3.h"
+#include "soh/Enhancements/cosmetics/NativeNpcModels.h"
 #include "objects/object_ma2/object_ma2.h"
 
 #define FLAGS                                                                                  \
@@ -246,7 +247,9 @@ void EnMa3_Init(Actor* thisx, PlayState* play) {
     s32 pad;
 
     ActorShape_Init(&this->actor.shape, 0.0f, ActorShadow_DrawCircle, 18.0f);
-    SkelAnime_InitFlex(play, &this->skelAnime, &gMalonAdultSkel, NULL, NULL, NULL, 0);
+    SkelAnime_InitFlex(play, &this->skelAnime,
+                       (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sAdultMalonNpcModel, gMalonAdultSkel), NULL,
+                       NULL, NULL, 0);
     Collider_InitCylinder(play, &this->collider);
     Collider_SetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
     CollisionCheck_SetInfo2(&this->actor.colChkInfo, DamageTable_Get(22), &sColChkInfoInit);
@@ -310,16 +313,23 @@ void EnMa3_Update(Actor* thisx, PlayState* play) {
 s32 EnMa3_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* thisx) {
     EnMa3* this = (EnMa3*)thisx;
     Vec3s vec;
+    static const u8 mouthMap[] = { 0, 2, 1 };
 
     if ((limbIndex == MALON_ADULT_LIMB_LEFT_THIGH) || (limbIndex == MALON_ADULT_LIMB_RIGHT_THIGH)) {
-        *dList = NULL;
+        if (!NativeNpcModel_IsActive(&sAdultMalonNpcModel)) {
+            *dList = NULL;
+        }
     }
     if (limbIndex == MALON_ADULT_LIMB_HEAD) {
-        Matrix_Translate(1400.0f, 0.0f, 0.0f, MTXMODE_APPLY);
+        s32 mouth = this->mouthIndex >= 0 && this->mouthIndex < 3 ? mouthMap[this->mouthIndex] : 0;
+        *dList = NativeNpcModel_SelectHead(&sAdultMalonNpcModel, *dList, this->eyeIndex, mouth);
+        /* The fitted head origin is the source neck; retain the vanilla pivot for native assets. */
+        Vec3f pivot = NativeNpcModel_IsActive(&sAdultMalonNpcModel) ? *pos : (Vec3f){ 1400.0f, 0.0f, 0.0f };
+        Matrix_Translate(pivot.x, pivot.y, pivot.z, MTXMODE_APPLY);
         vec = this->interactInfo.headRot;
         Matrix_RotateX((vec.y / 32768.0f) * M_PI, MTXMODE_APPLY);
         Matrix_RotateZ((vec.x / 32768.0f) * M_PI, MTXMODE_APPLY);
-        Matrix_Translate(-1400.0f, 0.0f, 0.0f, MTXMODE_APPLY);
+        Matrix_Translate(-pivot.x, -pivot.y, -pivot.z, MTXMODE_APPLY);
     }
     if (limbIndex == MALON_ADULT_LIMB_CHEST_AND_NECK) {
         vec = this->interactInfo.torsoRot;
@@ -331,6 +341,7 @@ s32 EnMa3_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* p
         rot->y += Math_SinS(this->unk_212[limbIndex].y) * 200.0f;
         rot->z += Math_CosS(this->unk_212[limbIndex].z) * 200.0f;
     }
+    *dList = NativeNpcPose_SelectLimb(&this->skelAnime, limbIndex, *dList);
     return false;
 }
 
@@ -345,7 +356,8 @@ void EnMa3_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot,
     }
 
     if ((limbIndex == MALON_ADULT_LIMB_LEFT_HAND) && (this->skelAnime.animation == &gMalonAdultStandStillAnim)) {
-        gSPDisplayList(POLY_OPA_DISP++, gMalonAdultBasketDL);
+        gSPDisplayList(POLY_OPA_DISP++,
+                       NativeNpcPose_SelectProp(&this->skelAnime, "Basket", (Gfx*)gMalonAdultBasketDL));
     }
 
     CLOSE_DISPS(play->state.gfxCtx);

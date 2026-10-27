@@ -19,6 +19,7 @@
  */
 #include "global.h"
 #include "2s2h/Enhancements/Audio/AudioEditor.h"
+#include "2s2h/Enhancements/Audio/MMWeather.h"
 
 // Direct audio command (skips the queueing system)
 #define SEQCMD_SET_SEQPLAYER_VOLUME_NOW(seqPlayerIndex, duration, volume)                          \
@@ -34,21 +35,43 @@ u8 sSoundModeList[] = {
 u8 gAudioSpecId = 0;
 u8 gAudioHeapResetState = AUDIO_HEAP_RESET_STATE_NONE;
 u32 sResetAudioHeapSeqCmd = 0;
+
+static const uint8_t sClockTownDaySeqIds[4] = {
+    NA_BGM_CLOCK_TOWN_DAY_1,
+    NA_BGM_CLOCK_TOWN_DAY_2,
+    NA_BGM_CLOCK_TOWN_DAY_3,
+    NA_BGM_CLOCK_TOWN_DAY_1,
+};
+
+static u16 AudioSeq_ResolveSequence(u16 seqId) {
+    u16 replacementId = seqId;
+    if (seqId == NA_BGM_CLOCK_TOWN_MAIN_SEQUENCE) {
+        replacementId = sClockTownDaySeqIds[CURRENT_DAY - 1];
+    }
+    return AudioEditor_GetReplacementSeq(replacementId);
+}
+
 // 2S2H [Custom Audio] seqId and seqArgs updated to use u16 instead of u8
 void AudioSeq_StartSequence(u8 seqPlayerIndex, u16 seqId, u16 seqArgs, u16 fadeInDuration) {
     u8 channelIndex;
     u16 skipTicks;
+    u16 resolvedSeqId;
     s32 pad;
 
     if (!sStartSeqDisabled || (seqPlayerIndex == SEQ_PLAYER_SFX)) {
+        resolvedSeqId = AudioSeq_ResolveSequence(seqId);
+#ifdef COMBO_BUILD
+        if (seqPlayerIndex == SEQ_PLAYER_BGM_MAIN)
+            resolvedSeqId = AudioEditor_ResolveSceneSequence(seqId, resolvedSeqId);
+#endif
         seqArgs &= 0x7F;
         if (seqArgs == 0x7F) {
             // `fadeInDuration` interpreted as seconds, 60 is refresh rate and does not account for PAL
             skipTicks = (fadeInDuration >> 3) * 60 * gAudioCtx.audioBufferParameters.updatesPerFrame;
-            AUDIOCMD_GLOBAL_INIT_SEQPLAYER_SKIP_TICKS(seqPlayerIndex, seqId, skipTicks);
+            AUDIOCMD_GLOBAL_INIT_SEQPLAYER_SKIP_TICKS(seqPlayerIndex, resolvedSeqId, skipTicks);
         } else {
             // `fadeInDuration` interpreted as 1/30th of a second, does not account for change in refresh rate for PAL
-            AUDIOCMD_GLOBAL_INIT_SEQPLAYER(seqPlayerIndex, seqId,
+            AUDIOCMD_GLOBAL_INIT_SEQPLAYER(seqPlayerIndex, resolvedSeqId,
                                            (fadeInDuration * (u16)gAudioCtx.audioBufferParameters.updatesPerFrame) / 4);
         }
 
@@ -130,22 +153,20 @@ void AudioSeq_ProcessSeqCmd(u32 cmd) {
                     gActiveSeqs[seqPlayerIndex].startAsyncSeqCmd =
                         (cmd & ~(SEQ_FLAG_ASYNC | SEQCMD_ASYNC_ACTIVE)) + SEQCMD_ASYNC_ACTIVE;
                     gActiveSeqs[seqPlayerIndex].isWaitingForFonts = true;
-                    u8* fontBuff[16];
-                    u8* prevFontBuff[16];
-                    u8* font = AudioThread_GetFontsForSequence(seqId, &outNumFonts, fontBuff);
+                    s32* font = AudioThread_GetFontsForSequence(seqId, &outNumFonts);
                     gActiveSeqs[seqPlayerIndex].fontId = *font;
                     AudioSeq_StopSequence(seqPlayerIndex, 1);
 
                     if (gActiveSeqs[seqPlayerIndex].prevSeqId != NA_BGM_DISABLED) {
-                        if (*AudioThread_GetFontsForSequence(seqId, &outNumFonts, fontBuff) !=
-                            *AudioThread_GetFontsForSequence(gActiveSeqs[seqPlayerIndex].prevSeqId & 0xFF, &outNumFonts,
-                                                             prevFontBuff)) {
+                        if (*AudioThread_GetFontsForSequence(seqId, &outNumFonts) !=
+                            *AudioThread_GetFontsForSequence(gActiveSeqs[seqPlayerIndex].prevSeqId & 0xFF,
+                                                             &outNumFonts)) {
                             // Discard Seq Fonts
                             AUDIOCMD_GLOBAL_DISCARD_SEQ_FONTS((s32)seqId);
                         }
                     }
 
-                    AUDIOCMD_GLOBAL_ASYNC_LOAD_FONT(*AudioThread_GetFontsForSequence(seqId, &outNumFonts, fontBuff),
+                    AUDIOCMD_GLOBAL_ASYNC_LOAD_FONT(*AudioThread_GetFontsForSequence(seqId, &outNumFonts),
                                                     (u8)((seqPlayerIndex + 1) & 0xFF));
                 }
             }
@@ -435,34 +456,8 @@ void AudioSeq_ProcessSeqCmd(u32 cmd) {
 /**
  * Add the sequence cmd to the `sAudioSeqCmds` queue
  */
-static const uint8_t sClockTownDaySeqIds[4] = {
-    NA_BGM_CLOCK_TOWN_DAY_1,
-    NA_BGM_CLOCK_TOWN_DAY_2,
-    NA_BGM_CLOCK_TOWN_DAY_3,
-    // Through glitches and the save editor it is possible to reach the 4th day.
-    NA_BGM_CLOCK_TOWN_DAY_1,
-};
 void AudioSeq_QueueSeqCmd(u32 cmd) {
-    // 2S2H [Port] Allow loading custom sequences and use 16 bit seqId
-    u8 op = cmd >> 28;
-    // Ship had a check for op 12 but it doesn't seem like the seqId is set there
-    if (op == 0 || op == 2) {
-        u16 seqId = cmd & SEQCMD_SEQID_MASK_16;
-        if (seqId == NA_BGM_CLOCK_TOWN_MAIN_SEQUENCE) {
-            // Clock town uses one sequence id for all 3 songs. We need to manually figure out which day it is
-            seqId = sClockTownDaySeqIds[CURRENT_DAY - 1];
-            // Don't update the command as that will break the morning sequence.
-        }
-        u8 playerIdx = (cmd & 0xF000000) >> 24;
-        u16 newSeqId = AudioEditor_GetReplacementSeq(seqId);
-        gAudioCtx.seqReplaced[playerIdx] = (seqId != newSeqId);
-        gAudioCtx.seqToPlay[playerIdx] = newSeqId;
-        // Don't overwrite the seqId we just set for Clock Town
-        if (seqId != sClockTownDaySeqIds[CURRENT_DAY - 1]) {
-            cmd |= (seqId & SEQCMD_SEQID_MASK_16);
-        }
-    }
-    sAudioSeqCmds[sSeqCmdWritePos++] = cmd;
+    sAudioSeqCmds[sSeqCmdWritePos++] = MMWeather_ResolveAmbienceSeqCmd(cmd);
 }
 
 void AudioSeq_ProcessSeqCmds(void) {

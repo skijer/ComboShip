@@ -1,0 +1,1324 @@
+{
+  "published_parent": "298fdc6c38510f17d5e614b9bdad8d9907481350",
+  "autumn_commit": "69a09fd0a006d3df62ab7285a65023351f9bcd7b",
+  "commands": 117,
+  "passed": 117,
+  "sanitizers": "Existing command-specific ASan/UBSan/float-cast-overflow/fast-math modes; ASAN_OPTIONS=detect_leaks=0 locally",
+  "runtime": "No game launched. Configuration-specific in-game acceptance remains pending.",
+  "checks": [
+    {
+      "index": 1,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_hint_item_name_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "001-run_hint_item_name_tests.log",
+      "log_sha256": "11fa9f02d581323efe03eea5f94df7228fe176a11ee2568e2893717d93b2715a"
+    },
+    {
+      "index": 2,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_combo_crash_owner_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "002-run_combo_crash_owner_tests.log",
+      "log_sha256": "8b334d98c00482aca0a32e3b6cd165dd515dcfd99acd367eb07ce6e56086e0ee"
+    },
+    {
+      "index": 3,
+      "command": [
+        "python3",
+        "-B",
+        "tools/nei_gi/test_tunic_clearance.py"
+      ],
+      "exit_code": 0,
+      "log": "003-test_tunic_clearance.log",
+      "log_sha256": "b3dfdf0f16bba1ae09ecc54dfeb56c93f145076cedc17324670bab6df88c0696"
+    },
+    {
+      "index": 4,
+      "command": [
+        "python3",
+        "-B",
+        "tools/nei_gi/SOURCE/mario_sm64_poc3.py",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "log": "004-mario_sm64_poc3.log",
+      "log_sha256": "0509a156c95dd79b53585f266fdeb5de0801a64ae5a13c4138788c7b3afb689f"
+    },
+    {
+      "index": 5,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_nei_gi_tests.py",
+        "--held",
+        "--combo"
+      ],
+      "exit_code": 0,
+      "log": "005-run_nei_gi_tests.log",
+      "log_sha256": "80b974165b4ffc8ee7bbc5e93ec49c823d25485fad7bcddf5f1097e24ab680b9"
+    },
+    {
+      "index": 6,
+      "command": [
+        "python3",
+        "-B",
+        "tests/elemental_arrow_gi/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "006-run_tests.log",
+      "log_sha256": "441552b00cf99e909ddfdb7aa6802ea35466d85525b422e9d18ce07989dc332f"
+    },
+    {
+      "index": 7,
+      "command": [
+        "python3",
+        "-B",
+        "tests/reward_gi/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "007-run_tests.log",
+      "log_sha256": "dd28d65fe3a18eb29ad2ece1341efff1030bf5f4dfed4aba82f319f0e7faad60"
+    },
+    {
+      "index": 8,
+      "command": [
+        "python3",
+        "-B",
+        "tests/reward_gi/run_asset_packaging_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "008-run_asset_packaging_tests.log",
+      "log_sha256": "895dcc8c4a9370191a5814db3af93fe623cd4fa70cc2c78405bf0b4481491394"
+    },
+    {
+      "index": 9,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_gi/run_flame_arena_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "009-run_flame_arena_tests.log",
+      "log_sha256": "20b68b7b67662c895ae5a7799eddca03640c22b5c4dd19836fc505923c32ee2f"
+    },
+    {
+      "index": 10,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_gi/run_sages_tunic_particle_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "run_sages_tunic_particle_tests-updated.log",
+      "log_sha256": "dc8bcaa66f0cbab271992288b3d0aad9f97c95982140224fa313cf14e22fa100"
+    },
+    {
+      "index": 11,
+      "command": [
+        "python3",
+        "-B",
+        "tools/nei_gi/check_time_gate_solidity.py"
+      ],
+      "exit_code": 0,
+      "log": "011-check_time_gate_solidity.log",
+      "log_sha256": "1dd135963ddb11273cc1f332f25dff6edca091bf57f847985f92a920ec1c1795"
+    },
+    {
+      "index": 12,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_item_presentation_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "012-run_mm_item_presentation_tests.log",
+      "log_sha256": "768590c5aeba23d30948c31e378485550de235231305fc953d93cdf4852a531c"
+    },
+    {
+      "index": 13,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_static_gi_bridge_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "013-run_mm_static_gi_bridge_tests.log",
+      "log_sha256": "e96ba314dd1a860b317d9ce15f8b7a4f9e8b0562e1809f71ce873093780c93ba"
+    },
+    {
+      "index": 14,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_tunic_material_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "014-run_tunic_material_tests.log",
+      "log_sha256": "3d04b57eb91234cf8f8871db796a1b350024fc8ef4c426518b5ca54071da6c80"
+    },
+    {
+      "index": 15,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_item_receipt_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "015-run_mm_item_receipt_tests.log",
+      "log_sha256": "912406f2ee759e23fca9ed23b1fc7c068b6e41de7f323e06047dc4e95b357074"
+    },
+    {
+      "index": 16,
+      "command": [
+        "python3",
+        "-B",
+        "tests/item_receipts/run_key_receipt_tests.py",
+        "--sanitizers"
+      ],
+      "exit_code": 0,
+      "log": "016-run_key_receipt_tests.log",
+      "log_sha256": "77e22a37139c06040dce8130b6e64ef57940cc746e986b52c8c159ed40eb0997"
+    },
+    {
+      "index": 17,
+      "command": [
+        "python3",
+        "-B",
+        "tests/cape_choice/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "017-run_tests.log",
+      "log_sha256": "fa0db194123dd9513a5b5c81c1aa4a6aad4e2fff449a448190d4d2e9794fdf41"
+    },
+    {
+      "index": 18,
+      "command": [
+        "python3",
+        "-B",
+        "tests/cape_choice/run_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "018-run_tests.log",
+      "log_sha256": "fa0db194123dd9513a5b5c81c1aa4a6aad4e2fff449a448190d4d2e9794fdf41"
+    },
+    {
+      "index": 19,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_anklet_icon_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "019-run_anklet_icon_tests.log",
+      "log_sha256": "657481678c1e800cf70619e7555616e38c22f46d16a0efd4a53fb393424c583f"
+    },
+    {
+      "index": 20,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_native_heart_receipt_icon_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "020-run_native_heart_receipt_icon_tests.log",
+      "log_sha256": "a621d232c1d70d02b3f5ab16f67bf4a7fc32b37697921eb519a5419bc4592564"
+    },
+    {
+      "index": 21,
+      "command": [
+        "python3",
+        "-B",
+        "tests/item_receipts/run_seed_settings_tests.py",
+        "--sanitizers"
+      ],
+      "exit_code": 0,
+      "log": "021-run_seed_settings_tests.log",
+      "log_sha256": "aeab20733499994ef91dc67ac19dc7a50b1b05145a1f99b1b3b7ed144e5aca8c"
+    },
+    {
+      "index": 22,
+      "command": [
+        "python3",
+        "-B",
+        "tests/item_receipts/run_mm_first_seed_gate_test.py",
+        "--sanitizers"
+      ],
+      "exit_code": 0,
+      "log": "022-run_mm_first_seed_gate_test.log",
+      "log_sha256": "4aefa91a2a8c41cc07f7bad20757ba3d3793976582ddbe6eca0e258cfc838733"
+    },
+    {
+      "index": 23,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_receipt_syntax_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "023-run_receipt_syntax_tests.log",
+      "log_sha256": "767d737213e50acc183e495d20f15d0546b1d2e552a8917e4216d0a36f3beb4a"
+    },
+    {
+      "index": 24,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_song_gi_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "024-run_song_gi_tests.log",
+      "log_sha256": "4529932270ebe27393b4eebc5b8df434707e2e4dc62e6bb8f68f26befccdafc0"
+    },
+    {
+      "index": 25,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_sword_pose_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "025-run_sword_pose_tests.log",
+      "log_sha256": "2bd241e9a740dc59af6e54645046ac90296a4ae5d7da9532075da6e0b8a00e35"
+    },
+    {
+      "index": 26,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_sword_mod_gi_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "026-run_sword_mod_gi_tests.log",
+      "log_sha256": "4614264f536390a813cdbc9a2f9a0856ceb5c563efd0cec7c57810880d50357d"
+    },
+    {
+      "index": 27,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_sword_fallback_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "027-run_sword_fallback_tests.log",
+      "log_sha256": "f0a1af3c96152b26231410ec33fc079a2c3624593805456844199d6943b67be5"
+    },
+    {
+      "index": 28,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_sword_receipt_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "028-run_sword_receipt_tests.log",
+      "log_sha256": "d5181dcf0e9c66346c48edd0e004494517daffc9711121080f527b9912ac7462"
+    },
+    {
+      "index": 29,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_sword_asset_toggle_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "029-run_sword_asset_toggle_tests.log",
+      "log_sha256": "450d83a6ea7d0c747c31c6bcf180d02b1726e7aca636f89d3fc6adeeaf81707d"
+    },
+    {
+      "index": 30,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_sword_resource_view_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "030-run_sword_resource_view_tests.log",
+      "log_sha256": "b930c63aa0fd77a53236ab035efb182a99eee1d65cf726008689d2fd02098972"
+    },
+    {
+      "index": 31,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_fairy_bottle_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "031-run_fairy_bottle_tests.log",
+      "log_sha256": "871e0a3afdf33534c6d7ea1e8a1967fd2612c7d2f6ccdc4a3d982db85710f2b2"
+    },
+    {
+      "index": 32,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_bottle_polish_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "032-run_bottle_polish_tests.log",
+      "log_sha256": "fb3c6dd7b1da47882506544fbcf0c2e5e79c6c770cb35dd68c0b22648c960309"
+    },
+    {
+      "index": 33,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_bottle_contents_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "033-run_bottle_contents_tests.log",
+      "log_sha256": "0c8d4db8f3a183d7a332a78aebb7d215ecc02f30495b79584c6dd9d6a472478a"
+    },
+    {
+      "index": 34,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_bottle_gi_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "034-run_bottle_gi_tests.log",
+      "log_sha256": "c9dc0623cd266b47b2f1fcd8893cbc62d19fde9dcb14d24c51ccc1dd9cdfad8d"
+    },
+    {
+      "index": 35,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "035-run_tests.log",
+      "log_sha256": "d6f09c511bafe4454b27adf0398210f19583e38c0f4430b768653a9bc537df15"
+    },
+    {
+      "index": 36,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_mode_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "036-run_mode_tests.log",
+      "log_sha256": "1453c2286384193e19198e1eed38919c62636684a3e867e1a23efe9c5a666867"
+    },
+    {
+      "index": 37,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_oot_mode_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "037-run_oot_mode_tests.log",
+      "log_sha256": "06aba48d7368ba3012bdd35d8090dff13fd46b8d7e15ecd88b8eade631551ed6"
+    },
+    {
+      "index": 38,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_mode_pool_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "038-run_mode_pool_tests.log",
+      "log_sha256": "b724698a983c17778b0dc0eab63f0931b3598f19dc99a6edb5a6e68b6c157625"
+    },
+    {
+      "index": 39,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_mode_save_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "039-run_mode_save_tests.log",
+      "log_sha256": "b8bd36ff2a165171aedf8a2bde6310421517e3009558fd5c911fd4098284e719"
+    },
+    {
+      "index": 40,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_native_weather_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "040-run_native_weather_tests.log",
+      "log_sha256": "dc9a7b262ca953a6c488ad1a6c7a78749510053c19a55314898dc26fe5ef19f6"
+    },
+    {
+      "index": 41,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_generated_leaf_texture_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "041-run_generated_leaf_texture_tests.log",
+      "log_sha256": "5efe1cb1071385f82dac259aaf138fced6ada1335c741582f81737ba79e72bdf"
+    },
+    {
+      "index": 42,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_leaf_combiner_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "042-run_leaf_combiner_tests.log",
+      "log_sha256": "4312b12aad34e616d8be48e8e2c28a3d2ce7c77cc30edcf97919d5b72b40a81e"
+    },
+    {
+      "index": 43,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_autumn_foliage_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "043-run_mm_autumn_foliage_tests.log",
+      "log_sha256": "14466459be6e7bf802bf8894ac91ef713806ede4328ff297212c6c8cfadcb3e4"
+    },
+    {
+      "index": 44,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_autumn_scene_foliage_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "044-run_mm_autumn_scene_foliage_tests.log",
+      "log_sha256": "79191e803cc0bdf74b03a9ad1f24515669a759dd6908adc5dbb6991afe2fa6ed"
+    },
+    {
+      "index": 45,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_rod_lifecycle_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "045-run_rod_lifecycle_tests.log",
+      "log_sha256": "b0b8d72b668a601e2c157f5e31e3c7c9f56c09677f0eace7445e9b2018448828"
+    },
+    {
+      "index": 46,
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_oot_shop_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "046-run_oot_shop_tests.log",
+      "log_sha256": "da12b2ccb8b0e6116348a0143e772fec8a8a878cf43dd8e3b5eded7f265f7fcb"
+    },
+    {
+      "index": 47,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_mask_bridge_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "047-run_mm_mask_bridge_tests.log",
+      "log_sha256": "2cf0117b31eddfbcac9fcedc622ddf2aa6702a0d76ddf72788cc6344d708bf04"
+    },
+    {
+      "index": 48,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mask_transformation_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "048-run_mask_transformation_tests.log",
+      "log_sha256": "27653e5a786246eb72bd0ac100f85ce3fcc87152a0372f54ac073014a0a93742"
+    },
+    {
+      "index": 49,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mask_progression_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "049-run_mask_progression_tests.log",
+      "log_sha256": "562067cbd90b7ae1b175e49099e2deac51a0cb97713b68ac9ed2ab9352ce8757"
+    },
+    {
+      "index": 50,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_gerudo_mask_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "050-run_gerudo_mask_tests.log",
+      "log_sha256": "04439f44e226d0584a3c82d625daeb6e41cccd11c242ec27a6921cb0d3181857"
+    },
+    {
+      "index": 51,
+      "command": [
+        "python3",
+        "-B",
+        "tests/great_fairy_facial/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "051-run_tests.log",
+      "log_sha256": "16fa5af801460f78bcfe220ba12a0ffafd87bdf023883e66efd69daf72273583"
+    },
+    {
+      "index": 52,
+      "command": [
+        "python3",
+        "-B",
+        "tests/oot_zora/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "052-run_tests.log",
+      "log_sha256": "2af5071a3259d966624c43c47e1de6198b0e64921f3852b251ab25da86fac5c4"
+    },
+    {
+      "index": 53,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_presentation/run_foreign_scale_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "053-run_foreign_scale_tests.log",
+      "log_sha256": "19c793122320e2b0718dc8755b5753617bdb5f855fc6b96607d0ef930608d340"
+    },
+    {
+      "index": 54,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_cape/run_texture_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "054-run_texture_tests.log",
+      "log_sha256": "3a238c50c59ee94797950e5c32c2448f95869df720a6b28c45bc35ad2875a292"
+    },
+    {
+      "index": 55,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_nei_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "run_mm_nei_tests-final.log",
+      "log_sha256": "63d95cf8a51b755c676145726a4fe84aabb5939dac1e32cd416afcc0a21d51dc"
+    },
+    {
+      "index": 56,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wallet/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "056-run_tests.log",
+      "log_sha256": "a8af53a0c039fdccd8ccb713e8558c5f960613119741a4d9e29ff3da22f33a68"
+    },
+    {
+      "index": 57,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_editor/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "057-run_tests.log",
+      "log_sha256": "b38015c02b7d82e3b2497053fb1a6da239bfd608bd8c71b09637d4e711e7d218"
+    },
+    {
+      "index": 58,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_grace/run_flight_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "058-run_flight_tests.log",
+      "log_sha256": "803f8dde209d65c89abbcf72e08203a4e9271575f8ee941f5aad297e477731d5"
+    },
+    {
+      "index": 59,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_grace/run_particle_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "059-run_particle_tests.log",
+      "log_sha256": "70d10bb94b8d6b710012706c0ce5897161b5a8ef439030a1826c1bc6401f4556"
+    },
+    {
+      "index": 60,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_grace/run_orientation_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "060-run_orientation_tests.log",
+      "log_sha256": "620f0aa9368055703356998fe2e62400dec86c23e57db62f4aa5cfc026b428e4"
+    },
+    {
+      "index": 61,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_grace/run_pool_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "061-run_pool_tests.log",
+      "log_sha256": "beceec440954407327c0acfa00eba2fe8e6bd1e055b1a3f4de085b616fb04d60"
+    },
+    {
+      "index": 62,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_grace/run_save_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "062-run_save_tests.log",
+      "log_sha256": "45ed85fc034aa50979725652f133aade4ef843e4c696667bd3bfd301ea44b006"
+    },
+    {
+      "index": 63,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_grace/run_settings_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "063-run_settings_tests.log",
+      "log_sha256": "87215d6aa0af3053e016c72850ef371fdbf40d70b89555c447bc81d2b714c480"
+    },
+    {
+      "index": 64,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_shared_slot/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "064-run_tests.log",
+      "log_sha256": "5bf7eccd68ceb829a0fa1771b17162b3b52eddbd7ac4f03153c0cb086d4b2c9e"
+    },
+    {
+      "index": 65,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_shared_slot/run_ui_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "065-run_ui_tests.log",
+      "log_sha256": "dbb3a6137e6f2267f91bbc4f3f2a6c20d90f067c15e3f9532506c0b4e800d34c"
+    },
+    {
+      "index": 66,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_shared_slot/run_sync_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "066-run_sync_tests.log",
+      "log_sha256": "719a776017ae4a5bd788ca2faaafd7099bcd0517408b189e68758e4cc87a293e"
+    },
+    {
+      "index": 67,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_shared_slot/run_save_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "067-run_save_tests.log",
+      "log_sha256": "613be4e1b226972eba3918493b243eb046a7842ce671263193dece32e112ba07"
+    },
+    {
+      "index": 68,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_skin_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "068-run_skin_tests.log",
+      "log_sha256": "72b7db4e3859b9fcc767f2e08a71b57afb251e2e98614f0e245bb996c40cbc49"
+    },
+    {
+      "index": 69,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_core_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "069-run_core_tests.log",
+      "log_sha256": "d0fb68f758410aeb9c038c471e9dac1bfe0e3679b424f361ee87ea4cfa9528df"
+    },
+    {
+      "index": 70,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_material_glow_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "070-run_material_glow_tests.log",
+      "log_sha256": "6f997b49ef746d47d091f13066431c9bb51553924caf36243bf17fa11cffb464"
+    },
+    {
+      "index": 71,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_bundled_asset_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "071-run_bundled_asset_tests.log",
+      "log_sha256": "e487ad47a6783fe7699a6eb7c59ecb60e6521f26301745bdf802d0fc669037a2"
+    },
+    {
+      "index": 72,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_eye_palette_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "072-run_eye_palette_tests.log",
+      "log_sha256": "242fcc25054b320742538abe597642219e74c9d2e154e05a5c7f7b38f1a14c3f"
+    },
+    {
+      "index": 73,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_real_asset_tests.py",
+        "soh/assets/custom/objects/forms/wolf_link/gWolfLinkData",
+        "soh/assets/custom/objects/forms/wolf_link/gWolfLinkHDData"
+      ],
+      "exit_code": 0,
+      "log": "073-run_real_asset_tests.log",
+      "log_sha256": "df3137f13b4c7da48fd55bb1a8a32cdd0324cce9d4a8a4d7dd6acb8269a737c4"
+    },
+    {
+      "index": 74,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_host_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "074-run_host_tests.log",
+      "log_sha256": "d6442d0d5fddb21841fd75172a2b501dc31528ae070002f0f04d97363bf515d1"
+    },
+    {
+      "index": 75,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_audio_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "075-run_audio_tests.log",
+      "log_sha256": "8aa4715915058e37415178d6b05dc17e54d059ed6c4e212afdb63896cafabaf7"
+    },
+    {
+      "index": 76,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_model_owner_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "076-run_model_owner_tests.log",
+      "log_sha256": "a178623423ac565aedb152bbd7a0760d01d5bac33a3dc1b80c6b64fa321464c8"
+    },
+    {
+      "index": 77,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_asset_packaging_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "077-run_asset_packaging_tests.log",
+      "log_sha256": "a590116010fdb3636e2e208ac6d906cf391de1118aadab6c9736e2d4a3a63ab4"
+    },
+    {
+      "index": 78,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_wolf/run_syntax_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "078-run_syntax_tests.log",
+      "log_sha256": "b4f5288e515fdfdafc0ed1f53892d4c67b8c5ee979b1226747eac6d39fe79951"
+    },
+    {
+      "index": 79,
+      "command": [
+        "python3",
+        "-B",
+        "tests/wand_modes/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "079-run_tests.log",
+      "log_sha256": "6ab0ba6dc1f78e5fe1fe36e577ed1024d42279bf8895f14b274e5b689b1e7bfc"
+    },
+    {
+      "index": 80,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_air_magic/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "080-run_tests.log",
+      "log_sha256": "ed7731f4aa0bed280a7023763841f6239da61fef3afedab0b9105e4e2d7e5aa6"
+    },
+    {
+      "index": 81,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_receipt_soul_color_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "081-run_receipt_soul_color_tests.log",
+      "log_sha256": "5677e84fbe8adc9dd76cb7b0b2051c16af0b5e6a0bbb7482698a4ea19a8db295"
+    },
+    {
+      "index": 82,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_nei_identity_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "run_nei_identity_tests-updated.log",
+      "log_sha256": "d4fad5efb927385847142f8c60378fb4d0374258150f0c7fe930a7dbd986b62e"
+    },
+    {
+      "index": 83,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_held/run_hand_fit_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "083-run_hand_fit_tests.log",
+      "log_sha256": "97a01af06b4283ad7922df6ee42fa894ed7915d0090d1c8664fb7be9dd5c3627"
+    },
+    {
+      "index": 84,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_held/run_articulated_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "084-run_articulated_tests.log",
+      "log_sha256": "585f5f3f9d6465114161f0767a52043dac7db339287319f17859b8fd21bd9852"
+    },
+    {
+      "index": 85,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_asset_priority/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "085-run_tests.log",
+      "log_sha256": "adcfbe4a1901e30877affe51737e46d21d2b864beaf4ec1cb230f03b98f94ac2"
+    },
+    {
+      "index": 86,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_asset_priority/run_oot_gi_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "086-run_oot_gi_tests.log",
+      "log_sha256": "0833e8a23bfd406f1d527937ebf695dc4e78fc11bccf1fb0dee9c16a053241ec"
+    },
+    {
+      "index": 87,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_asset_priority/run_tunic_model_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "087-run_tunic_model_tests.log",
+      "log_sha256": "82d7f923fe8e3a309be8cafdb4590f8dbce706db97e23937f98acd7d794a4022"
+    },
+    {
+      "index": 88,
+      "command": [
+        "python3",
+        "-B",
+        "tests/ikana_gi/run_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "088-run_tests.log",
+      "log_sha256": "9f47132ea2d586c15f708f9ea1dfb073b8d2af50bfc19e1af7cbd866702ab827"
+    },
+    {
+      "index": 89,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_held/run_equipment_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "089-run_equipment_tests.log",
+      "log_sha256": "5dc574581f2b67aec57196f52cf9d20d84ea2a8a0479fcb6e392adfb5af3b7c1"
+    },
+    {
+      "index": 90,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_held/run_four_sword_visibility_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "090-run_four_sword_visibility_tests.log",
+      "log_sha256": "32e257896266bd123c6fae0a1fc7f57c5105ada12232066beb79fc1cf8679ca5"
+    },
+    {
+      "index": 91,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_equipment_pause/run_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "091-run_tests.log",
+      "log_sha256": "04eb1e0805c14c03099eb641684131c2a8665f87cc8e3f2e071b427142ae1782"
+    },
+    {
+      "index": 92,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_equipment_pause/run_ownership_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "092-run_ownership_tests.log",
+      "log_sha256": "53c8b21486bfc402592ed5ecbdc7a0bc6c223d4e87af21197cb5dcc6168cfc9a"
+    },
+    {
+      "index": 93,
+      "command": [
+        "python3",
+        "-B",
+        "tests/oot_equipment_pause/run_access_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "oot-equipment-access-normal-final.log",
+      "log_sha256": "ca689c418b93a02b800f60724b5a16089758a18ee990fa70a8ccbcd8cbbf19ae"
+    },
+    {
+      "index": 94,
+      "command": [
+        "python3",
+        "-B",
+        "tests/oot_equipment_pause/run_access_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "oot-equipment-access-sanitized-final.log",
+      "log_sha256": "ca689c418b93a02b800f60724b5a16089758a18ee990fa70a8ccbcd8cbbf19ae"
+    },
+    {
+      "index": 95,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_equipment_pause/run_preview_transition_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "095-run_preview_transition_tests.log",
+      "log_sha256": "9e3d74a97c4b23cd1ff3c7b97ff47413feea61b1ca9975a3ce53615daee986d4"
+    },
+    {
+      "index": 96,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_equipment_pause/run_preview_transition_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "096-run_preview_transition_tests.log",
+      "log_sha256": "9e3d74a97c4b23cd1ff3c7b97ff47413feea61b1ca9975a3ce53615daee986d4"
+    },
+    {
+      "index": 97,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_pause_inventory/run_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "097-run_tests.log",
+      "log_sha256": "ebf5ebc066fec1764d764a005329f4f8eab611393ae317744a937395628358dc"
+    },
+    {
+      "index": 98,
+      "command": [
+        "python3",
+        "-B",
+        "tests/pause_tutorials/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "098-run_tests.log",
+      "log_sha256": "ec9a02a94a945edf92056097473eafc2cdcdf01dd3bdc415226e081f1ea18401"
+    },
+    {
+      "index": 99,
+      "command": [
+        "python3",
+        "-B",
+        "tests/pause_tutorials/run_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "099-run_tests.log",
+      "log_sha256": "ec9a02a94a945edf92056097473eafc2cdcdf01dd3bdc415226e081f1ea18401"
+    },
+    {
+      "index": 100,
+      "command": [
+        "python3",
+        "-B",
+        "tests/combo_button_transfer/run_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log": "100-run_tests.log",
+      "log_sha256": "97f705bfe4a08e07e6f869286c4cc6b2c733bedfde77d6dd4db3f0bfdd6e6b7c"
+    },
+    {
+      "index": 101,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_quest_held/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "101-run_tests.log",
+      "log_sha256": "a8fe1e3501d2d650df5b3d708bc8c8963613da94e9612394746e44715fa12247"
+    },
+    {
+      "index": 102,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_used_fx/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "102-run_tests.log",
+      "log_sha256": "901d8ce0bef9eb08c389e55e799d6100b6fe1b5fc727642b86b002ec1772519b"
+    },
+    {
+      "index": 103,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_leaf/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "103-run_tests.log",
+      "log_sha256": "975903b5daca9da3c99a198ce63c836a07499f70cc7cc0b79dfe12bce782e7b1"
+    },
+    {
+      "index": 104,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_sfx_lifetime/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "104-run_tests.log",
+      "log_sha256": "f9258266891122d032329810e974fa1a60ec641d50d5ce9ec877deb2450022ff"
+    },
+    {
+      "index": 105,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_whip/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "105-run_tests.log",
+      "log_sha256": "ae7cd14d82f39e57b9702c17b9567be8d7ce4673203b49efad2720b9d8605d22"
+    },
+    {
+      "index": 106,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_lantern_grip/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "106-run_tests.log",
+      "log_sha256": "5900d89010e21fbe8cf8fa1bb00287e3226004d27f5aad00055f834e6a272dc4"
+    },
+    {
+      "index": 107,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_switch_hook_instant_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "107-run_switch_hook_instant_tests.log",
+      "log_sha256": "38b7f43feabc24c4b2e7b26b2169a35d1ae463050e3b87201c466a8369050293"
+    },
+    {
+      "index": 108,
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_time_gate_visibility_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "108-run_time_gate_visibility_tests.log",
+      "log_sha256": "2a4903e6ac5bf61806bbc5d67f8c27ba31c01230934a1261661d4f1b316be39e"
+    },
+    {
+      "index": 109,
+      "command": [
+        "python3",
+        "-B",
+        "tests/mm_nei/run_timegate_audio_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "109-run_timegate_audio_tests.log",
+      "log_sha256": "040c46458d5ae9358741d9cce4c0093f6461442db74abf0329ce6270e73ffdf9"
+    },
+    {
+      "index": 110,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_item_stow/run_ballchain_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "110-run_ballchain_tests.log",
+      "log_sha256": "479eec39dfc1a3d9af26a481b9f028f4c73b9988d3d37d36c134b08614476257"
+    },
+    {
+      "index": 111,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_item_stow/run_lantern_rod_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "111-run_lantern_rod_tests.log",
+      "log_sha256": "c38955bc708bea5fc6c7d85dffabc2a5fb8c86d1bc6bbfba93b9f40d60ba41d6"
+    },
+    {
+      "index": 112,
+      "command": [
+        "python3",
+        "-B",
+        "tests/nei_item_stow/run_stow_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "112-run_stow_tests.log",
+      "log_sha256": "e2f4959d838a593a5b0510b4ae5d89febab897d28b097521fb5b69cd22f789cc"
+    },
+    {
+      "index": 113,
+      "command": [
+        "python3",
+        "-B",
+        "tools/nei_held/verify_assets.py"
+      ],
+      "exit_code": 0,
+      "log": "113-verify_assets.log",
+      "log_sha256": "813d6fca01cf791e1e0bb9bab35b41bdc8337efb72a3a501506983e72ef4fcec"
+    },
+    {
+      "index": 114,
+      "command": [
+        "python3",
+        "-B",
+        "tools/nei_icons/build.py",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "log": "114-build.log",
+      "log_sha256": "c1932237ccfb56ef1f2cd091483da0808206778528b2951f34bf80b2c3014234"
+    },
+    {
+      "index": 115,
+      "command": [
+        "python3",
+        "-B",
+        "tools/nei_icons/verify_routes.py"
+      ],
+      "exit_code": 0,
+      "log": "115-verify_routes.log",
+      "log_sha256": "dd2d58a87a334447783eb6071a9647559f334fb9fb65e444c404909ec7823eba"
+    },
+    {
+      "index": 116,
+      "command": [
+        "python3",
+        "-B",
+        "tests/optional_assets/run_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "116-run_tests.log",
+      "log_sha256": "14a0bcff25f5db381c7b0bed4704ddde0a153caebaa07f6f4d3c9a538447688c"
+    },
+    {
+      "index": 117,
+      "command": [
+        "python3",
+        "-B",
+        "tests/build_inputs/run_mod_discovery_tests.py"
+      ],
+      "exit_code": 0,
+      "log": "117-run_mod_discovery_tests.log",
+      "log_sha256": "69d817d782a3d190b0aaffbe06e03a4a22b3b6ff6b22eb8dec74487d742b77ac"
+    }
+  ]
+}

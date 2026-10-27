@@ -5,7 +5,10 @@
  */
 
 #include "z_en_horse_link_child.h"
+#include "young_epona.h"
+#include "overlays/actors/ovl_En_Horse/z_en_horse.h"
 #include "objects/object_horse_link_child/object_horse_link_child.h"
+#include "soh/Enhancements/cosmetics/EponaCosmetics.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -90,8 +93,8 @@ void func_80A693D0(EnHorseLinkChild* this) {
 
     if ((this->skin.skelAnime.curFrame > D_80A6AF5C[this->unk_1F0]) &&
         !((this->unk_1F0 == 0) && (this->skin.skelAnime.curFrame > D_80A6AF5C[1]))) {
-        Audio_PlaySoundGeneral(NA_SE_EV_KID_HORSE_WALK, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_KID_HORSE_WALK, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         this->unk_1F0++;
         if (this->unk_1F0 >= ARRAY_COUNT(D_80A6AF5C)) {
             this->unk_1F0 = 0;
@@ -104,15 +107,15 @@ void func_80A6948C(EnHorseLinkChild* this) {
         func_80A693D0(this);
     } else if (this->skin.skelAnime.curFrame == 0.0f) {
         if ((this->animationIdx == 3) || (this->animationIdx == 4)) {
-            Audio_PlaySoundGeneral(NA_SE_EV_KID_HORSE_RUN, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_EV_KID_HORSE_RUN, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else if (this->animationIdx == 1) {
             if (Rand_ZeroOne() > 0.5f) {
-                Audio_PlaySoundGeneral(NA_SE_EV_KID_HORSE_GROAN, &this->actor.projectedPos, 4,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_EV_KID_HORSE_GROAN, &this->actor.projectedPos, 4,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
             } else {
-                Audio_PlaySoundGeneral(NA_SE_EV_KID_HORSE_NEIGH, &this->actor.projectedPos, 4,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_EV_KID_HORSE_NEIGH, &this->actor.projectedPos, 4,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
             }
         }
     }
@@ -353,8 +356,8 @@ void func_80A6A068(EnHorseLinkChild* this, PlayState* play) {
     distFromLink = Actor_WorldDistXZToActor(&this->actor, &player->actor);
 
     if (gSaveContext.entranceIndex == ENTR_LON_LON_RANCH_1) {
-        Audio_PlaySoundGeneral(NA_SE_EV_KID_HORSE_NEIGH, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_KID_HORSE_NEIGH, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         func_80A6A724(this);
         return;
     }
@@ -445,8 +448,8 @@ void func_80A6A5A4(EnHorseLinkChild* this, PlayState* play) {
 
     if (DREG(53) != 0) {
         DREG(53) = 0;
-        Audio_PlaySoundGeneral(NA_SE_EV_KID_HORSE_NEIGH, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_KID_HORSE_NEIGH, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         func_80A6A724(this);
     } else {
         this->actor.speedXZ = 0.0f;
@@ -554,6 +557,21 @@ void EnHorseLinkChild_Update(Actor* thisx, PlayState* play) {
     EnHorseLinkChild* this = (EnHorseLinkChild*)thisx;
     s32 pad;
 
+    if (play->sceneNum == SCENE_LON_LON_RANCH && gSaveContext.sceneLayer < 4) {
+        Actor* rideable = Horse_FindYoungEpona(play);
+        if (rideable != NULL) {
+            if (((EnHorse*)rideable)->action != ENHORSE_ACT_INACTIVE) {
+                Actor_Kill(thisx);
+                return;
+            }
+            // Let the riding actor consume the song first. Keep the native NPC
+            // if no valid horse spawn point is available in this scene setup.
+            if (DREG(53) != 0) {
+                return;
+            }
+        }
+    }
+
     sActionFuncs[this->action](this, play);
     Actor_MoveXZGravity(&this->actor);
     Actor_UpdateBgCheckInfo(play, &this->actor, 20.0f, 55.0f, 100.0f, 0x1D);
@@ -621,5 +639,7 @@ void EnHorseLinkChild_Draw(Actor* thisx, PlayState* play) {
     EnHorseLinkChild* this = (EnHorseLinkChild*)thisx;
 
     Gfx_SetupDL_25Opa(play->state.gfxCtx);
+    EponaCosmetics_BeginDraw(play, &this->skin, true);
     func_800A6360(&this->actor, play, &this->skin, EnHorseLinkChild_PostDraw, EnHorseLinkChild_OverrideLimbDraw, true);
+    EponaCosmetics_EndDraw(play);
 }

@@ -115,6 +115,9 @@ class ResourceManager {
     std::shared_ptr<ArchiveManager> GetArchiveManager();
     /** @brief Returns the ResourceLoader responsible for deserializing file data. */
     std::shared_ptr<ResourceLoader> GetResourceLoader();
+    // An independent cache and asset mode pinned to one already-mounted
+    // archive. Shares the owner's factories; its own worker drains on teardown.
+    std::shared_ptr<ResourceManager> CreateResourceView(const std::shared_ptr<Archive>& archive);
 
     /**
      * @brief Returns a resource from the cache if present, without loading from disk.

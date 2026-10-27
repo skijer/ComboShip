@@ -65,6 +65,11 @@ class ResourceLoader {
      */
     std::shared_ptr<IResource> LoadResource(std::string filePath, std::shared_ptr<File> fileToLoad,
                                             std::shared_ptr<ResourceInitData> initData = nullptr);
+    // Archive-scoped reads keep metadata aliases and targets in that archive.
+    // The original overload is retained for existing callers and its ABI.
+    std::shared_ptr<IResource> LoadResource(std::string filePath, std::shared_ptr<File> fileToLoad,
+                                            std::shared_ptr<ResourceInitData> initData,
+                                            const std::shared_ptr<Archive>& archive);
 
     /**
      * @brief Registers a factory so that ResourceLoader can handle a new resource type.
@@ -120,6 +125,8 @@ class ResourceLoader {
      *         real asset's; otherwise nullptr (fileToLoad left unchanged).
      */
     std::shared_ptr<ResourceInitData> ResolveMetaAlias(const std::string& filePath, std::shared_ptr<File>& fileToLoad);
+    std::shared_ptr<ResourceInitData> ResolveMetaAlias(const std::string& filePath, std::shared_ptr<File>& fileToLoad,
+                                                       const std::shared_ptr<Archive>& archive);
 
     /** @brief Creates a ResourceInitData with default/zeroed fields. */
     static std::shared_ptr<ResourceInitData> CreateDefaultResourceInitData();

@@ -1,0 +1,31 @@
+{
+  "resource_count": 3,
+  "vertex_records": 14436,
+  "vertex_loads": 464,
+  "slug": "mario_mask",
+  "name": "Mario Mask SM64 POC3",
+  "entry": "objects/nei_gi_redesign/mario_mask/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 13112,
+  "bounds_author": [
+    [
+      -30.8125,
+      -25.625,
+      -16.375
+    ],
+    [
+      30.8125,
+      39.875,
+      29.5
+    ]
+  ],
+  "markers": {},
+  "notes": [
+    "Exact Mario SM64 POC3 runtime geometry/material colors, recovered from retained serialized source.",
+    "Original procedural authoring recipe unavailable; inspection GLB reconstructs display-list triangles.",
+    "Runtime GI resources and optional icon are restored verbatim; no new mesh authored."
+  ],
+  "source_archive_sha256": "9980d41450bcaa741d2f86cee3658606eec76f558b4d73c5d26d7eccc6f7e52f",
+  "runtime_tested": false
+}

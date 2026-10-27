@@ -12,6 +12,7 @@
 #include "objects/object_stk2/object_stk2.h"
 #include "objects/object_stk3/object_stk3.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "z_dm_stk_combo.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -1055,6 +1056,10 @@ void DmStk_PlaySfxForCutscenes(DmStk* this, PlayState* play) {
 }
 
 void DmStk_Init(Actor* thisx, PlayState* play) {
+#ifdef COMBO_BUILD
+    if (DmStk_ComboTryInit(thisx, play))
+        return;
+#endif
     s32 pad;
     DmStk* this = (DmStk*)thisx;
 

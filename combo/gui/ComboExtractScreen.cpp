@@ -7,6 +7,9 @@
 // (ComboMenu.cpp), so it owns the frame loop here. The actual ROM validation + ZAPD work happens in
 // soh.dll / 2ship.dll via the function pointers in ComboExtractCallbacks; this file only renders.
 #include "ComboExtractScreen.h"
+#include "ComboGameMode.h"
+#include "ComboExport.h"
+#include "ComboFilePicker.h"  // native Browse dialog (comdlg32 / pfd), shared with the settings-import screen
 #include "ComboWidgetStyle.h" // ComboShip port style: ComboMenu_ThemeColor / PushButton / PopButton
 
 #include <libultraship/libultraship.h>
@@ -20,12 +23,6 @@
 #include <algorithm>
 #include <cstdio>
 #include <cctype>
-
-#ifdef _WIN32
-#include <windows.h>
-#include <commdlg.h>
-#pragma comment(lib, "comdlg32") // GetOpenFileNameA — comboui doesn't otherwise link comdlg32
-#endif
 
 using ComboRando::ComboMenu_PopButton;
 using ComboRando::ComboMenu_PushButton;
@@ -42,6 +39,8 @@ struct RomSlot {
     ComboFnGetProgress progress = nullptr;
     std::string path;
     bool valid = false;
+    int ootKind = COMBO_OOT_ROM_INVALID;
+    int expectedOotKind = COMBO_OOT_ROM_INVALID; // zero accepts either OoT version
     // extraction runtime state
     bool started = false;
     bool done = false;
@@ -50,20 +49,14 @@ struct RomSlot {
 
 // Native open-file dialog filtered to N64 ROM extensions. Returns "" if cancelled.
 std::string PickRomFile() {
-#ifdef _WIN32
-    char file[MAX_PATH] = { 0 };
-    OPENFILENAMEA ofn = { 0 };
-    ofn.lStructSize = sizeof(ofn);
-    ofn.lpstrFilter = "N64 ROMs (*.z64;*.n64;*.v64)\0*.z64;*.n64;*.v64\0All Files (*.*)\0*.*\0";
-    ofn.lpstrFile = file;
-    ofn.nMaxFile = MAX_PATH;
-    ofn.lpstrTitle = "Select ROM";
-    ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
-    if (GetOpenFileNameA(&ofn)) {
-        return std::string(file);
-    }
-#endif
-    return std::string();
+    return ComboFilePicker::PickFile("Select ROM",
+                                     "N64 ROMs (*.z64;*.n64;*.v64)\0*.z64;*.n64;*.v64\0All Files (*.*)\0*.*\0",
+                                     { "N64 ROMs (*.z64 *.n64 *.v64)", "*.z64 *.n64 *.v64", "All Files", "*" });
+}
+
+// The UI disables Browse and points at drag & drop when no dialog helper exists (Linux only).
+bool PickerAvailable() {
+    return ComboFilePicker::Available();
 }
 
 // Dropped-file hand-off from the gfx backend's event pump (via FileDropMgr) to the PICK loop
@@ -110,7 +103,7 @@ void UseSharedImGuiContext() {
 
 } // namespace
 
-extern "C" __declspec(dllexport) int ComboUI_RunExtraction(const ComboExtractCallbacks* cb) {
+extern "C" COMBO_EXPORT int ComboUI_RunExtraction(const ComboExtractCallbacks* cb) {
     if (!cb) {
         return 0;
     }
@@ -125,39 +118,110 @@ extern "C" __declspec(dllexport) int ComboUI_RunExtraction(const ComboExtractCal
     auto gui = wnd->GetGui();
     UseSharedImGuiContext();
 
-    RomSlot slots[2];
+    constexpr int kSlotCount = 3;
+    constexpr int kMmSlot = 2;
+    RomSlot slots[kSlotCount];
     slots[0].label = "Ocarina of Time";
-    slots[0].needed = cb->sohNeeded != 0;
+    const bool ootEnabled = cb->gameMode != COMBO_GAME_MM;
+    slots[0].needed = ootEnabled && cb->sohNeeded != 0;
     slots[0].validate = cb->sohValidate;
     slots[0].classify = cb->sohClassify;
     slots[0].start = cb->sohStart;
     slots[0].progress = cb->sohProgress;
-    slots[1].label = "Majora's Mask";
-    slots[1].needed = cb->mmNeeded != 0;
-    slots[1].validate = cb->mmValidate;
-    slots[1].classify = cb->mmClassify;
-    slots[1].start = cb->mmStart;
-    slots[1].progress = cb->mmProgress;
+    slots[1].label = "Additional Ocarina of Time ROM";
+    slots[1].validate = cb->sohValidate;
+    slots[1].classify = cb->sohClassify;
+    slots[1].start = cb->sohStart;
+    slots[1].progress = cb->sohProgress;
+    slots[kMmSlot].label = "Majora's Mask";
+    slots[kMmSlot].needed = cb->gameMode != COMBO_GAME_OOT && cb->mmNeeded != 0;
+    slots[kMmSlot].validate = cb->mmValidate;
+    slots[kMmSlot].classify = cb->mmClassify;
+    slots[kMmSlot].start = cb->mmStart;
+    slots[kMmSlot].progress = cb->mmProgress;
+
+    const bool bothOotPresent = cb->sohVanillaPresent && cb->sohMqPresent;
+    auto updateComplement = [&]() {
+        if (!ootEnabled || bothOotPresent) {
+            return;
+        }
+        if (cb->sohVanillaPresent || slots[0].ootKind == COMBO_OOT_ROM_VANILLA) {
+            slots[1].label = "Ocarina of Time: Master Quest";
+            slots[1].expectedOotKind = COMBO_OOT_ROM_MQ;
+        } else if (cb->sohMqPresent || slots[0].ootKind == COMBO_OOT_ROM_MQ) {
+            slots[1].label = "Ocarina of Time: Vanilla";
+            slots[1].expectedOotKind = COMBO_OOT_ROM_VANILLA;
+        }
+        if (slots[1].ootKind != slots[1].expectedOotKind) {
+            slots[1].path.clear();
+            slots[1].valid = false;
+            slots[1].needed = false;
+            slots[1].ootKind = COMBO_OOT_ROM_INVALID;
+        }
+    };
+    updateComplement();
+
+    // Browse performs full CRC validation; scans and drops stay header-only until
+    // extraction validates the ROM again. A second copy of the same quest cannot
+    // accidentally replace the complementary archive.
+    auto selectRom = [&](int index, const std::string& path, bool fullValidation) {
+        RomSlot& s = slots[index];
+        s.path = path;
+        ComboFnValidateRom check = fullValidation ? s.validate : (s.classify ? s.classify : s.validate);
+        if (index != kMmSlot) {
+            s.ootKind = cb->sohClassifyKind ? cb->sohClassifyKind(path.c_str()) : COMBO_OOT_ROM_INVALID;
+            s.valid = (s.ootKind == COMBO_OOT_ROM_VANILLA || s.ootKind == COMBO_OOT_ROM_MQ) &&
+                      (!s.expectedOotKind || s.ootKind == s.expectedOotKind) && check && check(path.c_str());
+        } else {
+            s.valid = check && check(path.c_str());
+        }
+        if (index == 0 && s.valid) {
+            updateComplement();
+        }
+    };
 
     // Auto-scan the working directory and classify any ROMs found into the needed slots.
     {
         std::vector<std::string> candidates;
         ScanForRoms(std::filesystem::current_path(), candidates);
+        std::sort(candidates.begin(), candidates.end());
         for (const auto& c : candidates) {
-            for (auto& s : slots) {
-                if (!s.needed || s.valid) {
+            for (int i = 0; i < kSlotCount; ++i) {
+                auto& s = slots[i];
+                const bool selectable = i == 1 ? s.expectedOotKind != COMBO_OOT_ROM_INVALID : s.needed;
+                if (!selectable || s.valid) {
                     continue;
                 }
                 // Route by the header-only classify (fast); fall back to full validate if unavailable.
                 ComboFnValidateRom check = s.classify ? s.classify : s.validate;
                 if (check && check(c.c_str())) {
-                    s.path = c;
-                    s.valid = true;
-                    break;
+                    selectRom(i, c, false);
+                    if (s.valid) {
+                        break;
+                    }
                 }
             }
         }
+        // An unmatched scan candidate is not a player selection or an error.
+        for (auto& s : slots) {
+            if (!s.valid) {
+                s.path.clear();
+            }
+        }
     }
+
+    // Selection is deliberately ordered: first OoT, optional other quest, then
+    // MM. Keep installed archives out of the extraction queue.
+    int pickSlot = !ootEnabled ? kMmSlot : (slots[0].needed ? 0 : (bothOotPresent ? kMmSlot : 1));
+    auto advancePickSlot = [&]() {
+        if (pickSlot == 1 && (bothOotPresent || !slots[1].expectedOotKind)) {
+            ++pickSlot;
+        }
+        if (pickSlot == kMmSlot && !slots[kMmSlot].needed) {
+            ++pickSlot;
+        }
+    };
+    advancePickSlot();
 
     // Accept ROMs dragged onto the window while this screen is up. The gfx backends hand drops
     // to FileDropMgr (created by the window-only boot precisely so it exists here); the handler
@@ -224,96 +288,97 @@ extern "C" __declspec(dllexport) int ComboUI_RunExtraction(const ComboExtractCal
             ImGui::Separator();
 
             if (phase == PICK) {
-                // A ROM dropped onto the window: route it by the header-only classify (same
-                // routing as the auto-scan above), replacing a prior selection for that game —
-                // a drop is an explicit user action. If no slot claims it, park it in the first
-                // unfilled slot so the "Not a valid ... ROM" feedback explains what happened.
-                if (!sDroppedRomPath.empty()) {
-                    std::string dropped = std::move(sDroppedRomPath);
-                    sDroppedRomPath.clear();
-                    if (fileDropMgr != nullptr) {
-                        fileDropMgr->ClearDroppedFile();
-                    }
-                    bool placed = false;
-                    for (auto& s : slots) {
-                        if (!s.needed) {
-                            continue;
+                if (pickSlot < kSlotCount) {
+                    RomSlot& s = slots[pickSlot];
+                    if (!sDroppedRomPath.empty()) {
+                        std::string dropped = std::move(sDroppedRomPath);
+                        sDroppedRomPath.clear();
+                        if (fileDropMgr != nullptr) {
+                            fileDropMgr->ClearDroppedFile();
                         }
-                        ComboFnValidateRom check = s.classify ? s.classify : s.validate;
-                        if (check && check(dropped.c_str())) {
-                            s.path = dropped;
-                            s.valid = true;
-                            placed = true;
-                            break;
-                        }
+                        selectRom(pickSlot, dropped, false);
                     }
-                    if (!placed) {
-                        for (auto& s : slots) {
-                            if (s.needed && !s.valid) {
-                                s.path = dropped;
-                                s.valid = false;
-                                break;
-                            }
-                        }
-                    }
-                }
 
-                ImGui::TextWrapped("ComboShip needs both an Ocarina of Time ROM and a Majora's Mask ROM. "
-                                   "Select each ROM below or drag and drop ROM files onto this window, "
-                                   "then click Extract. Both are required.");
-                ImGui::Spacing();
-
-                for (int i = 0; i < 2; i++) {
-                    RomSlot& s = slots[i];
-                    ImGui::PushID(i);
                     ImGui::TextColored(theme, "%s", s.label);
-                    if (!s.needed) {
-                        ImGui::SameLine();
-                        ImGui::TextColored(kGreen, "(already extracted)");
+                    if (pickSlot == 0) {
+                        ImGui::TextWrapped("Select your Ocarina of Time ROM. Vanilla or Master Quest can be "
+                                           "selected first. You can add the other version next.");
+                    } else if (pickSlot == 1) {
+                        ImGui::TextWrapped("Add the other Ocarina of Time ROM to enable mixed vanilla/Master Quest "
+                                           "dungeons. This is optional; you can add it later by launching "
+                                           "ComboShip with --rom-setup.");
                     } else {
-                        ImGui::TextWrapped("%s", s.path.empty() ? "(no ROM selected)" : s.path.c_str());
-                        ComboMenu_PushButton(theme);
-                        if (ImGui::Button(s.path.empty() ? "Browse..." : "Change")) {
-                            std::string picked = PickRomFile();
-                            if (!picked.empty()) {
-                                s.path = picked;
-                                s.valid = s.validate && s.validate(picked.c_str());
-                            }
+                        ImGui::TextWrapped("Select your Majora's Mask ROM to finish ComboShip ROM setup.");
+                    }
+                    if (!PickerAvailable()) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+                        ImGui::TextWrapped("No file-picker helper found (install zenity or kdialog); "
+                                           "drag and drop your ROM onto this window instead.");
+                        ImGui::PopStyleColor();
+                    }
+                    ImGui::Spacing();
+                    ImGui::TextWrapped("%s", s.path.empty() ? "(no ROM selected)" : s.path.c_str());
+                    ComboMenu_PushButton(theme);
+                    ImGui::BeginDisabled(!PickerAvailable());
+                    if (ImGui::Button(s.path.empty() ? "Browse..." : "Change")) {
+                        std::string picked = PickRomFile();
+                        if (!picked.empty()) {
+                            selectRom(pickSlot, picked, true);
                         }
-                        ComboMenu_PopButton();
-                        ImGui::SameLine();
-                        if (s.path.empty()) {
-                            ImGui::TextDisabled("required");
-                        } else if (s.valid) {
-                            ImGui::TextColored(kGreen, "Valid %s ROM", s.label);
-                        } else {
-                            ImGui::TextColored(kRed, "Not a valid %s ROM", s.label);
-                        }
+                    }
+                    ImGui::EndDisabled();
+                    ComboMenu_PopButton();
+                    ImGui::SameLine();
+                    if (s.path.empty()) {
+                        ImGui::TextDisabled(pickSlot == 1 ? "optional" : "required");
+                    } else if (s.valid) {
+                        ImGui::TextColored(kGreen, "Valid %s ROM", s.label);
+                    } else {
+                        ImGui::TextColored(kRed, "Not a valid %s ROM", s.label);
                     }
                     ImGui::Spacing();
                     ImGui::Separator();
                     ImGui::Spacing();
-                    ImGui::PopID();
-                }
 
-                bool ready = true;
-                for (const auto& s : slots) {
-                    if (s.needed && !s.valid) {
-                        ready = false;
+                    ImGui::BeginDisabled(!s.valid);
+                    ComboMenu_PushButton(theme);
+                    if (ImGui::Button(pickSlot == 1 ? "Add ROM" : "Continue", ImVec2(150.0f, 0.0f))) {
+                        s.needed = true;
+                        ++pickSlot;
+                        advancePickSlot();
                     }
-                }
-
-                if (!ready) {
-                    ImGui::BeginDisabled();
-                }
-                ComboMenu_PushButton(theme);
-                if (ImGui::Button("Extract", ImVec2(150.0f, 0.0f))) {
-                    phase = EXTRACTING;
-                    activeSlot = -1;
-                }
-                ComboMenu_PopButton();
-                if (!ready) {
+                    ComboMenu_PopButton();
                     ImGui::EndDisabled();
+                    // Use the slot being rendered: Continue can already have advanced pickSlot.
+                    if (&s == &slots[1]) {
+                        ImGui::SameLine();
+                        ComboMenu_PushButton(theme);
+                        if (ImGui::Button("Skip", ImVec2(150.0f, 0.0f))) {
+                            s.needed = false;
+                            pickSlot = kMmSlot;
+                            advancePickSlot();
+                        }
+                        ComboMenu_PopButton();
+                    }
+                } else {
+                    ImGui::TextWrapped("ROM selection complete. Extract the selected ROMs to continue.");
+                    ImGui::Spacing();
+                    for (int i = 0; i < kSlotCount; ++i) {
+                        const auto& s = slots[i];
+                        if (s.needed) {
+                            ImGui::TextColored(theme, "%s", s.label);
+                            ImGui::TextWrapped("%s", s.path.c_str());
+                        } else if (i != 1) {
+                            ImGui::TextColored(kGreen, "%s (already extracted)", s.label);
+                        }
+                    }
+                    ImGui::Spacing();
+                    ComboMenu_PushButton(theme);
+                    if (ImGui::Button("Extract", ImVec2(150.0f, 0.0f))) {
+                        phase = EXTRACTING;
+                        activeSlot = -1;
+                    }
+                    ComboMenu_PopButton();
                 }
                 ImGui::SameLine();
                 ComboMenu_PushButton(theme);
@@ -326,7 +391,7 @@ extern "C" __declspec(dllexport) int ComboUI_RunExtraction(const ComboExtractCal
                 if (activeSlot < 0) {
                     // Pick the next needed-but-unfinished slot, or finish.
                     int next = -1;
-                    for (int i = 0; i < 2; i++) {
+                    for (int i = 0; i < kSlotCount; i++) {
                         if (slots[i].needed && !slots[i].done) {
                             next = i;
                             break;
@@ -408,4 +473,72 @@ extern "C" __declspec(dllexport) int ComboUI_RunExtraction(const ComboExtractCal
     sDroppedRomPath.clear();
 
     return result;
+}
+
+extern "C" COMBO_EXPORT int ComboUI_SelectGame(int currentMode) {
+    auto ctx = Ship::Context::GetRawInstance();
+    if (!ctx || !ctx->GetWindow() || !ctx->GetWindow()->GetGui()) {
+        return -1;
+    }
+    auto wnd = std::dynamic_pointer_cast<Fast::Fast3dWindow>(ctx->GetWindow());
+    if (!wnd) {
+        return -1;
+    }
+    const char* labels[] = { "Combo (OoT + MM)", "Ocarina of Time", "Majora's Mask" };
+    if (currentMode < COMBO_GAME_BOTH || currentMode > COMBO_GAME_MM) {
+        currentMode = COMBO_GAME_BOTH;
+    }
+    auto gui = wnd->GetGui();
+    while (wnd->IsRunning()) {
+        wnd->HandleEvents();
+        if (!wnd->IsFrameReady()) {
+            continue;
+        }
+        UseSharedImGuiContext();
+        gui->StartDraw();
+        wnd->StartFrame();
+        wnd->RunGuiOnly();
+        const auto theme = ComboMenu_ThemeColor();
+        auto vp = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(vp->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+        const float width = std::max(220.0f, std::min(520.0f, vp->WorkSize.x - 32.0f));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(width, 0.0f), ImVec2(width, vp->WorkSize.y - 32.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(24.0f, 20.0f));
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.09f, 0.09f, 0.11f, 0.98f));
+        const bool open = ImGui::Begin("ComboShip - Choose Game", nullptr,
+                                       ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                                           ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
+                                           ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        int result = -2;
+        if (open) {
+            ImGui::SetWindowFontScale(1.4f);
+            ImGui::TextColored(theme, "Choose your game");
+            ImGui::SetWindowFontScale(1.0f);
+            ImGui::TextDisabled("Last played: %s", labels[currentMode]);
+            ImGui::Separator();
+            ImGui::TextWrapped("Play both games together, or play either game on its own. "
+                               "Solo games offer vanilla and randomizer files.");
+            ImGui::Spacing();
+            ComboMenu_PushButton(theme);
+            for (int mode = COMBO_GAME_BOTH; mode <= COMBO_GAME_MM; ++mode) {
+                if (ImGui::Button(labels[mode], ImVec2(-1.0f, 48.0f))) {
+                    result = mode;
+                }
+            }
+            ImGui::Spacing();
+            if (ImGui::Button("Quit", ImVec2(-1.0f, 0.0f))) {
+                result = -1;
+            }
+            ComboMenu_PopButton();
+        }
+        ImGui::End();
+        gui->EndDraw();
+        wnd->EndFrame();
+        if (result != -2) {
+            return result;
+        }
+    }
+    return -1;
 }

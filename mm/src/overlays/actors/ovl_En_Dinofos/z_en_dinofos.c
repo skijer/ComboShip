@@ -5,6 +5,7 @@
  */
 
 #include "z_en_dinofos.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 
 #define FLAGS                                                                                 \
@@ -1308,7 +1309,7 @@ s32 EnDinofos_UpdateDamage(EnDinofos* this, PlayState* play) {
         }
 
         if ((this->drawDmgEffType == ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) &&
-            (this->bodyAndFireCollider.elements[i].base.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            (DinFireSword_OriginalDamageFlags(play, this->bodyAndFireCollider.elements[i].base.acHitElem) & 0xDB0B3)) {
             return false;
         }
 

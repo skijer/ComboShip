@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../../combo/ComboGameMode.h"
+
 #define BTN_CUSTOM_MODIFIER1 0x0040
 #define BTN_CUSTOM_MODIFIER2 0x0080
 
@@ -24,6 +26,10 @@
 
 #define MM_NTSC_US_10 0x5354631C
 #define MM_NTSC_US_GC 0xB443EB08
+
+#ifdef COMBO_BUILD
+#include "ComboExport.h"
+#endif
 
 #ifdef __cplusplus
 #include <ship/Context.h>
@@ -66,6 +72,7 @@ class OTRGlobals {
     void RunExtract(int argc, char* argv[]);
     void Initialize();
     void ScaleImGui();
+    void LoadModGuiFonts();
 
   private:
     ImFont* CreateFontWithSize(float size, std::string fontPath = "");
@@ -105,6 +112,7 @@ uint32_t ResourceMgr_GetGameRegion(int index);
 void ResourceMgr_LoadDirectory(const char* resName);
 char** ResourceMgr_ListFiles(const char* searchMask, int* resultSize);
 uint8_t ResourceMgr_FileExists(const char* resName);
+uint8_t ResourceMgr_FileAltExists(const char* resName);
 void ResourceMgr_LoadFile(const char* resName);
 char* ResourceMgr_LoadFileFromDisk(const char* filePath);
 uint8_t ResourceMgr_ResourceIsBackground(char* texPath);
@@ -114,8 +122,24 @@ uint16_t ResourceMgr_LoadTexHeightByName(char* texPath);
 CollisionHeader* ResourceMgr_LoadColByName(const char* path);
 AnimatedMaterial* ResourceMgr_LoadAnimatedMatByName(const char* path);
 char* ResourceMgr_LoadTexOrDListByName(const char* filePath);
+// Normalized center of visible RGBA artwork; transparent padding is excluded.
+uint8_t MM_GetTextureVisibleCenter(const char* filePath, float* x, float* y);
 char* ResourceMgr_LoadIfDListByName(const char* filePath);
 char* ResourceMgr_LoadPlayerAnimByName(const char* animPath);
+// Wraps a raw SOH_PlayerAnimation payload in a real header (cached). Skijer's NEI
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeader(const char* animPath);
+// Same, REWRITTEN: root frozen (stripY also pins Y), optionally cut to an inclusive
+// sub-range, optionally resampled to an exact length. The imported movesets need all
+// three — a clip carrying its own root would teleport the player, one packed clip
+// serves several engine rows, and the locomotion rows are SAMPLED so their length is
+// not free. firstFrame/lastFrame -1 = the whole clip; targetFrames 0 = keep length.
+// Cached by path AND parameters. Skijer's NEI
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeaderInPlaceRange(const char* animPath, uint8_t stripY,
+                                                                      int16_t firstFrame, int16_t lastFrame,
+                                                                      int16_t targetFrames);
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeaderInPlaceResampled(const char* animPath, uint8_t stripY,
+                                                                          int16_t targetFrames);
+PlayerAnimationHeader* ResourceMgr_LoadPlayerAnimAsHeaderInPlace(const char* animPath, uint8_t stripY);
 AnimationHeaderCommon* ResourceMgr_LoadAnimByName(const char* path);
 char* ResourceMgr_GetNameByCRC(uint64_t crc, char* alloc);
 Gfx* ResourceMgr_LoadGfxByCRC(uint64_t crc);
@@ -142,6 +166,9 @@ void Ctx_WriteSaveFile(uintptr_t addr, void* dramAddr, size_t size);
 
 uint64_t GetPerfCounter();
 bool ResourceMgr_IsAltAssetsEnabled();
+// Archive provenance, respecting the resource owner and its current Alt mode.
+int ResourceMgr_IsModAsset(const char* path);
+int ResourceMgr_IsModAssetForGame(const char* game, const char* path);
 struct SkeletonHeader* ResourceMgr_LoadSkeletonByName(const char* path, SkelAnime* skelAnime);
 void ResourceMgr_UnregisterSkeleton(SkelAnime* skelAnime);
 void ResourceMgr_ClearSkeletons();
@@ -190,6 +217,9 @@ void Combo_RequestOwlSaveQuit(void);
 // Load an existing MM save from disk into gSaveContext (C-callable wrapper). 0 = ok; negative = nothing
 // usable was loaded (logged; the load leaves the fail-closed sentinel behind and play still proceeds).
 int Combo_LoadMMSaveFile(int mmFileNum);
+// Recover from that failure: rebuild the slot's MM half from its baked seed, else leave a throwaway
+// baseline that cannot persist. Never let Play start on the zeroed SaveContext.
+void Combo_RepairMMSaveForSlot(int fileNum);
 // ComboShip (#182): 1-based MM file whose owlSave blob is what gSaveContext descends from (-1 = none).
 extern int gComboOwlBlobSlot;
 // ComboShip (#182): mirrors Sram_OpenSave's owl branch; resolveEntrance = 0 keeps combo's arrival point.
@@ -203,27 +233,22 @@ int32_t GetGIID(uint32_t itemID);
 #ifdef __cplusplus
 extern "C" {
 #endif
+// Typed tile preflight follows the selected resource owner and its Alt mode.
+uint8_t MM_IsRgba32TextureAvailable(const char* filePath);
 uint64_t GetUnixTimestamp();
 #ifdef COMBO_BUILD
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-    void MM_SetOnComboReturnCallback(void (*cb)(int kind));
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-    // Ctrl+R reset while MM is foreground: bounce back to OOT (saves if autosave on) + go dormant.
-    void MM_RequestComboReturn(void);
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-    void MM_PrepareForTransition(void);
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-    void MM_ResumeGame(int fileNum);
+COMBO_EXPORT void MM_SetOnComboReturnCallback(void (*cb)(int kind));
+// Ctrl+R reset while MM is foreground: bounce back to OOT (saves if autosave on) + go dormant.
+COMBO_EXPORT void MM_RequestComboReturn(void);
+void MM_ApplyComboPortalArrival(void);
+COMBO_EXPORT void MM_PrepareForTransition(void);
+COMBO_EXPORT void MM_ResumeGame(int fileNum);
 #endif
 void CrashHandler_PrintExt(char* buffer, size_t* pos);
+
+// The NEI asset folder for THIS game ("nei", or "nei/2ship" in ComboShip, where both games share one
+// Ship directory and their packs collide by name). Build every nei/ path from this, never a literal.
+const char* Nei_AssetDir(void);
 #ifdef __cplusplus
 };
 #endif

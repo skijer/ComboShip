@@ -828,6 +828,8 @@ s32 Cutscene_IsCueInChannel(struct PlayState* play, u16 cueType);
 u8 Cutscene_IsPlaying(struct PlayState* play);
 
 void CutsceneManager_Init(struct PlayState* play, ActorCutscene* cutsceneList, s16 numEntries);
+// Opt in for the current scene only; the next Init restores native behavior.
+void CutsceneManager_SetCameraOwnershipProtection(s32 enabled);
 void CutsceneManager_StoreCamera(Camera* camera);
 void CutsceneManager_ClearWaiting(void);
 s16 CutsceneManager_Update(void);
@@ -838,6 +840,9 @@ s16 CutsceneManager_StartWithPlayerCsAndSetFlag(s16 csId, Actor* actor);
 s16 CutsceneManager_Start(s16 csId, Actor* actor);
 s16 CutsceneManager_Stop(s16 csId);
 s16 CutsceneManager_GetCurrentCsId(void);
+s32 CutsceneManager_IsCurrentActor(Actor* actor);
+s32 CutsceneManager_IsCurrentCamera(struct PlayState* play);
+s32 CutsceneManager_EndForActor(struct PlayState* play, Actor* actor);
 ActorCutscene* CutsceneManager_GetCutsceneEntry(s16 csId);
 s16 CutsceneManager_GetAdditionalCsId(s16 csId);
 s16 CutsceneManager_GetLength(s16 csId);

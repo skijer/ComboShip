@@ -1,0 +1,25 @@
+{
+  "resource_count": 11,
+  "vertex_records": 3823,
+  "vertex_loads": 134,
+  "slug": "pendant_of_memories",
+  "name": "Pendant of Memories",
+  "entry": "objects/nei_gi_redesign/pendant_of_memories/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 3512,
+  "bounds_author": [
+    [
+      -30.3125,
+      -52.0,
+      0.0625
+    ],
+    [
+      30.3125,
+      53.0,
+      7.8125
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

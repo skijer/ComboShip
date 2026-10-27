@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_en_minideath.c
  * Overlay: ovl_En_Minideath
@@ -753,6 +754,9 @@ void EnMinideath_UpdateDamage(EnMinideath* this, PlayState* play) {
 
             for (i = 0; i < MINIDEATH_NUM_EFFECTS; i++) {
                 if (this->collider.elements[i].base.acElemFlags & ACELEM_HIT) {
+                    DinFireSword_FinishConfirmedPart(play, &this->actor, this->collider.elements[i].base.acHitElem, i,
+                                                     this->effects[i].pos.x, this->effects[i].pos.y,
+                                                     this->effects[i].pos.z, 10.0f);
                     this->collider.elements[i].base.acElemFlags &= ~(ACELEM_ON | ACELEM_HIT);
                     this->collider.elements[i].base.atElemFlags &= ~(ATELEM_ON | ATELEM_HIT);
                     this->effects[i].vel.y = -1.0f;

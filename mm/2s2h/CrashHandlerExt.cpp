@@ -8,6 +8,7 @@
 extern "C" {
 #include "build.h"
 #include "variables.h"
+#include "crash_actor_context.h"
 }
 
 #define WRITE_VAR_LINE(buff, len, varName, varValue) \
@@ -59,6 +60,19 @@ extern "C" void CrashHandler_PrintExt(char* buffer, size_t* pos) {
     WRITE_VAR_LINE(buffer, pos, "  Git Branch: ", (const char*)gGitBranch);
     WRITE_VAR_LINE(buffer, pos, "  Git Commit: ", (const char*)gGitCommitHash);
     WRITE_VAR_LINE(buffer, pos, "  Build Date: ", (const char*)gBuildDate);
+
+    const MMCrashActorContext* actorContext = MM_GetCrashActorContext();
+    if (actorContext->active) {
+        char actorLine[256];
+        snprintf(actorLine, sizeof(actorLine),
+                 "Native actor update: scene=%d room=%d id=0x%04x category=%d params=0x%04x actor=%p callback=%p",
+                 actorContext->sceneId, actorContext->room, actorContext->actorId & 0xFFFF, actorContext->category,
+                 actorContext->params & 0xFFFF, (void*)actorContext->actor, (void*)actorContext->callback);
+        append_line(buffer, pos, actorLine);
+        // An invalid callback can mean damaged actor memory. Keep the captured facts
+        // rather than risking a second fault while traversing that actor list.
+        return;
+    }
 
     if (gPlayState != nullptr) {
         WRITE_VAR_LINE(buffer, pos, "Scene: ", Ship_GetSceneName(gPlayState->sceneId));

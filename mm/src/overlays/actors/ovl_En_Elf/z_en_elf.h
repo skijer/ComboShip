@@ -65,6 +65,7 @@ typedef struct EnElf {
     /* 0x269 */ u8 unk_269;
     /* 0x26C */ EnElfUnkFunc unk_26C;
     /* 0x270 */ EnElfActionFunc actionFunc;
-} EnElf; // size = 0x274
+    u16 midnaBlinkTimer; // Optional companion presentation; visible update time only.
+} EnElf;
 
 #endif // Z_EN_ELF_H

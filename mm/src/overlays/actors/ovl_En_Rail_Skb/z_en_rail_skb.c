@@ -5,6 +5,7 @@
  */
 
 #include "z_en_rail_skb.h"
+#include "2s2h/Enhancements/Gameplay/ComboRegionalActorPresentation.h"
 #include "overlays/actors/ovl_En_Part/z_en_part.h"
 #include "overlays/effects/ovl_Effect_Ss_Hahen/z_eff_ss_hahen.h"
 
@@ -285,6 +286,10 @@ static InitChainEntry sInitChain[] = {
 };
 
 void EnRailSkb_Init(Actor* thisx, PlayState* play) {
+#ifdef COMBO_BUILD
+    if (ComboRegionalActor_TryInit(thisx, play))
+        return;
+#endif
     s32 pad;
     EnRailSkb* this = (EnRailSkb*)thisx;
 

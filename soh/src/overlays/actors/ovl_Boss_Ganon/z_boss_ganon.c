@@ -13,10 +13,12 @@
 #include "soh/frame_interpolation.h"
 #include "soh/OTRGlobals.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/transformation_masks/boss_super_damage.h"
 #include "soh/Enhancements/savestate_serialize.h"
 #include <libultraship/bridge/resourcebridge.h>
 
 #include <string.h>
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -584,7 +586,7 @@ void BossGanon_IntroCutscene(BossGanon* this, PlayState* play) {
             Play_ChangeCameraStatus(play, this->csCamIndex, CAM_STAT_ACTIVE);
             this->csCamFov = 60.0f;
 
-            if (Flags_GetEventChkInf(EVENTCHKINF_BEGAN_GANONDORF_BATTLE) || IS_RANDO || IS_BOSS_RUSH) {
+            if (Flags_GetEventChkInf(EVENTCHKINF_BEGAN_GANONDORF_BATTLE)) {
                 // watched cutscene already, skip most of it
                 this->csState = 17;
                 this->csTimer = 0;
@@ -917,7 +919,7 @@ void BossGanon_IntroCutscene(BossGanon* this, PlayState* play) {
                     this->csTimer = 0;
                     this->csCamFov = 60.0f;
                     BossGanon_SetIntroCsCamera(this, 12);
-                    if (!IS_RANDO && !IS_BOSS_RUSH) {
+                    if (GameInteractor_Should(VB_PLAY_GANONDORF_INTRO_CS, true, this)) {
                         Message_StartTextbox(play, 0x70CB, NULL);
                     }
                 }
@@ -941,7 +943,7 @@ void BossGanon_IntroCutscene(BossGanon* this, PlayState* play) {
 
             this->csState = 19;
             this->csTimer = 0;
-            if (!IS_BOSS_RUSH) {
+            if (GameInteractor_Should(VB_PLAY_GANONDORF_INTRO_CS, true, this)) {
                 Message_StartTextbox(play, 0x70CC, NULL);
             }
             Animation_MorphToPlayOnce(&this->skelAnime, &gGanondorfRaiseHandStartAnim, -5.0f);
@@ -984,8 +986,7 @@ void BossGanon_IntroCutscene(BossGanon* this, PlayState* play) {
             }
 
             if ((this->csTimer > 80) && (Message_GetState(&play->msgCtx) == TEXT_STATE_NONE)) {
-                // In rando, skip past dark waves section straight to title card phase of the cutscene.
-                if (IS_RANDO || IS_BOSS_RUSH) {
+                if (!GameInteractor_Should(VB_PLAY_GANONDORF_INTRO_CS, true, this)) {
                     this->timers[2] = 30;
                     this->csCamAt.x = this->unk_1FC.x - 10.0f;
                     this->csCamAt.y = this->unk_1FC.y + 30.0f;
@@ -1292,10 +1293,7 @@ void BossGanon_DeathAndTowerCutscene(BossGanon* this, PlayState* play) {
             this->actor.shape.yOffset = -7000.0f;
 
             this->actor.shape.rot.y = 0;
-            // Skip Ganondorf dying and go straight to next scene.
-            // The cutscene skip met a mixed reaction, so until we figure out a better way of doing it,
-            // it will stay not-skipped outside of Boss Rush (originally implemented for randomizer).
-            if (!IS_BOSS_RUSH) {
+            if (GameInteractor_Should(VB_GANONDORF_DEATH_SCENE, true, this)) {
                 this->csState = 1;
                 this->csTimer = 0;
             } else {
@@ -1569,7 +1567,7 @@ void BossGanon_DeathAndTowerCutscene(BossGanon* this, PlayState* play) {
             sZelda = (EnZl3*)Actor_SpawnAsChild(&play->actorCtx, &this->actor, play, ACTOR_EN_ZL3, 0.0f, 6000.0f, 0.0f,
                                                 0, 0, 0, 0x2000);
 
-            if (!IS_RANDO && !IS_BOSS_RUSH) {
+            if (GameInteractor_Should(VB_PLAY_ZELDA_CRYSTAL_CS, true, this)) {
                 this->csState = 101;
             } else {
                 this->skelAnime.playSpeed = 1.0f;
@@ -1696,8 +1694,7 @@ void BossGanon_DeathAndTowerCutscene(BossGanon* this, PlayState* play) {
             }
             // fallthrough
         case 104:
-            // In rando, fade out the white here as the earlier part is skipped.
-            if (IS_RANDO || IS_BOSS_RUSH) {
+            if (!GameInteractor_Should(VB_PLAY_ZELDA_CRYSTAL_CS, true, this)) {
                 Math_ApproachZeroF(&this->whiteFillAlpha, 1.0f, 10.0f);
             }
 
@@ -1718,8 +1715,7 @@ void BossGanon_DeathAndTowerCutscene(BossGanon* this, PlayState* play) {
             }
 
             if (this->csTimer == 50) {
-                // In rando, skip the rest of the cutscene after the crystal around Zelda dissapears.
-                if (!IS_RANDO && !IS_BOSS_RUSH) {
+                if (GameInteractor_Should(VB_PLAY_ZELDA_CRYSTAL_CS, true, this)) {
                     sZelda->unk_3C8 = 4;
                 } else {
                     this->csState = 108;
@@ -2765,6 +2761,59 @@ void BossGanon_UpdateDamage(BossGanon* this, PlayState* play) {
     s16 i;
     s16 j;
     ColliderInfo* acHitInfo;
+
+    // FD / Pika Gigantamax: stun-then-damage. NOT vulnerable → BossGanon_SetupVulnerable (the same
+    // dazed/exposed state you normally reach by reflecting his light ball); ALREADY vulnerable →
+    // damage (mash to kill). Detected by an accepted AC hit OR the geometric FD-sword/touch reach
+    // (so FD's sword + remote beam land even if its dmgFlags wouldn't match). Gated on IsFormActive
+    // + unk_2D4 cooldown; BossGanon_Damaged (the hit-reaction anim) is excluded so it paces the mash.
+    if (BossSuperDamage_IsFormActive(play) && ((s8)this->actor.colChkInfo.health > 0) && (this->unk_2D4 == 0) &&
+        ((this->collider.base.acFlags & 2) ||
+         BossSuperDamage_FormAttackReaches(play, &this->actor.world.pos,
+                                           BossSuperDamage_FormAttackRange(play) + 60.0f))) {
+        this->collider.base.acFlags &= ~2;
+        this->unk_2D4 = 6; // short cooldown → mashable in ANY state (the only throttle)
+        // Suppress the vanilla light-arrow-stun VFX: shockGlow (its unk_1A4 buildup) is the
+        // electric-shock overlay from the light-arrow stun — keep ONLY our own glow.
+        this->unk_1A4 = 0;
+        this->shockGlow = false;
+        BossSuperDamage_StartElectricSparks(&this->actor, 90);
+        // "Stunned/open" = the dazed Vulnerable loop OR the Damaged stagger. Hit while open →
+        // DAMAGE; hit in ANY other state (attacking, charging, even mid getup) → STUN him.
+        if ((this->actionFunc == BossGanon_Vulnerable) || (this->actionFunc == BossGanon_Damaged)) {
+            this->actor.colChkInfo.health -= BossSuperDamage_FormDamage(play);
+            if ((s8)this->actor.colChkInfo.health <= 0) {
+                BossGanon_SetupDeathCutscene(this, play);
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_GANON_DEAD);
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_GANON_DD_THUNDER);
+                Sfx_PlaySfxAtPos(&sZeroVec, NA_SE_EN_LAST_DAMAGE);
+                Audio_QueueSeqCmd(0x100100FF);
+                this->screenFlashTimer = 4;
+                GameInteractor_ExecuteOnBossDefeat(&this->actor);
+            } else {
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_GANON_DAMAGE2);
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_GANON_CUTBODY);
+                // If he's recovering (getup sub-states unk_1C2 >= 5), drag him back into the dazed
+                // loop so you can keep stunning/damaging him during the post-recover anim, like Dodongo.
+                if ((this->actionFunc == BossGanon_Vulnerable) && (this->unk_1C2 >= 5)) {
+                    this->unk_1C2 = 4;
+                    this->timers[0] = 70;
+                    this->fwork[GDF_FWORK_1] = Animation_GetLastFrame(&gGanondorfVulnerableAnim);
+                    Animation_MorphToLoop(&this->skelAnime, &gGanondorfVulnerableAnim, 0.0f);
+                }
+                this->unk_1A6 = 15;
+                sCape->tearTimer = 1;
+            }
+        } else {
+            // STUN via the short stagger (NOT SetupVulnerable, which plays the light-arrow-hit anim,
+            // spawns 10 shock-sparkle children, and runs the long downed→land→getup sequence — the VFX
+            // + the timer you didn't want). The stagger leads into the damageable Vulnerable loop.
+            BossGanon_SetupDamaged(this, play);
+            Audio_PlayActorSound2(&this->actor, NA_SE_EN_GANON_DAMAGE1);
+            this->unk_1A6 = 15;
+        }
+        return;
+    }
 
     if (this->collider.base.acFlags & 2) {
         this->unk_2D4 = 2;
@@ -3910,6 +3959,16 @@ void BossGanon_Draw(Actor* thisx, PlayState* play) {
     BossGanon_DrawShadowTexture(shadowTex, this, play);
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    // FD / Pika Gigantamax electric glow on Ganondorf — torso + head anchors (unk_1FC is his
+    // body-center reference). No-op when the spark timer is 0 (not recently hit).
+    {
+        Vec3f limbs[2];
+        limbs[0] = this->unk_1FC;
+        limbs[1] = this->unk_1FC;
+        limbs[1].y += 40.0f;
+        BossSuperDamage_DrawElectricSparks(&this->actor, play, limbs, 2, 1.4f);
+    }
 }
 
 s32 BossGanon_CheckFallingPlatforms(BossGanon* this, PlayState* play, Vec3f* checkPos) {
@@ -4026,9 +4085,9 @@ void BossGanon_LightBall_Update(Actor* thisx, PlayState* play2) {
 
                     if ((hitWithBottle == false) && (acHitInfo->toucher.dmgFlags & 0x100000)) {
                         spBA = 2;
-                        Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_REFLECT_MG, &player->actor.projectedPos, 4,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_REFLECT_MG, &player->actor.projectedPos, 4,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultReverb);
                         Rumble_Request(this->actor.xyzDistToPlayerSq, 0xFF, 0x14, 0x96);
                     } else {
                         spBA = 1;
@@ -4037,9 +4096,9 @@ void BossGanon_LightBall_Update(Actor* thisx, PlayState* play2) {
                             Math_Atan2S(sqrtf(SQ(xDistFromGanondorf) + SQ(zDistFromGanondorf)), yDistFromGanondorf);
                         this->unk_1A4++;
                         this->timers[1] = 2;
-                        Audio_PlaySoundGeneral(NA_SE_IT_SWORD_REFLECT_MG, &player->actor.projectedPos, 4,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_IT_SWORD_REFLECT_MG, &player->actor.projectedPos, 4,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultReverb);
                         Rumble_Request(this->actor.xyzDistToPlayerSq, 0xB4, 0x14, 0x64);
 
                         if (hitWithBottle == false) {

@@ -6,6 +6,10 @@
 
 struct EnSw;
 
+// Internal soil-spawn contract: the quiet birth uses otherwise-zero rotZ, not
+// token/region parameter bits. EnSw_Init consumes this before native behavior.
+#define ENSW_SOIL_QUIET_ROT_Z 0x7FFF
+
 typedef void (*EnSwActionFunc)(struct EnSw* thisx, PlayState* play);
 
 typedef struct EnSw {
@@ -48,5 +52,7 @@ typedef struct EnSw {
     /* 0x0484 */ Vec3f unk_484;
     /* 0x0490 */ char unk_490[0x48];
 } EnSw; // size = 0x04D8
+
+Actor* EnSw_SpawnFromSoil(Actor* soil, PlayState* play, s32 playChime);
 
 #endif

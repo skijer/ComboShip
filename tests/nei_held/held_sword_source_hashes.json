@@ -1,0 +1,29 @@
+{
+  "baseline_commit": "a82852a3a02c8cabc541cce7c124da71c5755efb",
+  "resource_sha256": {
+    "razor_sword": {
+      "blade_edge_tex": "58722d09db22ff8f66ce169f1c69518643121a2d2d4265b6708b48338b70ec2d",
+      "gi_dl": "e52a101f012d700f622acf8c2e7de463027a21980a773551a1936eab9f86a61c",
+      "grip_seam_tex": "1f9b24179ced1329cb33a60e435d0094b5650d7259dfd447016998e9ba0d1498",
+      "grip_tex": "8cf31850fb751836fe3be81558345b625bbc481bb454318ed448133b8e27674f",
+      "mesh_opa_vtx": "385aecf583d79e89954a4460e1d8f8c711e2bafdb6c777e6a82a7212c2e604d1",
+      "plum_enamel_tex": "364eb85c419bcded8eb7438636daeeb9629a0305afe97397eaa4e692920bfee5",
+      "scale_mtx": "9806b5a7c17c1c95ad4036ce4e6cbf5e93fdc09f24c0d9d28a5ea4dabbf1bc5d",
+      "steel_shadow_tex": "abca06ca2b18c4c221e2cca5c41919f528a6c293486f69de50658c092a9a1b56",
+      "steel_tex": "4b385fabf88d286f1f43edd44e600e25a96f71fcaae3d1643204c062c9c8f23c"
+    },
+    "biggoron_sword": {
+      "blade_edge_tex": "58722d09db22ff8f66ce169f1c69518643121a2d2d4265b6708b48338b70ec2d",
+      "bronze_edge_tex": "7fc100a488569ee97e54ec297f25738fd0723552a82f3121e4a29540e4b0459b",
+      "gi_dl": "6f1604994a7a2c0cdb021e529331a1d070e26fa92e71c445e2c3cf9f8b7cf567",
+      "gold_edge_tex": "f4b7fc66f3e9ca22ec7aab2f1ae59c1db60297c6270fd2ea12c30fbb05175bbf",
+      "goron_bronze_tex": "3a4ba065a89683f89690b29af502eaff6e5549f136b6d57dbe0899145cf3b981",
+      "grip_seam_tex": "d1928ad0bd67b9991a0202445b61a81e75cccb79bd86b5790f181094ed191d65",
+      "grip_tex": "f0833ebb8ceac803f90eb155a6afbfb62d54f1c5aea561d6ca102437a6ae7496",
+      "mesh_opa_vtx": "2303c1b9231332f21a808fb2a53cbbcb57dcf615fa980723224d727a93c0c890",
+      "scale_mtx": "9806b5a7c17c1c95ad4036ce4e6cbf5e93fdc09f24c0d9d28a5ea4dabbf1bc5d",
+      "steel_shadow_tex": "abca06ca2b18c4c221e2cca5c41919f528a6c293486f69de50658c092a9a1b56",
+      "steel_tex": "4b385fabf88d286f1f43edd44e600e25a96f71fcaae3d1643204c062c9c8f23c"
+    }
+  }
+}

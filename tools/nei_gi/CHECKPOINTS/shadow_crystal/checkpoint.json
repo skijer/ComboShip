@@ -1,0 +1,30 @@
+{
+  "resource_count": 3,
+  "vertex_records": 813,
+  "vertex_loads": 27,
+  "slug": "shadow_crystal",
+  "name": "Shadow Crystal",
+  "entry": "objects/nei_gi_redesign/shadow_crystal/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.03125,
+  "triangles": 614,
+  "bounds_author": [
+    [
+      -24.0,
+      -50.0,
+      -17.0
+    ],
+    [
+      24.0,
+      50.0,
+      17.0
+    ]
+  ],
+  "markers": {},
+  "notes": [
+    "Preserved black/orange Shadow Crystal mesh: original material groups, normals, UVs and winding.",
+    "All 614 renderable source triangles retained; two pre-existing zero-area faces omitted.",
+    "Opaque GI only; no interpreted violet crystal shell. Item ownership and Wolf Link behavior unchanged."
+  ],
+  "runtime_tested": false
+}

@@ -5,6 +5,7 @@
  */
 
 #include "z_demo_ec.h"
+#include "soh/Enhancements/cosmetics/NativeNpcModels.h"
 #include "vt.h"
 #include "objects/object_zo/object_zo.h"
 #include "objects/object_ec/object_ec.h"
@@ -455,7 +456,8 @@ void DemoEc_DrawKokiriBoy(DemoEc* this, PlayState* play) {
 
 void DemoEc_InitKokiriGirl(DemoEc* this, PlayState* play) {
     DemoEc_UseDrawObject(this, play);
-    DemoEc_InitSkelAnime(this, play, &gKw1Skel);
+    DemoEc_InitSkelAnime(this, play,
+                         (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sKokiriGirlNpcModel, gKw1Skel));
     DemoEc_UseAnimationObject(this, play);
     DemoEc_ChangeAnimation(this, &gDemoEcKokiriAnim, 0, 0.0f, false);
     func_8096D5D4(this, play);
@@ -466,7 +468,8 @@ void DemoEc_InitKokiriGirl(DemoEc* this, PlayState* play) {
 
 void DemoEc_InitDancingKokiriGirl(DemoEc* this, PlayState* play) {
     DemoEc_UseDrawObject(this, play);
-    DemoEc_InitSkelAnime(this, play, &gKw1Skel);
+    DemoEc_InitSkelAnime(this, play,
+                         (FlexSkeletonHeader*)NativeNpcModel_SelectSkeleton(&sKokiriGirlNpcModel, gKw1Skel));
     DemoEc_UseAnimationObject(this, play);
     DemoEc_ChangeAnimation(this, &gDemoEcDancingKokiriAnim, 0, 0.0f, false);
     func_8096D5D4(this, play);
@@ -486,6 +489,16 @@ void DemoEc_UpdateDancingKokiriGirl(DemoEc* this, PlayState* play) {
     DemoEc_UpdateKokiriGirl(this, play);
 }
 
+static s32 DemoEc_OverrideKokiriGirl(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* actor,
+                                     Gfx** gfx) {
+    DemoEc* this = (DemoEc*)actor;
+    if (limbIndex == 15) {
+        *dList = NativeNpcModel_SelectHead(&sKokiriGirlNpcModel, *dList, this->eyeTexIndex, 0);
+    }
+    *dList = NativeNpcPose_SelectLimb(&this->skelAnime, limbIndex, *dList);
+    return false;
+}
+
 void DemoEc_DrawKokiriGirl(DemoEc* this, PlayState* play) {
     static void* eyeTextures[] = { gKw1EyeOpenTex, gKw1EyeHalfTex, gKw1EyeClosedTex };
     static u8 color1[] = { 70, 190, 60, 255 };
@@ -493,7 +506,7 @@ void DemoEc_DrawKokiriGirl(DemoEc* this, PlayState* play) {
     s32 eyeTexIndex = this->eyeTexIndex;
     void* eyeTexture = eyeTextures[eyeTexIndex];
 
-    DemoEc_DrawSkeletonCustomColor(this, play, eyeTexture, NULL, color1, color2, NULL, NULL);
+    DemoEc_DrawSkeletonCustomColor(this, play, eyeTexture, NULL, color1, color2, DemoEc_OverrideKokiriGirl, NULL);
 }
 void DemoEc_InitOldMan(DemoEc* this, PlayState* play) {
     DemoEc_UseDrawObject(this, play);

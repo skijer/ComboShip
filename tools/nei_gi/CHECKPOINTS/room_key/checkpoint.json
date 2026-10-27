@@ -1,0 +1,45 @@
+{
+  "resource_count": 4,
+  "vertex_records": 762,
+  "vertex_loads": 25,
+  "slug": "room_key",
+  "name": "Room Key (MM3D)",
+  "entry": "objects/nei_gi_redesign/room_key/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 262,
+  "bounds_author": [
+    [
+      -20.75,
+      -34.625,
+      -10.375
+    ],
+    [
+      20.75,
+      34.625,
+      10.375
+    ]
+  ],
+  "markers": {
+    "source_center": [
+      0.4704500000000005,
+      0.8543500000000002,
+      0.14964999999999984
+    ],
+    "source_uniform_scale": 2.25,
+    "source_sha256": {
+      "roomkey.mtl": "09fee101b5e9859a90bf20c41eda78cff9bb4de071b85143905e4e723ced9c8f",
+      "roomkey.obj": "b6ae02be5f8cd4901c903fa08eb4af466bee732c67a81ac3f59f3c1b5a345964",
+      "zelda_gi_hotelk_0.png": "ced865cb8d9e590a2a4fd8c8c948296d47448232227a050ea88fb445d9b6e37d",
+      "zelda_gi_hotelk_0_sp.png": "3377252eb753f60f7ed36a381415147b8d0a9e308bde95064dfe5094a67d1dec"
+    }
+  },
+  "notes": [
+    "User-supplied MM3D inventory Room Key OBJ/MTL and diffuse texture.",
+    "All 262 visible source triangles retained; four source triangles with zero area omitted.",
+    "Centered and uniformly scaled; source Y remains upright.",
+    "Original 64x32 diffuse texture retained; the legacy N64 Room Key GI remains the fallback.",
+    "No inventory, grant, held-item, save, animation or shelf placement changes."
+  ],
+  "runtime_tested": false
+}

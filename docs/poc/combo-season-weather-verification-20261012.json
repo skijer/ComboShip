@@ -1,0 +1,311 @@
+{
+  "repository": "marsh6487/ComboShip",
+  "target_branch": "bridge/audit-merge-20261008",
+  "pull_request": 41,
+  "preserved_base": "fea48b50907f070820abfe07220b9a134a17fe1c",
+  "combo_release": "0.4.0",
+  "port_version": "1.27864.26741",
+  "checks": [
+    {
+      "label": "OoT seasonal controller/native actor, sky and light integration",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_soh_season_weather_tests.py"
+      ],
+      "exit_code": 0,
+      "log_sha256": "b319429379ed4a5efd5ac757c3182ed6208ed6da80c81fc6fca5e46208c5e92f",
+      "pass_lines": [
+        "PASS SoH seasonal presentation: saved Rod state, independent controls, native particle slots, actual weather-tag entry/exit, queued/applied/scripted sky handoffs, private cadence, native lighting clamp and bomb decay"
+      ]
+    },
+    {
+      "label": "OoT native seasonal renderer and all atmosphere states, ASan/UBSan",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_soh_season_particle_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log_sha256": "aded34a50522514d03a5381507400d02a3813d18a393d43d0504935ef21ab83e",
+      "pass_lines": [
+        "PASS falling particles:96/3 bands, private deterministic state, once/frame, pause, recycling, eligibility, room/scene/reentry/rollback,64 snow, native ownership, flurries",
+        "PASS summer: day/night/dusk, pause, continuous flight, recycling, camera travel, beams, rain, reset",
+        "PASS winter state: independent mist/aurora, day/night/dusk/dawn, pause, sky orientation, clipping and reset",
+        "PASS winter renderer: snow-independent terrain mist and night-only blue/green aurora, pause/toggles, clipping, native snow coexistence, gates and ownership",
+        "PASS native renderer:96leaf/petal,64snow,32seed/56firefly/3beam; command/matrix budget, texture restoration, pause/toggle/gates/reset, native actor/save/environment ownership",
+        "PASS real-header C++20 syntax: SeasonParticles.cpp",
+        "PASS real-header C++20 syntax: SeasonParticlesHooks.cpp",
+        "PASS exact ComboShip980e6fe09 leaf OTEX bytes:4 resources"
+      ]
+    },
+    {
+      "label": "OoT actual Fast::Texture pixels and bindings, ASan/UBSan",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_soh_season_foliage_tests.py",
+        "/workspace/scratch/ebc7470f7916/combo-oot-foliage",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log_sha256": "6e6eefc0361c018d303f4c611c321683fc2486c88f09508aae6e2c2e36c0ae58",
+      "pass_lines": [
+        "PASS native/HD seasonal foliage: spring scope, autumn/winter palettes, source/alpha/rock/metadata preservation",
+        "PASS seasonal foliage bindings: spring/ground, native/Alt, season transitions, cold assets, reload guards, cleanup"
+      ]
+    },
+    {
+      "label": "MM winter production state/renderer/controller, ASan/UBSan",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_winter_atmosphere_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log_sha256": "2a6ca9365c0be1cd9f40507f48d4f8cb7f60063f49cf7ab34576e6fd45a2aa31",
+      "pass_lines": [
+        "PASS MM winter state: independent mist/aurora, private RNG, dusk/dawn, pause, compass orientation, clipping, continuous motion and generation lifetimes",
+        "PASS MM winter renderer/controller: terrain feathering, snow independence, actual story/interior/Rod gates, pause/live controls, frame/scene/room/game lifetimes, blue/green night ribbons, far clip, depth test, native texture restoration and actor/save/environment immutability"
+      ]
+    },
+    {
+      "label": "MM weather/native sky/audio/season controller regressions",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_weather_tests.py"
+      ],
+      "exit_code": 0,
+      "log_sha256": "2529da337053c1fc4b7d5f15f8cbb0fa0850eb2ca2a0f402f6d5dbb36f427d40",
+      "pass_lines": [
+        "PASS MM weather state: defaults, view eligibility, fades, modes, timing, pause, flash release, reset",
+        "PASS MM weather mixer: ADPCM bounds, signed residuals, looping, resampling, concurrent voices, mute, clipping, reset",
+        "PASS real-header weather syntax: mm/src/code/z_kankyo.c",
+        "PASS real-header weather syntax: mm/src/code/z_play.c",
+        "PASS gentle autumn wet/dry cycle, audio/sky agreement, pause, Off and indoor cleanup",
+        "PASS MM weather bridge: native state preservation, sky, pause, scene/room reset",
+        "PASS rain and audio persist through held charge, quick spin and release lighting",
+        "PASS Termina Field, Woodfall and Clock Town outdoor overrides; view/lifecycle boundaries",
+        "PASS production sky: all day/time palettes, gloom, slot bindings, filters, stars and restoration",
+        "PASS Mayor's Residence rooms suppress enhanced rain/audio/overcast/lightning; Clock Town resumes",
+        "PASS seasonal rain, snow sky, clear weather, Off, interior/story restore and user override",
+        "PASS gated Rod weather uses real completion unlocks, persisted gates, Off and Rod ownership",
+        "PASS manual seasons without progression, per-season rain, paused selectors, eligibility and Native restoration",
+        "PASS MM weather audio adapter: native instruments, lazy load, master/SFX mute, reset, reload, missing sample"
+      ]
+    },
+    {
+      "label": "MM summer state/native renderer/preview parity, ASan/UBSan",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_summer_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "log_sha256": "0c8a5db418539f08d862eb2997cf01f561f4c614ba7d1c393b17eb8dc5fba589",
+      "pass_lines": [
+        "PASS summer: day/night/dusk, pause, continuous flight, recycling, camera travel, beams, rain, reset",
+        "PASS native/preview parity: 241 frames; maximum position difference 0.000326, opacity 0.000001, radius 0.000001, shaft 0.000208",
+        "PASS summer renderer: private IA texture, depth testing, command budget, balanced scopes/matrices, shaft lifetime, night/rain/season gates, disable/reset/re-entry"
+      ]
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_rain_runtime_test.py",
+        "/workspace/scratch/ebc7470f7916/combo-weather-regressions/rain-runtime",
+        "cc",
+        "c++"
+      ],
+      "exit_code": 0,
+      "seconds": 1.57,
+      "log_sha256": "c2fdbe26b2b6356f1c930a49104001e0a8863b208f46038b1d8b6dfaffb78d1e"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 20.17,
+      "log_sha256": "d6f09c511bafe4454b27adf0398210f19583e38c0f4430b768653a9bc537df15"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_oot_mode_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.55,
+      "log_sha256": "06aba48d7368ba3012bdd35d8090dff13fd46b8d7e15ecd88b8eade631551ed6"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_mode_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 2.95,
+      "log_sha256": "1453c2286384193e19198e1eed38919c62636684a3e867e1a23efe9c5a666867"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_mode_save_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 9.73,
+      "log_sha256": "b8bd36ff2a165171aedf8a2bde6310421517e3009558fd5c911fd4098284e719"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_rod_lifecycle_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.61,
+      "log_sha256": "b0b8d72b668a601e2c157f5e31e3c7c9f56c09677f0eace7445e9b2018448828"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_season_selector_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.17,
+      "log_sha256": "9666dcc3a8d20eb7606b6c94353c7fd47019b311e0272042d1697580c4987670"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_autumn_foliage_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.61,
+      "log_sha256": "cdd91f15383065760a6a350ebd6119c690aa6c70036beacec7b596aa12118244"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_autumn_scene_foliage_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 3.87,
+      "log_sha256": "740f976403ba2441ae8fdd89c8320c53745e3d5637c7ab1b6931bb6074bfb8a8"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/diagnostics/run_mm_autumn_surface_texture_tests.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.83,
+      "log_sha256": "ce39ea8c679c3afb3e30c081cc60df83f8691724264f99cbad9b0f0fe270d482"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/seasons/run_native_weather_tests.py",
+        "--sanitize"
+      ],
+      "exit_code": 0,
+      "seconds": 7.94,
+      "log_sha256": "7a2aba0363cc0bf4f26f78f8dac0e9981616e70ba21d225be03d60528b0e5d30"
+    }
+  ],
+  "verified_source_sha256": {
+    "mm/2s2h/Enhancements/Audio/AudioEditor.cpp": "5e74c0159bf4cc3484aca19849adebc18cbdf9c933cbdb761ed70e5be3eaa88c",
+    "mm/2s2h/Enhancements/Audio/MMWeather.cpp": "74fdc1a021eb57315df85c665498279c3adc48e40df35e78615c89e9896fc729",
+    "mm/2s2h/Enhancements/Graphics/MMWinterAtmosphere.cpp": "9e00b3984754684ff769729a0dda724aaac3996198bdabb86652d9ab6a2402fe",
+    "mm/2s2h/Enhancements/Graphics/MMWinterAtmosphere.h": "f918ac6f3b6be19a5039a8310860359c42f727a4f33c9f92b0c576454ff8b541",
+    "mm/2s2h/Enhancements/Graphics/MMWinterAtmosphereState.cpp": "9911503ce4fb649e723fabf41a435421c720e65527e0ac7b89a08c13fea9f3f2",
+    "mm/2s2h/Enhancements/Graphics/MMWinterAtmosphereState.h": "dd4b8ea79745d6ddee44de3e17c32a4b5a71c9ad0bd82c217ff27c65610068ce",
+    "mm/src/code/z_play.c": "932f9b1c1c16a914c2cd452abcb20d0b5df6c4198f49ba35e78ab933a709f3ed",
+    "mm/tests/weather_bridge_test.cpp": "defad4b89bd60f2cd0e08c176db6de1e8d50b061c38af5eda58c63e1eb536e7a",
+    "mm/tests/winter_atmosphere_render_test.cpp": "f054f4fea4cd90af71f8bd06323be3fb3dea46d6d0f246fdbc12d91d13ed8ce8",
+    "mm/tests/winter_atmosphere_test.cpp": "9f97c43057c39fdcb40819704bb1f6895954b62e9623d185d53c95fa53b7bf8f",
+    "scripts/diagnostics/run_mm_winter_atmosphere_tests.py": "84fe7c0e59a30c060ce4c9b4c858e3dfe3a3eb747637baec16c7f3706ea6da87",
+    "scripts/diagnostics/run_soh_season_foliage_tests.py": "344ee05fa36881afa5ff605b2d8bf59f0551218f71f1e71aff86106e469f9760",
+    "scripts/diagnostics/run_soh_season_particle_tests.py": "1277910843f04ea7e9e65c2b3a8d5bf4d15461d450a8d98e8644a10068132ea0",
+    "scripts/diagnostics/run_soh_season_weather_tests.py": "0b471e1d3ffaa888336fc133c368145af3d1e8dcd84f8bed10f24e5100ff48f9",
+    "soh/CMakeLists.txt": "5fc61578b7c10a0053db3477220b97740221ab36214ee26cfc6288fc2dee13cb",
+    "soh/assets/custom/objects/nei_autumn/leaves/copper_tex": "869debce4a1f6dd7d29836ca33dd65821d2b5650a99429d9b3fd18372fd131f6",
+    "soh/assets/custom/objects/nei_autumn/leaves/crimson_tex": "a0b0420d5f228d9818c732940a5d9b68706007985b0a1b726c5f82d67d5e85bb",
+    "soh/assets/custom/objects/nei_autumn/leaves/gold_tex": "2d579d757e7f3e93c0664af2516315ce89e3d92601c23bb00ec91217004ebd3f",
+    "soh/assets/custom/objects/nei_autumn/leaves/orange_tex": "0e9b93e9e8af2263190d7d93ee0f440bbabc264625d9d720ebdbc07ccfa26c43",
+    "soh/mods/items/logic/item_rod_of_seasons.c": "9dc3656d2c8a6d1d6bdbdfaf420b7bbcfbc639bea39ec699856b12a3b0b1439f",
+    "soh/soh/Enhancements/Graphics/SeasonFoliage.cpp": "50d53c9a6ee800d332895c107d5aa518378393dc8a7661f49a98ab5826e83b34",
+    "soh/soh/Enhancements/Graphics/SeasonFoliageMaterials.inc": "aa41267e55805c1d483f08be45387de6adbc7637c28a7aa62b43e2d21eb7898a",
+    "soh/soh/Enhancements/Graphics/SeasonFoliageTint.h": "dc0a31820285566e75aca0618745fc0903227a9e6d949e4b7833c32373a36e97",
+    "soh/soh/Enhancements/Graphics/SeasonParticleState.cpp": "8d1ab991707a4aaf7aec0e680771e50e563e6cf425217e73e6fc588ee480748b",
+    "soh/soh/Enhancements/Graphics/SeasonParticleState.h": "8efc5560d8695abf21872b74a10fd5b793ef71c39fceece329ca40f5df5cf05b",
+    "soh/soh/Enhancements/Graphics/SeasonParticles.cpp": "67c760fbc173f906a5077cf6d824092537ea3c73b486c0323d004a8f0306ccde",
+    "soh/soh/Enhancements/Graphics/SeasonParticles.h": "3d0042ac222b07ed25cd7cec82a39e3d89f8840b647bf68adce93de67492a26e",
+    "soh/soh/Enhancements/Graphics/SeasonParticlesHooks.cpp": "00c65a8c1d486a45d65b3f3d21f63244a839ba9f4bf01f3b6f4786eef2daf17a",
+    "soh/soh/Enhancements/Graphics/SeasonSummerState.cpp": "3a3803372c7b9fab3c2e686cb95bf9bd484f2e55d7868e7e2a504d81d55d3b4b",
+    "soh/soh/Enhancements/Graphics/SeasonSummerState.h": "dcab1b3b72e7c7b4eafb99e3aac6a0d4b4a1028b539995476f2b49ee9f8006ce",
+    "soh/soh/Enhancements/Graphics/SeasonSummerTextures.h": "03e6aa6e8ca7cfc425cd23a2128ee34601a624639d1cbd66d01752bce419f4b9",
+    "soh/soh/Enhancements/Graphics/SeasonWinterState.cpp": "8562c3b237679e9c18e3e684778df9b434a857df36a5ef604879212fab373d61",
+    "soh/soh/Enhancements/Graphics/SeasonWinterState.h": "9a5a3160cba7ac575e9a0e69f98dcb2a804574db85689565802f003ff915acb5",
+    "soh/soh/Enhancements/audio/AudioEditor.cpp": "6ca733ba3a2741eb9a1c3179596744df83dbd30fc799aa55b31195c43ed7ee55",
+    "soh/soh/Enhancements/audio/GlobalOutdoorRain.cpp": "8a811c74763bda49122ca30a28c1a374b6c91572421a802e43d4492bb923db58",
+    "soh/soh/Enhancements/audio/GlobalOutdoorRain.h": "5c3e72799f7bf35abcdb2a42aaac7e2e2347144e1ee16db59bb74b2646283b84",
+    "soh/soh/Enhancements/audio/GlobalOutdoorRainBridge.h": "aa75837e5942d887978ab5a447782a9b2131b3003d7bdee6583058c1bc165e29",
+    "soh/soh/Enhancements/audio/SeasonWeather.cpp": "ac210275c4367e3da66fefe8e3ca21ad2ef0121fe1230fc3ad32cad0c4a8b030",
+    "soh/soh/Enhancements/audio/SeasonWeather.h": "3d5da959c666204133ccaa0d8cb79c2c0cb8374f24d38a4b4772e25de32745d1",
+    "soh/src/code/z_kankyo.c": "8bfcbd7485c2ae1bc666e81e6049c09e6c6bc97889c799e52aa8c26c199a2ed6",
+    "soh/tests/season_foliage_binding_test.cpp": "818dca7f5e19d304280fd049550e65b9985b38702f1367bd0f17355b5e117df9",
+    "soh/tests/season_foliage_stubs/ship/Context.h": "c759334d6d829ebfaa34ac7a98d873c88d5e1803b140e5c4117cf48b2f343028",
+    "soh/tests/season_foliage_stubs/ship/resource/ResourceManager.h": "52acfc8a878fd63e9090ba4eb826ac7bca40dd200849221e2b1b5b47091c4666",
+    "soh/tests/season_foliage_stubs/soh/Enhancements/game-interactor/GameInteractor.h": "4a2daa9d5cd9ece556e7d0585e689d8aeb0d520c43882b1f4552cde693b74a3f",
+    "soh/tests/season_foliage_stubs/soh/ShipInit.hpp": "da57715a0fdabfa35b8cb23245f8c488fab5bce7560b62c70f9544dbb6c8fe88",
+    "soh/tests/season_foliage_test.cpp": "f1e6fbcda71e50897b1985b797d46a247e123414255f154c958494f4ceb4e240",
+    "soh/tests/season_particles_renderer_test.cpp": "79c307937736e2c865ec3cc7674f76deb4b9e4593ed0285caee6ae7e7eee862b",
+    "soh/tests/season_particles_state_test.cpp": "2affedcd9e693e49a023ff07a2b8c50f2084d49fb70b779ad2fcc3287f7d79ba",
+    "soh/tests/season_particles_summer_test.cpp": "736487291fe87fabd02a76029037e054503f367f089e5947c09eb86b8ea6a8d0",
+    "soh/tests/season_particles_winter_test.cpp": "afdd6c597d859d59398a9f97bb914e37ae0bcb390299dc1f1e576deaaa8fce19",
+    "soh/tests/season_weather_runtime_test.cpp": "516c0b1bd7a6f4a09508a759c8c8a152981be6d05f9a3c8f2aeddd060142873b",
+    "soh/tests/weather_audio_stubs/weather_runtime.h": "3c47c9a944e8c6a29e0b64107a51fa5e48ab22fddb02e019fb9b4d365bf33c84",
+    "tests/seasons/native_weather_test.cpp": "bc99b1266b7cafaf48ecf01b2f7057b45562f3b3f7ac03bc34133241a4ff9bf4",
+    ".github/workflows/build-artifacts.yml": "41de2659458122d7b527b68e50f5f381ad8d258c72ea3ba182f2ed7677c3702e"
+  },
+  "archive": {
+    "baseline_sha256": "f0c1c9400264e5a97e76eb186c77a4ec448b98285cbf3428aa04b67848fdadfa",
+    "candidate_sha256": "780fb475f5f98078fdd762cd6cabe89c199cd42113890f8f33f17a9347ea5edc",
+    "baseline_members": 6973,
+    "candidate_members": 6977,
+    "added": [
+      "objects/nei_autumn/leaves/copper_tex",
+      "objects/nei_autumn/leaves/crimson_tex",
+      "objects/nei_autumn/leaves/gold_tex",
+      "objects/nei_autumn/leaves/orange_tex"
+    ],
+    "unchanged_baseline_members": 6973,
+    "crc": "pass"
+  },
+  "review": "Independent review found no blocking finding in either module",
+  "runtime_gameplay_verified": false,
+  "leak_sanitizer_verified": false,
+  "environment": {
+    "cplus_include_path": "/workspace/scratch/30d246f84dfc/verification/native-deps/usr/include",
+    "cpath_for_mm_weather": "/workspace/scratch/30d246f84dfc/verification/native-deps/usr/include:/workspace/scratch/30d246f84dfc/verification/native-deps/usr/include/x86_64-linux-gnu",
+    "asan_options": "detect_leaks=0",
+    "compiler": "GNU C/C++ 13.3.0",
+    "build": "Linux Release, correct ComboShip 9.3 source"
+  }
+}

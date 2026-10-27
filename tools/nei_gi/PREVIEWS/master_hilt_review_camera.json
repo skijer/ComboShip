@@ -1,0 +1,44 @@
+{
+  "glb_sha256": "532728001c667ea3568c88ec27d2e1d1bfd25a1a34e7434556680d7f30d4a2e5",
+  "model_unchanged": true,
+  "orthographic_bounds_y": [
+    -30.0,
+    11.0
+  ],
+  "orthographic_bounds_x": [
+    -15.0,
+    15.0
+  ],
+  "viewport": [
+    600,
+    820
+  ],
+  "effects": false,
+  "mirrored_mask_comparison": {
+    "mask_pixels": 77166,
+    "whole_hilt_mismatch_pixels": 816,
+    "guard_region_mismatch_pixels": 0
+  },
+  "views": [
+    {
+      "name": "front_flat",
+      "yaw": 0,
+      "elevation": 0
+    },
+    {
+      "name": "front_balanced",
+      "yaw": 0,
+      "elevation": 0
+    },
+    {
+      "name": "angled",
+      "yaw": 15,
+      "elevation": 12
+    },
+    {
+      "name": "rear_flat",
+      "yaw": 180,
+      "elevation": 0
+    }
+  ]
+}

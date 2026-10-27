@@ -1,3 +1,4 @@
+#include "rando/CrossEntranceBoss.h"
 #include "z_en_encount2.h"
 #include "overlays/actors/ovl_En_Fire_Rock/z_en_fire_rock.h"
 #include "vt.h"
@@ -49,8 +50,10 @@ void EnEncount2_Init(Actor* thisx, PlayState* play) {
         osSyncPrintf(VT_FGCOL(GREEN) "☆☆☆☆☆ デスマウンテンエンカウント２セットされました ☆☆☆☆☆ %d\n" VT_RST,
                      this->actor.params);
         if (LINK_IS_ADULT &&
-            (Flags_GetEventChkInf(
-                EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP))) { // flag for having used fire temple blue warp
+            (Combo_SOH_CrossBossLogicalClear(
+                COMBO_BOSS_VOLVAGIA,
+                Flags_GetEventChkInf(
+                    EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP)))) { // flag for having used fire temple blue warp
             Actor_Kill(thisx);
         }
     } else {

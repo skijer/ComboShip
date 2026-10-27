@@ -6,6 +6,9 @@
 #include <2s2h/BenPort.h>
 #include <locale>
 #include <filesystem>
+#ifdef COMBO_BUILD
+#include "audio/SceneMusic.h"
+#endif
 
 #define SEQUENCE_MAP_ENTRY(sequenceId, label, sfxKey, type, categoryFlags, seqIdReplacements, canBeReplaced,         \
                            canBeUsedAsReplacement)                                                                   \
@@ -276,6 +279,14 @@ AudioCollection::AudioCollection() {
                            SEQ_BGM_WORLD, SEQ_CAT_NONE, nullptr, false, false),
     };
 
+#ifdef COMBO_BUILD
+    mSequenceMap.emplace(ComboSceneMusic::kForest,
+                         SequenceInfo{ NA_BGM_SARIAS_SONG, "Lost Woods (2Ship)", "COMBO_MM_LOST_WOODS", SEQ_BGM_WORLD,
+                                       SEQ_CAT_FIELD | SEQ_CAT_CALM, nullptr, true, false });
+    mSequenceMap.emplace(ComboSceneMusic::kMarket,
+                         SequenceInfo{ NA_BGM_SHOP, "Skiejer's Black Market", "COMBO_MM_BLACK_MARKET", SEQ_BGM_WORLD,
+                                       SEQ_CAT_INDOOR | SEQ_CAT_CALM, nullptr, true, false });
+#endif
     // Initialize counts for each type
     for (const auto& [seqId, seqInfo] : mSequenceMap) {
         // Don't count sequences that are marked as custom BGM
@@ -375,6 +386,12 @@ void AudioCollection::AddToCollection(char* otrPath, uint16_t seqNum) {
 }
 
 uint16_t AudioCollection::GetReplacementSequence(uint16_t seqId) {
+#ifdef COMBO_BUILD
+    if (ComboSceneMusic::IsEntry(seqId))
+        return ComboSceneMusic::ResolveEntry(
+            mSequenceMap, seqId, SEQ_BGM_WORLD,
+            [this](const std::string& key, int fallback) { return CVarGetInteger(GetCvarKey(key).c_str(), fallback); });
+#endif
     if (mSequenceMap.find(seqId) == mSequenceMap.end()) {
         return seqId;
     }
@@ -382,6 +399,10 @@ uint16_t AudioCollection::GetReplacementSequence(uint16_t seqId) {
     const auto& sequenceInfo = mSequenceMap.at(seqId);
     const std::string cvarKey = GetCvarKey(sequenceInfo.sfxKey);
     int replacementSeq = CVarGetInteger(cvarKey.c_str(), seqId);
+#ifdef COMBO_BUILD
+    if (ComboSceneMusic::IsEntry(replacementSeq))
+        return seqId;
+#endif
     if (!mSequenceMap.contains(replacementSeq)) {
         replacementSeq = seqId;
     }
@@ -401,6 +422,10 @@ uint16_t AudioCollection::GetOriginalSequence(uint16_t seqId) {
         const std::string cvarKey = GetCvarKey(a.second.sfxKey);
         int replacementSeq = CVarGetInteger(cvarKey.c_str(), NA_BGM_DISABLED);
         if (replacementSeq == seqId) {
+#ifdef COMBO_BUILD
+            if (ComboSceneMusic::IsEntry(a.first))
+                return a.second.sequenceId;
+#endif
             return a.first;
         }
     }

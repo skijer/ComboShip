@@ -1,0 +1,336 @@
+{
+  "archive_sha256": "ce1b8bfbfe9e1b2cf4a51355ea62c16826f60e8a65f07945d33a628b724cc781",
+  "profiles": {
+    "modern_din_bgs": {
+      "root": "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE",
+      "root_crc64": "0AC6FFD3F0AE6266",
+      "source_sha256": {
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE": "3e6b315104f94efba519d3b8ed1ace101d834e493403163d94ce1f9270cd7aca",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v1": "b23238b456bcd4602dc31aab114f3965431c1237ffe6959be0517c646d66f645",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v2": "7dde8f0b46c9c85fbf56977a4f436f63fe4b76ceffab5326d1554be0138eb288",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v3": "7930f1363b3d20a99c839546e864415cc0109fbeea5d238ebb467eba0b762e6c",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v4": "bb7f44eaaba0b55e29ccb9a048854a9b6f548b69799280515bc06de5b131df68",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v5": "0387be37e69a654b34a7d4a8100cb173ccf8ed876b04bf9523d3a1d36acca3a4",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v6": "19ba8e7bb51f7c78b44f09f344fec6c10bd3c9e62342068ec5eb9f56dede53cf",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v7": "1b990c5dd18d8665b4f3d25d49f1df47ad7cbe7f190f8350a4a1f36984479c3f"
+      },
+      "embedded_matrices": 0,
+      "blade_bounds": [
+        [
+          951,
+          6295
+        ],
+        [
+          48,
+          782
+        ],
+        [
+          -92,
+          131
+        ]
+      ]
+    },
+    "modern_din_broken": {
+      "root": "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN",
+      "root_crc64": "68A55E4B08BD368C",
+      "source_sha256": {
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN": "e549dc9f1486e8e97e99e229a9b726e7607dd8a60c66b8cf2fdf08bc3ed3067e",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v1": "f8ce38e17350d5ff1e1d02c4e966bec7a600bd7681ac6addfb27d9276894eef3",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v2": "5d493865c7851f8c0f659833a5eae8d2b22a6b45bb94af30617d85f2e469a2b7",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v3": "2519e99cd6c5b948a4e27c1df5d9e78a7fa2096d857ec1376233d85a197054fb",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v4": "f5e8013511c9f245d8e35cd1ad78934628ffe9288dd465e1844b030f238731c6",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v5": "0387be37e69a654b34a7d4a8100cb173ccf8ed876b04bf9523d3a1d36acca3a4",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v6": "19ba8e7bb51f7c78b44f09f344fec6c10bd3c9e62342068ec5eb9f56dede53cf",
+        "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v7": "1b990c5dd18d8665b4f3d25d49f1df47ad7cbe7f190f8350a4a1f36984479c3f"
+      },
+      "embedded_matrices": 0,
+      "blade_bounds": [
+        [
+          951,
+          2152
+        ],
+        [
+          48,
+          782
+        ],
+        [
+          -92,
+          131
+        ]
+      ]
+    }
+  },
+  "equipment_aliases": {
+    "gCustomLongswordDL": {
+      "resource": "alt/objects/object_custom_equip/gCustomLongswordDL",
+      "sha256": "bc0d0852d998f40d8c43ae9a62095278f71f5b68fef03871fa44e6537bf6b89f",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          1312474620,
+          3518880364
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          2989617634,
+          763947694
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          180813779,
+          4037960294
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "gCustomBreakableLongswordDL": {
+      "resource": "alt/objects/object_custom_equip/gCustomBreakableLongswordDL",
+      "sha256": "34db5f25408dfa0908f6589c9127e81e97fc2cf440cd2307837299979d25772c",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          1283249138,
+          265825707
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          2989617634,
+          763947694
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          180813779,
+          4037960294
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "gCustomBrokenLongswordDL": {
+      "resource": "alt/objects/object_custom_equip/gCustomBrokenLongswordDL",
+      "sha256": "7bb4646c69c3f63bb609bd192cce87d4729505f9d382a6371a614f103da86bf2",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          3636732725,
+          3568784822
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          2989617634,
+          763947694
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          1755668043,
+          146617996
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "gLinkAdultLeftHandHoldingBgsNearDL": {
+      "resource": "alt/objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL",
+      "sha256": "92099aa29a0a8ef72ad54ef23ceca75cabb1f36cbd0bde66501fe44f530ddba6",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          4129090380,
+          3450022691
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          2989617634,
+          763947694
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          180813779,
+          4037960294
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          3185204302,
+          693708812
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "gLinkAdultLeftHandHoldingBgsFarDL": {
+      "resource": "alt/objects/object_link_boy/gLinkAdultLeftHandHoldingBgsFarDL",
+      "sha256": "367e21454f71c2e2392a62501244aa5e6e282920421b119543b10f19099293b6",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          3558559705,
+          3504448952
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          2989617634,
+          763947694
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          180813779,
+          4037960294
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          3185204302,
+          693708812
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "gLinkAdultHandHoldingBrokenGiantsKnifeDL": {
+      "resource": "alt/objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeDL",
+      "sha256": "26710a4cb31f79b64da80eda81066e405374a67b6bc6ab8542173a6e33f29214",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          2429317319,
+          1908307179
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          2989617634,
+          763947694
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          1755668043,
+          146617996
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          3185204302,
+          693708812
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    },
+    "gLinkAdultHandHoldingBrokenGiantsKnifeFarDL": {
+      "resource": "alt/objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeFarDL",
+      "sha256": "e052eecc8e6f31d694419a2df6c6759ebcf290ca70db008cc945bf0903e678ec",
+      "commands": [
+        [
+          855638016,
+          3203383023
+        ],
+        [
+          1251125172,
+          1101196547
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          2989617634,
+          763947694
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          1755668043,
+          146617996
+        ],
+        [
+          822083584,
+          0
+        ],
+        [
+          3185204302,
+          693708812
+        ],
+        [
+          3741319168,
+          0
+        ]
+      ]
+    }
+  },
+  "records_sha256": "5f85ce5e4d0b4b116c60272c10bfe79d58b1a062d3653e737891bd3afdea7ed6"
+}

@@ -1,0 +1,30 @@
+{
+  "resource_count": 9,
+  "vertex_records": 7267,
+  "vertex_loads": 257,
+  "slug": "spirit_breastplate",
+  "name": "Spirit Breastplate",
+  "entry": "objects/nei_gi_redesign/spirit_breastplate/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 7746,
+  "bounds_author": [
+    [
+      -46.8125,
+      -48.375,
+      -15.375
+    ],
+    [
+      46.8125,
+      46.625,
+      15.75
+    ]
+  ],
+  "markers": {},
+  "notes": [
+    "Spirit Breastplate canonical icon is the dark brown/orange Spirit Tunic.",
+    "New fitted short-sleeved leather cuirass preserves that silhouette/palette, with overlapping orange chest plates, lacing, tooled seams and sun engraving.",
+    "GI author span fitted to 61.75\u201379.95 effective units; final quantization winding checked. Runtime untested."
+  ],
+  "runtime_tested": false
+}

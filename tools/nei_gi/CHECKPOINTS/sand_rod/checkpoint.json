@@ -1,0 +1,35 @@
+{
+  "resource_count": 9,
+  "vertex_records": 1826,
+  "vertex_loads": 64,
+  "slug": "sand_rod",
+  "name": "Sand Rod",
+  "entry": "objects/nei_gi_redesign/sand_rod/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 1848,
+  "bounds_author": [
+    [
+      -16.4375,
+      -51.4375,
+      -14.375
+    ],
+    [
+      25.375,
+      50.4375,
+      14.375
+    ]
+  ],
+  "markers": {
+    "tip_author": [
+      9.434953928387042,
+      37.841533324763866,
+      0.0
+    ]
+  },
+  "notes": [
+    "New wand silhouette and material candidate, derived from each elemental theme.",
+    "No Dominion Rod stand-in; GI resources only, held/action behavior preserved."
+  ],
+  "runtime_tested": false
+}

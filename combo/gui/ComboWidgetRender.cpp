@@ -13,8 +13,9 @@
 // effective CVars by UpdateResolutionVars) do NOT apply through this generic CVar-write path.
 // Toggling them here writes the UI CVars but not the effective ones, so the viewport never changes.
 #include "ComboWidgetRender.h"
-#include "ComboMenuModel.h"        // GameMenu (resolved export fn-ptrs)
-#include "ComboWidgetStyle.h"      // combo-owned replication of OOT UIWidgets menu styling
+#include "ComboMenuModel.h"   // GameMenu (resolved export fn-ptrs)
+#include "ComboWidgetStyle.h" // combo-owned replication of OOT UIWidgets menu styling
+#include "WhatsNew.h"
 #include "ComboAudioBridge.h"      // Shared-tab audio -> MM mirror
 #include "ComboResolutionEditor.h" // combo-owned Advanced Resolution editor (intercepts broken widgets)
 
@@ -229,6 +230,8 @@ void RenderWidget(const CwWidget& w, const GameMenu& game, int widthBudget) {
     if (disabled) {
         ImGui::BeginDisabled(true);
     }
+
+    WhatsNew::Scope releaseHighlight(w.cvar, w.name, CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0, disabled);
 
     // 2) render by kind. `changed` => the backing CVar (or button) changed this frame.
     bool changed = false;

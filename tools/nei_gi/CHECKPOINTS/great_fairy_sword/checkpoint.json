@@ -1,0 +1,554 @@
+{
+  "resource_count": 11,
+  "vertex_records": 5138,
+  "vertex_loads": 226,
+  "slug": "great_fairy_sword",
+  "name": "Great Fairy Sword",
+  "entry": "objects/nei_gi_redesign/great_fairy_sword/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 4430,
+  "bounds_author": [
+    [
+      -22.0,
+      -42.3125,
+      -5.0625
+    ],
+    [
+      22.0,
+      154.5,
+      5.0625
+    ]
+  ],
+  "markers": {
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "guard_baseline_y": 0,
+    "original_gi_vertex_data_available": false,
+    "proportion_reference": "Secondary stock held geometry; absolute get-item dimensions are approximate.",
+    "imported_approved_model": false,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade fuller face",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Rose-tempered fairy blade cutting bevel",
+        "factor": 1.5
+      },
+      {
+        "part": "Domed lilac forged blade tip",
+        "factor": 1.5
+      },
+      {
+        "part": "Domed lily blade shoulder",
+        "factor": 1.5
+      },
+      {
+        "part": "Recessed fairy motif border",
+        "factor": 1.5
+      },
+      {
+        "part": "Emerald enamel motif field",
+        "factor": 1.5
+      },
+      {
+        "part": "Raised fairy vine stem",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Raised fairy vine stem",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Faceted inset gemstone",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Faceted inset gemstone",
+        "factor": 1.5
+      },
+      {
+        "part": "Lilac central blade frame",
+        "factor": 1.5
+      },
+      {
+        "part": "Domed lilac forged blade tip",
+        "factor": 1.5
+      },
+      {
+        "part": "Domed lily blade shoulder",
+        "factor": 1.5
+      },
+      {
+        "part": "Recessed fairy motif border",
+        "factor": 1.5
+      },
+      {
+        "part": "Emerald enamel motif field",
+        "factor": 1.5
+      },
+      {
+        "part": "Raised fairy vine stem",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Raised fairy vine stem",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Embossed fairy leaf",
+        "factor": 1.5
+      },
+      {
+        "part": "Leaf central engraving",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Faceted inset gemstone",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Small fairy rosette petal",
+        "factor": 1.5
+      },
+      {
+        "part": "Faceted inset gemstone",
+        "factor": 1.5
+      },
+      {
+        "part": "Lilac central blade frame",
+        "factor": 1.5
+      },
+      {
+        "part": "Lily-shaped fairy quillon",
+        "factor": 1.2
+      },
+      {
+        "part": "Quillon petal vein",
+        "factor": 1.2
+      },
+      {
+        "part": "Leaf under fairy crossguard",
+        "factor": 1.2
+      },
+      {
+        "part": "Quillon petal vein",
+        "factor": 1.2
+      },
+      {
+        "part": "Leaf under fairy crossguard",
+        "factor": 1.2
+      },
+      {
+        "part": "Lily-shaped fairy quillon",
+        "factor": 1.2
+      },
+      {
+        "part": "Quillon petal vein",
+        "factor": 1.2
+      },
+      {
+        "part": "Leaf under fairy crossguard",
+        "factor": 1.2
+      },
+      {
+        "part": "Quillon petal vein",
+        "factor": 1.2
+      },
+      {
+        "part": "Leaf under fairy crossguard",
+        "factor": 1.2
+      },
+      {
+        "part": "Shaped oval leather grip",
+        "factor": 1.0
+      },
+      {
+        "part": "Raised diagonal leather wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Fairy blade-to-grip fitted collar",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Sculpted leaf grip wrap",
+        "factor": 1.0
+      },
+      {
+        "part": "Fairy grip lower collar",
+        "factor": 1.0
+      },
+      {
+        "part": "Fairy leaf bud pommel",
+        "factor": 1.0
+      }
+    ]
+  },
+  "notes": [
+    "Rebuilt rose-metal blade, lilac lily fittings, emerald field and sculpted leaves/floral ornament.",
+    "All blade, handle and ornament surfaces are opaque; no enlarged low-resolution black/green motif is used.",
+    "User-requested long two-handed get-item silhouette; botanical relief anchors and grip leaves follow the new part dimensions.",
+    "Blade, guard and grip ratios follow secondary stock held geometry; absolute get-item size is approximate, not measured from Nintendo GI vertices.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "gi_dl": "cd3ca964688e60f2aaccd2d7f6bb2e712014204eacc8a9d81a9cb2540f5b46b4",
+      "gold_edge_tex": "d499b1a4d2f97541a6805df075e60932c1a08eecee2110c1cf0a695830e8b406",
+      "green_leather_tex": "538b5e1709ac4ebf1a06fd7f211fde057e775436b3c646a2339894229519a28b",
+      "jade_edge_tex": "0625fc019defd9fb62e45ea87044639a23483312761e17e4eddccdeb4923d838",
+      "jade_tex": "0c959cf2bde5589753cbf68f24fd1dd4c1816f28fce80fcd566eabd280493ac1",
+      "mesh_opa_vtx": "9d0d79353354e82f22abbe35dc00df8470d187757560d7c8425af0620c1718ea",
+      "rose_edge_tex": "02bb3e14419ad4cab65d6cb8ea88cd9348f321b2b78190ecd3b6caa879955fa7",
+      "rose_tex": "dd2dc652a89b76656e3e9b6b8ade4262e273fb265dfb1c474463516dcd11fda4",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "violet_edge_tex": "c3a807d4ae7b3b3e471dae1ba2768dde0bb9331ba956ae21497d52317fa99866",
+      "violet_tex": "6c1d1fdf0353b6ba9379f79c511607e66c55955ec2f01649e7a43c3d36f88205"
+    },
+    "glb_sha256": "5bb2501578dbc18ea3ffa217d77640107a308782d4c2020bb67edfcec3dabd4c",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  },
+  "depth_parent": {
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "glb_path": "tools/nei_gi/CHECKPOINTS/great_fairy_sword/great_fairy_sword.glb",
+    "preserved": "X/Y positions, topology, UVs, materials, texture resources, display lists and scale matrix"
+  }
+}

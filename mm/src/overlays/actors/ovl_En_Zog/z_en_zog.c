@@ -5,6 +5,7 @@
  */
 
 #include "z_en_zog.h"
+#include "2s2h/Enhancements/Gameplay/ComboRegionalActorPresentation.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY)
@@ -188,6 +189,10 @@ void func_80B93468(EnZog* this, PlayState* play) {
 }
 
 void EnZog_Init(Actor* thisx, PlayState* play) {
+#ifdef COMBO_BUILD
+    if (ComboRegionalActor_TryInit(thisx, play))
+        return;
+#endif
     s32 pad;
     EnZog* this = (EnZog*)thisx;
     s32 i;

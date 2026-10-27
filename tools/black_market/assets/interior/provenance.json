@@ -1,0 +1,101 @@
+{
+  "generated_on_utc": "2026-10-22",
+  "mode": "built-in imagegen reconstruction",
+  "reference_images": [
+    {
+      "name": "Black-Market-Interior-Preview.png",
+      "sha256": "53e74d50d0305afa29d07e6e13bd567d65fef1370942c092d096adfa354d4230",
+      "role": "prior offline room preview; color/style reference only"
+    }
+  ],
+  "assets": [
+    {
+      "name": "timber",
+      "prompt": "Use case: stylized-concept\nAsset type: production seamless square opaque albedo texture for a fantasy game interior, one material image.\nPrimary request: Original aged dark walnut / ebonized timber material for a clandestine forest-market interior. Fine vertical wood grain with a few subtle shallow grain channels and restrained worn bronze-brown wear. Readable organic timber detail with quiet variation, nearly black brown base with muted warm brown grain, no separate objects.\nStyle/medium: slightly painterly realistic late-1990s fantasy-game remake material texture, restrained hand-painted realism.\nComposition/framing: strict overhead orthographic flat material scan, square edge-to-edge texture filling the entire image; grain runs vertically. Seamless repeat with opposing image edges matching, no border and no vignette.\nLighting/mood: even neutral albedo illumination across every pixel; no directional light, no baked shadows, no highlights.\nConstraints: single square opaque material only. Original design. No room, no perspective, no objects, no ornaments, no metal fittings, no signage, no words, no symbols, no watermark, no montage, no labels. Do not resemble tree bark: timber has fine smooth dense grain, not coarse cracked bark. Do not depict a framed wooden panel. No white margins.\n\nReconstruction context: recreate this individual material for the existing Black Market, matching its previous material palette in the attached room preview. The preview is a color/style reference only, not the requested output. Produce a single seamless flat opaque square material texture edge to edge. No room, no objects, no text, no montage. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "62dc29aef9b2e4b0194a5c2ce25e1bff79139deb2ab3e9a74642555d9207ec7c",
+      "bytes": 364669,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "59d53d98e7d86e325eb96e1c42ed3bcd26dd0c9cb3f02a59611c419e2edf7282"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "01bd1e0497cff4a69c9c6f14d1369598bd7abf2174adeacb1b210ef17c1d6599",
+        "bytes": 2600504
+      }
+    },
+    {
+      "name": "slate",
+      "prompt": "Use case: stylized-concept\nAsset type: production seamless square opaque albedo texture for a fantasy game interior floor, one material image.\nPrimary request: Original charcoal blue-green slate flagstone material for a clandestine forest-market interior. Tightly fitted irregular medium rectangular slabs, desaturated dark blue gray and muted green gray, narrow dark joints, subtle natural slate grain and small soft scratches. Readable planar stone and varied slab shapes without strong contrast.\nStyle/medium: slightly painterly realistic late-1990s fantasy-game remake material texture, restrained hand-painted realism.\nComposition/framing: strict overhead orthographic flat material scan, square edge-to-edge texture filling the entire image, medium-sized rectangular flagstones on a mostly horizontal and vertical irregular grid. Seamless repeat with opposing image edges matching; stones continue through edges.\nLighting/mood: even neutral albedo illumination across every pixel, no directional light, no baked shadows, no specular highlights, no vignette.\nConstraints: single square opaque material only. Original design. No objects, no moss, no vegetation, no ornaments, no border, no room, no perspective, no labels, no words, no symbols, no watermark, no montage, no white margins. Not brickwork. No tiny pebbles. No highly luminous or saturated color.\n\nReconstruction context: recreate this individual material for the existing Black Market, matching its previous material palette in the attached room preview. The preview is a color/style reference only, not the requested output. Produce a single seamless flat opaque square material texture edge to edge. No room, no objects, no text, no montage. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "e91d3c7ef5d1e78dabaadf138d76db2cd6b74c3ca7e3dca0890fd2b4d4e408db",
+      "bytes": 452068,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "d6443cac4b6aa1912c8ad906565487614ab31e0e116978f76e566cc98d7df831"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "c27db9c549aa645290c2b16234e102544d6dbf7b7116f00b81957e5949556499",
+        "bytes": 3308642
+      }
+    },
+    {
+      "name": "plaster",
+      "prompt": "Use case: stylized-concept\nAsset type: production seamless square opaque albedo texture for fantasy game interior walls, one material image.\nPrimary request: Original muted smoky sage and charcoal lime plaster material for a clandestine forest-market interior. Subtle fine mineral grain, restrained cloudy trowelled tonal variation, very small worn flecks, mostly smooth matte plaster with readable fine surface texture. Dark muted sage gray with subdued charcoal mottling.\nStyle/medium: slightly painterly realistic late-1990s fantasy-game remake material texture, restrained hand-painted realism.\nComposition/framing: strict overhead orthographic flat material scan, square edge-to-edge texture filling the entire image. Seamless repeat with opposing image edges matching. Uniform-scale plaster texture across whole image.\nLighting/mood: even neutral albedo illumination across every pixel; no directional light, no baked shadows or highlights, no vignette.\nConstraints: single square opaque material only. Original design. No objects, no room, no perspective, no bricks, no stone blocks, no trim, no borders, no cracks forming masonry, no decorations, no symbols, no words, no labels, no watermark, no montage, no white margins. No large focal marks or large holes. No green vegetation.\n\nReconstruction context: recreate this individual material for the existing Black Market, matching its previous material palette in the attached room preview. The preview is a color/style reference only, not the requested output. Produce a single seamless flat opaque square material texture edge to edge. No room, no objects, no text, no montage. Target a 512 by 512 source.",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "opaque": true,
+      "sha256": "aef51704902f9144fb88d3492667fc143ee77c976a192bae2a7cdb0d76688b84",
+      "bytes": 413592,
+      "generation": "built-in imagegen reconstruction; previous texture bytes unavailable",
+      "generated_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "429cf5d72188cc0a648e1cbdb0e2b29cc113a53306138728dd640c80e1ef5e09"
+      },
+      "processing": "Existing LANCZOS conversion to the 512px runtime size, then lossless PNG compression; no quantization",
+      "unavailable_original": {
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "sha256": "473f242489a01fd820cd2db294e59222a6cc78b4cc81d258c8ca196d362e28d2",
+        "bytes": 3605051
+      }
+    }
+  ],
+  "build_encoding": "Recorded 512x512 source PNGs; lossless RGBA8 with existing UV atlas layouts; compressed base64 parts no larger than 128 KiB"
+}

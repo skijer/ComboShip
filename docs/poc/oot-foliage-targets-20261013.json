@@ -1,0 +1,253 @@
+{
+  "baseline_commit": "63ec02733b048b87e384504b7d902c537ad2078e",
+  "hyrule_archive_sha256": "6a3c2662e03598a1b3aa4eaa6d421466dac9d0a295f121af0d5c7d864b5d49ad",
+  "verification": "41 exact serialized source textures passed the production BuildTexture implementation for eligible Spring/Autumn/Winter; source, alpha, non-green pixels and texture metadata retained. No live renderer/visual acceptance.",
+  "sources": [
+    {
+      "path": "alt/scenes/shared/spot00_scene/s00_yuka_01_78B00___Copie",
+      "surface": "Ground",
+      "archive": "!Hyrule Field - FINAL(1).o2r",
+      "sha256": "932cebc74cae3726a35eac27281b3d8a8d1bd17bf9bafde2616d4fa4c6ceeb18"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_01_kabe_01r_0",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "39278524ffb0e9fe8854d58dfe9049b97620cb674494d7c521fadb9f1d3947b2"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_01_road_01r_5400",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "c06c872bb67cd46dc136b98fd8ae36d8f2d68d22a4e36a363814ea5a65eb27ab"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_02_en_01_0",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "4dd8a76b55d7c58cb1e47a6aa40ca8f32ed6cacff8a01314604af383522bc777"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_02kabe_01r_1000",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "f4a708bcc536eeaea44ced2d43af76c664d44f68e8c12751996b10af35e4e867"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_02kabe_02r_B800",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "ad86893064ddddaeebe454bf2ac05ee379da8c905b7337b50877ab25bd0c382a"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ha_01bx_33800",
+      "surface": "Canopy",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "4fcced0811c3e4653c864770301877dffc2fbe36cd76e7113fc0d4116ebeaff5"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ha_01bx_33800LIVE",
+      "surface": "Canopy",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "478a1c659fe29d20b8c07e3ca6b84e8fe6442afec27ca342cfdf7108888922d0"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ha_03_38800",
+      "surface": "Canopy",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "05f04a2c169e012d4c639c6dd95e9c69026bda8562e4f92a0055a0f1687181da"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ha_03_5800",
+      "surface": "Canopy",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "05f04a2c169e012d4c639c6dd95e9c69026bda8562e4f92a0055a0f1687181da"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ie_01r_D100",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "270e8598c4310709464b65f6eb6859fd66962ac053ebf4ebb22044bf60a52e43"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ie_01x_17900",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "676cedd5db20f146298877324cf206741bc5c5ff47bd0d62378aa85972c52f69"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ie_01x_17900___Copie",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "e4f4736e8603235dd1d668eb51443daee987cd2e93b60bf437994aa4ae404cf2"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_kabe_01r2_37100",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "7e9e6579f9cbd33dab9d6ea43c5e0f90b366784b61c5d46b6deece00472bec48"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_kabe_01r_2C900",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "594ae8b38ecdbe8f413cf10a059b005d3724bd882c32b55adcaab2f86910bde6"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_ki_02_3D800",
+      "surface": "Canopy",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "cb2982b564c9288a74b5c3831a55b018773efe4035dd15c452d7fd033e7f5543"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_kusa_03_3F800",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "8c69b70f81eae4d74b9083b262d6b9b39d2b9223a643a8447dd47cc111137296"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_kusa_04_41F00",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "528eaf6dbf43d4a73826da6522ada33a223ed0dc7a84a0d9f9622fa4f6ec4f8e"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_kusa_05_44900",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "8156b3a286605c6717b02ed07b95ff1a6f58c465addda89016a4c5aff9a9b445"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_tuta_02_41800",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "a32540aaeeea7e0ca07261331cbfc54d269fab66f9c2cb922846c19e4c064358"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_yuka_01r_46800",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "2fb5ca3328e7698973bc34509f0045cb0cc13b8aa2e0f4ba3d80fad6855e94d5"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/s04_yuka_01r_46800___Copie",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "beef754326d5146b703fcfe5cc9b3d7b44fc2e3c8ad70bcece900b7c6d73a781"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/spot04_room_0Tex_011F08_rgba16_png",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "41d35ce90ccd0ffc531c8700dc24e318c4412e3881a8df094f7a236d3915df7b"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/spot04_room_0Tex_01B090_rgba16_png",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "b9fa9f28a105ead4a17a67b420583143d13fa19ef0120bcd0bd497710dd10406"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/spot04_room_1Tex_0056A8_rgba16_png",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "41d35ce90ccd0ffc531c8700dc24e318c4412e3881a8df094f7a236d3915df7b"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/spot04_sceneTex_00FE18_rgba16_png",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "229e1a7c2ac41f344439ea621bd0b7dcfce2742c7bd6bdc87cac8d65f226c3bd"
+    },
+    {
+      "path": "alt/scenes/shared/spot04_scene/spot04_sceneTex_010618_rgba16_png",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "3b3ad9247ebe694945fd681925d14e5b2e540425753a2d3d97aa115083c34bac"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/s04_kusa_04_0",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "528eaf6dbf43d4a73826da6522ada33a223ed0dc7a84a0d9f9622fa4f6ec4f8e"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/s04_kusa_05_2A00",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 20 Scenes Map(3).otr",
+      "sha256": "5c6130da32fa179a1f57d41977860bde5a2f64c0bd666b38e9759d3ffba171f0"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/s10_kabe_01r_500",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "f9dfe174f0aeda318de5a735a4c731d14f4873ac5263d6cf2d03b59d73afad74"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/s10_yuka_01r_AD00",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "1e56748f7f79b1b9b70e4365099761caf4cbb7812a78ac52fd731679dbd991c9"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_ha_01old_17F00",
+      "surface": "Canopy",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "f30f06c7370be8f1655293f4170b9da5eecd5f7b20f40b207f9e1045aef2fe7e"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_kabe_02r_35800",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "cb1eee91fe4c20530c9b20f588bf2abf03aaa977d5dc2bfb0260f2a13dd155a1"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_kabe_03r_46300",
+      "surface": "Canopy",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "711acdf6f65d81534202becbeeb2175793aa6cce78a393e72ce155e26cd62e9c"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_ki_02_2CF00",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "9de3d54162ab5d65a5f0f5c70ece78ecb1ccfd8723373717dd92454cbc75625a"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_ki_02c_4E100",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "032452e12986942a394f8b2dd1ad4691b85b42363e3504d95486d3bbfe828412"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_leaf_01_32300",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "d86fe1a9bc4e6b30b8e5c66c322b3e04b401b534b6c3348066bdb378d391fdea"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_mizukusa_0_3CB00",
+      "surface": "Understory",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "d4dadaa5444edc12cf76eb91b1057ee34d5509afd7218e728ae315be3728042d"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_mon_01_3CB00",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "c13d46bf7db702c381efb2ed6a24bc46dda1a757fa3e7cad21082d97118bcbab"
+    },
+    {
+      "path": "alt/scenes/shared/spot10_scene/sp10_mon_02_3F500",
+      "surface": "Ground",
+      "archive": "Djipi's 3DE - 21 Scenes Map 3DS Textures(3).otr",
+      "sha256": "973a6d84d024cc4729af7d6b4beb6465e4d919fe58c9935b17696dfebae5baa6"
+    },
+    {
+      "path": "scenes/shared/spot00_scene/s00_yuka_01_78B00___Copie",
+      "surface": "Ground",
+      "archive": "!Hyrule Field - FINAL(1).o2r",
+      "sha256": "f4e98211535f2ef84a6fdd6133f65cd8e3568ae4e2ac402de7154b798a8225ea"
+    }
+  ]
+}

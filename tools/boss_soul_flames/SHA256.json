@@ -1,0 +1,23 @@
+{
+  "README.txt": "18347e9f960c640e022e9c105609a245acbb9c142b738fd21c5b711899b1bda9",
+  "baseline-gpu-failure.json": "b18bafa0ea33d079f16c858210600798b98d7a738a02a2ff175b18e688339cb7",
+  "baseline-gpu-failure.log": "917e8a08dc475b36cf19adb7c03e09858fc33294ede623273e204a5be383c047",
+  "clip-evidence.json": "09686c8ff2c37c78a3226168ea14a11dc79e2347192b9abb581cef4788c8f7c7",
+  "gpu_check.py": "156acffed0a7c85ef1859e8a3aab14e5ea635bff16562229eefc9d85e943b619",
+  "inputs/POC4_MM.o2r": "cf1b71ef263f59a4eda10f6b0ca04a9825b5db91c28d2335251799452ef3ed80",
+  "inputs/POC4_OoT.o2r": "066f877c737ef9113b9971ec687921d25afbc16446c99dbb20499d886176e79a",
+  "manifest.json": "bf5d3cee0b2f270c49a2c96d862923cb10aa72d09be3459ebb5e0c95912e7c1f",
+  "mods/2ship/zz_BossSoul_Realistic_Flames_MM_POC5_AlphaSafe.o2r": "d3df70cf45eb1add95f2e9a7e4f282268ef6241206913a2801926866fb1f818d",
+  "mods/soh/zz_BossSoul_Realistic_Flames_OoT_POC5_AlphaSafe.o2r": "1dd1814ab9942254df97a5df57431043d652f18597b53fb88e82ac3f5be6589d",
+  "native/MM-flame-DL": "e582a2c4200f14e1003073fdc03b695109052ef169a129da9b2a5eadd039c9fa",
+  "native/OoT-flame-DL": "d6bb77148a89aa9c16c28a146be64c8cfff9942e0fce2c91f5989fe79e9d2a15",
+  "native/fixed": "7fee10e9e4cb91c9b6c8c0627c07fb486a614f4d45dbc7c31bec7f51ea5ce733",
+  "native/moving": "39e1874ec47fd5cc51ac76378b92ae82fd0b6008fe118452f52d4de22db51f6a",
+  "repair_pack.py": "82c8fa3ea5f79af7e9aa580ceede7d0f00e3362028696e71805c9ffca1185914",
+  "shader-sources.json": "57977a5e1811743cb5b77c2f4f350fcd6924e2dda2053c7dc7b41050d27c43ce",
+  "source-shaders/directx.hlsl": "32c416888ab1ba050d419f722329394c8f36736e820377e7e0c586bee7b99daf",
+  "source-shaders/metal.metal": "7dea65b5e554ef0c417215e570ef46a2a578e29f8687d8bc5923c0d3a1e3320c",
+  "source-shaders/opengl.glsl": "c5022db74200ec332d0d3ff344c853b547d2bf7fc352906b2b0c8ee01a7d31e3",
+  "verification.json": "3460c12103c3456b93b76a78d56c182e322269e866cc144916d070f49fbcb8ce",
+  "verify_flame.py": "ae64f4116b6ae8b45f420083b74522ccfd87426549d197b602ee446781a97e64"
+}

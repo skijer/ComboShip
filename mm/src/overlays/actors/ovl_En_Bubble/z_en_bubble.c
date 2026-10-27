@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_en_bubble.c
  * Overlay: ovl_En_Bubble
@@ -276,7 +277,7 @@ void EnBubble_Fly(EnBubble* this, PlayState* play) {
     Math_ApproachF(&this->velocityFromBump.z, 0.0f, 0.3f, 0.1f);
 }
 
-s32 func_8089FF30(EnBubble* this) {
+s32 func_8089FF30(EnBubble* this, PlayState* play) {
     if (((this->colliderSphere.base.acFlags & AC_HIT) != 0) == false) {
         return false;
     }
@@ -289,6 +290,8 @@ s32 func_8089FF30(EnBubble* this) {
         this->modelEllipticity = 0.48f;
         return false;
     }
+    DinFireSword_FinishConfirmedHit(play, &this->colliderSphere.base, this->colliderSphere.elements[0].base.acHitElem,
+                                    this->colliderSphere.elements[0].base.acDmgInfo.dmgFlags);
     this->timer = 8;
     return true;
 }
@@ -303,7 +306,7 @@ s32 EnBubble_IsPopped(EnBubble* this, PlayState* play) {
         this->timer = 8;
         return true;
     }
-    return func_8089FF30(this);
+    return func_8089FF30(this, play);
 }
 
 void func_808A005C(EnBubble* this) {

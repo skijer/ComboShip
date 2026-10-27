@@ -1,0 +1,49 @@
+{
+  "source_sha256": "dddeaed512e7b4aaedf960e1ddab13e74c480897e0f44404fb980c0c9ce5d63a",
+  "prop_scale": 0.8,
+  "hands": {
+    "Left": {
+      "wrist_offset": [
+        49.8019,
+        75.918,
+        52.8399
+      ],
+      "curls": {
+        "Index": 0.64,
+        "Middle": 0.5531,
+        "Ring": 0.52483,
+        "Pinky": 0.56,
+        "Thumb": 0.72
+      },
+      "approach_wrist_offset": [
+        0.0,
+        0.0,
+        60.0
+      ],
+      "approach_end": 1.0,
+      "approach_start": 0.75
+    },
+    "Right": {
+      "wrist_offset": [
+        -109.7056,
+        43.5592,
+        -147.3356
+      ],
+      "curls": {
+        "Index": 0.64,
+        "Middle": 0.58056,
+        "Ring": 0.66667,
+        "Pinky": 0.56,
+        "Thumb": 0.72
+      },
+      "carried_offset": [
+        0.0,
+        700.0,
+        0.0
+      ],
+      "carried_support_end": 0.55
+    }
+  },
+  "fit": "anatomical left hand and forearm seated over the ocarina front through whole-arm IK; right playing wrist restored to POC6; finger shape retained",
+  "fit_mode": "whole_arm_wrist_seat"
+}

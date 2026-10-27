@@ -23,6 +23,7 @@
  */
 #ifndef COMBO_FOREIGN_DRAW_MM_H
 #define COMBO_FOREIGN_DRAW_MM_H
+#include "ComboMagicMirrorForeign.h"
 
 #ifndef OPEN_DISPS
 #error "ComboForeignDrawMM.h is TU-glue: include the host engine headers before it"
@@ -33,24 +34,49 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 #include "ComboItemDrawABI.h"
+#include "ComboCollectibleShimmerDraw.h"
+#include "ComboRewardGi.h"
+#include "ComboMmNativeImports.h"
+#include "ComboFairyBottle.h"
+#include "ComboBottleContents.h"
+#include "ComboSwordGiFit.h"
+#define COMBO_DIN_SWORD_GI_HOST_MM
+#include "ComboDinSwordGi.h"
+#undef COMBO_DIN_SWORD_GI_HOST_MM
+#define COMBO_FAIRY_HOST_MM
+#include "ComboFairyBottleDraw.h"
+#undef COMBO_FAIRY_HOST_MM
+#include "Rando/NeiGiPresentation.h"
+#include "Rando/NeiResourceRouting.h"
+#define COMBO_MORPHA_GI_HOST_MM
+#include "ComboMorphaGi.h"
+#undef COMBO_MORPHA_GI_HOST_MM
 // ComboShip: the animated class, with 2ship.dll as the host (see the shim in ComboForeignAnim.h).
 #define COMBO_FOREIGN_ANIM_HOST_MM 1
 #include "ComboForeignAnim.h"
+#define COMBO_MASK_SHIMMER_HOST_MM
+#include "ComboMaskShimmer.h"
+#undef COMBO_MASK_SHIMMER_HOST_MM
 #include "2s2h/Rando/MiscBehavior/MiscBehavior.h" // Rando::MiscBehavior::MM_LookupForeign
 #include "rando/CrossForeign.h"                   // ComboRando::ForeignItem / GAME_OOT
+#include "ComboResolve.h"                         // Combo_ResolveSym (process-wide combo-ABI resolution)
+#include "ComboSwordGiAssetSelection.h"
+
+void DrawOotSlateRuneFlame(uint8_t r, uint8_t g, uint8_t b);
 
 namespace {
 
 struct ComboForeignDrawInfoOOT {
     bool ok = false;
+    int32_t nativeMmItem = -1;
     int32_t count = 0;
     int32_t xluStart = -1; // first XLU entry in dls[] order; -1 = all OPA
     float scale = 0.0f;    // extra uniform model scale; 0 = none (OOT rupees: 0.7)
+    int32_t itemShimmer = CW_ITEM_SHIMMER_NONE;
+    uint8_t itemShimmerColor[4] = {};
+    int32_t neiShimmer = 0;
     bool hasEnvColor = false;
     uint8_t envColor[4] = { 0, 0, 0, 0 };
     int32_t drawKind = CW_DRAW_KIND_SIMPLE;   // non-SIMPLE = replicate a specific OOT draw func
@@ -67,6 +93,7 @@ struct ComboForeignDrawInfoOOT {
     // OOT's own setup DL for each stream (raw Gfx* in soh.dll), or null for our 25 Opa/Xlu.
     const void* setupDlOpa = nullptr;
     const void* setupDlXlu = nullptr;
+    const char* segTexPath = nullptr; // OOT's own (unrouted) seg-8 texture path, or null
     // ComboShip: animated class (no static DL row — OOT boss souls' real skeletons). When animOk,
     // anim describes the item and ComboForeignAnim_Draw renders it; paths point at soh.dll statics.
     bool animOk = false;
@@ -74,6 +101,15 @@ struct ComboForeignDrawInfoOOT {
     // Recipe chosen from live save state (progressive tier, Triforce shard, junk/trap) — re-resolve
     // every frame instead of caching, or the first model drawn sticks for the whole save slot.
     bool stateDependent = false;
+    bool appearanceDependent = false; // Keep cosmetic palettes live after grant latching.
+    // Resolved receipt identity: the actual progressive tier or the base item name.
+    std::string resolvedName;
+    int32_t neiEffect = 0;
+    float neiEffectCenter[3] = {};
+    int32_t neiSomariaUpgrade = 0;
+    int32_t neiLegacyCane = 0;
+    int32_t opCount = 0;
+    CwDrawOp ops[CW_DRAW_MAX_OPS] = {};
 };
 
 // Routed path strings must outlive the frame (the GBI wrapper emits the raw pointer into the display
@@ -87,36 +123,56 @@ inline const char* ComboInternRoutedPathOOT(const std::string& s) {
 // not resident, OOT's rando context null while dormant), which must NEVER be negative-cached.
 enum class ComboForeignResolveOOT { Ok, Unknown, NotReady };
 
-inline ComboForeignResolveOOT ComboFillForeignDrawInfoOOT(RandoCheckId rc, ComboForeignDrawInfoOOT& info) {
-    const ComboRando::ForeignItem* fi = Rando::MiscBehavior::MM_LookupForeign(rc);
-    if (fi == nullptr || fi->itemGame != ComboRando::GAME_OOT) {
+inline ComboForeignResolveOOT ComboFillForeignDrawInfoOOT(RandoCheckId rc, ComboForeignDrawInfoOOT& info,
+                                                          const char* namedItem = nullptr) {
+    const ComboRando::ForeignItem* fi = namedItem ? nullptr : Rando::MiscBehavior::MM_LookupForeign(rc);
+    if (!namedItem && (fi == nullptr || fi->itemGame != ComboRando::GAME_OOT)) {
         return ComboForeignResolveOOT::Unknown;
     }
 
-#ifdef _WIN32
+    const char* drawName =
+        namedItem ? namedItem : (fi->HasDisguise() ? fi->fakeItemName.c_str() : fi->itemName.c_str());
+    const int32_t nativeItem = ComboNativeMmImport(drawName);
+    if (nativeItem >= 0) {
+        info.nativeMmItem = nativeItem;
+        info.resolvedName = drawName;
+        info.ok = true;
+        return ComboForeignResolveOOT::Ok;
+    }
+
     static Fn_GetItemDrawInfo sGetItemDrawInfo = nullptr;
     if (sGetItemDrawInfo == nullptr) {
-        HMODULE h = GetModuleHandleA("soh.dll"); // already loaded by the exe (ComboMenuModel pattern)
-        sGetItemDrawInfo = h ? (Fn_GetItemDrawInfo)GetProcAddress(h, "OOT_GetItemDrawInfo") : nullptr;
+        // soh already loaded by the exe (ComboMenuModel pattern); resolution is process-wide.
+        sGetItemDrawInfo = (Fn_GetItemDrawInfo)Combo_ResolveSym("soh", "OOT_GetItemDrawInfo");
     }
     if (sGetItemDrawInfo == nullptr) {
         return ComboForeignResolveOOT::NotReady; // soh.dll may simply not be resident yet
     }
+    static Fn_SetGiCosmeticFrame sSetGiCosmeticFrame = nullptr;
+    if (!sSetGiCosmeticFrame)
+        sSetGiCosmeticFrame = (Fn_SetGiCosmeticFrame)Combo_ResolveSym("soh", "OOT_SetGiCosmeticFrame");
+    if (sSetGiCosmeticFrame && gPlayState)
+        sSetGiCosmeticFrame(static_cast<uint32_t>(gPlayState->gameplayFrames));
     // A disguised trap must draw the item it pretends to be. Same namespace, so the itemGame dispatch
     // above is unaffected. Not state-dependent: like OOT, the disguise holds until the get-item cutscene.
-    const char* drawName = fi->HasDisguise() ? fi->fakeItemName.c_str() : fi->itemName.c_str();
     CwItemDrawInfo raw{};
     int32_t rcStatic = sGetItemDrawInfo(drawName, &raw);
+    const int32_t baseChoice = ComboSwordGi_SelectBaseAssets(raw, ResourceMgr_IsAltAssetsEnabled());
+    if (baseChoice == CW_DRAW_NOT_READY)
+        return ComboForeignResolveOOT::NotReady;
+    if (baseChoice == 2)
+        rcStatic = 1;
     if (rcStatic == CW_DRAW_NOT_READY) {
         return ComboForeignResolveOOT::NotReady; // OOT dormant / rando context null — retry next frame
     }
-    if (rcStatic == 0 || raw.dlistCount <= 0) {
+    if (rcStatic == 0 || (raw.dlistCount <= 0 && raw.drawKind != CW_DRAW_KIND_NEI_CANE &&
+                          raw.drawKind != CW_DRAW_KIND_OOT_NATIVE_EQUIPMENT && raw.drawKind != CW_DRAW_KIND_SEASON_GI &&
+                          raw.drawKind != CW_DRAW_KIND_MAGIC_MIRROR)) {
         // ComboShip: no static DL row — try the animated ABI (OOT boss souls' real skeletons). OOT
         // only describes the item; ComboForeignAnim_Draw loads + draws it (mirror of the OOT side).
         static Fn_GetItemAnimDrawInfo sGetItemAnimDrawInfo = nullptr;
         if (sGetItemAnimDrawInfo == nullptr) {
-            HMODULE h = GetModuleHandleA("soh.dll");
-            sGetItemAnimDrawInfo = h ? (Fn_GetItemAnimDrawInfo)GetProcAddress(h, "OOT_GetItemAnimDrawInfo") : nullptr;
+            sGetItemAnimDrawInfo = (Fn_GetItemAnimDrawInfo)Combo_ResolveSym("soh", "OOT_GetItemAnimDrawInfo");
         }
         if (sGetItemAnimDrawInfo == nullptr) {
             return ComboForeignResolveOOT::NotReady;
@@ -134,6 +190,8 @@ inline ComboForeignResolveOOT ComboFillForeignDrawInfoOOT(RandoCheckId rc, Combo
         return ComboForeignResolveOOT::Unknown; // unknown item or non-portable draw func -> sentinel
     }
 
+    if (raw.drawKind == CW_DRAW_KIND_MAGIC_MIRROR && (raw.dlistCount != 0 || raw.opCount != 0))
+        return ComboForeignResolveOOT::Unknown;
     static constexpr char kOtrPrefix[] = "__OTR__";
     int32_t n = raw.dlistCount < CW_DRAW_MAX_DLISTS ? raw.dlistCount : CW_DRAW_MAX_DLISTS;
     if (n < CwMinDlistsForKind(raw.drawKind)) {
@@ -144,16 +202,84 @@ inline ComboForeignResolveOOT ComboFillForeignDrawInfoOOT(RandoCheckId rc, Combo
         if (p == nullptr || strncmp(p, kOtrPrefix, sizeof(kOtrPrefix) - 1) != 0) {
             return ComboForeignResolveOOT::Unknown; // not an OTR path literal — can't route it
         }
-        info.dls[i] = ComboInternRoutedPathOOT(std::string("__OTR__@oot:") + (p + sizeof(kOtrPrefix) - 1));
+        const char* ownerPrefix = (raw.drawKind == CW_DRAW_KIND_MM_MASK || raw.drawKind == CW_DRAW_KIND_MM_REMAINS ||
+                                   raw.drawKind == CW_DRAW_KIND_MM_SPIN_ATTACK)
+                                      ? "__OTR__@mm:"
+                                      : "__OTR__@oot:";
+        // A concrete OoT weapon tier may use MM's native GI mesh. Preserve only recognized
+        // explicit owner routes; ordinary paths still belong to the producing game.
+        const bool routedMm = strncmp(p, "__OTR__@mm:", 11) == 0;
+        const bool routedOot = strncmp(p, "__OTR__@oot:", 12) == 0;
+        const bool routedBase = strncmp(p, "__OTR__@oot-gi-base:", 20) == 0;
+        if (p[7] == '@' && !routedMm && !routedOot && !routedBase)
+            return ComboForeignResolveOOT::Unknown;
+        info.dls[i] = ComboInternRoutedPathOOT(routedMm || routedOot || routedBase
+                                                   ? std::string(p)
+                                                   : std::string(ownerPrefix) + (p + sizeof(kOtrPrefix) - 1));
     }
     info.count = n;
     info.xluStart = raw.xluStartIndex;
     info.scale = raw.scale;
     info.setupDlOpa = raw.setupDlOpa;
     info.setupDlXlu = raw.setupDlXlu;
+    if (raw.segTexPath != nullptr) {
+        if (strncmp(raw.segTexPath, kOtrPrefix, sizeof(kOtrPrefix) - 1) != 0) {
+            return ComboForeignResolveOOT::Unknown; // bound under OOT's RM below; must be a path literal
+        }
+        info.segTexPath = raw.segTexPath;
+    }
     info.hasEnvColor = raw.hasEnvColor != 0;
     info.drawKind = raw.drawKind;
+    info.neiEffect = raw.neiEffect;
+    memcpy(info.neiEffectCenter, raw.neiEffectCenter, sizeof(info.neiEffectCenter));
+    info.neiSomariaUpgrade = raw.neiSomariaUpgrade;
+    info.neiLegacyCane = raw.neiLegacyCane;
+    if (raw.opCount < 0 || raw.opCount > CW_DRAW_MAX_OPS)
+        return ComboForeignResolveOOT::Unknown;
+    if (raw.drawKind == CW_DRAW_KIND_SEASON_GI &&
+        (raw.neiEffect < 1 || raw.neiEffect > 6 || (raw.neiEffect != 5 ? n != 0 || raw.opCount != 0 : n < 1)))
+        return ComboForeignResolveOOT::Unknown;
+    if (raw.drawKind == CW_DRAW_KIND_CUSTOM_GI || raw.drawKind == CW_DRAW_KIND_SEASON_GI) {
+        if (raw.xluStartIndex < -1 || raw.xluStartIndex > n)
+            return ComboForeignResolveOOT::Unknown;
+        for (int i = 0; i < raw.opCount; ++i) {
+            const int op = raw.ops[i].op;
+            if (op != CW_OP_ROTATE_X && op != CW_OP_ROTATE_Z && op != CW_OP_SCALE && op != CW_OP_TRANSLATE &&
+                op != CW_OP_FRAME_PAIR && op != CW_OP_NO_CULL)
+                return ComboForeignResolveOOT::Unknown;
+            if (op == CW_OP_FRAME_PAIR &&
+                (n != 2 || raw.xluStartIndex != -1 || !(raw.ops[i].a >= 0 && raw.ops[i].a <= 30) ||
+                 raw.ops[i].a != static_cast<int>(raw.ops[i].a)))
+                return ComboForeignResolveOOT::Unknown;
+        }
+    }
+    if (raw.drawKind == CW_DRAW_KIND_OOT_NATIVE_EQUIPMENT) {
+        if (raw.opCount != 1 || raw.ops[0].op != CW_OP_NATIVE_EQUIPMENT ||
+            !(raw.ops[0].a >= static_cast<float>(CW_OOT_EQUIP_AXE) &&
+              raw.ops[0].a <= static_cast<float>(CW_OOT_EQUIP_ROC_BOOTS)) ||
+            raw.ops[0].a != static_cast<int32_t>(raw.ops[0].a))
+            return ComboForeignResolveOOT::Unknown;
+    }
+    if (raw.drawKind == CW_DRAW_KIND_ELEMENTAL_ARROW &&
+        (raw.neiEffect < 1 || raw.neiEffect > 3 || raw.dlistCount != 1 || raw.opCount != 0))
+        return ComboForeignResolveOOT::Unknown;
+    if (raw.drawKind == CW_DRAW_KIND_SIMPLE) {
+        if (raw.opCount > 2)
+            return ComboForeignResolveOOT::Unknown;
+        for (int i = 0; i < raw.opCount; ++i)
+            if (raw.ops[i].op != CW_OP_ROTATE_X && raw.ops[i].op != CW_OP_ROTATE_Z)
+                return ComboForeignResolveOOT::Unknown;
+    }
+    info.opCount = raw.opCount;
+    memcpy(info.ops, raw.ops, sizeof(info.ops));
     info.stateDependent = raw.stateDependent != 0;
+    info.appearanceDependent = raw.stateDependent == 2;
+    info.itemShimmer = raw.itemShimmer;
+    info.neiShimmer = raw.neiShimmer;
+    memcpy(info.itemShimmerColor, raw.itemShimmerColor, sizeof(info.itemShimmerColor));
+    if (raw.resolvedName != nullptr) {
+        info.resolvedName = raw.resolvedName;
+    }
     info.layerPrimMask = raw.layerPrimMask;
     info.layerEnvMask = raw.layerEnvMask;
     memcpy(info.layerPrimColor, raw.layerPrimColor, sizeof(info.layerPrimColor));
@@ -167,38 +293,101 @@ inline ComboForeignResolveOOT ComboFillForeignDrawInfoOOT(RandoCheckId rc, Combo
     }
     info.ok = true;
     return ComboForeignResolveOOT::Ok;
-#else
-    return ComboForeignResolveOOT::Unknown; // GetProcAddress resolution is Windows-only (ComboMenuModel)
-#endif
+}
+
+// Recipe cache, swept per save slot and per foreign-map generation. Shared by the resolver and the
+// grant-time latch below so both observe the same sweep.
+struct ComboForeignDrawCacheOOT {
+    std::unordered_map<int32_t, ComboForeignDrawInfoOOT> map;
+    std::unordered_map<int32_t, std::string> receiptNames;
+    std::unordered_map<int32_t, std::string> swordReceiptNames;
+    int slot = -1;
+    uint64_t gen = (uint64_t)-1;
+};
+
+inline ComboForeignDrawCacheOOT& ComboForeignDrawCacheOOTGet() {
+    static ComboForeignDrawCacheOOT c;
+    int slot = gSaveContext.fileNum;
+    uint64_t gen = Rando::MiscBehavior::ComboRandoGen();
+    if (slot != c.slot || gen != c.gen) {
+        c.map.clear();
+        c.receiptNames.clear();
+        c.swordReceiptNames.clear();
+        c.slot = slot;
+        c.gen = gen;
+    }
+    return c;
 }
 
 // Full lookup chain (foreign map -> OOT export -> routed strings), cached per check per slot per
 // foreign-map generation so it runs once per check instead of every frame.
 inline const ComboForeignDrawInfoOOT* ComboResolveForeignDrawInfoOOT(RandoCheckId rc) {
-    static std::unordered_map<int32_t, ComboForeignDrawInfoOOT> sCache;
-    static int sCacheSlot = -1;
-    static uint64_t sCacheGen = (uint64_t)-1;
-    int slot = gSaveContext.fileNum;
-    uint64_t gen = Rando::MiscBehavior::ComboRandoGen();
-    if (slot != sCacheSlot || gen != sCacheGen) {
-        sCache.clear();
-        sCacheSlot = slot;
-        sCacheGen = gen;
-    }
-    auto cached = sCache.find(rc);
-    if (cached != sCache.end() && !cached->second.stateDependent) {
+    ComboForeignDrawCacheOOT& c = ComboForeignDrawCacheOOTGet();
+    auto cached = c.map.find(rc);
+    if (cached != c.map.end() && !cached->second.stateDependent) {
         return cached->second.ok ? &cached->second : nullptr;
     }
     // A state-dependent recipe (progressive tier, Triforce shard, junk/trap) is re-resolved every
     // frame; caching it would freeze whichever model happened to be correct on the first draw.
     ComboForeignDrawInfoOOT info{}; // built locally: a failure must not clobber a live cached recipe
-    if (ComboFillForeignDrawInfoOOT(rc, info) == ComboForeignResolveOOT::NotReady) {
-        sCache.erase(rc); // transient — retry next frame instead of freezing the sentinel in
+    // Once granted, refresh only the frozen concrete sword's appearance.
+    // Resolving its progressive placeholder again would select the NEXT tier.
+    auto receipt = c.swordReceiptNames.find(rc);
+    const char* namedItem = receipt != c.swordReceiptNames.end() ? receipt->second.c_str() : nullptr;
+    if (ComboFillForeignDrawInfoOOT(rc, info, namedItem) == ComboForeignResolveOOT::NotReady) {
+        c.map.erase(rc); // transient — retry next frame instead of freezing the sentinel in
         return nullptr;
     }
-    ComboForeignDrawInfoOOT& entry = sCache[rc]; // Unknown caches ok=false: one lookup, then sentinel
+    ComboForeignDrawInfoOOT& entry = c.map[rc]; // Unknown caches ok=false: one lookup, then sentinel
     entry = info;
     return entry.ok ? &entry : nullptr;
+}
+
+// ComboShip: freeze this check's recipe at the tier it is ABOUT to grant. The cross-grant mutates
+// OOT's dormant save mid-presentation, so a live re-resolve would flip the held-up model next frame.
+inline void ComboLatchForeignDrawOOT(RandoCheckId rc) {
+    if (rc == RC_UNKNOWN) {
+        return;
+    }
+    ComboForeignDrawCacheOOT& c = ComboForeignDrawCacheOOTGet();
+    ComboForeignDrawInfoOOT info{};
+    if (ComboFillForeignDrawInfoOOT(rc, info) != ComboForeignResolveOOT::Ok) {
+        return; // nothing written, nothing erased: the draw stays live, i.e. no worse than before
+    }
+    if (!info.resolvedName.empty())
+        c.receiptNames[rc] = info.resolvedName;
+    if (info.animOk) {
+        return; // that class's state-dependence is a CVar (SimplerBossSoulModels), not save state
+    }
+    // Progressive producers use stateDependent=1 to freeze the awarded tier.
+    // Its sword mesh must still follow the host's live Alt Assets selection.
+    if (!info.resolvedName.empty() && info.neiShimmer > 0 &&
+        NeiGi::IsSword(static_cast<NeiGi::Kind>(info.neiShimmer - 1))) {
+        c.swordReceiptNames[rc] = info.resolvedName;
+        info.appearanceDependent = true;
+    }
+    info.stateDependent = info.appearanceDependent; // Freeze tiers while keeping appearance live.
+    c.map[rc] = info;
+}
+
+// The receipt identity remains frozen even when the model's cosmetic recipe is
+// live. Both caches reset together when the save slot or foreign map changes.
+inline const char* ComboForeignLatchedNameOOT(RandoCheckId rc) {
+    ComboForeignDrawCacheOOT& c = ComboForeignDrawCacheOOTGet();
+    auto it = c.receiptNames.find(rc);
+    if (it == c.receiptNames.end() || it->second.empty()) {
+        return nullptr;
+    }
+    return it->second.c_str();
+}
+
+// Live tier name for previews: runs the same per-frame resolver the shelf model uses.
+inline const char* ComboForeignLiveNameOOT(RandoCheckId rc) {
+    const ComboForeignDrawInfoOOT* info = ComboResolveForeignDrawInfoOOT(rc);
+    if (info == nullptr || info->resolvedName.empty()) {
+        return nullptr;
+    }
+    return info->resolvedName.c_str();
 }
 
 } // namespace
@@ -239,11 +428,39 @@ inline void MM_RestoreForeignSegs(const int32_t* segs, int32_t count) {
     CLOSE_DISPS(gfxCtx);
 }
 
+inline void MM_DrawForeignSpinAttack(const ComboForeignDrawInfoOOT* info) {
+    ComboDrawSpinAttackGi(gPlayState, info->dls[0], info->dls[1], info->scale, info->primColorXlu, "mm");
+}
+
+// The owner already classified its selected Alt asset, so custom jars get the
+// same grayscale tint scope as the native OoT draw without recoloring native DLs.
+inline Gfx* MM_DrawForeignMagicJarDList(Gfx* gfx, const char* dlist, const uint8_t* color) {
+    if (color[3]) {
+        gDPSetGrayscaleColor(gfx++, color[0], color[1], color[2], 255);
+        gSPGrayscale(gfx++, true);
+    }
+    gSPDisplayList(gfx++, (Gfx*)dlist);
+    if (color[3])
+        gSPGrayscale(gfx++, false);
+    return gfx;
+}
+
 // Simple path: OPA layers then XLU layers (self-contained funcs, rupees, wallets, Triforce/rod scale).
 inline void MM_DrawForeignSimple(const ComboForeignDrawInfoOOT* info) {
     int32_t n = info->count;
     int32_t xs = (info->xluStart < 0 || info->xluStart > n) ? n : info->xluStart;
     GraphicsContext* gfxCtx = gPlayState->state.gfxCtx;
+    const bool pose = info->drawKind == CW_DRAW_KIND_SIMPLE && info->opCount > 0;
+    if (pose) {
+        Matrix_Push();
+        for (int i = 0; i < info->opCount; ++i) {
+            const auto& op = info->ops[i];
+            if (op.op == CW_OP_ROTATE_Z)
+                Matrix_RotateZF(op.a * (3.14159265358979323846f / 32768.f), MTXMODE_APPLY);
+            else if (op.op == CW_OP_ROTATE_X)
+                Matrix_RotateXF(op.a * (3.14159265358979323846f / 32768.f), MTXMODE_APPLY);
+        }
+    }
     OPEN_DISPS(gfxCtx);
     if (info->scale > 0.0f) {
         Matrix_Scale(info->scale, info->scale, info->scale, MTXMODE_APPLY);
@@ -258,12 +475,17 @@ inline void MM_DrawForeignSimple(const ComboForeignDrawInfoOOT* info) {
             Gfx_SetupDL25_Opa(gfxCtx);
         }
         MM_FOREIGN_PIN_OPA();
+        if (info->drawKind == CW_DRAW_KIND_MM_MASK || info->drawKind == CW_DRAW_KIND_MM_REMAINS)
+            gDPSetTextureLUT(POLY_OPA_DISP++, G_TT_NONE);
         MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, gfxCtx);
         if (info->hasEnvColor) {
             gDPSetEnvColor(POLY_OPA_DISP++, info->envColor[0], info->envColor[1], info->envColor[2], info->envColor[3]);
         }
         for (int32_t i = 0; i < xs; i++) {
-            gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->dls[i]);
+            if (info->drawKind == CW_DRAW_KIND_MAGIC_JAR)
+                POLY_OPA_DISP = MM_DrawForeignMagicJarDList(POLY_OPA_DISP, info->dls[i], info->primColorOpa);
+            else
+                gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->dls[i]);
         }
     }
     if (xs < n) {
@@ -273,6 +495,8 @@ inline void MM_DrawForeignSimple(const ComboForeignDrawInfoOOT* info) {
             Gfx_SetupDL25_Xlu(gfxCtx);
         }
         MM_FOREIGN_PIN_XLU();
+        if (info->drawKind == CW_DRAW_KIND_MM_MASK || info->drawKind == CW_DRAW_KIND_MM_REMAINS)
+            gDPSetTextureLUT(POLY_XLU_DISP++, G_TT_NONE);
         MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
         if (info->hasEnvColor) {
             gDPSetEnvColor(POLY_XLU_DISP++, info->envColor[0], info->envColor[1], info->envColor[2], info->envColor[3]);
@@ -282,6 +506,8 @@ inline void MM_DrawForeignSimple(const ComboForeignDrawInfoOOT* info) {
         }
     }
     CLOSE_DISPS(gfxCtx);
+    if (pose)
+        Matrix_Pop();
 }
 
 // Biggoron's / Broken Goron's Sword: seg8 OPA scroll (z_draw.c GetItem_DrawGoronSword).
@@ -302,12 +528,16 @@ inline void MM_DrawForeignGoronSword(const ComboForeignDrawInfoOOT* info) {
     MM_RestoreForeignSegs(segs, 1);
 }
 
-// Deku Nuts: seg8 OPA scroll (GetItem_DrawDekuNuts).
+// Deku Nuts: seg8 OPA scroll (GetItem_DrawDekuNuts). The rando nut bag carries OOT's 26 Opa.
 inline void MM_DrawForeignDekuNuts(const ComboForeignDrawInfoOOT* info) {
     PlayState* play = gPlayState;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     OPEN_DISPS(gfxCtx);
-    Gfx_SetupDL25_Opa(gfxCtx);
+    if (info->setupDlOpa != nullptr) {
+        gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->setupDlOpa);
+    } else {
+        Gfx_SetupDL25_Opa(gfxCtx);
+    }
     MM_FOREIGN_PIN_OPA();
     gSPSegment(POLY_OPA_DISP++, 0x08,
                (uintptr_t)Gfx_TwoTexScrollEx(gfxCtx, G_TX_RENDERTILE, play->state.frames * 6, play->state.frames * 6,
@@ -458,6 +688,7 @@ inline void MM_DrawForeignPoes(const ComboForeignDrawInfoOOT* info) {
 inline void MM_DrawForeignFairy(const ComboForeignDrawInfoOOT* info) {
     PlayState* play = gPlayState;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
+    const ComboFairyBottleMotion motion = ComboFairyBottle_SampleForShell(play->gameplayFrames, info->dls[0]);
     OPEN_DISPS(gfxCtx);
     Gfx_SetupDL25_Opa(gfxCtx);
     MM_FOREIGN_PIN_OPA();
@@ -466,18 +697,29 @@ inline void MM_DrawForeignFairy(const ComboForeignDrawInfoOOT* info) {
     Gfx_SetupDL25_Xlu(gfxCtx);
     MM_FOREIGN_PIN_XLU();
     MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
-    gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[1]);
+    if (strcmp(info->dls[0], info->dls[1]) != 0) {
+        gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[1]);
+    }
     gSPSegment(POLY_XLU_DISP++, 0x08,
                (uintptr_t)Gfx_TwoTexScrollEx(gfxCtx, G_TX_RENDERTILE, 0, 0, 32, 32, 1, play->state.frames * 1,
                                              -(play->state.frames * 6), 32, 32, 0, 0, 1, -6));
     Matrix_Push();
+    if (ComboFairyBottle_IsBlueFireShell(info->dls[0])) {
+        Matrix_Translate(-8.0f, -2.0f, 0.0f, MTXMODE_APPLY);
+    }
+    Matrix_Translate(motion.x, motion.y, motion.z, MTXMODE_APPLY);
     Matrix_ReplaceRotation(&play->billboardMtxF);
-    MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
-    gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[2]);
+    Matrix_Scale(motion.scaleX, motion.scaleY, motion.scaleZ, MTXMODE_APPLY);
+    if (!ComboFairyBottle_DrawVfx(play, info->dls[0])) {
+        MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
+        gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[2]);
+    }
     Matrix_Pop();
     CLOSE_DISPS(gfxCtx);
     int32_t segs[] = { 0x08 };
     MM_RestoreForeignSegs(segs, 1);
+    if (ComboFairyBottle_IsBundledShell(info->dls[0]))
+        ComboBottleShimmer_DrawMotes(play, CW_SHIMMER_FAIRY);
 }
 
 // Spiritual stones: seg9 XLU + seg8 OPA (static binds), rotate, per-layer prim/env colors, gem dl0
@@ -504,15 +746,19 @@ inline void MM_DrawForeignJewel(const ComboForeignDrawInfoOOT* info) {
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 128, info->primColorOpa[0], info->primColorOpa[1], info->primColorOpa[2], 255);
     gDPSetEnvColor(POLY_OPA_DISP++, info->envColorOpa[0], info->envColorOpa[1], info->envColorOpa[2], 255);
     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->dls[1]);
-    Matrix_Pop();
     CLOSE_DISPS(gfxCtx);
     int32_t segs[] = { 0x08, 0x09 };
+    // Complete the native recipe's allocating tail before optional materials.
     MM_RestoreForeignSegs(segs, 2);
+    NeiGi_DrawRewardMaterial(play, RewardGi_ProfileForPaths(info->dls[0], nullptr), info->dls[0], info->dls[1], "oot");
+    Matrix_Pop();
 }
 
 // Din's Fire / Farore's Wind / Nayru's Love: XLU seg8 scroll, dl0,1,2 (GetItem_DrawMagicSpell).
 inline void MM_DrawForeignMagicSpell(const ComboForeignDrawInfoOOT* info) {
     PlayState* play = gPlayState;
+    if (!NeiGi_CanDrawElementalSpellFallback(play))
+        return;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     OPEN_DISPS(gfxCtx);
     Gfx_SetupDL25_Xlu(gfxCtx);
@@ -575,6 +821,13 @@ inline void MM_DrawForeignSkullToken(const ComboForeignDrawInfoOOT* info) {
 
 // Generic rando song note: grayscale-tinted note DL (GetItem_DrawGenericMusicNote). No segments.
 inline void MM_DrawForeignMusicNote(const ComboForeignDrawInfoOOT* info) {
+    if (info->count == 2) {
+        OPEN_DISPS(gPlayState->state.gfxCtx);
+        gSPGrayscale(POLY_XLU_DISP++, false);
+        CLOSE_DISPS(gPlayState->state.gfxCtx);
+        MM_DrawForeignSimple(info); // Native warp color DL followed by its original clef.
+        return;
+    }
     GraphicsContext* gfxCtx = gPlayState->state.gfxCtx;
     OPEN_DISPS(gfxCtx);
     MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
@@ -587,33 +840,110 @@ inline void MM_DrawForeignMusicNote(const ComboForeignDrawInfoOOT* info) {
     CLOSE_DISPS(gfxCtx);
 }
 
-// OOT boss soul: seg8 flame scroll + billboard, grayscale-colored flame dl0, then generic skull dl1
-// with env color (Randomizer_DrawBossSoul, SimplerBossSoulModels path — no boss skeleton cross-game).
+// OoT's simpler boss souls use MM's native flame plus the owner-routed generic skull.
 inline void MM_DrawForeignBossSoul(const ComboForeignDrawInfoOOT* info) {
     PlayState* play = gPlayState;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
+    const float translate[3] = { 0.0f, -70.0f, 0.0f };
+    const float scale[3] = { 5.0f, 5.0f, 5.0f };
+    DrawOotSoulFlame(play, info->primColorXlu, translate, scale);
     OPEN_DISPS(gfxCtx);
     Gfx_SetupDL25_Xlu(gfxCtx);
     MM_FOREIGN_PIN_XLU();
-    gSPSegment(POLY_XLU_DISP++, 0x08,
-               (uintptr_t)Gfx_TwoTexScrollEx(gfxCtx, G_TX_RENDERTILE, 0, 0, 16, 32, 1, play->state.frames * 1,
-                                             -(play->state.frames * 8), 16, 32, 0, 0, 1, -8));
-    Matrix_Push();
-    Matrix_Translate(0.0f, -70.0f, 0.0f, MTXMODE_APPLY);
-    Matrix_Scale(5.0f, 5.0f, 5.0f, MTXMODE_APPLY);
-    Matrix_ReplaceRotation(&play->billboardMtxF);
-    MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
-    gDPSetGrayscaleColor(POLY_XLU_DISP++, info->primColorXlu[0], info->primColorXlu[1], info->primColorXlu[2], 255);
-    gSPGrayscale(POLY_XLU_DISP++, true);
-    gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[0]); // flame
-    gSPGrayscale(POLY_XLU_DISP++, false);
-    Matrix_Pop();
     MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
     gDPSetEnvColor(POLY_XLU_DISP++, info->envColorXlu[0], info->envColorXlu[1], info->envColorXlu[2], 255);
     gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[1]); // generic soul skull
     CLOSE_DISPS(gfxCtx);
-    int32_t segs[] = { 0x08 };
-    MM_RestoreForeignSegs(segs, 1);
+}
+
+// DrawMorpha's two XLU core layers. The flame remains MM-owned, while every inner model
+// resource resolves through OoT's live Alt selection under the owner bracket.
+inline void MM_DrawForeignMorphaSoul(const ComboForeignDrawInfoOOT* info) {
+    PlayState* play = gPlayState;
+    GraphicsContext* gfxCtx = play->state.gfxCtx;
+    const float translate[3] = { 0.0f, -70.0f, 0.0f };
+    const float scale[3] = { 5.0f, 5.0f, 5.0f };
+    DrawOotSoulFlame(play, info->primColorXlu, translate, scale);
+    Matrix_Push();
+    Matrix_Scale(0.015f, 0.015f, 0.015f, MTXMODE_APPLY);
+    Matrix_RotateXF(play->state.frames * 0.1f, MTXMODE_APPLY);
+    Matrix_RotateZF(play->state.frames * 0.16f, MTXMODE_APPLY);
+    OPEN_DISPS(gfxCtx);
+    Gfx_SetupDL25_Xlu(gfxCtx);
+    MM_FOREIGN_PIN_XLU();
+    gSPSegment(POLY_XLU_DISP++, 0x08,
+               (uintptr_t)Gfx_TwoTexScrollEx(gfxCtx, 0, play->state.frames * 3, play->state.frames * 3, 32, 32, 1,
+                                             play->state.frames * -3, play->state.frames * -3, 32, 32, 3, 3, -3, -3));
+    gSPSegment(POLY_XLU_DISP++, 0x09,
+               (uintptr_t)Gfx_TwoTexScrollEx(gfxCtx, 0, play->state.frames * 3, 0, 32, 32, 1, 0,
+                                             play->state.frames * -5, 32, 32, 3, 0, 0, -5));
+    MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
+    gDPSetPrimColor(POLY_XLU_DISP++, 0x80, 0x80, 255, 255, 255, 255);
+    gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[1]);
+    gDPPipeSync(POLY_XLU_DISP++);
+    gDPSetEnvColor(POLY_XLU_DISP++, 0, 220, 255, 128);
+    gDPSetPrimColor(POLY_XLU_DISP++, 0x80, 0x80, 255, 255, 255, 255);
+    gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[2]);
+    CLOSE_DISPS(gfxCtx);
+    Matrix_Pop();
+    const int32_t segs[] = { 8, 9 };
+    MM_RestoreForeignSegs(segs, 2);
+}
+
+// Native MM imported boss souls have no foreign check-map entry. Resolve the
+// same OoT model recipe by name so both pickup routes honor OoT's Alt selection,
+// native animation and simplified-model setting.
+inline bool MM_TryDrawOotBossSoul(RandoItemId item) {
+    if (!gPlayState || !Ship::CrossRMRegistry::Get("oot"))
+        return false;
+    const char* name = nullptr;
+    switch (item) {
+        case RI_SOUL_OOT_BOSS_GOHMA:
+            name = "Gohma's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_KING_DODONGO:
+            name = "King Dodongo's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_BARINADE:
+            name = "Barinade's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_PHANTOM_GANON:
+            name = "Phantom Ganon's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_VOLVAGIA:
+            name = "Volvagia's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_MORPHA:
+            name = "Morpha's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_BONGO_BONGO:
+            name = "Bongo Bongo's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_TWINROVA:
+            name = "Twinrova's Soul";
+            break;
+        case RI_SOUL_OOT_BOSS_GANON:
+            name = "Ganon's Soul";
+            break;
+        default:
+            return false;
+    }
+    ComboForeignDrawInfoOOT info{};
+    if (ComboFillForeignDrawInfoOOT(RC_UNKNOWN, info, name) != ComboForeignResolveOOT::Ok)
+        return false;
+    bool drawn = false;
+    Matrix_Push();
+    if (info.animOk) {
+        drawn = ComboForeignAnim_Draw(&info.anim, "oot", gPlayState) != 0;
+    } else if (info.drawKind == CW_DRAW_KIND_OOT_MORPHA_SOUL) {
+        MM_DrawForeignMorphaSoul(&info);
+        drawn = true;
+    } else if (info.drawKind == CW_DRAW_KIND_BOSS_SOUL) {
+        MM_DrawForeignBossSoul(&info);
+        drawn = true;
+    }
+    Matrix_Pop();
+    return drawn;
 }
 
 // Per-DL prim/env colored layers: the rando map/compass/small-key/boss-key/key-ring/jabber-nut/
@@ -667,6 +997,55 @@ inline void MM_DrawForeignColorLayers(const ComboForeignDrawInfoOOT* info) {
     CLOSE_DISPS(gfxCtx);
 }
 
+// Per-layer grayscale matches native editor tint scopes without tinting neighboring DLs.
+inline void MM_DrawForeignGrayscaleLayers(const ComboForeignDrawInfoOOT* info) {
+    GraphicsContext* gfxCtx = gPlayState->state.gfxCtx;
+    if (info->scale > 0.0f)
+        Matrix_Scale(info->scale, info->scale, info->scale, MTXMODE_APPLY);
+    const int split = info->xluStart < 0 || info->xluStart > info->count ? info->count : info->xluStart;
+    OPEN_DISPS(gfxCtx);
+    for (int stream = 0; stream < 2; ++stream) {
+        const int begin = stream ? split : 0;
+        const int end = stream ? info->count : split;
+        if (begin >= end)
+            continue;
+        if (stream) {
+            if (info->setupDlXlu)
+                gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->setupDlXlu);
+            else
+                Gfx_SetupDL25_Xlu(gfxCtx);
+            MM_FOREIGN_PIN_XLU();
+            MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
+            for (int i = begin; i < end; ++i) {
+                const bool tint = (info->layerPrimMask & (1 << i)) != 0;
+                if (tint)
+                    gDPSetGrayscaleColor(POLY_XLU_DISP++, info->layerPrimColor[i][0], info->layerPrimColor[i][1],
+                                         info->layerPrimColor[i][2], info->layerPrimColor[i][3]);
+                gSPGrayscale(POLY_XLU_DISP++, tint);
+                gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[i]);
+                gSPGrayscale(POLY_XLU_DISP++, false);
+            }
+        } else {
+            if (info->setupDlOpa)
+                gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->setupDlOpa);
+            else
+                Gfx_SetupDL25_Opa(gfxCtx);
+            MM_FOREIGN_PIN_OPA();
+            MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, gfxCtx);
+            for (int i = begin; i < end; ++i) {
+                const bool tint = (info->layerPrimMask & (1 << i)) != 0;
+                if (tint)
+                    gDPSetGrayscaleColor(POLY_OPA_DISP++, info->layerPrimColor[i][0], info->layerPrimColor[i][1],
+                                         info->layerPrimColor[i][2], info->layerPrimColor[i][3]);
+                gSPGrayscale(POLY_OPA_DISP++, tint);
+                gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->dls[i]);
+                gSPGrayscale(POLY_OPA_DISP++, false);
+            }
+        }
+    }
+    CLOSE_DISPS(gfxCtx);
+}
+
 // Grayscale-tinted XLU glyph: ocarina buttons (Randomizer_DrawOcarinaButton). No segments.
 inline void MM_DrawForeignGrayscaleXlu(const ComboForeignDrawInfoOOT* info) {
     GraphicsContext* gfxCtx = gPlayState->state.gfxCtx;
@@ -697,7 +1076,9 @@ inline void MM_DrawForeignDoubleDefense(const ComboForeignDrawInfoOOT* info) {
 }
 
 // Master Sword: seg8 OPA scroll + fixed scale/rotation (Randomizer_DrawMasterSword).
-inline void MM_DrawForeignMasterSword(const ComboForeignDrawInfoOOT* info) {
+inline void MM_DrawForeignMasterSword(const ComboForeignDrawInfoOOT* info, bool drawFlame = true) {
+    if (drawFlame && info->primColorXlu[3])
+        DrawOotSlateRuneFlame(info->primColorXlu[0], info->primColorXlu[1], info->primColorXlu[2]);
     PlayState* play = gPlayState;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     OPEN_DISPS(gfxCtx);
@@ -740,14 +1121,186 @@ inline void MM_DrawForeignBronzeScale(const ComboForeignDrawInfoOOT* info) {
     MM_RestoreForeignSegs(segs, 1);
 }
 
+// Rotating custom OoT models. The two alpha values express independent, optional
+// grayscale (OPA) and weapon-flame (XLU) colors; the flame never tints the model.
+inline void MM_DrawForeignCustomGi(const ComboForeignDrawInfoOOT* info, bool shop = false, bool drawFlame = true) {
+    if (drawFlame && info->primColorXlu[3])
+        DrawOotSlateRuneFlame(info->primColorXlu[0], info->primColorXlu[1], info->primColorXlu[2]);
+    Matrix_Push();
+    const uint32_t bits = (static_cast<uint32_t>(gPlayState->gameplayFrames) * 2u) & 0xFFFFu;
+    const int32_t rotation = bits >= 0x8000u ? static_cast<int32_t>(bits) - 0x10000 : bits;
+    Matrix_RotateYF(rotation * .01f, MTXMODE_APPLY);
+    const bool sword = info->neiShimmer > 0 && info->neiShimmer <= static_cast<int32_t>(NeiGi::Kind::Last) + 1 &&
+                       NeiGi::IsSword(static_cast<NeiGi::Kind>(info->neiShimmer - 1));
+    int selectedOpaque = -1;
+    bool noCull = false;
+    for (int i = 0; i < info->opCount; ++i) {
+        const auto& op = info->ops[i];
+        switch (op.op) {
+            case CW_OP_ROTATE_X:
+                Matrix_RotateXF(op.a * (3.14159265358979323846f / 32768.0f), MTXMODE_APPLY);
+                break;
+            case CW_OP_ROTATE_Z:
+                Matrix_RotateZF(sword ? ComboSwordGi_SelectedTilt(op.a * (3.14159265358979323846f / 32768.0f), shop)
+                                      : op.a * (3.14159265358979323846f / 32768.0f),
+                                MTXMODE_APPLY);
+                break;
+            case CW_OP_SCALE:
+                Matrix_Scale(op.a, op.b, op.c, MTXMODE_APPLY);
+                break;
+            case CW_OP_TRANSLATE:
+                Matrix_Translate(op.a, op.b, op.c, MTXMODE_APPLY);
+                break;
+            case CW_OP_FRAME_PAIR:
+                selectedOpaque = (static_cast<uint32_t>(gPlayState->gameplayFrames) >> static_cast<int>(op.a)) & 1u;
+                break;
+            case CW_OP_NO_CULL:
+                noCull = true;
+                break;
+            default:
+                break;
+        }
+    }
+    if (info->scale > 0)
+        Matrix_Scale(info->scale, info->scale, info->scale, MTXMODE_APPLY);
+    GraphicsContext* gfxCtx = gPlayState->state.gfxCtx;
+    OPEN_DISPS(gfxCtx);
+    const int split = info->xluStart < 0 ? info->count : info->xluStart;
+    for (int stream = 0; stream < 2; ++stream) {
+        const int begin = stream ? split : 0;
+        const int end = stream ? info->count : split;
+        if (begin >= end)
+            continue;
+        if (stream) {
+            Gfx_SetupDL25_Xlu(gfxCtx);
+            MM_FOREIGN_PIN_XLU();
+            MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, gfxCtx);
+            for (int i = begin; i < end; ++i)
+                gSPDisplayList(POLY_XLU_DISP++, (Gfx*)info->dls[i]);
+        } else {
+            Gfx_SetupDL25_Opa(gfxCtx);
+            MM_FOREIGN_PIN_OPA();
+            MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, gfxCtx);
+            if (noCull)
+                gSPClearGeometryMode(POLY_OPA_DISP++, G_CULL_BOTH);
+            if (info->primColorOpa[3]) {
+                gDPSetGrayscaleColor(POLY_OPA_DISP++, info->primColorOpa[0], info->primColorOpa[1],
+                                     info->primColorOpa[2], info->primColorOpa[3]);
+                gSPGrayscale(POLY_OPA_DISP++, true);
+            }
+            for (int i = begin; i < end; ++i) {
+                if (selectedOpaque < 0 || i == selectedOpaque)
+                    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->dls[i]);
+            }
+            if (info->primColorOpa[3])
+                gSPGrayscale(POLY_OPA_DISP++, false);
+            if (noCull)
+                gSPSetGeometryMode(POLY_OPA_DISP++, G_CULL_BACK);
+        }
+    }
+    CLOSE_DISPS(gfxCtx);
+    if (info->opCount == 1 && info->ops[0].op == CW_OP_ROTATE_Z && info->neiShimmer > 0 &&
+        info->neiShimmer <= static_cast<int32_t>(NeiGi::Kind::Last) + 1 &&
+        NeiGi::IsSword(static_cast<NeiGi::Kind>(info->neiShimmer - 1)))
+        ComboDinSwordGi_DrawLayers(gPlayState, "oot", info->dls[0]);
+    Matrix_Pop();
+}
+
+// Concrete inline/palette-remapped equipment uses the already-proven host-native renderer.
+void DrawOotIronKnuckleAxe();
+void DrawOotExtSpiritBreastplate();
+void DrawOotExtChampionsTunic();
+void DrawOotExtSagesTunic();
+void DrawOotExtPegasusAnklet();
+void DrawOotExtTrident();
+void DrawOotExtClimbBoots();
+void DrawOotExtRocBoots();
+inline void MM_DrawForeignNativeEquipment(const ComboForeignDrawInfoOOT* info) {
+    Matrix_Push();
+    switch (static_cast<int32_t>(info->ops[0].a)) {
+        case CW_OOT_EQUIP_AXE:
+            DrawOotIronKnuckleAxe();
+            break;
+        case CW_OOT_EQUIP_SPIRIT_TUNIC:
+            DrawOotExtSpiritBreastplate();
+            break;
+        case CW_OOT_EQUIP_CHAMPIONS_TUNIC:
+            DrawOotExtChampionsTunic();
+            break;
+        case CW_OOT_EQUIP_SAGES_TUNIC:
+            DrawOotExtSagesTunic();
+            break;
+        case CW_OOT_EQUIP_PEGASUS_BOOTS:
+            DrawOotExtPegasusAnklet();
+            break;
+        case CW_OOT_EQUIP_TRIDENT:
+            DrawOotExtTrident();
+            break;
+        case CW_OOT_EQUIP_CLIMB_BOOTS:
+            DrawOotExtClimbBoots();
+            break;
+        case CW_OOT_EQUIP_ROC_BOOTS:
+            DrawOotExtRocBoots();
+            break;
+    }
+    Matrix_Pop();
+}
+
+// Silver rupee (NewDrops off): drop rupee DL on OOT's silver texture (Randomizer_DrawSilverRupee).
+// The texture path exists in both archives, so seg 8 is bound under OOT's RM, as CfaBindSeg does.
+inline bool MM_DrawForeignSilverRupee(const ComboForeignDrawInfoOOT* info) {
+    std::shared_ptr<Ship::ResourceManager> rm = Ship::CrossRMRegistry::Get("oot");
+    if (rm == nullptr || info->segTexPath == nullptr) {
+        return false;
+    }
+    GraphicsContext* gfxCtx = gPlayState->state.gfxCtx;
+    bool gray = info->primColorOpa[3] != 0;
+    OPEN_DISPS(gfxCtx);
+    Gfx_SetupDL25_Opa(gfxCtx);
+    MM_FOREIGN_PIN_OPA();
+    if (info->scale > 0.0f) {
+        Matrix_Scale(info->scale, info->scale, info->scale, MTXMODE_APPLY);
+    }
+    MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, gfxCtx);
+    {
+        Ship::ResourceManagerScope rmScope(rm); // gSPSegment probes the path at record time
+        gSPSegment(POLY_OPA_DISP++, 0x08, (uintptr_t)info->segTexPath);
+    }
+    gSPComboRMPush(POLY_OPA_DISP++, "oot");
+    if (gray) {
+        gDPSetGrayscaleColor(POLY_OPA_DISP++, info->primColorOpa[0], info->primColorOpa[1], info->primColorOpa[2], 255);
+        gSPGrayscale(POLY_OPA_DISP++, true);
+    }
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)info->dls[0]);
+    if (gray) {
+        gSPGrayscale(POLY_OPA_DISP++, false);
+    }
+    gSPComboRMPop(POLY_OPA_DISP++);
+    CLOSE_DISPS(gfxCtx);
+    int32_t segs[] = { 0x08 };
+    MM_RestoreForeignSegs(segs, 1);
+    return true;
+}
+
 // Draw a foreign (OOT-bound) item's real OOT model at the current model matrix. Any resolution
 // failure falls back to the sentinel blue rupee (the RI_COMBO_FOREIGN item's GID_RUPEE_BLUE), so we
 // never draw blank. Mirrors Randomizer_DrawComboForeign (soh/.../draw.cpp).
-inline void MM_DrawComboForeign(RandoCheckId randoCheckId) {
+inline void MM_DrawComboForeign(RandoCheckId randoCheckId, bool shop = false, int mmPickup = 0,
+                                Actor* actor = nullptr) {
     const ComboForeignDrawInfoOOT* info =
         (randoCheckId != RC_UNKNOWN) ? ComboResolveForeignDrawInfoOOT(randoCheckId) : nullptr;
     if (info == nullptr) {
         GetItem_Draw(gPlayState, GID_RUPEE_BLUE);
+        return;
+    }
+#ifdef COMBO_GI_RECEIPT_TRACE
+    ComboGiReceiptTrace::Dispatch(info->resolvedName.c_str(), info->drawKind, info->dls, info->count, info->scale,
+                                  info->nativeMmItem, mmPickup);
+#endif
+    if (ComboDrawMagicMirrorForeign(gPlayState, info->drawKind))
+        return;
+    if (info->nativeMmItem >= 0) {
+        Rando::DrawResolvedItem(static_cast<RandoItemId>(info->nativeMmItem), RC_UNKNOWN, actor);
         return;
     }
 
@@ -759,7 +1312,92 @@ inline void MM_DrawComboForeign(RandoCheckId randoCheckId) {
         return;
     }
 
+    if (info->drawKind == CW_DRAW_KIND_NEI_CANE) {
+        Matrix_Push();
+        static constexpr RandoItemId skills[] = { RI_NONE,
+                                                  RI_OOT_NEI_CANE_OF_SOMARIA,
+                                                  RI_OOT_NEI_CANE_PACCI_FLIP,
+                                                  RI_OOT_NEI_CANE_SOMARIA_BLOCK,
+                                                  RI_OOT_NEI_CANE_PACCI_STONE,
+                                                  RI_OOT_NEI_CANE_SOMARIA_PLATFORM,
+                                                  RI_OOT_NEI_CANE_PACCI_ULTRAHAND };
+        if (info->neiLegacyCane == 6)
+            DrawOotNeiUltrahand();
+        else if (info->neiLegacyCane > 0 && info->neiLegacyCane < 6)
+            DrawOotNeiCaneOfSomaria(skills[info->neiLegacyCane]);
+        else
+            GetItem_Draw(gPlayState, GID_RUPEE_BLUE);
+        Matrix_Pop();
+        if (info->itemShimmer)
+            ComboDrawMaskShimmer(gPlayState, nullptr, info->itemShimmerColor, "oot");
+        return;
+    }
+    if (info->drawKind == CW_DRAW_KIND_NEI_GI) {
+        CwItemDrawInfo recipe{};
+        for (int i = 0; i < info->count; ++i)
+            recipe.dlists[i] = info->dls[i];
+        recipe.dlistCount = info->count;
+        recipe.xluStartIndex = info->xluStart;
+        recipe.scale = info->scale;
+        recipe.neiEffect = info->neiEffect;
+        recipe.neiShimmer = info->neiShimmer;
+        memcpy(recipe.neiEffectCenter, info->neiEffectCenter, sizeof(recipe.neiEffectCenter));
+        recipe.neiSomariaUpgrade = info->neiSomariaUpgrade;
+        recipe.itemShimmer = info->itemShimmer;
+        MM_DrawNeiGi(recipe, shop, mmPickup);
+        return;
+    }
+    const bool swordIdentity = info->neiShimmer > 0 &&
+                               info->neiShimmer <= static_cast<int32_t>(NeiGi::Kind::Last) + 1 &&
+                               NeiGi::IsSword(static_cast<NeiGi::Kind>(info->neiShimmer - 1));
+    const bool fitModel =
+        info->count > 0 &&
+        ((info->drawKind == CW_DRAW_KIND_CUSTOM_GI &&
+          (info->opCount == 0 || (info->opCount == 1 && info->ops[0].op == CW_OP_ROTATE_Z)) &&
+          (mmPickup || swordIdentity)) ||
+         (swordIdentity && (info->drawKind == CW_DRAW_KIND_SIMPLE || info->drawKind == CW_DRAW_KIND_MASTER_SWORD ||
+                            info->drawKind == CW_DRAW_KIND_GORON_SWORD)));
+    const bool swordFlame = swordIdentity && info->primColorXlu[3] &&
+                            (info->drawKind == CW_DRAW_KIND_CUSTOM_GI || info->drawKind == CW_DRAW_KIND_MASTER_SWORD);
+    if (fitModel && swordIdentity) {
+        Matrix_Push();
+        ComboSwordGi_ApplyPresentationSize(shop, mmPickup);
+    }
+    if (swordFlame) {
+        Matrix_Push();
+        ComboSwordGi_ApplyEffectFit(static_cast<NeiGi::Kind>(info->neiShimmer - 1), shop, mmPickup);
+        DrawOotSlateRuneFlame(info->primColorXlu[0], info->primColorXlu[1], info->primColorXlu[2]);
+        Matrix_Pop();
+    }
+    if (fitModel) {
+        Matrix_Push();
+        const float scale = info->drawKind == CW_DRAW_KIND_MASTER_SWORD  ? .05f
+                            : info->drawKind == CW_DRAW_KIND_GORON_SWORD ? 1.f
+                            : info->scale > 0                            ? info->scale
+                                                                         : 1.f;
+        const float tilt =
+            info->drawKind == CW_DRAW_KIND_MASTER_SWORD ? 2.1f
+            : info->drawKind == CW_DRAW_KIND_CUSTOM_GI && info->opCount == 1 && info->ops[0].op == CW_OP_ROTATE_Z
+                ? (swordIdentity ? ComboSwordGi_SelectedTilt(info->ops[0].a * (3.14159265358979323846f / 32768.f), shop)
+                                 : info->ops[0].a * (3.14159265358979323846f / 32768.f))
+                : 0.f;
+        ComboSwordGi_ApplyModelsFit("oot", info->dls, info->count, scale, tilt, shop, mmPickup);
+    }
+    const int reward = RewardGi_ProfileForPaths(info->dls[0], info->count > 1 ? info->dls[1] : nullptr);
+    const bool overlayShimmer = info->itemShimmer && !reward && info->drawKind != CW_DRAW_KIND_ELEMENTAL_ARROW &&
+                                info->drawKind != CW_DRAW_KIND_MAGIC_SPELL;
+    if (overlayShimmer) {
+        Matrix_Push();
+    }
     switch (info->drawKind) {
+        case CW_DRAW_KIND_ELEMENTAL_ARROW: {
+            auto core = *info;
+            core.count = 1;
+            core.xluStart = -1;
+            MM_DrawForeignSimple(&core);
+            NeiGi_DrawElementalArrowForOwner(gPlayState, info->neiEffect, 0, shop);
+            break;
+        }
         case CW_DRAW_KIND_GORON_SWORD:
             MM_DrawForeignGoronSword(info);
             break;
@@ -791,7 +1429,8 @@ inline void MM_DrawComboForeign(RandoCheckId randoCheckId) {
             MM_DrawForeignJewel(info);
             break;
         case CW_DRAW_KIND_MAGIC_SPELL:
-            MM_DrawForeignMagicSpell(info);
+            if (!NeiGi_DrawElementalSpell(gPlayState, info->neiEffect, 0, shop))
+                MM_DrawForeignMagicSpell(info);
             break;
         case CW_DRAW_KIND_SCALE:
             MM_DrawForeignScale(info);
@@ -799,11 +1438,18 @@ inline void MM_DrawComboForeign(RandoCheckId randoCheckId) {
         case CW_DRAW_KIND_SKULL_TOKEN:
             MM_DrawForeignSkullToken(info);
             break;
+        case CW_DRAW_KIND_SONG_GI:
         case CW_DRAW_KIND_MUSIC_NOTE:
             MM_DrawForeignMusicNote(info);
             break;
         case CW_DRAW_KIND_BOSS_SOUL:
             MM_DrawForeignBossSoul(info);
+            break;
+        case CW_DRAW_KIND_OOT_MORPHA_SOUL:
+            MM_DrawForeignMorphaSoul(info);
+            break;
+        case CW_DRAW_KIND_GRAYSCALE_LAYERS:
+            MM_DrawForeignGrayscaleLayers(info);
             break;
         case CW_DRAW_KIND_COLOR_LAYERS:
             MM_DrawForeignColorLayers(info);
@@ -814,17 +1460,83 @@ inline void MM_DrawComboForeign(RandoCheckId randoCheckId) {
         case CW_DRAW_KIND_DOUBLE_DEFENSE:
             MM_DrawForeignDoubleDefense(info);
             break;
+        case CW_DRAW_KIND_OOT_NATIVE_EQUIPMENT:
+            MM_DrawForeignNativeEquipment(info);
+            break;
+        case CW_DRAW_KIND_BOTTLE_CONTENTS:
+            if (!ComboBottleContents_Draw(gPlayState, ComboBottleContents_Profile(info->dls[0]))) {
+                MM_DrawForeignSimple(info);
+            }
+            break;
+        case CW_DRAW_KIND_SEASON_GI:
+            if (info->neiEffect == 5)
+                MM_DrawForeignCustomGi(info, shop, !swordFlame);
+            NeiGi_DrawSeasonOverlay(gPlayState, info->neiEffect, "oot");
+            break;
+        case CW_DRAW_KIND_CUSTOM_GI:
+            MM_DrawForeignCustomGi(info, shop, !swordFlame);
+            break;
         case CW_DRAW_KIND_MASTER_SWORD:
-            MM_DrawForeignMasterSword(info);
+            MM_DrawForeignMasterSword(info, !swordFlame);
             break;
         case CW_DRAW_KIND_BRONZE_SCALE:
             MM_DrawForeignBronzeScale(info);
             break;
+        case CW_DRAW_KIND_SILVER_RUPEE:
+            if (!MM_DrawForeignSilverRupee(info)) {
+                GetItem_Draw(gPlayState, GID_RUPEE_BLUE);
+            }
+            break;
+        case CW_DRAW_KIND_MM_SPIN_ATTACK:
+            MM_DrawForeignSpinAttack(info);
+            break;
+        case CW_DRAW_KIND_MM_MASK:
+        case CW_DRAW_KIND_MM_REMAINS:
+        case CW_DRAW_KIND_MAGIC_JAR:
         case CW_DRAW_KIND_SIMPLE:
         default:
             MM_DrawForeignSimple(info);
             break;
     }
+    if (reward >= 1 && reward <= 6)
+        NeiGi_DrawRewardMaterial(gPlayState, reward, info->dls[0], info->count > 1 ? info->dls[1] : nullptr, "oot");
+    if (overlayShimmer)
+        Matrix_Pop();
+    if (fitModel && swordIdentity)
+        Matrix_Pop();
+    if (overlayShimmer) {
+        if (swordIdentity) {
+            Matrix_Push();
+            ComboSwordGi_ApplyEffectFit(static_cast<NeiGi::Kind>(info->neiShimmer - 1), shop, mmPickup);
+        }
+        if (info->neiShimmer > 0 && info->neiShimmer <= static_cast<int32_t>(NeiGi::Kind::Last) + 1 &&
+            NeiGi::IsSword(static_cast<NeiGi::Kind>(info->neiShimmer - 1)))
+            NeiGi_DrawMesh(gPlayState, NeiGi::SampleSpecial(
+                                           static_cast<NeiGi::Kind>(info->neiShimmer - 1), gPlayState->gameplayFrames,
+                                           NeiGi_CameraBasis(gPlayState),
+                                           ComboSwordGi_ParticleScale(static_cast<NeiGi::Kind>(info->neiShimmer - 1),
+                                                                      shop, mmPickup, fitModel)));
+        const bool mmOwner = info->drawKind == CW_DRAW_KIND_MM_MASK || info->drawKind == CW_DRAW_KIND_MM_REMAINS;
+        if (info->drawKind == CW_DRAW_KIND_SONG_GI)
+            NeiGi_DrawSongOverlay(gPlayState, info->neiEffect, "oot");
+        else if (info->neiShimmer > 0 && info->neiShimmer <= static_cast<int32_t>(NeiGi::Kind::Last) + 1)
+            NeiGi_DrawMesh(gPlayState,
+                           NeiGi::SampleShimmer(gPlayState->gameplayFrames, true, NeiGi_CameraBasis(gPlayState),
+                                                static_cast<NeiGi::Kind>(info->neiShimmer - 1)));
+        else if (info->neiEffect == static_cast<int32_t>(NeiGi::Kind::Pokeball))
+            NeiGi_DrawMesh(gPlayState, NeiGi::SampleShimmer(gPlayState->gameplayFrames, true,
+                                                            NeiGi_CameraBasis(gPlayState), NeiGi::Kind::Pokeball));
+        else if (info->itemShimmer == CW_ITEM_SHIMMER_TINTED)
+            NeiGi_DrawTintedShimmerOverlay(gPlayState, info->itemShimmerColor, mmOwner ? "mm" : "oot");
+        else
+            ComboDrawMaskShimmer(gPlayState, nullptr, info->itemShimmerColor, mmOwner ? "mm" : "oot");
+    }
+    if (overlayShimmer && swordIdentity)
+        Matrix_Pop();
+    if (fitModel && !swordIdentity)
+        Matrix_Pop();
+    if (fitModel && swordIdentity)
+        Matrix_Pop();
 }
 
 #undef MM_FOREIGN_PIN_OPA

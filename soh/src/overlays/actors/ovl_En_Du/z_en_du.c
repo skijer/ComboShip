@@ -2,6 +2,7 @@
 #include "objects/object_du/object_du.h"
 #include "scenes/overworld/spot18/spot18_scene.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -386,8 +387,8 @@ void func_809FE4A4(EnDu* this, PlayState* play) {
         EnDu_SetupAction(this, func_809FE890);
         play->msgCtx.ocarinaMode = OCARINA_MODE_04;
     } else if (play->msgCtx.ocarinaMode == OCARINA_MODE_03) {
-        Audio_PlaySoundGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         if (GameInteractor_Should(VB_PLAY_DARUNIAS_JOY_CS, true)) {
             play->csCtx.segment = SEGMENTED_TO_VIRTUAL(gGoronCityDaruniaCorrectCs);
             gSaveContext.cutsceneTrigger = 1;
@@ -684,4 +685,96 @@ void EnDu_Draw(Actor* thisx, PlayState* play) {
     func_80034BA0(play, &this->skelAnime, EnDu_OverrideLimbDraw, EnDu_PostLimbDraw, &this->actor, 255);
 
     CLOSE_DISPS(play->state.gfxCtx);
+}
+
+// Public: Trigger Darunia's joy cutscene + reward (used by Kamaro's Mask dance)
+void EnDu_TriggerDaruniasJoy(Actor* thisx, PlayState* play) {
+    EnDu* this = (EnDu*)thisx;
+
+    Audio_PlaySoundGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+
+    if (GameInteractor_Should(VB_PLAY_DARUNIAS_JOY_CS, true)) {
+        play->csCtx.segment = SEGMENTED_TO_VIRTUAL(gGoronCityDaruniaCorrectCs);
+        gSaveContext.cutsceneTrigger = 1;
+    }
+
+    this->unk_1E8 = 0;
+    EnDu_SetupAction(this, func_809FE890);
+    play->msgCtx.ocarinaMode = OCARINA_MODE_04;
+}
+
+// =============================================================================
+// Kamaro's Mask: Dance alongside player (no cutscene, just dancing)
+// =============================================================================
+
+static s32 sDaruniaDancing = 0;
+static EnDuActionFunc sDaruniaSavedAction = NULL;
+static s32 sDaruniaDanceStep = 0;
+
+// Action function: cycle through dance animations, face player, happy face
+static void EnDu_DanceWithKamaro(EnDu* this, PlayState* play) {
+    static const s32 sAnimSeq[] = {
+        ENDU_ANIM_8, ENDU_ANIM_8, ENDU_ANIM_8, ENDU_ANIM_8, ENDU_ANIM_9, ENDU_ANIM_10, ENDU_ANIM_10, ENDU_ANIM_13,
+    };
+
+    // Cycle dance animations when current one finishes
+    if (Animation_OnFrame(&this->skelAnime, this->skelAnime.endFrame)) {
+        sDaruniaDanceStep++;
+        if (sDaruniaDanceStep >= 8) {
+            sDaruniaDanceStep = 0;
+        }
+        if (CVarGetInteger(CVAR_ENHANCEMENT("FixDaruniaDanceSpeed"), 1)) {
+            Animation_ChangeByInfo(&this->skelAnime, sAnimationInfoFix, sAnimSeq[sDaruniaDanceStep]);
+        } else {
+            Animation_ChangeByInfo(&this->skelAnime, sAnimationInfo, sAnimSeq[sDaruniaDanceStep]);
+        }
+    }
+
+    // Happy face while dancing
+    this->mouthTexIndex = 3; // happy
+    this->noseTexIndex = 1;  // happy
+
+    // Face toward player
+    Player* player = GET_PLAYER(play);
+    s16 targetYaw = Math_Vec3f_Yaw(&this->actor.world.pos, &player->actor.world.pos);
+    Math_SmoothStepToS(&this->actor.shape.rot.y, targetYaw, 6, 2000, 100);
+    this->actor.world.rot.y = this->actor.shape.rot.y;
+}
+
+void EnDu_StartDancing(Actor* thisx, PlayState* play) {
+    EnDu* this = (EnDu*)thisx;
+    if (sDaruniaDancing)
+        return;
+
+    sDaruniaSavedAction = this->actionFunc;
+    sDaruniaDancing = 1;
+    sDaruniaDanceStep = 0;
+
+    // Start with the first dance animation
+    if (CVarGetInteger(CVAR_ENHANCEMENT("FixDaruniaDanceSpeed"), 1)) {
+        Animation_ChangeByInfo(&this->skelAnime, sAnimationInfoFix, ENDU_ANIM_7);
+    } else {
+        Animation_ChangeByInfo(&this->skelAnime, sAnimationInfo, ENDU_ANIM_7);
+    }
+
+    EnDu_SetupAction(this, (EnDuActionFunc)EnDu_DanceWithKamaro);
+}
+
+void EnDu_StopDancing(Actor* thisx, PlayState* play) {
+    EnDu* this = (EnDu*)thisx;
+    if (!sDaruniaDancing)
+        return;
+
+    sDaruniaDancing = 0;
+    Animation_ChangeByInfo(&this->skelAnime, sAnimationInfo, ENDU_ANIM_0); // Return to idle
+
+    if (sDaruniaSavedAction != NULL) {
+        EnDu_SetupAction(this, sDaruniaSavedAction);
+        sDaruniaSavedAction = NULL;
+    }
+}
+
+s32 EnDu_IsDancing(void) {
+    return sDaruniaDancing;
 }

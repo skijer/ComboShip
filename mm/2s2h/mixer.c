@@ -6,6 +6,8 @@
 #include <stdio.h>
 
 #include "mixer.h"
+#include "../../combo/audio/MMAudioTraceBridge.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 #ifndef __clang__
 #pragma GCC optimize("unroll-loops")
 #endif
@@ -105,6 +107,20 @@ void aLoadBufferImpl(const void* source_addr, uint16_t dest_addr, uint16_t nbyte
 #endif
 }
 
+// Host-decoded PCM is not a native DMA transfer. Preserve partial 16-byte
+// chunks, as SoH does, so fractional-rate streams do not lose sample tails.
+void aLoadBufferExactImpl(const void* source_addr, uint16_t dest_addr, uint16_t nbytes) {
+#if __SANITIZE_ADDRESS__
+    for (size_t i = 0; i < nbytes; i++) {
+        BUF_U8(dest_addr)[i] = ((const unsigned char*)source_addr)[i];
+    }
+#else
+    memcpy(BUF_U8(dest_addr), source_addr, nbytes);
+#endif
+    if (MM_AudioTraceEnabled())
+        MM_AudioTracePCM(MM_TRACE_DECODED, BUF_S16(dest_addr), nbytes / 2, 0);
+}
+
 #include <opus/opus.h>
 #include <opusfile.h>
 
@@ -113,19 +129,32 @@ void aOPUSdecImpl(void* source_addr, uint16_t dest_addr, uint16_t nbytes, struct
     int readSamples = 0;
     if (*decState == NULL) {
         *decState = op_open_memory(source_addr, size, NULL);
+        if (*decState == NULL) {
+            MM_AudioTraceEvent("opus-open-failed", nbytes / 2, 0);
+            return;
+        }
     }
-    op_pcm_seek(*decState, pos);
-    int ret = op_read(*decState, BUF_S16(dest_addr), nbytes / 2, NULL);
-    if (ret < 0) {
+    if (op_pcm_seek(*decState, pos) < 0) {
+        MM_AudioTraceEvent("opus-seek-failed", nbytes / 2, 0);
         return;
     }
-    readSamples += ret;
     while (readSamples < nbytes / 2) {
-        ret = op_read(*decState, BUF_S16(dest_addr + readSamples * 2), (nbytes - readSamples * 2) / 2, NULL);
-        if (ret == 0)
+        int ret = op_read(*decState, BUF_S16(dest_addr + readSamples * 2), (nbytes - readSamples * 2) / 2, NULL);
+        if (ret <= 0) {
+            MM_AudioTraceEvent(ret < 0 ? "opus-read-failed" : "opus-eof", nbytes / 2, readSamples);
             break;
+        }
         readSamples += ret;
     }
+    if (MM_AudioTraceEnabled())
+        MM_AudioTracePCM(MM_TRACE_DECODED, BUF_S16(dest_addr), readSamples, 0);
+}
+
+void aAudioTraceDMemImpl(int stage, uint16_t addr, unsigned samples) {
+    if (!MM_AudioTraceEnabled() || addr < 0x330 || (unsigned)(addr - 0x330) > DMEM_BUF_SIZE ||
+        samples > (DMEM_BUF_SIZE - (unsigned)(addr - 0x330)) / sizeof(int16_t))
+        return;
+    MM_AudioTracePCM(stage, BUF_S16(addr), samples, 0);
 }
 
 void aOPUSFree(struct OggOpusFile* opusFile) {
@@ -230,6 +259,8 @@ void aADPCMdecImpl(uint8_t flags, ADPCM_STATE state) {
         nbytes -= 16 * sizeof(int16_t);
     }
     memcpy(state, out - 16, 16 * sizeof(int16_t));
+    if (MM_AudioTraceEnabled())
+        MM_AudioTracePCM(MM_TRACE_DECODED, BUF_S16(rspa.out) + 16, ROUND_UP_32(rspa.nbytes) / 2, 0);
 }
 
 void aResampleImpl(uint8_t flags, uint16_t pitch, RESAMPLE_STATE state) {
@@ -279,6 +310,9 @@ void aResampleImpl(uint8_t flags, uint16_t pitch, RESAMPLE_STATE state) {
     }
     state[5] = i;
     memcpy(state + 8, in, 8 * sizeof(int16_t));
+    if (MM_AudioTraceEnabled())
+        MM_AudioTracePCM(MM_TRACE_RESAMPLED, BUF_S16(rspa.out), MM_AudioTraceNoteSamples(ROUND_UP_16(rspa.nbytes) / 2),
+                         0);
 }
 
 void aEnvSetup1Impl(uint8_t initial_vol_wet, uint16_t rate_wet, uint16_t rate_left, uint16_t rate_right) {
@@ -551,12 +585,33 @@ void aFilterImpl(uint8_t flags, uint16_t count_or_buf, int16_t* state_or_filter)
 
         memcpy(state_or_filter, tmp, 8 * sizeof(int16_t));
         memcpy(state_or_filter + 8, rspa.filter, 8 * sizeof(int16_t));
+        if (MM_AudioTraceEnabled())
+            MM_AudioTracePCM(MM_TRACE_FILTER, BUF_S16(count_or_buf), rspa.filter_count / 2, 0);
     }
 }
+
+// Report first corrected gain use through the MM host.
+extern void MM_LogAudioGainMode(int enabled, int gain, int requestedBytes, int processedBytes);
 
 void aHiLoGainImpl(uint8_t g, uint16_t count, uint16_t addr) {
     int16_t* samples = BUF_S16(addr);
     int nbytes = ROUND_UP_32(count);
+    const int consumedBytes = 8 * sizeof(int16_t);
+    unsigned traceClips = 0;
+    const int tracing = MM_AudioTraceEnabled();
+    const unsigned traceSamples = tracing ? MM_AudioTraceNoteSamples(nbytes / 2) : 0;
+    if (tracing) {
+        // Count attempted saturation within the requested span, not the legacy spill.
+        for (unsigned i = 0; i < traceSamples; ++i) {
+            const int32_t amplified = ((int32_t)samples[i] * g) >> 4;
+            traceClips += amplified < INT16_MIN || amplified > INT16_MAX;
+        }
+    }
+    static int reported = 0;
+    if (!reported) {
+        reported = 1;
+        MM_LogAudioGainMode(1, g, nbytes, nbytes);
+    }
 
     do {
         *samples = clamp16((*samples * g) >> 4);
@@ -576,8 +631,11 @@ void aHiLoGainImpl(uint8_t g, uint16_t count, uint16_t addr) {
         *samples = clamp16((*samples * g) >> 4);
         samples++;
 
-        nbytes -= 8;
+        // Eight s16 samples consume sixteen bytes, including the final rounded block.
+        nbytes -= consumedBytes;
     } while (nbytes > 0);
+    if (tracing)
+        MM_AudioTracePCM(MM_TRACE_GAIN, BUF_S16(addr), traceSamples, traceClips);
 }
 
 void aUnkCmd3Impl(uint16_t a, uint16_t b, uint16_t c) {
@@ -658,10 +716,13 @@ static void aMixImplSSE2(uint16_t count, int16_t gain, uint16_t in_addr, uint16_
 
             // Interleave the lo and hi bits into one 32 bit value for each vector element.
             // So now we have 4 full elements in each vector instead of 8 half elements.
+            // Both halves must read the original product words before either is replaced.
+            __m128i outProductHiVec = _mm_unpackhi_epi16(outx7fffLoVec, outx7fffHiVec);
+            __m128i inProductHiVec = _mm_unpackhi_epi16(inxGainLoVec, inxGainHiVec);
             outx7fffLoVec = _mm_unpacklo_epi16(outx7fffLoVec, outx7fffHiVec);
-            outx7fffHiVec = _mm_unpackhi_epi16(outx7fffLoVec, outx7fffHiVec);
+            outx7fffHiVec = outProductHiVec;
             inxGainLoVec = _mm_unpacklo_epi16(inxGainLoVec, inxGainHiVec);
-            inxGainHiVec = _mm_unpackhi_epi16(inxGainLoVec, inxGainHiVec);
+            inxGainHiVec = inProductHiVec;
 
             // Now we have 4 32 bit elements.  Continue the calculaton per the reference implementation.
             // We already did out + 0x7fff and in * gain.

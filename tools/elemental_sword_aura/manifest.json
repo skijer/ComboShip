@@ -1,0 +1,1411 @@
+{
+  "fire_source": {
+    "archive_sha256": "5f7972b03e494aa3c309860dc2e91d85ab3bbe18c61244c06d063f8205e27306",
+    "texture_size": [
+      64,
+      32
+    ],
+    "resample": "Pillow LANCZOS, existing I8 red channel",
+    "protected_artwork_regenerated": false,
+    "resources": {
+      "objects/din_fire_sword/poc1/CoreTex": {
+        "sha256": "144ad466daa6f9d649778c618b143b44ac4ede77999af5f775440e6c2d651cea",
+        "fallback_sha256": "8436490d7ab5d0b0e25cb4caf118178cbc02d07dbb58870c8fff32bb07400e7d"
+      },
+      "objects/din_fire_sword/poc1/FlameTex": {
+        "sha256": "b867ebf55488a3397ead8a604c2add7bfef16a7132674fa597d362a008498fac",
+        "fallback_sha256": "da3c134d7836ad4ad7603ae586de8394c64860cca4e1cf19c696be61bbbbf634"
+      },
+      "objects/din_fire_sword/poc1/adult/CoreVertices": {
+        "sha256": "1749f1ced001630d4346abe7aeec96368ace56deb5ff4d57afe2311abb683e72"
+      },
+      "objects/din_fire_sword/poc1/adult/FlameVertices": {
+        "sha256": "094eba98eac0a3b81282f84e28d4f2384dbe9967a9a08b05fee2a3ca697cf20c"
+      },
+      "objects/din_fire_sword/poc1/child/CoreVertices": {
+        "sha256": "782503d2421728b43b5c445d71211c27df4ad20eef3e86b93ea3bf785d9449be"
+      },
+      "objects/din_fire_sword/poc1/child/FlameVertices": {
+        "sha256": "dbc1b15acf6c0f3e02568071a6157ce7849f1c7c089882053b7e6fd5f0ba3b2d"
+      },
+      "objects/din_fire_sword/poc1/bgs/CoreVertices": {
+        "sha256": "14bcd573d8f3f7ee728522471f73d73ede5cdf2270ded67c4a27ebdbd4ec6255"
+      },
+      "objects/din_fire_sword/poc1/bgs/FlameVertices": {
+        "sha256": "ba10ed010082cb651a1bd197a28277c0f96084237edddac4f6a61cbefe1cf2eb"
+      },
+      "objects/din_fire_sword/poc1/broken/CoreVertices": {
+        "sha256": "3de268ba84071cdbe677c220bbe02a6f19e048b843ff6cfee69bc13d33729eda"
+      },
+      "objects/din_fire_sword/poc1/broken/FlameVertices": {
+        "sha256": "fc1bb6096bb4eed0bc5180496a1c1228aa7f1d724dcfa874c806822ee009fb9e"
+      }
+    },
+    "original_artwork": {
+      "core": {
+        "file": "Core_Source.png",
+        "sha256": "86b3f2176971051a5cad1a3ccf66f45bd1b4d1d3491b25374cc73453cfec2eed"
+      },
+      "flame": {
+        "file": "Rim_Source.png",
+        "sha256": "c9a189d8998de36e57af0299b83027a03cbf8606e4ebc79e4c5cd1e961da44a2"
+      }
+    },
+    "layer_records_sha256": "73d41a984841f69bf118a931105dda3ccc4b1010efc76bf3e6461d3d6935483c",
+    "equipment_aliases": {
+      "adult": {
+        "resource": "alt/objects/object_custom_equip/gCustomMasterSwordDL",
+        "sha256": "b451edc184a657b6229ccb684a0c6abbda6c2ac1184c68c53b10b01b3f5b79f7",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            1085583804,
+            4016665320
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            3105501194,
+            4116633154
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "child": {
+        "resource": "alt/objects/object_custom_equip/gCustomKokiriSwordDL",
+        "sha256": "bfa77022419dd1aad4f88ca678d2bab1a97f77d5f65426864f04b94db478969b",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            2871616777,
+            4255860468
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            351367670,
+            2771146875
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "bgs": {
+        "resource": "alt/objects/object_custom_equip/gCustomLongswordDL",
+        "sha256": "cbc9b9d956bb77bd4cb1b7549278717ea59e39eadeeba685fec5f48d31279e0b",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            1312474620,
+            3518880364
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            1927456901,
+            283004960
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "broken": {
+        "resource": "alt/objects/object_custom_equip/gCustomBrokenLongswordDL",
+        "sha256": "9b385ae639a6d4189e0ce3e213a51629bccc51e0f0b0323cfd09306eac25467a",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            3636732725,
+            3568784822
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            1033839945,
+            3982328716
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      }
+    }
+  },
+  "fits": {
+    "kokiri_sword/oot_adult": {
+      "source": "kokiri_sword",
+      "source_vertices_sha256": "4e8cae38ebec10e9d643c93318267700c503ef397fc4c8059b86b01c29f59a7f",
+      "held_matrix_sha256": "de039e15c5c51d18a674b00e1613de39f4c0990085832da1df1afc105e2259a9",
+      "blade_bounds": [
+        [
+          338,
+          3000
+        ],
+        [
+          77,
+          579
+        ],
+        [
+          -176,
+          22
+        ]
+      ]
+    },
+    "kokiri_sword/oot_child": {
+      "source": "kokiri_sword",
+      "source_vertices_sha256": "4e8cae38ebec10e9d643c93318267700c503ef397fc4c8059b86b01c29f59a7f",
+      "held_matrix_sha256": "321612f5daff5cf4803f0bb1c57a99c3e765c9e3e1566be4e5a5a4b6f20e0348",
+      "blade_bounds": [
+        [
+          338,
+          3000
+        ],
+        [
+          -35,
+          467
+        ],
+        [
+          -95,
+          104
+        ]
+      ]
+    },
+    "kokiri_sword/mm_human": {
+      "source": "kokiri_sword",
+      "source_vertices_sha256": "4e8cae38ebec10e9d643c93318267700c503ef397fc4c8059b86b01c29f59a7f",
+      "held_matrix_sha256": "321612f5daff5cf4803f0bb1c57a99c3e765c9e3e1566be4e5a5a4b6f20e0348",
+      "blade_bounds": [
+        [
+          338,
+          3000
+        ],
+        [
+          -35,
+          467
+        ],
+        [
+          -95,
+          104
+        ]
+      ]
+    },
+    "mm_kokiri_sword/oot_adult": {
+      "source": "mm_kokiri_sword",
+      "source_vertices_sha256": "6d1d44d45f8d43cf356ad33e399b0adf70522cb837bce67762de0c015a7cdfea",
+      "held_matrix_sha256": "8620503c4854c3b4a5296cadb8dcf1d4fe45482831b089fd5ade177548f0a5fd",
+      "blade_bounds": [
+        [
+          294,
+          3000
+        ],
+        [
+          -49,
+          681
+        ],
+        [
+          -224,
+          70
+        ]
+      ]
+    },
+    "mm_kokiri_sword/oot_child": {
+      "source": "mm_kokiri_sword",
+      "source_vertices_sha256": "6d1d44d45f8d43cf356ad33e399b0adf70522cb837bce67762de0c015a7cdfea",
+      "held_matrix_sha256": "6d2e62b92964b2ff4716bcbdc468fc0278d014c781f1dab52c20c78531083ba1",
+      "blade_bounds": [
+        [
+          294,
+          3000
+        ],
+        [
+          -161,
+          569
+        ],
+        [
+          -143,
+          152
+        ]
+      ]
+    },
+    "mm_kokiri_sword/mm_human": {
+      "source": "mm_kokiri_sword",
+      "source_vertices_sha256": "6d1d44d45f8d43cf356ad33e399b0adf70522cb837bce67762de0c015a7cdfea",
+      "held_matrix_sha256": "6d2e62b92964b2ff4716bcbdc468fc0278d014c781f1dab52c20c78531083ba1",
+      "blade_bounds": [
+        [
+          294,
+          3000
+        ],
+        [
+          -161,
+          569
+        ],
+        [
+          -143,
+          152
+        ]
+      ]
+    },
+    "razor_sword/oot_adult": {
+      "source": "razor_sword",
+      "source_vertices_sha256": "ac0d5aae2c5a3c6c3c1686041a5045fd2828dc61d451413a2de94ec0b40dbbde",
+      "held_matrix_sha256": "4c488ec7a3fbf2f327d4c9bf31dbea1f90cdc08c27d0fe6bf1f347eb259509dd",
+      "blade_bounds": [
+        [
+          489,
+          4000
+        ],
+        [
+          -530,
+          1186
+        ],
+        [
+          -255,
+          101
+        ]
+      ]
+    },
+    "razor_sword/oot_child": {
+      "source": "razor_sword",
+      "source_vertices_sha256": "ac0d5aae2c5a3c6c3c1686041a5045fd2828dc61d451413a2de94ec0b40dbbde",
+      "held_matrix_sha256": "02ba7641da65fb30efcdfef306a614f4f24e186f1aaea9b88efe63fb21acf27c",
+      "blade_bounds": [
+        [
+          489,
+          4000
+        ],
+        [
+          -642,
+          1075
+        ],
+        [
+          -173,
+          182
+        ]
+      ]
+    },
+    "razor_sword/mm_human": {
+      "source": "razor_sword",
+      "source_vertices_sha256": "ac0d5aae2c5a3c6c3c1686041a5045fd2828dc61d451413a2de94ec0b40dbbde",
+      "held_matrix_sha256": "166766cf424099f1807bb610bf48e3b9d4495dfb289264e9ff6910c2522b2612",
+      "blade_bounds": [
+        [
+          367,
+          3000
+        ],
+        [
+          -428,
+          860
+        ],
+        [
+          -129,
+          138
+        ]
+      ]
+    },
+    "gilded_sword/oot_adult": {
+      "source": "gilded_sword",
+      "source_vertices_sha256": "480e91ffb59d460abf1a11410aa5f1670e2c8013c96b3dea196f2cf888e40d36",
+      "held_matrix_sha256": "c05ce6022806d8ddc13041fb369172d62e4b2fc477b8c8df932b567c46d816b7",
+      "blade_bounds": [
+        [
+          667,
+          4000
+        ],
+        [
+          134,
+          522
+        ],
+        [
+          -157,
+          3
+        ]
+      ]
+    },
+    "gilded_sword/oot_child": {
+      "source": "gilded_sword",
+      "source_vertices_sha256": "480e91ffb59d460abf1a11410aa5f1670e2c8013c96b3dea196f2cf888e40d36",
+      "held_matrix_sha256": "bf9e71c52c7dec8849290f36c7ffb8a1f3acf008608b9a81835592edacf55fed",
+      "blade_bounds": [
+        [
+          667,
+          4000
+        ],
+        [
+          23,
+          410
+        ],
+        [
+          -76,
+          85
+        ]
+      ]
+    },
+    "gilded_sword/mm_human": {
+      "source": "gilded_sword",
+      "source_vertices_sha256": "480e91ffb59d460abf1a11410aa5f1670e2c8013c96b3dea196f2cf888e40d36",
+      "held_matrix_sha256": "bf9e71c52c7dec8849290f36c7ffb8a1f3acf008608b9a81835592edacf55fed",
+      "blade_bounds": [
+        [
+          667,
+          4000
+        ],
+        [
+          23,
+          410
+        ],
+        [
+          -76,
+          85
+        ]
+      ]
+    },
+    "master_sword/oot_adult": {
+      "source": "master_sword",
+      "source_vertices_sha256": "ce89895bb75f26aab33178d64d045cbdaccec181aba1e2569705c77876580336",
+      "held_matrix_sha256": "a38a573b7df38fedd1103f7889df0c89b56acb72df00fc34958016f38599866a",
+      "blade_bounds": [
+        [
+          599,
+          4000
+        ],
+        [
+          154,
+          502
+        ],
+        [
+          -149,
+          -5
+        ]
+      ]
+    },
+    "master_sword/oot_child": {
+      "source": "master_sword",
+      "source_vertices_sha256": "ce89895bb75f26aab33178d64d045cbdaccec181aba1e2569705c77876580336",
+      "held_matrix_sha256": "89bc124cbc2961c5e8e31c1f89c0c93b06d16e1e25d2f0d0e2568ed569c5e87b",
+      "blade_bounds": [
+        [
+          599,
+          4000
+        ],
+        [
+          42,
+          390
+        ],
+        [
+          -67,
+          76
+        ]
+      ]
+    },
+    "master_sword/mm_human": {
+      "source": "master_sword",
+      "source_vertices_sha256": "ce89895bb75f26aab33178d64d045cbdaccec181aba1e2569705c77876580336",
+      "held_matrix_sha256": "89bc124cbc2961c5e8e31c1f89c0c93b06d16e1e25d2f0d0e2568ed569c5e87b",
+      "blade_bounds": [
+        [
+          599,
+          4000
+        ],
+        [
+          42,
+          390
+        ],
+        [
+          -67,
+          76
+        ]
+      ]
+    },
+    "true_master_sword/oot_adult": {
+      "source": "true_master_sword",
+      "source_vertices_sha256": "349643779eae1ac1553de986c64d1cf3181b11408e596d8bc68b1a22e7be526a",
+      "held_matrix_sha256": "a38a573b7df38fedd1103f7889df0c89b56acb72df00fc34958016f38599866a",
+      "blade_bounds": [
+        [
+          599,
+          4000
+        ],
+        [
+          154,
+          502
+        ],
+        [
+          -149,
+          -5
+        ]
+      ]
+    },
+    "true_master_sword/oot_child": {
+      "source": "true_master_sword",
+      "source_vertices_sha256": "349643779eae1ac1553de986c64d1cf3181b11408e596d8bc68b1a22e7be526a",
+      "held_matrix_sha256": "89bc124cbc2961c5e8e31c1f89c0c93b06d16e1e25d2f0d0e2568ed569c5e87b",
+      "blade_bounds": [
+        [
+          599,
+          4000
+        ],
+        [
+          42,
+          390
+        ],
+        [
+          -67,
+          76
+        ]
+      ]
+    },
+    "true_master_sword/mm_human": {
+      "source": "true_master_sword",
+      "source_vertices_sha256": "349643779eae1ac1553de986c64d1cf3181b11408e596d8bc68b1a22e7be526a",
+      "held_matrix_sha256": "89bc124cbc2961c5e8e31c1f89c0c93b06d16e1e25d2f0d0e2568ed569c5e87b",
+      "blade_bounds": [
+        [
+          599,
+          4000
+        ],
+        [
+          42,
+          390
+        ],
+        [
+          -67,
+          76
+        ]
+      ]
+    },
+    "biggoron_sword/oot_adult": {
+      "source": "biggoron_sword",
+      "source_vertices_sha256": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "held_matrix_sha256": "0d30bb7800938236c1958b5a57a9a1f18ec45e10830803d65e82f322ddb953cc",
+      "blade_bounds": [
+        [
+          739,
+          5500
+        ],
+        [
+          56,
+          600
+        ],
+        [
+          -138,
+          -16
+        ]
+      ]
+    },
+    "biggoron_sword/oot_child": {
+      "source": "biggoron_sword",
+      "source_vertices_sha256": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "held_matrix_sha256": "3014e33d5f1356dabf2023b3a84986eb022d8d743e2b2420a38d3c22e7eb03fc",
+      "blade_bounds": [
+        [
+          739,
+          5500
+        ],
+        [
+          -56,
+          489
+        ],
+        [
+          -56,
+          65
+        ]
+      ]
+    },
+    "biggoron_sword/mm_human": {
+      "source": "biggoron_sword",
+      "source_vertices_sha256": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "held_matrix_sha256": "3014e33d5f1356dabf2023b3a84986eb022d8d743e2b2420a38d3c22e7eb03fc",
+      "blade_bounds": [
+        [
+          739,
+          5500
+        ],
+        [
+          -56,
+          489
+        ],
+        [
+          -56,
+          65
+        ]
+      ]
+    },
+    "great_fairy_sword/oot_adult": {
+      "source": "great_fairy_sword",
+      "source_vertices_sha256": "9d0d79353354e82f22abbe35dc00df8470d187757560d7c8425af0620c1718ea",
+      "held_matrix_sha256": "6be432150ba07d43a8a9facf30fbbb4a9e690aad17cb2d2183243a9fda1dfb5f",
+      "blade_bounds": [
+        [
+          480,
+          5500
+        ],
+        [
+          -358,
+          1014
+        ],
+        [
+          -235,
+          81
+        ]
+      ]
+    },
+    "great_fairy_sword/oot_child": {
+      "source": "great_fairy_sword",
+      "source_vertices_sha256": "9d0d79353354e82f22abbe35dc00df8470d187757560d7c8425af0620c1718ea",
+      "held_matrix_sha256": "cbf62a6475e0b94875ce318498c880871e5c1dcb2de56ffc1591bf63205eb563",
+      "blade_bounds": [
+        [
+          480,
+          5500
+        ],
+        [
+          -470,
+          902
+        ],
+        [
+          -153,
+          162
+        ]
+      ]
+    },
+    "great_fairy_sword/mm_human": {
+      "source": "great_fairy_sword",
+      "source_vertices_sha256": "9d0d79353354e82f22abbe35dc00df8470d187757560d7c8425af0620c1718ea",
+      "held_matrix_sha256": "cbf62a6475e0b94875ce318498c880871e5c1dcb2de56ffc1591bf63205eb563",
+      "blade_bounds": [
+        [
+          480,
+          5500
+        ],
+        [
+          -470,
+          902
+        ],
+        [
+          -153,
+          162
+        ]
+      ]
+    },
+    "broken_knife/oot_adult": {
+      "source": "biggoron_sword",
+      "source_vertices_sha256": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "held_matrix_sha256": "0d30bb7800938236c1958b5a57a9a1f18ec45e10830803d65e82f322ddb953cc",
+      "blade_bounds": [
+        [
+          739,
+          2500
+        ],
+        [
+          57,
+          599
+        ],
+        [
+          -138,
+          -16
+        ]
+      ]
+    },
+    "broken_knife/oot_child": {
+      "source": "biggoron_sword",
+      "source_vertices_sha256": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "held_matrix_sha256": "3014e33d5f1356dabf2023b3a84986eb022d8d743e2b2420a38d3c22e7eb03fc",
+      "blade_bounds": [
+        [
+          739,
+          2500
+        ],
+        [
+          -55,
+          488
+        ],
+        [
+          -56,
+          65
+        ]
+      ]
+    },
+    "broken_knife/mm_human": {
+      "source": "biggoron_sword",
+      "source_vertices_sha256": "9fd25f43eb1669c34b2a074a31e074ed3e497e8cb3fb7c87fccec84cb8a97958",
+      "held_matrix_sha256": "3014e33d5f1356dabf2023b3a84986eb022d8d743e2b2420a38d3c22e7eb03fc",
+      "blade_bounds": [
+        [
+          739,
+          2500
+        ],
+        [
+          -55,
+          488
+        ],
+        [
+          -56,
+          65
+        ]
+      ]
+    },
+    "giants_knife/oot_adult": {
+      "source": "giants_knife",
+      "source_vertices_sha256": "aac2027bc348aed3dde6e3c37751dcf5e150047fbc99b7012e656d3d79f31ae9",
+      "held_matrix_sha256": "b1cf2d15a951fa7d68fb7c21cf98fa2a195f64131fd192333998f0d9a94913eb",
+      "blade_bounds": [
+        [
+          730,
+          5500
+        ],
+        [
+          6,
+          650
+        ],
+        [
+          -144,
+          -10
+        ]
+      ]
+    },
+    "giants_knife/oot_child": {
+      "source": "giants_knife",
+      "source_vertices_sha256": "aac2027bc348aed3dde6e3c37751dcf5e150047fbc99b7012e656d3d79f31ae9",
+      "held_matrix_sha256": "4e13205448f64bd1fb4a7faad6b19cb1bcff70f1396708cc030ba9659689530d",
+      "blade_bounds": [
+        [
+          730,
+          5500
+        ],
+        [
+          -105,
+          538
+        ],
+        [
+          -62,
+          71
+        ]
+      ]
+    },
+    "giants_knife/mm_human": {
+      "source": "giants_knife",
+      "source_vertices_sha256": "aac2027bc348aed3dde6e3c37751dcf5e150047fbc99b7012e656d3d79f31ae9",
+      "held_matrix_sha256": "4e13205448f64bd1fb4a7faad6b19cb1bcff70f1396708cc030ba9659689530d",
+      "blade_bounds": [
+        [
+          730,
+          5500
+        ],
+        [
+          -105,
+          538
+        ],
+        [
+          -62,
+          71
+        ]
+      ]
+    },
+    "broken_giants_knife/oot_adult": {
+      "source": "broken_giants_knife",
+      "source_vertices_sha256": "f1d151afd18c26e19bc45f83f384d685b54f34aac7ed0c96c19984a16fe69754",
+      "held_matrix_sha256": "b1cf2d15a951fa7d68fb7c21cf98fa2a195f64131fd192333998f0d9a94913eb",
+      "blade_bounds": [
+        [
+          730,
+          2499
+        ],
+        [
+          8,
+          648
+        ],
+        [
+          -144,
+          -10
+        ]
+      ]
+    },
+    "broken_giants_knife/oot_child": {
+      "source": "broken_giants_knife",
+      "source_vertices_sha256": "f1d151afd18c26e19bc45f83f384d685b54f34aac7ed0c96c19984a16fe69754",
+      "held_matrix_sha256": "4e13205448f64bd1fb4a7faad6b19cb1bcff70f1396708cc030ba9659689530d",
+      "blade_bounds": [
+        [
+          730,
+          2499
+        ],
+        [
+          -104,
+          536
+        ],
+        [
+          -62,
+          71
+        ]
+      ]
+    },
+    "broken_giants_knife/mm_human": {
+      "source": "broken_giants_knife",
+      "source_vertices_sha256": "f1d151afd18c26e19bc45f83f384d685b54f34aac7ed0c96c19984a16fe69754",
+      "held_matrix_sha256": "4e13205448f64bd1fb4a7faad6b19cb1bcff70f1396708cc030ba9659689530d",
+      "blade_bounds": [
+        [
+          730,
+          2499
+        ],
+        [
+          -104,
+          536
+        ],
+        [
+          -62,
+          71
+        ]
+      ]
+    }
+  },
+  "native": {
+    "oot": {
+      "archive_sha256": "ea80d61b223ee38075fe5383b652998f3b08164e903134922f63f205d995717b",
+      "profiles": {
+        "native_oot_master": {
+          "root": "objects/object_link_boy/gLinkAdultLeftHandHoldingMasterSwordNearDL",
+          "blade_x_clip": [
+            852,
+            true
+          ],
+          "source_sha256": {
+            "objects/object_link_boy/gLinkAdultLeftHandHoldingMasterSwordNearDL": "e370a0eb81184275d1d08102b27430ca4ecf01faa8c826e65afa843ec99a7d45",
+            "objects/object_link_boy/object_link_boyVtx_010EE8": "eb0e8fda39539e5859c8f9899a7f4014f00126c07dc98b3a0d1a4f8936ca344f"
+          },
+          "blade_bounds": [
+            [
+              852,
+              3387
+            ],
+            [
+              52,
+              605
+            ],
+            [
+              -153,
+              0
+            ]
+          ]
+        },
+        "native_oot_kokiri": {
+          "root": "objects/object_link_child/gLinkChildLeftFistAndKokiriSwordNearDL",
+          "blade_x_clip": [
+            480,
+            true
+          ],
+          "source_sha256": {
+            "objects/object_link_child/gLinkChildLeftFistAndKokiriSwordNearDL": "3e5eb1bdd62aa5077ff02833d0d8c4dbbeb5c188289cd86664857d213cb23855",
+            "objects/object_link_child/object_link_childVtx_00B1B0": "5e004c843521588e6ce08859c27e6c798298be3cc0af90d30f1999969eaafa83"
+          },
+          "blade_bounds": [
+            [
+              480,
+              1666
+            ],
+            [
+              71,
+              389
+            ],
+            [
+              -38,
+              38
+            ]
+          ]
+        },
+        "native_oot_bgs": {
+          "root": "objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL",
+          "blade_x_clip": [
+            900,
+            true
+          ],
+          "source_sha256": {
+            "objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL": "9c5b38802d346f9fa12d20bf47723abe880b799ae93209e9cc6d0fe45ade6869",
+            "objects/object_link_boy/object_link_boyVtx_014448": "ba46d04b6d06535d9d2395f55da5cb327e2efc9b4a7d726ade590a5e3a662f23"
+          },
+          "blade_bounds": [
+            [
+              900,
+              5492
+            ],
+            [
+              63,
+              641
+            ],
+            [
+              -105,
+              -5
+            ]
+          ]
+        },
+        "native_oot_broken": {
+          "root": "objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeDL",
+          "blade_x_clip": [
+            900,
+            true
+          ],
+          "source_sha256": {
+            "objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeDL": "4a1e5b1092bc12a0daf4ab37eef66d621c5652b09da11de574140141bb56cff7",
+            "objects/object_link_boy/object_link_boyVtx_014BA8": "b4392e9a36a3914cf26134be70743cff3c9e706a4ae7ad9c38bfab8bbd5972c7"
+          },
+          "blade_bounds": [
+            [
+              900,
+              1474
+            ],
+            [
+              74,
+              636
+            ],
+            [
+              -117,
+              7
+            ]
+          ]
+        },
+        "native_oot_child_master": {
+          "root": "objects/object_link_child/gLinkChildLeftHandHoldingMasterSwordDL",
+          "blade_x_clip": [
+            -900,
+            false
+          ],
+          "source_sha256": {
+            "objects/object_link_child/gLinkChildLeftHandHoldingMasterSwordDL": "16cd84aa6d6acfb9e851db947f74dd93f57432f032d8ea0608cf99f703e5cdff",
+            "objects/object_link_child/object_link_childVtx_00D4E0": "8ddb6a653f9e5a03b73478bcfb33168e01503dd07189be81abe00f7822d5ae24"
+          },
+          "blade_bounds": [
+            [
+              -3171,
+              -900
+            ],
+            [
+              -784,
+              66
+            ],
+            [
+              -309,
+              176
+            ]
+          ]
+        }
+      },
+      "records_sha256": "0bf02ec6c0af42603b5c50edaadf78281639ab0b3dac272cc898afa6919793ca"
+    },
+    "mm": {
+      "archive_sha256": "f10167e5682d74cc8da0137c524b1521f4e7ff47438b8888b63db6c7c6dc8d59",
+      "profiles": {
+        "native_mm_kokiri": {
+          "root": "objects/gameplay_keep/gKokiriSwordBladeDL",
+          "blade_x_clip": [
+            426,
+            true
+          ],
+          "source_sha256": {
+            "objects/gameplay_keep/gKokiriSwordBladeDL": "64d453f2324d1d5d1acf1862b67368e1648737914a49d2c1877c770fcd431540",
+            "objects/gameplay_keep/gKokiriSwordBladePart1DL": "96bbbe45f910f12533e5bb59944dec043969e1ce548a4889cc4243bf9acf7279",
+            "objects/gameplay_keep/gameplay_keepVtx_000D90": "485ff3e789adcf99a4563f4015815591eaa1d7dea0329e4f015e0849bf441666",
+            "objects/gameplay_keep/gKokiriSwordBladePart2DL": "b53a3946485b71a0087c670af98a9f6b7eecb86918231a06be78d7a21f9acca3",
+            "objects/gameplay_keep/gameplay_keepVtx_000DC0": "e70c444dd17d3d29ff8e204cbf657edc822c2523393423fe354858eb7fab638a",
+            "objects/gameplay_keep/gKokiriSwordBladePart3DL": "e1412cc84546f5f44d8821066af64e5b56899c94064e2b4bc953a8e23d3785d8",
+            "objects/gameplay_keep/gameplay_keepVtx_000DF0": "51f9669bc0e966fabfcb5c7f344509371a841628f7ab08464502d4c24ea5ce26",
+            "objects/gameplay_keep/gKokiriSwordBladePart4DL": "5ae8803290cdf4d7f3c6ee9d48cef8efc042a82489c6b6f6e47c758c5bc883b9",
+            "objects/gameplay_keep/gameplay_keepVtx_000E20": "96868d040768c63067a7fc33f59567c3688cc437f621e72654cd18e332c2803d",
+            "objects/gameplay_keep/gKokiriSwordBladePart5DL": "58257b545e9ab95ff8599fcf1080833411b300bdc442ce2aff717fa4e9cb2638",
+            "objects/gameplay_keep/gameplay_keepVtx_000E50": "2ddb4618e9d6d471593d9f6c378b029557bebfdc8ba61654d3ae34cdbf6ac9dd",
+            "objects/gameplay_keep/gKokiriSwordBladePart6DL": "f7f0dbf5d99de64d559b747843ea997dc1bb0674e8009de8460f97d921a9e9c3",
+            "objects/gameplay_keep/gameplay_keepVtx_000E90": "5bc5ac70cbdfb72a68a4633b57aab11982b972ab6d7964a5344340b036fe63f3",
+            "objects/gameplay_keep/gKokiriSwordBladePart7DL": "76d9c7282e59a4769f6d818f28e40c59486b707c60022911ea2e38e11d99c285",
+            "objects/gameplay_keep/gameplay_keepVtx_000ED0": "7672b81c0e753688af9d758ac444412adf8a549228a58724ea9c58c99e40276d",
+            "objects/gameplay_keep/gKokiriSwordBladePart8DL": "63aea79b42e972b27b0db4d10a76e91a21cb9832848ac93ce89d95e2b55bf8c5",
+            "objects/gameplay_keep/gameplay_keepVtx_000F10": "cbcd93fbb3b65ab5f83f66984ae718f12eac0dd5048aa71a864c99474f31eba1"
+          },
+          "blade_bounds": [
+            [
+              426,
+              1727
+            ],
+            [
+              79,
+              378
+            ],
+            [
+              -38,
+              80
+            ]
+          ]
+        },
+        "native_mm_razor": {
+          "root": "objects/gameplay_keep/gRazorSwordBladeDL",
+          "blade_x_clip": [
+            326,
+            true
+          ],
+          "source_sha256": {
+            "objects/gameplay_keep/gRazorSwordBladeDL": "f0e2c8dd4b1ba6646a46f5d771f6aff97f106b523ed474b2a1ee4c174dd603c5",
+            "objects/gameplay_keep/gRazorSwordBladePart1DL": "d147ef091fa735dc4b5318a60a3f5014b50c2ad2902a21d37261f7de48e9480c",
+            "objects/gameplay_keep/gameplay_keepVtx_0011C0": "6595f40dda06d9cfffc76416866cb7c6df5cd784cb6665696d6649eaeab40c78",
+            "objects/gameplay_keep/gRazorSwordBladePart2DL": "a4c3696daed38d8ffe2d5c5154cb2b7e510870e46026d2d6ab7b5a4e2a24804a",
+            "objects/gameplay_keep/gameplay_keepVtx_001230": "e6013bd9903a3d9fb42ef602e9e7bf4eacf87ca4739a0d32c19e5f5c2789eaf5",
+            "objects/gameplay_keep/gRazorSwordBladePart3DL": "82d65eb34fac05d90b4611956b84962e986fbe2d6871b140bb180aedd4854ad5",
+            "objects/gameplay_keep/gameplay_keepVtx_001270": "da75d4efe83131bb4b37725aa905947d06183eea1ff200ab7b7b5ea21f707b88",
+            "objects/gameplay_keep/gRazorSwordBladePart4DL": "8eaeda6dc40bc8e82c9041859d04f5290541fc3faf32b14f8e827bb4ca602ea8",
+            "objects/gameplay_keep/gameplay_keepVtx_0012B0": "59a3504625d678e54d06bdaeae47ba2a81138b28585de2f8a27dd6c5b0ef8d69",
+            "objects/gameplay_keep/gRazorSwordBladePart5DL": "3f468cf11f942a33dd942c0eef6086acf1232488899741357d259e9297e40317",
+            "objects/gameplay_keep/gameplay_keepVtx_001320": "b36cdde578b06b1cc1e4f295af83d5701150c057e43ff0b8f7f7958d4a2d905c",
+            "objects/gameplay_keep/gRazorSwordBladePart6DL": "85efad80c6ae72552ba7ccb83fafe14a20a6c0018bb5d98450818ebc161719d6",
+            "objects/gameplay_keep/gameplay_keepVtx_0013E0": "b7046ee8ea4330a99a1d233a6060aa92f8d540ebd33b099736950e6c6a1bdcc8",
+            "objects/gameplay_keep/gRazorSwordBladePart7DL": "dfa53185cbf87e38de3bc42f6e77393764d6cfea4d61aa0a4c644f40c02fb9a8",
+            "objects/gameplay_keep/gameplay_keepVtx_001410": "29dfbf78633d26bdbf5f86e6861655507fa6cb64db4fb507584feaee67a6bff1"
+          },
+          "blade_bounds": [
+            [
+              326,
+              1902
+            ],
+            [
+              31,
+              432
+            ],
+            [
+              -42,
+              89
+            ]
+          ]
+        },
+        "native_mm_gilded": {
+          "root": "objects/object_link_child/gLinkHumanGildedSwordBladeDL",
+          "blade_x_clip": [
+            426,
+            true
+          ],
+          "source_sha256": {
+            "objects/object_link_child/gLinkHumanGildedSwordBladeDL": "dd4b6cdbd2cb1a5255af6612062abf4646b774c4e22fe8a44b59e970d818a717",
+            "objects/object_link_child/object_link_child_DL_017270": "2a42ec97fed094e58346a958d4b897b904b254173833bd7e02de82285dd89878",
+            "objects/object_link_child/object_link_childVtx_014498": "bb706e29e7865d256f7a863acebfca9d2d133c6c50d60716d6bcc8807d436dff",
+            "objects/object_link_child/object_link_child_DL_0171D0": "7e08b46aec75a1481e8aaa673e1cdf8ed607281bc2fbfa72243ed33cd04568ce",
+            "objects/object_link_child/object_link_childVtx_014568": "e692ea03f1f17ad29c8dd8156ea79c072ae4759b087ce4ea13983e87aada3054",
+            "objects/object_link_child/object_link_child_DL_017130": "207a9d91283850d96b49d9642ec9afc118d676bc29c14079f828246b1cb42764",
+            "objects/object_link_child/object_link_childVtx_014638": "e48ab15f73ec9a75af0e3bd0de082927a1c9f29920388785aeff7b1569c28f20",
+            "objects/object_link_child/object_link_child_DL_017090": "7a0a651f6b33ed4f8bfc6d6448444d2be9cfc09c6ee882bdf7406649e15aa4fa",
+            "objects/object_link_child/object_link_childVtx_014718": "0ed84abe2d5194654ac42aa1b5445b2b8fbd7c050ba855d95b93bdb43b30d189"
+          },
+          "blade_bounds": [
+            [
+              426,
+              3348
+            ],
+            [
+              67,
+              395
+            ],
+            [
+              -41,
+              83
+            ]
+          ]
+        },
+        "native_mm_fairy": {
+          "root": "objects/object_link_child/gLinkHumanGreatFairysSwordDL",
+          "blade_x_clip": [
+            1039,
+            true
+          ],
+          "source_sha256": {
+            "objects/object_link_child/gLinkHumanGreatFairysSwordDL": "0d24a927760cd1ad985b0d15e28f3efbdbf3d02d5a3609c401f083bc10ca1da9",
+            "objects/object_link_child/object_link_child_DL_0167D0": "623e359f96c2071d5ee71382afcb0a403ef281f16951ae704fc34b7c2a7244fd",
+            "objects/object_link_child/object_link_childVtx_015218": "f90130c15e234371bddc736643b1c6057f2be73311ff47cb3f05900dfb6ec084",
+            "objects/object_link_child/object_link_child_DL_0166F8": "e3c28175ed2f0e82a17c7aca00253df3be49a91ee7e7720482d6a6f47807870a",
+            "objects/object_link_child/object_link_childVtx_015338": "22c9d5e0b9c0b55be9e09695c598aa7bfb0b703077fbb28ddddd705930af66e9",
+            "objects/object_link_child/object_link_child_DL_016608": "2f1abd2096af9f226382f630d35d51ed2ec3ebecd781cd34cff6fdf6145202a8",
+            "objects/object_link_child/object_link_childVtx_0154C8": "e96f69d314437a94151ebe2957909c555cad999b187653d170fb7817f19929f8",
+            "objects/object_link_child/object_link_child_DL_0164B8": "1a027af437d686156ab253b5bf6811bebe45999806b71e297951f3da0cc4bba7",
+            "objects/object_link_child/object_link_childVtx_015658": "28adfeca50ae1ef295ef2657f348cfc90f5e27abadd8bfd35044aa096ba7ba6d"
+          },
+          "blade_bounds": [
+            [
+              1039,
+              5498
+            ],
+            [
+              -210,
+              690
+            ],
+            [
+              -89,
+              153
+            ]
+          ]
+        }
+      },
+      "records_sha256": "66d61d2cb79c688b5eee98a811c236d4b5194ba70e57625b09fa398b20901c74"
+    }
+  },
+  "modern_din": {
+    "archive_sha256": "ce1b8bfbfe9e1b2cf4a51355ea62c16826f60e8a65f07945d33a628b724cc781",
+    "profiles": {
+      "modern_din_bgs": {
+        "root": "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE",
+        "root_crc64": "0AC6FFD3F0AE6266",
+        "source_sha256": {
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE": "3e6b315104f94efba519d3b8ed1ace101d834e493403163d94ce1f9270cd7aca",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v1": "b23238b456bcd4602dc31aab114f3965431c1237ffe6959be0517c646d66f645",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v2": "7dde8f0b46c9c85fbf56977a4f436f63fe4b76ceffab5326d1554be0138eb288",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v3": "7930f1363b3d20a99c839546e864415cc0109fbeea5d238ebb467eba0b762e6c",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v4": "bb7f44eaaba0b55e29ccb9a048854a9b6f548b69799280515bc06de5b131df68",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v5": "0387be37e69a654b34a7d4a8100cb173ccf8ed876b04bf9523d3a1d36acca3a4",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v6": "19ba8e7bb51f7c78b44f09f344fec6c10bd3c9e62342068ec5eb9f56dede53cf",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BLADE_v7": "1b990c5dd18d8665b4f3d25d49f1df47ad7cbe7f190f8350a4a1f36984479c3f"
+        },
+        "embedded_matrices": 0,
+        "blade_bounds": [
+          [
+            951,
+            6295
+          ],
+          [
+            48,
+            782
+          ],
+          [
+            -92,
+            131
+          ]
+        ]
+      },
+      "modern_din_broken": {
+        "root": "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN",
+        "root_crc64": "68A55E4B08BD368C",
+        "source_sha256": {
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN": "e549dc9f1486e8e97e99e229a9b726e7607dd8a60c66b8cf2fdf08bc3ed3067e",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v1": "f8ce38e17350d5ff1e1d02c4e966bec7a600bd7681ac6addfb27d9276894eef3",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v2": "5d493865c7851f8c0f659833a5eae8d2b22a6b45bb94af30617d85f2e469a2b7",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v3": "2519e99cd6c5b948a4e27c1df5d9e78a7fa2096d857ec1376233d85a197054fb",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v4": "f5e8013511c9f245d8e35cd1ad78934628ffe9288dd465e1844b030f238731c6",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v5": "0387be37e69a654b34a7d4a8100cb173ccf8ed876b04bf9523d3a1d36acca3a4",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v6": "19ba8e7bb51f7c78b44f09f344fec6c10bd3c9e62342068ec5eb9f56dede53cf",
+          "alt/objects/object_custom_equip/ModernDinPOC2_LONGSWORD_BROKEN_v7": "1b990c5dd18d8665b4f3d25d49f1df47ad7cbe7f190f8350a4a1f36984479c3f"
+        },
+        "embedded_matrices": 0,
+        "blade_bounds": [
+          [
+            951,
+            2152
+          ],
+          [
+            48,
+            782
+          ],
+          [
+            -92,
+            131
+          ]
+        ]
+      }
+    },
+    "equipment_aliases": {
+      "gCustomLongswordDL": {
+        "resource": "alt/objects/object_custom_equip/gCustomLongswordDL",
+        "sha256": "bc0d0852d998f40d8c43ae9a62095278f71f5b68fef03871fa44e6537bf6b89f",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            1312474620,
+            3518880364
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            2989617634,
+            763947694
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            180813779,
+            4037960294
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "gCustomBreakableLongswordDL": {
+        "resource": "alt/objects/object_custom_equip/gCustomBreakableLongswordDL",
+        "sha256": "34db5f25408dfa0908f6589c9127e81e97fc2cf440cd2307837299979d25772c",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            1283249138,
+            265825707
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            2989617634,
+            763947694
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            180813779,
+            4037960294
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "gCustomBrokenLongswordDL": {
+        "resource": "alt/objects/object_custom_equip/gCustomBrokenLongswordDL",
+        "sha256": "7bb4646c69c3f63bb609bd192cce87d4729505f9d382a6371a614f103da86bf2",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            3636732725,
+            3568784822
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            2989617634,
+            763947694
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            1755668043,
+            146617996
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "gLinkAdultLeftHandHoldingBgsNearDL": {
+        "resource": "alt/objects/object_link_boy/gLinkAdultLeftHandHoldingBgsNearDL",
+        "sha256": "92099aa29a0a8ef72ad54ef23ceca75cabb1f36cbd0bde66501fe44f530ddba6",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            4129090380,
+            3450022691
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            2989617634,
+            763947694
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            180813779,
+            4037960294
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            3185204302,
+            693708812
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "gLinkAdultLeftHandHoldingBgsFarDL": {
+        "resource": "alt/objects/object_link_boy/gLinkAdultLeftHandHoldingBgsFarDL",
+        "sha256": "367e21454f71c2e2392a62501244aa5e6e282920421b119543b10f19099293b6",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            3558559705,
+            3504448952
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            2989617634,
+            763947694
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            180813779,
+            4037960294
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            3185204302,
+            693708812
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "gLinkAdultHandHoldingBrokenGiantsKnifeDL": {
+        "resource": "alt/objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeDL",
+        "sha256": "26710a4cb31f79b64da80eda81066e405374a67b6bc6ab8542173a6e33f29214",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            2429317319,
+            1908307179
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            2989617634,
+            763947694
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            1755668043,
+            146617996
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            3185204302,
+            693708812
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      },
+      "gLinkAdultHandHoldingBrokenGiantsKnifeFarDL": {
+        "resource": "alt/objects/object_link_boy/gLinkAdultHandHoldingBrokenGiantsKnifeFarDL",
+        "sha256": "e052eecc8e6f31d694419a2df6c6759ebcf290ca70db008cc945bf0903e678ec",
+        "commands": [
+          [
+            855638016,
+            3203383023
+          ],
+          [
+            1251125172,
+            1101196547
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            2989617634,
+            763947694
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            1755668043,
+            146617996
+          ],
+          [
+            822083584,
+            0
+          ],
+          [
+            3185204302,
+            693708812
+          ],
+          [
+            3741319168,
+            0
+          ]
+        ]
+      }
+    },
+    "records_sha256": "5f85ce5e4d0b4b116c60272c10bfe79d58b1a062d3653e737891bd3afdea7ed6"
+  },
+  "fire_geometry_recipe": "build_din_fire_weapons.sword_meshes unchanged",
+  "ice_light": "translucent blade-only cross-section envelope; procedural 64x32 I8 frost/shimmer",
+  "runtime_tested": false
+}

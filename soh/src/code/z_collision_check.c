@@ -1,10 +1,30 @@
 #include "global.h"
+#include "din_fire_sword.h"
 #include "vt.h"
 #include "overlays/effects/ovl_Effect_Ss_HitMark/z_eff_ss_hitmark.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
+#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include <assert.h>
+#include <libultraship/bridge/consolevariablebridge.h>
+
+// Skijer's NEI: damage scaled by ivanDamageMultiplier (Ivan co-op or SM64 Mario)
+static u8 NEI_PlayerDamageBoostActive(void) {
+    extern u8 gIvanPossessActive;
+    extern u8 Sm64Mario_IsReady(void);
+    return CVarGetInteger(CVAR_ENHANCEMENT("IvanCoopModeEnabled"), 0) || gIvanPossessActive || Sm64Mario_IsReady();
+}
 
 typedef s32 (*ColChkResetFunc)(PlayState*, Collider*);
+
+// Skijer's NEI shared time control (mods/items/helpers/timestop_helper.c): caches which AC
+// colliders each actor registers so frozen actors can stay hittable during a time stop.
+void TimeCtl_NoteAcCollider(Collider* collider);
+// Skijer's NEI Champion's Tunic (mods/equipment/behaviors/equip_champion.c): snapshots
+// where every hostile attack collider is, so Flurry Rush can tell that a damage collider
+// is sweeping past Link. It has to be taken HERE because ClearContext wipes the AT list
+// before Actor_UpdateAll, so this is the only point in the frame where the list is whole.
+void Champion_NoteIncomingAttacks(PlayState* play);
+
 typedef void (*ColChkBloodFunc)(PlayState*, Collider*, Vec3f*);
 typedef void (*ColChkApplyFunc)(PlayState*, CollisionCheckContext*, Collider*);
 typedef void (*ColChkVsFunc)(PlayState*, CollisionCheckContext*, Collider*, Collider*);
@@ -1039,6 +1059,7 @@ void CollisionCheck_InitContext(PlayState* play, CollisionCheckContext* colChkCt
 }
 
 void CollisionCheck_DestroyContext(PlayState* play, CollisionCheckContext* colChkCtx) {
+    DinFireSword_FinishTeardown(play);
 }
 
 /**
@@ -1275,6 +1296,11 @@ s32 CollisionCheck_SetAC(PlayState* play, CollisionCheckContext* colChkCtx, Coll
     }
     index = colChkCtx->colACCount;
     colChkCtx->colAC[colChkCtx->colACCount++] = collider;
+    // Skijer's NEI time stop: remember who registered what. A frozen actor never runs
+    // its update, so it never gets here again and would drop out of the AC list —
+    // Link's sword and arrows would pass straight through a stopped enemy. The freeze
+    // pass re-registers these on the actor's behalf. No-op when nothing is frozen.
+    TimeCtl_NoteAcCollider(collider);
     return index;
 }
 
@@ -1600,11 +1626,11 @@ void CollisionCheck_HitSolid(PlayState* play, ColliderInfo* info, Collider* coll
     if (flags == TOUCH_SFX_NORMAL && collider->colType != COLTYPE_METAL) {
         EffectSsHitMark_SpawnFixedScale(play, EFFECT_HITMARK_WHITE, hitPos);
         if (collider->actor == NULL) {
-            Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_BOUND, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_BOUND, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else {
-            Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_BOUND, &collider->actor->projectedPos, 4,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_BOUND, &collider->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     } else if (flags == TOUCH_SFX_NORMAL) { // collider->colType == COLTYPE_METAL
         EffectSsHitMark_SpawnFixedScale(play, EFFECT_HITMARK_METAL, hitPos);
@@ -1616,20 +1642,20 @@ void CollisionCheck_HitSolid(PlayState* play, ColliderInfo* info, Collider* coll
     } else if (flags == TOUCH_SFX_HARD) {
         EffectSsHitMark_SpawnFixedScale(play, EFFECT_HITMARK_WHITE, hitPos);
         if (collider->actor == NULL) {
-            Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_BOUND, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_BOUND, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else {
-            Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_BOUND, &collider->actor->projectedPos, 4,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_BOUND, &collider->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     } else if (flags == TOUCH_SFX_WOOD) {
         EffectSsHitMark_SpawnFixedScale(play, EFFECT_HITMARK_DUST, hitPos);
         if (collider->actor == NULL) {
-            Audio_PlaySoundGeneral(NA_SE_IT_REFLECTION_WOOD, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_REFLECTION_WOOD, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else {
-            Audio_PlaySoundGeneral(NA_SE_IT_REFLECTION_WOOD, &collider->actor->projectedPos, 4,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_REFLECTION_WOOD, &collider->actor->projectedPos, 4,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     }
 }
@@ -1640,17 +1666,17 @@ void CollisionCheck_HitSolid(PlayState* play, ColliderInfo* info, Collider* coll
 s32 CollisionCheck_SwordHitAudio(Collider* at, ColliderInfo* acInfo) {
     if (at->actor != NULL && at->actor->category == ACTORCAT_PLAYER) {
         if (acInfo->elemType == ELEMTYPE_UNK0) {
-            Audio_PlaySoundGeneral(NA_SE_IT_SWORD_STRIKE, &at->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SWORD_STRIKE, &at->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else if (acInfo->elemType == ELEMTYPE_UNK1) {
-            Audio_PlaySoundGeneral(NA_SE_IT_SWORD_STRIKE_HARD, &at->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SWORD_STRIKE_HARD, &at->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else if (acInfo->elemType == ELEMTYPE_UNK2) {
-            Audio_PlaySoundGeneral(NA_SE_PL_WALK_GROUND - SFX_FLAG, &at->actor->projectedPos, 4,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_PL_WALK_GROUND - SFX_FLAG, &at->actor->projectedPos, 4,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else if (acInfo->elemType == ELEMTYPE_UNK3) {
-            Audio_PlaySoundGeneral(NA_SE_PL_WALK_GROUND - SFX_FLAG, &at->actor->projectedPos, 4,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_PL_WALK_GROUND - SFX_FLAG, &at->actor->projectedPos, 4,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     }
     return 1;
@@ -1687,8 +1713,8 @@ void CollisionCheck_HitEffects(PlayState* play, Collider* at, ColliderInfo* atIn
         } else if (sHitInfo[ac->colType].effect == HIT_WOOD) {
             if (at->actor == NULL) {
                 CollisionCheck_SpawnShieldParticles(play, hitPos);
-                Audio_PlaySoundGeneral(NA_SE_IT_REFLECTION_WOOD, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_IT_REFLECTION_WOOD, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
             } else {
                 CollisionCheck_SpawnShieldParticlesWood(play, hitPos, &at->actor->projectedPos);
             }
@@ -1701,11 +1727,11 @@ void CollisionCheck_HitEffects(PlayState* play, Collider* at, ColliderInfo* atIn
     } else {
         EffectSsHitMark_SpawnFixedScale(play, EFFECT_HITMARK_WHITE, hitPos);
         if (ac->actor == NULL) {
-            Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_BOUND, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_BOUND, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         } else {
-            Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_BOUND, &ac->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_BOUND, &ac->actor->projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
     }
 }
@@ -2641,6 +2667,8 @@ void CollisionCheck_AC(PlayState* play, CollisionCheckContext* colChkCtx, Collid
 void CollisionCheck_AT(PlayState* play, CollisionCheckContext* colChkCtx) {
     Collider** col;
 
+    Champion_NoteIncomingAttacks(play);
+
     if (colChkCtx->colATCount == 0 || colChkCtx->colACCount == 0) {
         return;
     }
@@ -2999,7 +3027,9 @@ void CollisionCheck_ApplyDamage(PlayState* play, CollisionCheckContext* colChkCt
     if (collider->actor == NULL || !(collider->acFlags & AC_HIT)) {
         return;
     }
-    if (!(info->bumperFlags & BUMP_HIT) || info->bumperFlags & BUMP_NO_DAMAGE) {
+    if (!(info->bumperFlags & BUMP_HIT) ||
+        (info->bumperFlags & BUMP_NO_DAMAGE &&
+         !(info->acHitInfo && info->acHitInfo->toucher.dmgFlags & DMG_UNBLOCKABLE))) {
         return;
     }
 
@@ -3020,14 +3050,29 @@ void CollisionCheck_ApplyDamage(PlayState* play, CollisionCheckContext* colChkCt
             }
         }
 
-        damage = tbl->table[i] & 0xF;
-        collider->actor->colChkInfo.damageEffect = tbl->table[i] >> 4 & 0xF;
+        u8 entry =
+            DinFireSword_DamageEntry(play, collider->actor, info->acHitInfo, info->bumper.dmgFlags, tbl->table[i]);
+        damage = entry & 0xF;
+        collider->actor->colChkInfo.damageEffect = entry >> 4 & 0xF;
+    }
+    // DMG_UNBLOCKABLE (Gigantamax Pikachu): bypass damage table, force minimum damage
+    if (info->acHitInfo->toucher.dmgFlags & DMG_UNBLOCKABLE) {
+        if (damage < 4)
+            damage = 4; // Minimum 4 damage regardless of resistance
+    }
+    // Skijer's NEI: DMG_FIXED_DAMAGE (forms) uses toucher damage verbatim
+    if (info->acHitInfo->toucher.dmgFlags & DMG_FIXED_DAMAGE) {
+        damage = (f32)info->acHitInfo->toucher.damage;
     }
     if (!(collider->acFlags & AC_HARD)) {
-        collider->actor->colChkInfo.damage += damage;
+        // Scale this hit before accumulation; actors can have several hit collider elements.
+        u8 hitDamage = (u8)damage;
+        GameInteractor_Should(VB_PLAYER_ATTACK_DAMAGE_MULTIPLIER, true, play, &hitDamage, collider->actor);
+        collider->actor->colChkInfo.damage += hitDamage;
+        DinFireSword_FinishAcceptedHit(play, collider, info->acHitInfo, info->bumper.dmgFlags, hitDamage);
     }
 
-    if (CVarGetInteger(CVAR_ENHANCEMENT("IvanCoopModeEnabled"), 0)) {
+    if (NEI_PlayerDamageBoostActive()) {
         collider->actor->colChkInfo.damage *= GET_PLAYER(play)->ivanDamageMultiplier;
     }
 }
@@ -3440,8 +3485,8 @@ void CollisionCheck_SpawnShieldParticles(PlayState* play, Vec3f* v) {
  */
 void CollisionCheck_SpawnShieldParticlesMetal(PlayState* play, Vec3f* v) {
     CollisionCheck_SpawnShieldParticles(play, v);
-    Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_REFLECT_SW, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_REFLECT_SW, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 }
 
 /**
@@ -3449,8 +3494,8 @@ void CollisionCheck_SpawnShieldParticlesMetal(PlayState* play, Vec3f* v) {
  */
 void CollisionCheck_SpawnShieldParticlesMetalSound(PlayState* play, Vec3f* v, Vec3f* pos) {
     CollisionCheck_SpawnShieldParticles(play, v);
-    Audio_PlaySoundGeneral(NA_SE_IT_SHIELD_REFLECT_SW, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                           &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(NA_SE_IT_SHIELD_REFLECT_SW, pos, 4, &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                         &gSfxDefaultReverb);
 }
 
 /**
@@ -3490,8 +3535,8 @@ void CollisionCheck_SpawnShieldParticlesWood(PlayState* play, Vec3f* v, Vec3f* a
     initWood.lightPoint.z = initWood.position.z;
 
     Effect_Add(play, &effectIndex, EFFECT_SHIELD_PARTICLE, 0, 1, &initWood);
-    Audio_PlaySoundGeneral(NA_SE_IT_REFLECTION_WOOD, actorPos, 4, &gSfxDefaultFreqAndVolScale,
-                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    Audio_PlaySfxGeneral(NA_SE_IT_REFLECTION_WOOD, actorPos, 4, &gSfxDefaultFreqAndVolScale,
+                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 }
 
 /**
@@ -3650,7 +3695,20 @@ u8 CollisionCheck_GetSwordDamage(s32 dmgFlags, PlayState* play) {
         damage = 8;
     }
 
-    if (CVarGetInteger(CVAR_ENHANCEMENT("IvanCoopModeEnabled"), 0)) {
+    {
+        // Fierce Deity: use MM's Fierce Deity damage regardless of Link's equipped sword.
+        // MM D_8085D09C dmgTransformed fields (same for every sword): normal slash = 4, strong
+        // slash (jump/flip/spin finish) = 8, sword beam = up to 4. In OOT the strong/jump attack
+        // already resolves to 8 (flag 0x04000000), so keep 8 there and flatten everything else
+        // (normal slashes 1/2/4 + the beam's 2) to MM's 4. FD is the only sword attacker in FD skin
+        // mode, so gating on a recognized sword hit (damage != 0) is safe; normal play is unaffected.
+        extern u8 TransformMasks_IsFDSkinMode(void);
+        if ((damage != 0) && TransformMasks_IsFDSkinMode()) {
+            damage = (damage >= 8) ? 8 : 4;
+        }
+    }
+
+    if (NEI_PlayerDamageBoostActive()) {
         damage *= GET_PLAYER(play)->ivanDamageMultiplier;
     }
 

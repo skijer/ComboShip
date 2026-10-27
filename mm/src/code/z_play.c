@@ -1,4 +1,14 @@
+#include "../../../combo/emotes/EmoteBridge.h"
+#include "2s2h/Enhancements/Gameplay/BlackMarket.h"
+#include "2s2h/Enhancements/Gameplay/ComboSoloForest.h"
 #include "z64.h"
+#ifdef COMBO_BUILD
+#include "gameplay/MagicMirrorArrival.h"
+#endif
+#include "2s2h/Enhancements/Audio/MMWeather.h"
+#include "2s2h/Enhancements/Graphics/MMSummerAtmosphere.h"
+#include "2s2h/Enhancements/Graphics/MMWinterAtmosphere.h"
+#include <libultraship/log/luslog.h> // 2S2H [Port] LUSLOG_ERROR (transition guard)
 #include "regs.h"
 #include "functions.h"
 #include "z64vismono.h"
@@ -41,7 +51,10 @@ u8 sMotionBlurStatus;
 #include "overlays/gamestates/ovl_file_choose/z_file_select.h"
 #include "debug.h"
 #include "BenPort.h"
+#include "2s2h/Enhancements/Gameplay/ComboOpeningForest.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include "2s2h/Enhancements/Audio/AudioEditor.h"
+#include "2s2h/FleetShipCombo/FleetShipCombo.h"
 #include "2s2h/Enhancements/FrameInterpolation/FrameInterpolation.h"
 #include "2s2h/Enhancements/Graphics/Graphics.h"
 #include "2s2h/DeveloperTools/CollisionViewer.h"
@@ -409,6 +422,11 @@ Gfx* Play_SetFog(PlayState* this, Gfx* gfx) {
 }
 
 void Play_Destroy(GameState* thisx) {
+    ComboEmotes_Reset();
+#ifdef COMBO_BUILD
+    extern void Combo_MM_CancelCrossDungeonTransition(void);
+    Combo_MM_CancelCrossDungeonTransition();
+#endif
     PlayState* this = (PlayState*)thisx;
     GraphicsContext* gfxCtx = this->state.gfxCtx;
 
@@ -475,6 +493,7 @@ void Play_Destroy(GameState* thisx) {
     KaleidoManager_Destroy();
     ZeldaArena_Cleanup();
 
+    MMWeather_Reset();
     GameInteractor_ExecuteOnPlayDestroy();
 
     // #region 2S2H [General] Making gPlayState available
@@ -618,7 +637,38 @@ void Play_UpdateTransition(PlayState* this) {
     }
 
     switch (this->transitionMode) {
-        case TRANS_MODE_SETUP:
+        case TRANS_MODE_SETUP: {
+#ifdef COMBO_BUILD
+            extern int Combo_MM_CrossDungeonTransition(int32_t * index);
+            if (this->transitionTrigger != TRANS_TRIGGER_END) {
+                int32_t composedEntrance = this->nextEntrance;
+                // A foreign route keeps its native movement/camera/effect until completion.
+                if (!Combo_MM_CrossDungeonTransition(&composedEntrance)) {
+                    this->nextEntrance = composedEntrance;
+                }
+            }
+#endif
+            // 2S2H [Port] Fleet Ship Combo: a STALE/GARBAGE nextEntrance (e.g. a hole-fall warp
+            // that completed while this game was combo-frozen) walks Entrance_GetTableEntry's
+            // unbounded pointers below and crashes (0xc0000005). Validate scene + spawn against
+            // the real table and CANCEL the transition instead, logging the value.
+            extern s32 gSceneEntranceTableCount;
+            extern SceneEntranceTableEntry sSceneEntranceTable[];
+            s16 guardLayer = 0;
+            if (gSaveContext.nextCutsceneIndex >= 0xFFF0) {
+                guardLayer = (gSaveContext.nextCutsceneIndex & 0xF) + 1;
+            }
+            u16 guardEntrance = (u16)(this->nextEntrance + guardLayer);
+            u32 guardScene = (u32)guardEntrance >> 9;
+            if ((s32)guardScene >= gSceneEntranceTableCount || sSceneEntranceTable[guardScene].table == NULL ||
+                ((guardEntrance >> 4) & 0x1F) >= sSceneEntranceTable[guardScene].tableCount) {
+                LUSLOG_ERROR("Play_UpdateTransition: INVALID nextEntrance 0x%04X (layer %d) — cancelled",
+                             this->nextEntrance, guardLayer);
+                this->transitionTrigger = TRANS_TRIGGER_OFF;
+                this->transitionMode = TRANS_MODE_OFF;
+                break;
+            }
+        }
             if (this->transitionTrigger != TRANS_TRIGGER_END) {
                 s16 sceneLayer = 0;
 
@@ -751,6 +801,12 @@ void Play_UpdateTransition(PlayState* this) {
         case TRANS_MODE_INSTANCE_RUNNING:
             if (this->transitionCtx.isDone(&this->transitionCtx.instanceData)) {
                 if (this->transitionTrigger != TRANS_TRIGGER_END) {
+#ifdef COMBO_BUILD
+                    extern int Combo_MM_CompleteCrossDungeonTransition(void);
+                    if (Combo_MM_CompleteCrossDungeonTransition()) {
+                        break; // Retain the native effect without replacing the source Play state.
+                    }
+#endif
                     if (this->transitionCtx.transitionType == TRANS_TYPE_CIRCLE) {
                         D_801D0D54 = false;
                     }
@@ -760,12 +816,15 @@ void Play_UpdateTransition(PlayState* this) {
                         // ComboShip: quit to OOT's title; MM's own file select is unreachable here. Play
                         // must keep running (the return hook drives the handoff), so end the transition
                         // instead of the gamestate — otherwise this branch re-fires every frame.
-                        this->transitionMode = TRANS_MODE_OFF;
-                        Combo_RequestOwlSaveQuit();
-#else
-                        STOP_GAMESTATE(&this->state);
-                        SET_NEXT_GAMESTATE(&this->state, TitleSetup_Init, sizeof(TitleSetupState));
+                        if (Combo_IsCombinedGame()) {
+                            this->transitionMode = TRANS_MODE_OFF;
+                            Combo_RequestOwlSaveQuit();
+                        } else
 #endif
+                        {
+                            STOP_GAMESTATE(&this->state);
+                            SET_NEXT_GAMESTATE(&this->state, TitleSetup_Init, sizeof(TitleSetupState));
+                        }
                     } else if (gSaveContext.gameMode != GAMEMODE_FILE_SELECT) {
                         STOP_GAMESTATE(&this->state);
                         SET_NEXT_GAMESTATE(&this->state, Play_Init, sizeof(PlayState));
@@ -821,6 +880,12 @@ void Play_UpdateTransition(PlayState* this) {
             this->envCtx.screenFillColor[3] = (sTransitionFillTimer / 20.0f) * 255.0f;
 
             if (sTransitionFillTimer >= 20) {
+#ifdef COMBO_BUILD
+                extern int Combo_MM_CompleteCrossDungeonTransition(void);
+                if (Combo_MM_CompleteCrossDungeonTransition()) {
+                    break;
+                }
+#endif
                 STOP_GAMESTATE(&this->state);
                 SET_NEXT_GAMESTATE(&this->state, Play_Init, sizeof(PlayState));
                 gSaveContext.save.entrance = this->nextEntrance;
@@ -863,6 +928,12 @@ void Play_UpdateTransition(PlayState* this) {
 
         case TRANS_MODE_INSTANT:
             if (this->transitionTrigger != TRANS_TRIGGER_END) {
+#ifdef COMBO_BUILD
+                extern int Combo_MM_CompleteCrossDungeonTransition(void);
+                if (Combo_MM_CompleteCrossDungeonTransition()) {
+                    break;
+                }
+#endif
                 STOP_GAMESTATE(&this->state);
                 SET_NEXT_GAMESTATE(&this->state, Play_Init, sizeof(PlayState));
                 gSaveContext.save.entrance = this->nextEntrance;
@@ -905,6 +976,12 @@ void Play_UpdateTransition(PlayState* this) {
                 }
             } else {
                 if (this->envCtx.sandstormEnvA == 255) {
+#ifdef COMBO_BUILD
+                    extern int Combo_MM_CompleteCrossDungeonTransition(void);
+                    if (Combo_MM_CompleteCrossDungeonTransition()) {
+                        break;
+                    }
+#endif
                     STOP_GAMESTATE(&this->state);
                     SET_NEXT_GAMESTATE(&this->state, Play_Init, sizeof(PlayState));
                     gSaveContext.save.entrance = this->nextEntrance;
@@ -973,6 +1050,13 @@ const char D_801DFA34[][4] = {
     "f",   "g",  "g",  "h",  "h",  "i",  "i",  "all", "all", "a",  "b",  "c",  "d",  "e",  "f",  "g",
     "h",   "i",  "f",  "fa", "fb", "fc", "fd", "fe",  "ff",  "fg", "fh", "fi", "fj", "fk",
 };
+
+// Generic hold-button box selector (Sheikah Slate runes, ...). Declared locally rather than via a
+// header: mods/*.h is globbed with CONFIGURE_DEPENDS, so a new header there forces a full CMake
+// regeneration. Definitions live in mods/items/helpers/box_menu.c. Skijer's NEI
+u8 BoxMenu_IsOpen(void);
+void BoxMenu_Update(PlayState* play);
+void BoxMenu_Draw(PlayState* play);
 
 void Play_UpdateMain(PlayState* this) {
     s32 pad;
@@ -1075,7 +1159,13 @@ void Play_UpdateMain(PlayState* this) {
             Skybox_Update(&this->skyboxCtx);
 
             if (IS_PAUSED(&this->pauseCtx)) {
-                KaleidoScopeCall_Update(this);
+                // Generic hold-button box selector (Sheikah Slate runes, ...) borrows the pause
+                // state the same way, so it must win over the kaleido here. Skijer's NEI
+                if (BoxMenu_IsOpen()) {
+                    BoxMenu_Update(this);
+                } else {
+                    KaleidoScopeCall_Update(this);
+                }
             } else if (this->gameOverCtx.state != GAMEOVER_INACTIVE) {
                 GameOver_Update(this);
             }
@@ -1083,6 +1173,7 @@ void Play_UpdateMain(PlayState* this) {
             Message_Update(this);
             Interface_Update(this);
             AnimTaskQueue_Update(this, &this->animTaskQueue);
+            ComboEmotes_ApplyPose(this);
             SoundSource_UpdateAll(this);
             ShrinkWindow_Update(this->state.framerateDivisor);
             TransitionFade_Update(&this->unk_18E48, this->state.framerateDivisor);
@@ -1108,6 +1199,7 @@ void Play_UpdateMain(PlayState* this) {
 
     Environment_Update(this, &this->envCtx, &this->lightCtx, &this->pauseCtx, &this->msgCtx, &this->gameOverCtx,
                        this->state.gfxCtx);
+    MMWinterAtmosphere_Update(this);
 
     if (this->sramCtx.status != 0) {
         if (GameInteractor_Should(VB_SAVE_USE_OWL_SAVE_TIMING, gSaveContext.save.isOwlSave)) {
@@ -1119,6 +1211,7 @@ void Play_UpdateMain(PlayState* this) {
 }
 
 void Play_Update(PlayState* this) {
+    ComboEmotes_BeginUpdate(this);
     if (!sBombersNotebookOpen) {
         if (this->pauseCtx.bombersNotebookOpen) {
             sBombersNotebookOpen = true;
@@ -1149,13 +1242,16 @@ void Play_Update(PlayState* this) {
 }
 
 void Play_PostWorldDraw(PlayState* this) {
-    if (IS_PAUSED(&this->pauseCtx)) {
+    if (IS_PAUSED(&this->pauseCtx) && !BoxMenu_IsOpen()) {
         KaleidoScopeCall_Draw(this);
     }
 
     if (gSaveContext.gameMode == GAMEMODE_NORMAL) {
         Interface_Draw(this);
     }
+
+    // Generic box selector — drawn after the HUD so it sits on top. Skijer's NEI
+    BoxMenu_Draw(this);
 
     if (!IS_PAUSED(&this->pauseCtx) || (this->msgCtx.currentTextId != 0xFF)) {
         Message_Draw(this);
@@ -1374,6 +1470,8 @@ void Play_DrawMain(PlayState* this) {
                 goto PostWorldDraw;
             }
 
+            GameInteractor_ExecuteOnPlayDrawWorldStart();
+
             if (!this->soaringCsOrSoTCsPlaying) {
                 if (1) {
                     if (((u32)this->skyboxId != SKYBOX_NONE) && !this->envCtx.skyboxDisabled) {
@@ -1430,9 +1528,11 @@ void Play_DrawMain(PlayState* this) {
                     }
                 }
 
-                if (this->envCtx.precipitation[PRECIP_RAIN_CUR] != 0) {
+                if ((this->envCtx.precipitation[PRECIP_RAIN_CUR] != 0) || (MMWeather_RainDensity() > 0)) {
                     Environment_DrawRain(this, &this->view, gfxCtx);
                 }
+                MMSummerAtmosphere_Draw(this);
+                MMWinterAtmosphere_Draw(this);
             }
 
             if (1) {
@@ -1562,6 +1662,10 @@ void Play_DrawMain(PlayState* this) {
     }
 
 SkipPostWorldDraw:
+#ifdef COMBO_BUILD
+    // Pause/capture branches can bypass the general world-draw end hook.
+    ComboBlackMarket_RestoreRoomAfterDraw(this);
+#endif
 
     if ((this->view.unk164 != 0) && !gDbgCamEnabled) {
         Camera_Update(GET_ACTIVE_CAM(this));
@@ -2102,6 +2206,10 @@ s32 Play_CamIsNotFixed(PlayState* this) {
 }
 
 s32 FrameAdvance_IsEnabled(PlayState* this) {
+    // NOTE (Fleet Ship Combo): do NOT force this true for the inactive game. The freeze is
+    // done in FrameAdvance_Update (returns false -> whole play update is skipped). Forcing
+    // IsEnabled true here also gates Effect_Add (z_effect.c), so the player's melee weapon
+    // blur effect wouldn't be allocated during Player_Init -> null deref crash.
     return this->frameAdvCtx.enabled != false;
 }
 
@@ -2222,6 +2330,21 @@ void Play_FillScreen(PlayState* this, s16 fillScreenOn, u8 red, u8 green, u8 blu
     R_PLAY_FILL_SCREEN_ALPHA = alpha;
 }
 
+#ifdef COMBO_BUILD
+extern int Combo_MM_CrossDungeonRuntimeEnabled(void);
+
+static void Combo_NormalizeStoneTowerArrival(PlayState* play) {
+    if (!Combo_MM_CrossDungeonRuntimeEnabled())
+        return;
+    // Both exterior orientations share cycle switch flags. Match the chosen scene before
+    // room actors initialize, so the native inverter does not immediately undo this arrival.
+    if (play->sceneId == SCENE_F41)
+        Flags_SetSwitch(play, 0x14);
+    else if (play->sceneId == SCENE_F40)
+        Flags_UnsetSwitch(play, 0x14);
+}
+#endif
+
 void Play_Init(GameState* thisx) {
     PlayState* this = (PlayState*)thisx;
     GraphicsContext* gfxCtx = this->state.gfxCtx;
@@ -2233,6 +2356,13 @@ void Play_Init(GameState* thisx) {
     s32 scene;
     u8 sceneLayer;
     s32 pad2;
+
+#ifdef COMBO_BUILD
+    ComboOpeningForest_NormalizeEntry();
+    ComboBlackMarket_NormalizeEntry();
+    ComboSoloForestMm_NormalizeEntry();
+#endif
+    MMWinterAtmosphere_Reset();
 
     if ((gSaveContext.respawnFlag == -4) || (gSaveContext.respawnFlag == -0x63)) {
         if (CHECK_EVENTINF(EVENTINF_TRIGGER_DAYTELOP)) {
@@ -2471,7 +2601,14 @@ void Play_Init(GameState* thisx) {
     //! @bug: Incorrect ALIGN16s
     ZeldaArena_Init((void*)((zAlloc + 8) & ~0xF), (zAllocSize - ((zAlloc + 8) & ~0xF)) + zAlloc);
 
+#ifdef COMBO_BUILD
+    MagicMirror_PrepareArrival(this);
+#endif
     Actor_InitContext(this, &this->actorCtx, this->linkActorEntry);
+#ifdef COMBO_BUILD
+    MagicMirror_FinishArrival(this);
+    Combo_NormalizeStoneTowerArrival(this);
+#endif
 
     // Busyloop until the room loads
     while (!Room_ProcessRoomRequest(this, &this->roomCtx)) {}
@@ -2492,6 +2629,11 @@ void Play_Init(GameState* thisx) {
 
     CutsceneManager_StoreCamera(&this->mainCamera);
     Interface_SetSceneRestrictions(this);
+    // Shuffle before the destination scene requests its music, including same-scene loads.
+    AudioEditor_RandomizeOnSceneLoad();
+#ifdef COMBO_BUILD
+    AudioEditor_ConfigureSceneMusic(this);
+#endif
     Environment_PlaySceneSequence(this);
     gSaveContext.seqId = this->sceneSequences.seqId;
     gSaveContext.ambienceId = this->sceneSequences.ambienceId;

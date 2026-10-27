@@ -123,11 +123,11 @@ ResourceFactoryBinaryTextureAnimationV0::ReadResource(std::shared_ptr<Ship::File
                 e->textureList = new void*[textureListSize];
                 e->textureIndexList = new uint8_t[e->keyFrameLength];
 
-                tAnim->textureCycleTextures.reserve(textureListSize);
-
                 for (size_t i = 0; i < textureListSize; i++) {
                     tAnim->textureCycleTextures.emplace_back("__OTR__" + reader->ReadString());
-                    e->textureList[i] = (Gfx*)tAnim->textureCycleTextures[i].c_str();
+                    // Bind the newly owned path, not the first cycle's i-th
+                    // path. The deque keeps every prior c_str() pointer stable.
+                    e->textureList[i] = (Gfx*)tAnim->textureCycleTextures.back().c_str();
                 }
                 for (size_t i = 0; i < e->keyFrameLength; i++) {
                     e->textureIndexList[i] = reader->ReadUByte();

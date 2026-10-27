@@ -1,0 +1,8 @@
+newmtl Mushroom
+Ka 0.1 0.1 0.1
+Kd 1 1 1
+Ks 0.22 0.22 0.22
+Ns 40
+d 1
+illum 2
+map_Kd Magic_Mushroom_512.png

@@ -1,0 +1,35 @@
+{
+  "resource_count": 10,
+  "vertex_records": 1630,
+  "vertex_loads": 56,
+  "slug": "shadow_scepter",
+  "name": "Shadow Scepter",
+  "entry": "objects/nei_gi_redesign/shadow_scepter/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 1508,
+  "bounds_author": [
+    [
+      -16.4375,
+      -51.4375,
+      -6.8125
+    ],
+    [
+      29.8125,
+      50.4375,
+      6.8125
+    ]
+  ],
+  "markers": {
+    "tip_author": [
+      9.434953928387042,
+      37.841533324763866,
+      0.0
+    ]
+  },
+  "notes": [
+    "New wand silhouette and material candidate, derived from each elemental theme.",
+    "No Dominion Rod stand-in; GI resources only, held/action behavior preserved."
+  ],
+  "runtime_tested": false
+}

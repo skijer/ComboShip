@@ -5,9 +5,9 @@
  */
 
 #include "z_en_zf.h"
+#include "din_fire_sword.h"
 #include "objects/object_zf/object_zf.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/savestate_serialize.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
@@ -373,8 +373,6 @@ void EnZf_Destroy(Actor* thisx, PlayState* play) {
     Effect_Delete(play, this->blureIndex);
     Collider_DestroyCylinder(play, &this->bodyCollider);
     Collider_DestroyQuad(play, &this->swordCollider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 /**
@@ -1294,6 +1292,7 @@ void EnZf_JumpBack(EnZf* this, PlayState* play) {
 }
 
 void EnZf_SetupStunned(EnZf* this) {
+    const ColliderInfo* hitInfo = this->bodyCollider.info.acHitInfo;
     if ((this->actor.bgCheckFlags & BGCHECKFLAG_GROUND) &&
         ((this->actor.velocity.y == 0.0f) || (this->actor.velocity.y == -4.0f))) {
         this->actor.speedXZ = 0.0f;
@@ -1308,7 +1307,11 @@ void EnZf_SetupStunned(EnZf* this) {
         Animation_PlayOnceSetSpeed(&this->skelAnime, &gZfKnockedBackAnim, 0.0f);
     }
 
-    Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_JR_FREEZE);
+    // Sword ice already emitted its glacial impact at accepted collision.
+    // This shared stun cue still belongs to native ice arrows and Deku nuts.
+    if (this->damageEffect != ENZF_DMGEFF_ICE || hitInfo == NULL ||
+        (hitInfo->toucher.dmgFlags ^ DinFireSword_OriginalDamageFlags(gPlayState, hitInfo)) != DMG_ARROW_ICE)
+        Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_JR_FREEZE);
     this->action = ENZF_ACTION_STUNNED;
     EnZf_SetupAction(this, EnZf_Stunned);
 }

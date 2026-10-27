@@ -13,6 +13,7 @@
 
 #include "2s2h/ShipUtils.h"
 #include "GameInteractor/GameInteractor.h"
+#include "2s2h/Enhancements/Audio/MMWeather.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_THROW_ONLY)
 
@@ -710,6 +711,11 @@ void EnKusa_Update(Actor* thisx, PlayState* play2) {
 void EnKusa_DrawBush(Actor* thisx, PlayState* play2) {
     PlayState* play = play2;
     EnKusa* this = (EnKusa*)thisx;
+    s32 season = MMWeather_SeasonForPlay(play);
+    s32 frost = season == SEASON_WINTER;
+    // Full blossom blush separates spring grass from summer while retaining source shading.
+    s32 spring = season == SEASON_SPRING;
+    s32 seasonal = spring || season == SEASON_AUTUMN || frost;
 
     Ship_ExtendedCullingActorAdjustProjectedZ(&this->actor);
 
@@ -720,7 +726,26 @@ void EnKusa_DrawBush(Actor* thisx, PlayState* play2) {
             EnKusa_ApplySway(&D_80936AD8[this->kusaMtxIdx]);
         }
 
+        OPEN_DISPS(play->state.gfxCtx);
+        if (seasonal) {
+            gDPSetGrayscaleColor(POLY_OPA_DISP++,
+                                 spring  ? 246
+                                 : frost ? 220
+                                         : 242,
+                                 spring  ? 193
+                                 : frost ? 236
+                                         : 104,
+                                 spring  ? 217
+                                 : frost ? 245
+                                         : 70,
+                                 255);
+            gSPGrayscale(POLY_OPA_DISP++, spring || frost ? 3 : 2);
+        }
         Gfx_DrawDListOpa(play, gKusaBushType1DL);
+        if (seasonal) {
+            gSPGrayscale(POLY_OPA_DISP++, false);
+        }
+        CLOSE_DISPS(play->state.gfxCtx);
 
     } else if (this->actor.projectedPos.z < 1300.0f) {
         s32 alpha;
@@ -732,7 +757,24 @@ void EnKusa_DrawBush(Actor* thisx, PlayState* play2) {
 
         MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
         gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, alpha);
+        if (seasonal) {
+            gDPSetGrayscaleColor(POLY_XLU_DISP++,
+                                 spring  ? 246
+                                 : frost ? 220
+                                         : 242,
+                                 spring  ? 193
+                                 : frost ? 236
+                                         : 104,
+                                 spring  ? 217
+                                 : frost ? 245
+                                         : 70,
+                                 255);
+            gSPGrayscale(POLY_XLU_DISP++, spring || frost ? 3 : 2);
+        }
         gSPDisplayList(POLY_XLU_DISP++, gKusaBushType2DL);
+        if (seasonal) {
+            gSPGrayscale(POLY_XLU_DISP++, false);
+        }
 
         CLOSE_DISPS(play->state.gfxCtx);
     }
@@ -751,6 +793,31 @@ void EnKusa_DrawGrass(Actor* thisx, PlayState* play) {
                 EnKusa_ApplySway(&D_80936AD8[this->kusaMtxIdx]);
             }
         }
+        // Scope RGB treatment around the selected grass draw, so texture and
+        // model replacements receive it too. Cut stumps keep their material.
+        s32 season = MMWeather_SeasonForPlay(play);
+        s32 frost = season == SEASON_WINTER;
+        s32 spring = season == SEASON_SPRING;
+        s32 seasonal = spring || season == SEASON_AUTUMN || frost;
+        OPEN_DISPS(play->state.gfxCtx);
+        if (seasonal) {
+            gDPSetGrayscaleColor(POLY_OPA_DISP++,
+                                 spring  ? 246
+                                 : frost ? 220
+                                         : 242,
+                                 spring  ? 193
+                                 : frost ? 236
+                                         : 104,
+                                 spring  ? 217
+                                 : frost ? 245
+                                         : 70,
+                                 255);
+            gSPGrayscale(POLY_OPA_DISP++, spring || frost ? 3 : 2);
+        }
         Gfx_DrawDListOpa(play, gKusaSproutDL);
+        if (seasonal) {
+            gSPGrayscale(POLY_OPA_DISP++, false);
+        }
+        CLOSE_DISPS(play->state.gfxCtx);
     }
 }

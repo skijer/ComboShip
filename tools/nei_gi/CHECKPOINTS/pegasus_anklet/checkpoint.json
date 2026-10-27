@@ -1,0 +1,25 @@
+{
+  "resource_count": 8,
+  "vertex_records": 4849,
+  "vertex_loads": 180,
+  "slug": "pegasus_anklet",
+  "name": "Pegasus Anklet",
+  "entry": "objects/nei_gi_redesign/pegasus_anklet/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 0.040618896484375,
+  "triangles": 3858,
+  "bounds_author": [
+    [
+      -48.5625,
+      -40.375,
+      -21.4375
+    ],
+    [
+      46.4375,
+      43.0,
+      25.0
+    ]
+  ],
+  "markers": {},
+  "runtime_tested": false
+}

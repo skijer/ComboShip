@@ -181,8 +181,18 @@ void Font_LoadCharNES(PlayState* play, u8 codePointIndex, s32 offset) {
 
     int fontIdx = codePointIndex - 0x20;
 
+    // A decoded page owns 120 fixed-size glyph slots in either bank. A bad
+    // decoder offset must never turn a font resource path into a state write.
+    if (font->unk_11D88 >= ARRAY_COUNT(font->charBuf) || offset < 0 ||
+        offset > (s32)(sizeof(font->charBuf[0]) - FONT_CHAR_TEX_SIZE)) {
+        return;
+    }
+
     if (fontIdx >= 0 && fontIdx < ARRAY_COUNT(fontTbl)) {
-        memcpy(&font->charBuf[font->unk_11D88][offset], fontTbl[fontIdx], strlen(fontTbl[fontIdx]) + 1);
+        size_t pathSize = strlen(fontTbl[fontIdx]) + 1;
+        if (pathSize <= FONT_CHAR_TEX_SIZE) {
+            memcpy(&font->charBuf[font->unk_11D88][offset], fontTbl[fontIdx], pathSize);
+        }
     }
 
     // DmaMgr_SendRequest0(&font->charBuf[font->unk_11D88][offset],

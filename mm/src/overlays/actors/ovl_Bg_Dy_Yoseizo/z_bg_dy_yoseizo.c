@@ -6,7 +6,9 @@
 
 #include "z_bg_dy_yoseizo.h"
 #include "overlays/actors/ovl_Demo_Effect/z_demo_effect.h"
+#include "2s2h/BenPort.h"
 #include "2s2h/GameInteractor/GameInteractor.h"
+#include <string.h>
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -83,7 +85,50 @@ void BgDyYoseizo_Init(Actor* thisx, PlayState* play) {
 void BgDyYoseizo_Destroy(Actor* thisx, PlayState* play) {
 }
 
-// Has no visible effect since no segment is set for manually-controllable eye textures
+/* The optional R6 port uses baked eyelid and jaw geometry. Only select these
+ * heads when this actor actually owns that pack's native 27-matrix skeleton;
+ * having the pack mounted must not replace a different model's head. */
+static s32 BgDyYoseizo_UsesMMFacialHeads(BgDyYoseizo* this) {
+    StandardLimb* head;
+
+    if (!ResourceMgr_IsAltAssetsEnabled() || this->skelAnime.skeleton == NULL ||
+        this->skelAnime.limbCount != GREAT_FAIRY_LIMB_MAX || this->skelAnime.dListCount != GREAT_FAIRY_LIMB_MAX - 1) {
+        return false;
+    }
+
+    head = Lib_SegmentedToVirtual(this->skelAnime.skeleton[GREAT_FAIRY_LIMB_HEAD - 1]);
+    if (head == NULL || !ResourceMgr_OTRSigCheck((char*)head->dList) ||
+        strcmp((const char*)head->dList, "__OTR__objects/object_dy_obj/HWGreatFairyMMPOC2_BaseHeadDL") != 0) {
+        return false;
+    }
+
+    return ResourceMgr_FileExists("alt/objects/object_dy_obj/HWGreatFairyMMPOC2_BaseHeadDL");
+}
+
+static Gfx* BgDyYoseizo_LoadMMFacialHead(BgDyYoseizo* this) {
+    static const char* const heads[2][3] = {
+        {
+            "alt/objects/object_dy_obj/HWGreatFairyMMPOC2_Eye0Mouth0DL",
+            "alt/objects/object_dy_obj/HWGreatFairyMMPOC2_Eye1Mouth0DL",
+            "alt/objects/object_dy_obj/HWGreatFairyMMPOC2_Eye2Mouth0DL",
+        },
+        {
+            "alt/objects/object_dy_obj/HWGreatFairyMMPOC2_Eye0Mouth1DL",
+            "alt/objects/object_dy_obj/HWGreatFairyMMPOC2_Eye1Mouth1DL",
+            "alt/objects/object_dy_obj/HWGreatFairyMMPOC2_Eye2Mouth1DL",
+        },
+    };
+    s16 eye = this->eyeIndex >= 0 && this->eyeIndex < 3 ? this->eyeIndex : 0;
+    s16 mouth = this->mouthIndex >= 0 && this->mouthIndex < 2 ? this->mouthIndex : 0;
+    const char* path = heads[mouth][eye];
+
+    if (!BgDyYoseizo_UsesMMFacialHeads(this) || !ResourceMgr_FileExists(path)) {
+        return NULL;
+    }
+    return ResourceMgr_LoadGfxByName(path);
+}
+
+/* Vanilla MM does not bind eye textures; the optional heads expose these states. */
 void BgDyYoseizo_UpdateEyes(BgDyYoseizo* this) {
     if (this->blinkTimer != 0) {
         this->blinkTimer--;
@@ -542,8 +587,14 @@ void func_80A0BB08(BgDyYoseizo* this, PlayState* play) {
 
 void BgDyYoseizo_Update(Actor* thisx, PlayState* play) {
     BgDyYoseizo* this = (BgDyYoseizo*)thisx;
+    BgDyYoseizoActionFunc actionFunc = this->actionFunc;
 
     this->actionFunc(this, play);
+    /* The reclining action already ticks eyes, even on its transition frame.
+     * Extend blinking to the other visible native animations for this pack. */
+    if (actionFunc != func_80A0B5F0 && this->actor.draw != NULL && BgDyYoseizo_UsesMMFacialHeads(this)) {
+        BgDyYoseizo_UpdateEyes(this);
+    }
     Actor_MoveWithGravity(&this->actor);
 
     DECR(this->timer);
@@ -559,6 +610,10 @@ s32 BgDyYoseizo_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Ve
     }
 
     if (limbIndex == GREAT_FAIRY_LIMB_HEAD) {
+        Gfx* head = BgDyYoseizo_LoadMMFacialHead(this);
+        if (head != NULL) {
+            *dList = head;
+        }
         rot->x += this->headRot.y;
         rot->z += this->headRot.z;
     }

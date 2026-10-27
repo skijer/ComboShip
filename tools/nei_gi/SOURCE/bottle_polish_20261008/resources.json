@@ -1,0 +1,40 @@
+{
+  "checkpoint": "2ce9283f63db977e301a15e9cf38994b73559d93",
+  "models": {
+    "mushroom": {
+      "resource_count": 4,
+      "vertex_records": 3008,
+      "vertex_loads": 95
+    },
+    "princess": {
+      "resource_count": 5,
+      "vertex_records": 3003,
+      "vertex_loads": 101
+    },
+    "seahorse": {
+      "resource_count": 5,
+      "vertex_records": 1734,
+      "vertex_loads": 59
+    }
+  },
+  "resources": {
+    "objects/combo_bottle_gi/SeahorseBottle": "b314571652f95bb61adcf3fe7fd7f875af80618f366b3dd40a840e1fe12dd5d3",
+    "objects/combo_bottle_gi/polish/mushroom/Mushroom_tex": "85cca32ba0e0756b30d52aef7e815a16917ee5a336a050e62b1dc1c35433d603",
+    "objects/combo_bottle_gi/polish/mushroom/gi_dl": "e04a60e2db25f78a8490817bac91d97304d5421e9c242ea2289d1f6fc8633779",
+    "objects/combo_bottle_gi/polish/mushroom/mesh_opa_vtx": "eaa6916c3512b3f01b1f6b73fc68a86a70e0b76491f6c5b399ba8a7b41d14bd0",
+    "objects/combo_bottle_gi/polish/mushroom/scale_mtx": "740cab7ecd6d5b3d0bf1d1bdbfe92187e0edc0ffef3a04b982418debaec71210",
+    "objects/combo_bottle_gi/polish/princess/gi_dl": "c20c46f48b585b9800cfde0abadd88025a641942526c16172c5b47d62de77dd0",
+    "objects/combo_bottle_gi/polish/princess/material-0138A9AD_tex": "e4856c405ec139e23a94693b25a8e6df5aea815c62ca68c40528427821fa102d",
+    "objects/combo_bottle_gi/polish/princess/material-02FDF718_tex": "d58319b62536cf4d0fed91388723f20a8b9534dad2ae987015f3d7f9fbc105ec",
+    "objects/combo_bottle_gi/polish/princess/mesh_opa_vtx": "db21e2db8c217116e5f805a0f78a42521d4b6190a1c33795b90e97ebed0a5035",
+    "objects/combo_bottle_gi/polish/princess/scale_mtx": "740cab7ecd6d5b3d0bf1d1bdbfe92187e0edc0ffef3a04b982418debaec71210",
+    "objects/combo_bottle_gi/polish/seahorse/gi_dl": "c4d49aa1b6f91ff7663565dc5b3a29dfc13887fa25d6a6142356d159dc7f8ab5",
+    "objects/combo_bottle_gi/polish/seahorse/material2_tex": "c4e060348b85e88fd02da434caa04be087b7aa7ff593df965599e8c19bef0645",
+    "objects/combo_bottle_gi/polish/seahorse/material3_tex": "c4e060348b85e88fd02da434caa04be087b7aa7ff593df965599e8c19bef0645",
+    "objects/combo_bottle_gi/polish/seahorse/mesh_opa_vtx": "d2c3d52ff660a8b076436e9019f89c2cd01e12ba7683b0f4a13578e67ded1bd2",
+    "objects/combo_bottle_gi/polish/seahorse/scale_mtx": "740cab7ecd6d5b3d0bf1d1bdbfe92187e0edc0ffef3a04b982418debaec71210"
+  },
+  "position_quantization": "nearest 1/256 GI unit; no extra fit transform",
+  "pixels": "original RGBA pixels; OBJ V converted to native top origin",
+  "runtime": "untested"
+}

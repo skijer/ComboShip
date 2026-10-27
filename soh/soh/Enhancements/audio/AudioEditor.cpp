@@ -1,24 +1,33 @@
-#include "AudioEditor.h"
-#include "sequence.h"
-
+#include <array>
 #include <map>
 #include <set>
 #include <string>
-#include <functions.h>
+
+#include <ship/Context.h>
+
+#include "AudioEditor.h"
+#include "SeasonWeather.h"
 #include "soh/ShipUtils.h"
 #include "soh/OTRGlobals.h"
 #include "soh/cvar_prefixes.h"
-#include <ship/utils/StringHelper.h>
 #include "soh/SohGui/SohMenu.h"
 #include "soh/SohGui/SohGui.hpp"
 #include "AudioCollection.h"
+#include "HyruleFieldNightMusic.h"
+#include "OotrsArchive.h"
 #include "soh/Enhancements/enhancementTypes.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/randomizer/SeedContext.h"
+#include "../../../src/code/concurrent_weather_audio.h"
+#include "soh/SohGui/UIWidgets.hpp"
+#include "../../../../combo/gui/WhatsNew.h"
 
 extern "C" {
+#include "sequence.h"
+#include <functions.h>
 #include "z64save.h"
 extern SaveContext gSaveContext;
+void Audio_PreviewSceneSequence(uint16_t sequence);
 }
 
 Vec3f pos = { 0.0f, 0.0f, 0.0f };
@@ -26,6 +35,10 @@ f32 freqScale = 1.0f;
 s8 reverbAdd = 0;
 
 using namespace UIWidgets;
+#ifdef COMBO_BUILD
+#include "global.h"
+#include "audio/SceneMusicNative.h"
+#endif
 
 static WidgetInfo lowHpAlarm;
 static WidgetInfo naviCall;
@@ -37,6 +50,18 @@ static WidgetInfo ovlDuration;
 static WidgetInfo voicePitch;
 static WidgetInfo randomAudioGenModes;
 static WidgetInfo lowerOctaves;
+static WidgetInfo proximityWeatherThunder;
+static WidgetInfo proximityWeatherThunderStyle;
+static WidgetInfo proximityWeatherRainVolume;
+static WidgetInfo proximityWeatherThunderVolume;
+static WidgetInfo proximityWeatherThunderFrequency;
+static WidgetInfo hyruleFieldNightMusic;
+static WidgetInfo globalOutdoorRain;
+static WidgetInfo globalOutdoorRainMode;
+static WidgetInfo globalOutdoorRainColor;
+static WidgetInfo globalOutdoorRainOvercast;
+static WidgetInfo weatherAudioDiagnostics;
+static std::array<WidgetInfo, 13> seasonWeatherWidgets;
 
 namespace SohGui {
 extern std::shared_ptr<SohMenu> mSohMenu;
@@ -44,7 +69,7 @@ extern std::shared_ptr<SohMenu> mSohMenu;
 
 // Authentic sequence counts
 // used to ensure we have enough to shuffle
-#define SEQ_COUNT_BGM_WORLD 30
+#define SEQ_COUNT_BGM_WORLD 31
 #define SEQ_COUNT_BGM_BATTLE 6
 #define SEQ_COUNT_FANFARE 15
 #define SEQ_COUNT_OCARINA 12
@@ -60,7 +85,11 @@ size_t AuthenticCountBySequenceType(SeqType type) {
         case SEQ_NOSHUFFLE:
             return SEQ_COUNT_NOSHUFFLE;
         case SEQ_BGM_WORLD:
-            return SEQ_COUNT_BGM_WORLD;
+            return SEQ_COUNT_BGM_WORLD
+#ifdef COMBO_BUILD
+                   + 2
+#endif
+                ;
         case SEQ_BGM_EVENT:
             return SEQ_COUNT_BGM_EVENT;
         case SEQ_BGM_BATTLE:
@@ -90,9 +119,92 @@ static const std::map<int32_t, const char*> audioRandomizerModes = {
     { RANDOMIZE_ON_FILE_LOAD_SEEDED, "On File Load (Seeded)" },
 };
 
+static const std::map<int32_t, const char*> proximityWeatherThunderStyles = {
+    { CONCURRENT_WEATHER_THUNDER_LOW, "Low Thunder" },
+    { CONCURRENT_WEATHER_THUNDER_LAYERED, "Layered Thunder" },
+    { CONCURRENT_WEATHER_THUNDER_LIGHTNING, "Lightning" },
+};
+
+static const std::map<int32_t, const char*> globalOutdoorRainModes = {
+    { 0, "Persistent" },
+    { 1, "Intermittent Storms" },
+};
+
+static const std::map<int32_t, const char*> seasonWeatherChoices = {
+    { -2, "Follow Game / Rod" }, { -1, "Native" }, { 0, "Spring" }, { 1, "Summer" }, { 2, "Autumn" }, { 3, "Winter" },
+};
+
+static const std::map<int32_t, const char*> seasonRainModes = {
+    { -1, "Season Default" },
+    { 0, "Off" },
+    { 1, "Persistent" },
+    { 2, "Intermittent" },
+};
+
+static void DrawHyruleFieldNightTrack() {
+    if (!CVarGetInteger(CVAR_AUDIO("HyruleFieldNightMusic"), 0)) {
+        return;
+    }
+
+    const auto sequences = AudioCollection::Instance->GetAllSequences();
+    int selected = AudioCollection::Instance->GetReplacementSequence(HYRULE_FIELD_NIGHT_MUSIC_ENTRY);
+
+    WhatsNew::Scope releaseHighlight(CVAR_AUDIO("HyruleFieldNightSequence"), "Hyrule Field Night Track",
+                                     CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0);
+    ImGui::TextUnformatted("Hyrule Field Night Track");
+    ImGui::SameLine(300.0f);
+    ImGui::SetNextItemWidth(-FLT_MIN);
+    UIWidgets::PushStyleCombobox(THEME_COLOR);
+    if (ImGui::BeginCombo("##HyruleFieldNightTrack", sequences.at(selected).label.c_str())) {
+        for (const auto& [id, sequence] : sequences) {
+            if (!sequence.canBeUsedAsReplacement ||
+                !(sequence.category & (SEQ_BGM_WORLD | SEQ_BGM_EVENT | SEQ_BGM_BATTLE))) {
+                continue;
+            }
+            if (ImGui::Selectable(sequence.label.c_str(), id == selected)) {
+                CVarSetInteger(CVAR_AUDIO("HyruleFieldNightSequence"), id);
+                HyruleFieldNightMusic_RequestRefresh();
+                Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+            }
+            if (id == selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+    UIWidgets::PopStyleCombobox();
+    UIWidgets::Tooltip("Selects the nighttime BGM used only in Hyrule Field. The same entry in World BGM "
+                       "supports shuffle, reset and locking.");
+}
+
+static bool IsBgmEntry(uint16_t sequenceId) {
+    return sequenceId == HYRULE_FIELD_NIGHT_MUSIC_ENTRY
+#ifdef COMBO_BUILD
+           || ComboSceneMusic::IsEntry(sequenceId)
+#endif
+        ;
+}
+
+static uint16_t CurrentBGMEntry(uint16_t sequenceId) {
+    if (HyruleFieldNightMusic_IsPlaying(sequenceId))
+        return HYRULE_FIELD_NIGHT_MUSIC_ENTRY;
+#ifdef COMBO_BUILD
+    const auto row = AudioEditor_GetSceneMusicRow(sequenceId);
+    if (row)
+        return row;
+#endif
+    return sequenceId;
+}
+
+static uint16_t CurrentBGMReplacement(uint16_t sequenceId) {
+    return AudioCollection::Instance->GetReplacementSequence(CurrentBGMEntry(sequenceId));
+}
+
 // Grabs the current BGM sequence ID and replays it
 // which will lookup the proper override, or reset back to vanilla
 void ReplayCurrentBGM() {
+    if (HyruleFieldNightMusic_RequestRefresh())
+        return;
     u16 curSeqId = func_800FA0B4(SEQ_PLAYER_BGM_MAIN);
     // TODO: replace with Audio_StartSeq when the macro is shared
     // The fade time and audio player flags will always be 0 in the case of replaying the BGM, so they are not set here
@@ -105,9 +217,13 @@ void UpdateCurrentBGM(u16 seqKey, SeqType seqType) {
     if (seqType != SEQ_BGM_WORLD) {
         return;
     }
+    // The night lifecycle may be temporarily yielding MAIN to a cutscene,
+    // fanfare or preview. Retain the edit until that owner releases it.
+    if (seqKey == HYRULE_FIELD_NIGHT_MUSIC_ENTRY && HyruleFieldNightMusic_RequestRefresh())
+        return;
 
     u16 curSeqId = func_800FA0B4(SEQ_PLAYER_BGM_MAIN);
-    if (curSeqId == seqKey) {
+    if (CurrentBGMEntry(curSeqId) == seqKey) {
         ReplayCurrentBGM();
     }
 }
@@ -218,6 +334,9 @@ void UnlockGroup(const std::map<u16, SequenceInfo>& map, SeqType type) {
 }
 
 void DrawPreviewButton(uint16_t sequenceId, std::string sfxKey, SeqType sequenceType) {
+    const bool sceneEntry = IsBgmEntry(sequenceId);
+    if (sceneEntry)
+        sequenceId = AudioCollection::Instance->GetReplacementSequence(sequenceId);
     const std::string cvarKey = AudioCollection::Instance->GetCvarKey(sfxKey);
     const std::string hiddenKey = "##" + cvarKey;
     const std::string stopButton = ICON_FA_STOP + hiddenKey;
@@ -243,13 +362,16 @@ void DrawPreviewButton(uint16_t sequenceId, std::string sfxKey, SeqType sequence
                 CVarSetInteger(CVAR_AUDIO("Playing"), 0);
             } else {
                 if (sequenceType == SEQ_SFX || sequenceType == SEQ_VOICE) {
-                    Audio_PlaySoundGeneral(sequenceId, &pos, 4, &freqScale, &freqScale, &reverbAdd);
+                    Audio_PlaySfxGeneral(sequenceId, &pos, 4, &freqScale, &freqScale, &reverbAdd);
                 } else if (sequenceType == SEQ_INSTRUMENT) {
                     AudioOcarina_SetInstrument(sequenceId - INSTRUMENT_OFFSET);
                     AudioOcarina_SetPlaybackSong(9, 1);
                 } else {
                     // TODO: Cant do both here, so have to click preview button twice
-                    PreviewSequence(sequenceId);
+                    if (sceneEntry)
+                        Audio_PreviewSceneSequence(sequenceId);
+                    else
+                        PreviewSequence(sequenceId);
                     CVarSetInteger(CVAR_AUDIO("Playing"), sequenceId);
                 }
             }
@@ -270,10 +392,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
     if (UIWidgets::Button(resetAllButton.c_str(),
                           UIWidgets::ButtonOptions().Size(UIWidgets::Sizes::Inline).Color(THEME_COLOR))) {
         auto currentBGM = func_800FA0B4(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         ResetGroup(map, type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -282,10 +404,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
     if (UIWidgets::Button(randomizeAllButton.c_str(),
                           UIWidgets::ButtonOptions().Size(UIWidgets::Sizes::Inline).Color(THEME_COLOR))) {
         auto currentBGM = func_800FA0B4(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         RandomizeGroup(type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -294,10 +416,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
     if (UIWidgets::Button(lockAllButton.c_str(),
                           UIWidgets::ButtonOptions().Size(UIWidgets::Sizes::Inline).Color(THEME_COLOR))) {
         auto currentBGM = func_800FA0B4(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         LockGroup(map, type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -306,10 +428,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
     if (UIWidgets::Button(unlockAllButton.c_str(),
                           UIWidgets::ButtonOptions().Size(UIWidgets::Sizes::Inline).Color(THEME_COLOR))) {
         auto currentBGM = func_800FA0B4(SEQ_PLAYER_BGM_MAIN);
-        auto prevReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto prevReplacement = CurrentBGMReplacement(currentBGM);
         UnlockGroup(map, type);
         Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-        auto curReplacement = AudioCollection::Instance->GetReplacementSequence(currentBGM);
+        auto curReplacement = CurrentBGMReplacement(currentBGM);
         if (type == SEQ_BGM_WORLD && prevReplacement != curReplacement) {
             ReplayCurrentBGM();
         }
@@ -332,7 +454,8 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
         if ((((seqData.category & SEQ_BGM_CUSTOM) || seqData.category == SEQ_FANFARE) &&
              defaultValue >= MAX_AUTHENTIC_SEQID) ||
             seqData.canBeReplaced == false) {
-            continue;
+            if (!IsBgmEntry(defaultValue))
+                continue;
         }
 
         const std::string initialSfxKey = seqData.sfxKey;
@@ -343,8 +466,10 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
         const std::string randomizeButton = ICON_FA_RANDOM + hiddenKey;
         const std::string lockedButton = ICON_FA_LOCK + hiddenKey;
         const std::string unlockedButton = ICON_FA_UNLOCK + hiddenKey;
-        const int currentValue = CVarGetInteger(cvarKey.c_str(), defaultValue);
-        const bool isCurrentlyPlaying = currentValue == playingFromMenu || seqData.sequenceId == currentBGM;
+        const int currentValue = IsBgmEntry(defaultValue)
+                                     ? AudioCollection::Instance->GetReplacementSequence(defaultValue)
+                                     : CVarGetInteger(cvarKey.c_str(), defaultValue);
+        const bool isCurrentlyPlaying = currentValue == playingFromMenu || defaultValue == CurrentBGMEntry(currentBGM);
 
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
@@ -360,6 +485,8 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
         UIWidgets::PushStyleCombobox(THEME_COLOR);
         if (ImGui::BeginCombo(hiddenKey.c_str(), map.at(initialValue).label.c_str())) {
             for (const auto& [value, seqData] : map) {
+                if (IsBgmEntry(value))
+                    continue;
                 // If excluded as a replacement sequence, don't show in other dropdowns except the effect's own
                 // dropdown.
                 if (~(seqData.category) & type ||
@@ -383,8 +510,9 @@ void Draw_SfxTab(const std::string& tabId, SeqType type, const std::string& tabN
         UIWidgets::PopStyleCombobox();
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-FLT_MIN);
-        DrawPreviewButton((type == SEQ_SFX || type == SEQ_VOICE || type == SEQ_INSTRUMENT) ? defaultValue
-                                                                                           : currentValue,
+        DrawPreviewButton((type == SEQ_SFX || type == SEQ_VOICE || type == SEQ_INSTRUMENT || IsBgmEntry(defaultValue))
+                              ? defaultValue
+                              : currentValue,
                           seqData.sfxKey, type);
         auto locked = CVarGetInteger(cvarLockKey.c_str(), 0) == 1;
         ImGui::SameLine();
@@ -546,6 +674,50 @@ void AudioEditor::InitElement() {
     AudioEditorRegisterOnLoadGameHook();
 }
 
+static void DrawWeatherOptions() {
+    const auto draw = [](WidgetInfo& widget) { SohGui::mSohMenu->MenuDrawItem(widget, THEME_COLOR); };
+
+    ImGui::SeparatorText("Seasonal Presentation");
+    draw(seasonWeatherWidgets[0]);
+    ImGui::TextWrapped(
+        "The selected season controls outdoor colors and effects. The Rod still controls world changes.");
+    ImGui::TextWrapped("Configure each season below; opening a tab does not change the selected season.");
+    if (ImGui::BeginTabBar("SeasonWeatherSettings")) {
+        const auto drawSeason = [&](const char* name, size_t first, size_t last) {
+            if (WhatsNew::BeginTabItem(name, CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0)) {
+                for (size_t i = first; i <= last; ++i) {
+                    draw(seasonWeatherWidgets[i]);
+                }
+                ImGui::EndTabItem();
+            }
+        };
+        drawSeason("Spring", 1, 2);
+        drawSeason("Summer", 3, 6);
+        drawSeason("Autumn", 7, 8);
+        drawSeason("Winter", 9, 12);
+        ImGui::EndTabBar();
+    }
+
+    ImGui::SeparatorText("Outdoor Rain");
+    draw(globalOutdoorRain);
+    if (CVarGetInteger(CVAR_AUDIO("GlobalOutdoorRain"), 0)) {
+        draw(globalOutdoorRainMode);
+        draw(globalOutdoorRainColor);
+    }
+    draw(globalOutdoorRainOvercast);
+
+    ImGui::SeparatorText("Rain Audio and Thunder");
+    draw(proximityWeatherRainVolume);
+    draw(proximityWeatherThunder);
+    draw(proximityWeatherThunderStyle);
+    draw(proximityWeatherThunderVolume);
+    draw(proximityWeatherThunderFrequency);
+    if (ImGui::TreeNode("Diagnostics")) {
+        draw(weatherAudioDiagnostics);
+        ImGui::TreePop();
+    }
+}
+
 void AudioEditor::DrawElement() {
     AudioCollection::Instance->InitializeShufflePool();
 
@@ -579,6 +751,22 @@ void AudioEditor::DrawElement() {
                                                    .Tooltip("Unlocks all music and sound effects across tab groups"))) {
         AudioEditor_UnlockAll();
     }
+
+    const std::vector<std::string>& skippedMusic = SOH::GetOotrsSkippedForCustomBank();
+    if (!skippedMusic.empty()) {
+        UIWidgets::Separator();
+        ImGui::TextColored(UIWidgets::ColorValues.at(UIWidgets::Colors::Yellow),
+                           "%zu custom music file(s) were skipped: custom soundbanks are not supported yet.",
+                           skippedMusic.size());
+        if (ImGui::IsItemHovered()) {
+            ImGui::BeginTooltip();
+            for (const std::string& file : skippedMusic) {
+                ImGui::BulletText("%s", file.c_str());
+            }
+            ImGui::EndTooltip();
+        }
+    }
+
     UIWidgets::Separator();
 
     UIWidgets::PushStyleTabs(THEME_COLOR);
@@ -592,38 +780,40 @@ void AudioEditor::DrawElement() {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             if (ImGui::BeginChild("SfxOptions", ImVec2(0, -8))) {
-                SohGui::mSohMenu->MenuDrawItem(lowHpAlarm, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
-                SohGui::mSohMenu->MenuDrawItem(naviCall, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
-                SohGui::mSohMenu->MenuDrawItem(enemyProx, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(lowHpAlarm, THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(naviCall, THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(enemyProx, THEME_COLOR);
                 if (!CVarGetInteger(CVAR_AUDIO("EnemyBGMDisable"), 0)) {
-                    SohGui::mSohMenu->MenuDrawItem(leeverProx, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                                   THEME_COLOR);
+                    SohGui::mSohMenu->MenuDrawItem(leeverProx, THEME_COLOR);
                 }
-                SohGui::mSohMenu->MenuDrawItem(leadingMusic, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
-                SohGui::mSohMenu->MenuDrawItem(displaySeqName, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
-                SohGui::mSohMenu->MenuDrawItem(ovlDuration, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
-                SohGui::mSohMenu->MenuDrawItem(voicePitch, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(leadingMusic, THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(displaySeqName, THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(ovlDuration, THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(voicePitch, THEME_COLOR);
                 ImGui::SameLine();
                 ImGui::SetCursorPosY(ImGui::GetCursorPos().y + 40.f);
                 if (UIWidgets::Button("Reset##linkVoiceFreqMultiplier",
                                       UIWidgets::ButtonOptions().Size(ImVec2(80, 36)).Padding(ImVec2(5.0f, 0.0f)))) {
                     CVarSetFloat(CVAR_LINK_VOICE_FREQ_MULTIPLIER, 1.0f);
                 }
-                SohGui::mSohMenu->MenuDrawItem(randomAudioGenModes,
-                                               static_cast<uint32_t>(ImGui::GetContentRegionAvail().x), THEME_COLOR);
-                SohGui::mSohMenu->MenuDrawItem(lowerOctaves, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x),
-                                               THEME_COLOR);
+                ImGui::SeparatorText("Night Music");
+                SohGui::mSohMenu->MenuDrawItem(hyruleFieldNightMusic, THEME_COLOR);
+                DrawHyruleFieldNightTrack();
+                ImGui::SeparatorText("Audio Randomization");
+                SohGui::mSohMenu->MenuDrawItem(randomAudioGenModes, THEME_COLOR);
+                SohGui::mSohMenu->MenuDrawItem(lowerOctaves, THEME_COLOR);
             }
             ImGui::EndChild();
             ImGui::EndTable();
             ImGui::PopStyleVar(1);
+            ImGui::EndTabItem();
+        }
+
+        if (WhatsNew::BeginTabItem("Weather & Seasons", CVarGetInteger(WhatsNew::kEnabledCvar, 1) != 0)) {
+            if (ImGui::BeginChild("WeatherOptions", ImVec2(0, -8))) {
+                DrawWeatherOptions();
+            }
+            ImGui::EndChild();
             ImGui::EndTabItem();
         }
 
@@ -945,6 +1135,211 @@ void RegisterAudioWidgets() {
                      .DefaultValue(1.0f)
                      .Size(ImVec2(300.0f, 0.0f)));
     SohGui::mSohMenu->AddSearchWidget({ voicePitch, "Enhancements", "Audio Editor", "Audio Options" });
+
+    hyruleFieldNightMusic = { .name = "Enable Hyrule Field Night Music", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    hyruleFieldNightMusic.CVar(CVAR_AUDIO("HyruleFieldNightMusic"))
+        .Options(CheckboxOptions()
+                     .Color(THEME_COLOR)
+                     .DefaultValue(false)
+                     .Tooltip("Plays the selected night track only in Hyrule Field while preserving crickets, "
+                              "ordinary SFX, and proximity weather."));
+    SohGui::mSohMenu->AddSearchWidget({ hyruleFieldNightMusic, "Enhancements", "Audio Editor", "Audio Options" });
+
+    seasonWeatherWidgets[0] = { .name = "Seasonal Weather", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    seasonWeatherWidgets[0]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Season"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(-2)
+                     .ComboMap(seasonWeatherChoices)
+                     .Tooltip("Follow Game / Rod uses your saved, owned Rod season. Native uses the scene's original "
+                              "presentation. Manual seasons change outdoor visuals without granting the Rod, "
+                              "unlocking seasons or changing saved gameplay."));
+    seasonWeatherWidgets[1] = { .name = "Spring Rain", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    seasonWeatherWidgets[1]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Spring.RainMode"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(-1)
+                     .ComboMap(seasonRainModes)
+                     .Tooltip("Season Default keeps Spring dry. Persistent and Intermittent add seasonal rain. "
+                              "Scene and story rain retain priority. The global outdoor rain setting also "
+                              "remains independent."));
+    seasonWeatherWidgets[2] = { .name = "Spring Falling Petals", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[2]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Spring.Blossoms"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Falling pink petals outdoors during Spring."));
+    seasonWeatherWidgets[3] = { .name = "Summer Atmosphere", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[3]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Summer.Enabled"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Enables Summer fluff, nighttime fireflies and optional sunbeams. "
+                              "Each effect also has its own setting below."));
+    seasonWeatherWidgets[4] = { .name = "Summer Drifting Fluff", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[4]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Summer.Fluff"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Drifting dandelion fluff during clear Summer days."));
+    seasonWeatherWidgets[5] = { .name = "Summer Nighttime Fireflies", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[5]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Summer.Fireflies"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Softly pulsing Summer fireflies after dusk."));
+    seasonWeatherWidgets[6] = { .name = "Soft Summer Sunbeams", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[6]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Summer.Sunbeams"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(false)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Soft shafts of sunlight during clear Summer days. Disabled by default."));
+    seasonWeatherWidgets[7] = { .name = "Autumn Rain", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    seasonWeatherWidgets[7]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Autumn.RainMode"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(-1)
+                     .ComboMap(seasonRainModes)
+                     .Tooltip("Season Default preserves the Rod's steady Autumn rain. Off clears added seasonal "
+                              "rain; Persistent and Intermittent use a separate shower cycle. Scene and story "
+                              "rain retain priority."));
+    seasonWeatherWidgets[8] = { .name = "Autumn Falling Leaves", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[8]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Autumn.Leaves"))
+        .Options(
+            CheckboxOptions().DefaultValue(true).Color(THEME_COLOR).Tooltip("Falling leaves outdoors during Autumn."));
+    seasonWeatherWidgets[9] = { .name = "Winter Snow", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[9]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Winter.Snow"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Adds falling snow outdoors during Winter. Scenes with native snow keep their "
+                              "existing snow."));
+    seasonWeatherWidgets[10] = { .name = "Winter Windblown Flurries", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[10]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Winter.Flurries"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(false)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Adds gusts of windblown snow when Winter Snow is enabled."));
+    seasonWeatherWidgets[11] = { .name = "Winter Freezing Mist", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[11]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Winter.Mist"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Low, pale blue mist over outdoor terrain during Winter, day and night. "
+                              "Works with Winter Snow turned off."));
+    seasonWeatherWidgets[12] = { .name = "Winter Nighttime Aurora", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    seasonWeatherWidgets[12]
+        .CVar(SOH_SEASON_WEATHER_CVAR("Winter.Aurora"))
+        .Options(CheckboxOptions()
+                     .DefaultValue(true)
+                     .Color(THEME_COLOR)
+                     .Tooltip("Slow blue and green ribbons in the open Winter night sky, fading after dusk "
+                              "and toward dawn. Works with Winter Snow turned off."));
+    for (auto& widget : seasonWeatherWidgets) {
+        SohGui::mSohMenu->AddSearchWidget({ widget, "Enhancements", "Audio Editor", "Weather & Seasons" });
+    }
+
+    globalOutdoorRain = { .name = "Enable Rain in Outdoor Scenes", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    globalOutdoorRain.CVar(CVAR_AUDIO("GlobalOutdoorRain"))
+        .Options(CheckboxOptions()
+                     .Color(THEME_COLOR)
+                     .DefaultValue(false)
+                     .Tooltip("Displays rain and plays the concurrent rain loop in outdoor scenes without requiring "
+                              "a proximity-weather actor. Does not force lightning or thunder."));
+    SohGui::mSohMenu->AddSearchWidget({ globalOutdoorRain, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    globalOutdoorRainMode = { .name = "Global Rain Mode", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    globalOutdoorRainMode.CVar(CVAR_AUDIO("GlobalOutdoorRainMode"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(0)
+                     .ComboMap(globalOutdoorRainModes)
+                     .Tooltip("Persistent rains continuously. Intermittent Storms alternate randomized dry and "
+                              "rain periods with synchronized visual and audio fades."));
+    SohGui::mSohMenu->AddSearchWidget({ globalOutdoorRainMode, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    globalOutdoorRainColor = { .name = "Global Rain Color", .type = WidgetType::WIDGET_CVAR_COLOR_PICKER };
+    globalOutdoorRainColor.CVar(CVAR_AUDIO("GlobalOutdoorRainColor"))
+        .Options(ColorPickerOptions()
+                     .Color(THEME_COLOR)
+                     .DefaultValue({ 150, 255, 255, 255 })
+                     .ShowReset()
+                     .Tooltip("Changes only rain created by Enable Rain in Outdoor Scenes. Native story and "
+                              "proximity-weather rain keep their original color."));
+    SohGui::mSohMenu->AddSearchWidget({ globalOutdoorRainColor, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    globalOutdoorRainOvercast = { .name = "Overcast Sky During Rain", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    globalOutdoorRainOvercast.CVar(CVAR_AUDIO("GlobalOutdoorRainOvercast"))
+        .Options(CheckboxOptions()
+                     .Color(THEME_COLOR)
+                     .DefaultValue(true)
+                     .Tooltip("Fades compatible outdoor skies and lighting to the native overcast palette during "
+                              "placed thunderstorms, persistent rain, and intermittent rain."));
+    SohGui::mSohMenu->AddSearchWidget(
+        { globalOutdoorRainOvercast, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    weatherAudioDiagnostics = { .name = "Log Weather Audio Diagnostics", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    weatherAudioDiagnostics.CVar(CVAR_AUDIO("WeatherAudioDiagnostics"))
+        .Options(CheckboxOptions()
+                     .Color(THEME_COLOR)
+                     .DefaultValue(false)
+                     .Tooltip("Logs thunder voice admission and periodic pre/post weather PCM peaks and clamp "
+                              "counts for troubleshooting weather audio."));
+    SohGui::mSohMenu->AddSearchWidget({ weatherAudioDiagnostics, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    proximityWeatherThunder = { .name = "Enable Weather Thunder", .type = WidgetType::WIDGET_CVAR_CHECKBOX };
+    proximityWeatherThunder.CVar(CVAR_AUDIO("ProximityWeatherThunder"))
+        .Options(CheckboxOptions()
+                     .Color(THEME_COLOR)
+                     .DefaultValue(true)
+                     .Tooltip("Enables synchronized lightning and thunder for placed, persistent, and intermittent "
+                              "weather."));
+    SohGui::mSohMenu->AddSearchWidget({ proximityWeatherThunder, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    proximityWeatherThunderStyle = { .name = "Thunder Style", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    proximityWeatherThunderStyle.CVar(CVAR_AUDIO("ProximityWeatherThunderStyle"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(CONCURRENT_WEATHER_THUNDER_LOW)
+                     .ComboMap(proximityWeatherThunderStyles)
+                     .Tooltip("Low Thunder plays the native rumble. Lightning plays the native crack. Layered "
+                              "Thunder combines both."));
+    SohGui::mSohMenu->AddSearchWidget(
+        { proximityWeatherThunderStyle, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    proximityWeatherRainVolume = { .name = "Weather Rain Volume: %d%%", .type = WidgetType::WIDGET_CVAR_SLIDER_INT };
+    proximityWeatherRainVolume.CVar(CVAR_AUDIO("ProximityWeatherRainVolume"))
+        .Options(IntSliderOptions().Color(THEME_COLOR).Min(0).Max(100).DefaultValue(50).Size(ImVec2(300.0f, 0.0f)));
+    SohGui::mSohMenu->AddSearchWidget(
+        { proximityWeatherRainVolume, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    proximityWeatherThunderVolume = { .name = "Weather Thunder Volume: %d%%",
+                                      .type = WidgetType::WIDGET_CVAR_SLIDER_INT };
+    proximityWeatherThunderVolume.CVar(CVAR_AUDIO("ProximityWeatherThunderVolume"))
+        .Options(IntSliderOptions().Color(THEME_COLOR).Min(0).Max(100).DefaultValue(70).Size(ImVec2(300.0f, 0.0f)));
+    SohGui::mSohMenu->AddSearchWidget(
+        { proximityWeatherThunderVolume, "Enhancements", "Audio Editor", "Weather & Seasons" });
+
+    proximityWeatherThunderFrequency = { .name = "Weather Thunder Frequency: %d%%",
+                                         .type = WidgetType::WIDGET_CVAR_SLIDER_INT };
+    proximityWeatherThunderFrequency.CVar(CVAR_AUDIO("ProximityWeatherThunderFrequency"))
+        .Options(IntSliderOptions()
+                     .Color(THEME_COLOR)
+                     .Min(0)
+                     .Max(100)
+                     .DefaultValue(50)
+                     .Size(ImVec2(300.0f, 0.0f))
+                     .Tooltip("Controls the shared lightning cadence. 50% preserves the native timing; 0% disables "
+                              "strikes and 100% approximately doubles their frequency."));
+    SohGui::mSohMenu->AddSearchWidget(
+        { proximityWeatherThunderFrequency, "Enhancements", "Audio Editor", "Weather & Seasons" });
 
     randomAudioGenModes = { .name = "Automatically Randomize All Music and Sound Effects",
                             .type = WidgetType::WIDGET_CVAR_COMBOBOX };

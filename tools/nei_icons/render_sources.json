@@ -1,0 +1,461 @@
+{
+  "ClimbBoots": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 24,
+      "elevation": 12,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/climb_boots/climb_boots.glb": "babb719d7526538281b54f45e1b8998b93e1e6a8a7e5465f3103e922f2abdc7a",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "climb_boots",
+    "title": "Climbing Boots",
+    "triangles": 7672
+  },
+  "ClimbSpeed": {
+    "approximations": [
+      "ROM-only texture unavailable; neutral reflection: objects/gameplay_keep/gEffUnknown11Tex"
+    ],
+    "camera": {
+      "azimuth": 25,
+      "elevation": 12,
+      "roll": 0
+    },
+    "dependencies": {
+      "soh/assets/custom/objects/object_stat_upgrade/gStatClimbSpeedDL": "81906076e0e89f83726c606b356dff25d87130866f55141ade71af3db7a346b5",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatClimbSpeedDL_tri_0": "6f715212827ea86ffc01ff40c62482f528d2f2c97adcc8bfcf56530f47fdebd4",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatClimbSpeedDL_tri_1": "d6083b247c7dc22e749c2be36236ea7070acc0ea7ff4a56431240ec6be3671f8",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatClimbSpeedDL_vtx_0": "c241c5b44e63d1e781ab0703657c10b40ecc9bd6ba55766a9db690bc4f7bef80",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatClimbSpeedDL_vtx_1": "8d44494d7b8037a04824d8adce003705dc676970a357dc0a969030e004e3b879",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatClimbSpeedDL_speed_plus_layerOpaque": "ba70086b16dfac2c3aad06dff5323c5732962e274d88d20020971950607256e6",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatClimbSpeedDL_speed_upgrade_layerOpaque": "9be05fc20928b8fb9e83082ea3b10687dff0f786207edeb6f6af1b29ec3a1139",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native XML display-list triangles and primitive/environment materials",
+    "source": "gStatClimbSpeedDL",
+    "title": "Climb Speed",
+    "triangles": 94
+  },
+  "CrawlSpeed": {
+    "approximations": [
+      "ROM-only texture unavailable; neutral reflection: objects/gameplay_keep/gEffUnknown11Tex",
+      "ROM-only texture unavailable; neutral reflection: objects/object_gi_gloves/object_gi_glovesTex_000000"
+    ],
+    "camera": {
+      "azimuth": 25,
+      "elevation": 12,
+      "roll": 0
+    },
+    "dependencies": {
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL": "661aa28ba8a7a57f2a2831c9c993cc595693192a9da0307e30046cf2bd279d7c",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_tri_0": "3ee4dc87356728a54c6e33e1949863f70e6d579b48dd5cc0bd4df2368e08246e",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_tri_1": "48b0f0023e87d870f032acf2bd37a95fa3166d72ce9a08744846054882e94309",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_tri_2": "b550bc82040f36e910f11b8d3b39a7984e7b529481ea045b3dd6155d7a1d72e2",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_tri_3": "64451b37153f8b6e152d2252f51401e79bc54b71f6dea2e9ddec4f3448e267fe",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_tri_4": "afe921a2a463d0a4feab1cbfb4f750b1124c7e03036b3a2a5834fa774182da97",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_vtx_0": "0d6287c31153363cdfef6e8a8b0f1d7bae7272b05be81a050dad71870488917c",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_vtx_1": "54d9ffefb1b2d6d9ee3e4d20cb45b081a5c74cd2a8e3afaae54d52a5fe3e129f",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_vtx_2": "4395fb21b46c78f1ef09250901a77892c7deafc2e8df20f034d6f3f3a094cda4",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_vtx_3": "cb65c35db01d407ecd9952eed455d37d31f03beffe8392c001444a05861d6e46",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatCrawlSpeedDL_vtx_4": "e355bc12115718c49316744cd8a723ccf424ebbe684e8f06ed13df234a31ba7f",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatCrawlSpeedDL_kneepad_decal_2_layerOpaque": "3da2b86a53480377fa322afa2becee98077e7ba4be1043655efd888471d21a46",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatCrawlSpeedDL_kneepad_decal_layerOpaque": "e2332896574ada32afae6a5dfca1319b54d4a69ce159068e1da63e91711eb86d",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatCrawlSpeedDL_speed_accent_2_layerOpaque": "143cfda347a9258a1e39fece04c414d91c3b2b984ad304e6e5cbe07ad350426e",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatCrawlSpeedDL_speed_plus_layerOpaque": "ba70086b16dfac2c3aad06dff5323c5732962e274d88d20020971950607256e6",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatCrawlSpeedDL_speed_upgrade_2_layerOpaque": "4a7a04e6593b72664fa7049b6f5c630bd0140a5fcec74a7d155aef1e86720cd5",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native XML display-list triangles and primitive/environment materials",
+    "source": "gStatCrawlSpeedDL",
+    "title": "Crawl Speed",
+    "triangles": 182
+  },
+  "DemiseDestruction": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 20,
+      "elevation": 12,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/demise_destruction/demise_destruction.glb": "7b5e3447a552687ae955bf7aea77939f2f8efff104f24062a3b6dd912dc6af8f",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "demise_destruction",
+    "title": "Demise Destruction",
+    "triangles": 776
+  },
+  "ElementalWand": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 18,
+      "elevation": 8,
+      "roll": -27
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/elemental_wand/elemental_wand.glb": "c201697593ca9d9532293188ed30d902727b2b087179b3e0d90ccf0bb83af28a",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "elemental_wand",
+    "title": "Elemental Wand",
+    "triangles": 2056
+  },
+  "MarioMask": {
+    "approximations": [
+      "Original icon camera/lighting and procedural authoring recipe unavailable; pixels preserved exactly."
+    ],
+    "camera": null,
+    "dependencies": {
+      "tools/nei_gi/SOURCE/mario_sm64_poc3.py": "a96bbe095e993b9f6b1a38129f3f8cc344201a50d8bb03cba8e796a3f78719a4",
+      "tools/nei_gi/SOURCE/mario_sm64_poc3/serialized_source.o2r": "9980d41450bcaa741d2f86cee3658606eec76f558b4d73c5d26d7eccc6f7e52f",
+      "tools/nei_gi/SOURCE/mario_sm64_poc3/source.json": "ab7cbced182f564a912fa17df75f2f6d83f17aefadc82f4456059b542b3d541b"
+    },
+    "method": "lossless pixels from retained Mario SM64 POC3 OTEX1 source",
+    "source": "ComboShip_Mario_SM64_POC3",
+    "title": "Mario Mask",
+    "triangles": 13112
+  },
+  "MeteorRod": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 18,
+      "elevation": 8,
+      "roll": -27
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/meteor_rod/meteor_rod.glb": "f3207cf66a2e745cf5ab8fa4a21781925f5d764569f11774c289d4436dab6c2a",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "meteor_rod",
+    "title": "Meteor Rod",
+    "triangles": 1976
+  },
+  "PushSpeed": {
+    "approximations": [
+      "ROM-only texture unavailable; neutral reflection: objects/gameplay_keep/gEffUnknown11Tex"
+    ],
+    "camera": {
+      "azimuth": 25,
+      "elevation": 12,
+      "roll": 0
+    },
+    "dependencies": {
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL": "e33e6d6385a2d0731de3735621a626e024ff501e18c9de5f91c5cfd5a35dfcc5",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_tri_0": "e66a2b0e39ff775eb9fc2e2fd9a4a7fc3af686dd4c598e7bd4268d6ddded8ad6",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_tri_1": "6c3ee62d8e5ea31dc260dc7d3893364d334199941cb73d1bd4374ec0dc93562a",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_tri_2": "7cab9a5c796c1a95c2344bff5235e40eed2a752b1b2aab05ac7a5e12a53218b4",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_tri_3": "c3191833125c45909979ae02a36578e4cd8bae51308ff686397ebc5877009414",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_vtx_0": "8d44494d7b8037a04824d8adce003705dc676970a357dc0a969030e004e3b879",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_vtx_1": "cf0dd999baf2c14c23291a3852276af15535010a1cec8773c1a44ebc2a645688",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_vtx_2": "6dec6b34ac6379fe3b17ad6bc5df00cff3fdf18562b126d7473d04bfa4ed6be2",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPushSpeedDL_vtx_3": "42de1d1e3bba4fa043a5be5a145b3c743baf2319eefa5b45825ad93fd41b27b8",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPushSpeedDL_speed_accent_layerOpaque": "85fa4273b702f1f527837621e1adf36ba21814a6f795921fadef8716338964a4",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPushSpeedDL_speed_gem_layerOpaque": "a39481f47d5707963965c739cf0d6aa856a9f006eb7638745a21704c9548b842",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPushSpeedDL_speed_plus_layerOpaque": "ba70086b16dfac2c3aad06dff5323c5732962e274d88d20020971950607256e6",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPushSpeedDL_speed_upgrade_layerOpaque": "9be05fc20928b8fb9e83082ea3b10687dff0f786207edeb6f6af1b29ec3a1139",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native XML display-list triangles and primitive/environment materials",
+    "source": "gStatPushSpeedDL",
+    "title": "Push Speed",
+    "triangles": 204
+  },
+  "SandRod": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 18,
+      "elevation": 8,
+      "roll": -27
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/sand_rod/sand_rod.glb": "64001a52795000798f5c22918d1c829989a1c142a9648ab4bfbcfed3b9ecd541",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "sand_rod",
+    "title": "Sand Rod",
+    "triangles": 1848
+  },
+  "ShadowScepter": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 18,
+      "elevation": 8,
+      "roll": -27
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/shadow_scepter/shadow_scepter.glb": "fe9ba9addf623a2fdffb044f332a01a8bed965b472560f8f6f00dfd6e4acfb90",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "shadow_scepter",
+    "title": "Shadow Scepter",
+    "triangles": 1508
+  },
+  "SheikahSlate": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 16,
+      "elevation": 8,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/sheikah_slate/sheikah_slate.glb": "8f621bbd967842556e45c33419993af27a0e56ad2dd77cd63007b3ecabe90e2f",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "sheikah_slate",
+    "title": "Sheikah Slate",
+    "triangles": 4316
+  },
+  "SheikahSlateBomb": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 16,
+      "elevation": 8,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/slate_bomb/slate_bomb.glb": "9ed98efc93f741c59bb6cce180c149445b2377abbd056a6aa5dab0c9b9f85683",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "slate_bomb",
+    "title": "Slate \u00b7 Bomb",
+    "triangles": 4466
+  },
+  "SheikahSlateCryonis": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 16,
+      "elevation": 8,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/slate_cryonis/slate_cryonis.glb": "34aa19b610262b1765cd6fe496888cc04177d69b02bc0a760b7e037e11798307",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "slate_cryonis",
+    "title": "Slate \u00b7 Cryonis",
+    "triangles": 4400
+  },
+  "SheikahSlateMasterCycle": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 16,
+      "elevation": 8,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/slate_master_cycle/slate_master_cycle.glb": "3eb2a460630ddcca64dcffc74d27f9e4d8714a3a5e317cab050ad84c0033a22d",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "slate_master_cycle",
+    "title": "Slate \u00b7 Master Cycle",
+    "triangles": 4676
+  },
+  "SheikahSlateSensor": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 16,
+      "elevation": 8,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/slate_sensor/slate_sensor.glb": "7af48b818b606bcaf652198a43d24551972a7bd42e169ce8c165c6d616e845b2",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "slate_sensor",
+    "title": "Slate \u00b7 Sensor",
+    "triangles": 4796
+  },
+  "SheikahSlateStasis": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 16,
+      "elevation": 8,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/slate_stasis/slate_stasis.glb": "09fcb54f568a26ea087d586178cfcf4a80ff20983a1a3e606f88a0e26b749646",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "slate_stasis",
+    "title": "Slate \u00b7 Stasis",
+    "triangles": 4372
+  },
+  "StatDefense": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 25,
+      "elevation": 12,
+      "roll": 0
+    },
+    "dependencies": {
+      "mm/assets/custom/objects/gameplay_keep/gEffUnknown10Tex": "fbbfbdd05ec65f84de2da84bfc17f7da8d9a7e0f06a53ddbb5ad35096fafbe29",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatDefenseDL": "b9db82cb92b269bd3fb7b7143da955f6e2deb9294b9790d16e67736a3419f624",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatDefenseDL_layer_Opaque_tri_0": "7ce2cca74a0a72c703fda22e5374b51e9faca9b610cd904fa0846a4e460f0986",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatDefenseDL_layer_Opaque_tri_1": "760e5db22d120fb8065d878c6db7963f7b6c528570cfada3cfa4201e25a2352a",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatDefenseDL_layer_Opaque_vtx_0": "2ed61657b6e9a06db01911a5abfa5e42b8792337072e801afd3ea24e96cf81db",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatDefenseDL_layer_Opaque_vtx_1": "385a57b0273f4125c8270f795fdbe6b2be92033f48cc1aaa337f32e87b32042b",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatDefenseDL_Acorn_DB_layerOpaque": "07d43327507bbf28e3cb794ae9db0b86d6ee3a472859861964ad486f14e9cbbb",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatDefenseDL_Acorn_LB_layerOpaque": "89265f10f3e3bc8fbafdb1697272ed7aec8c5b133fa044a3825f0335b43f6d24",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native XML display-list triangles and primitive/environment materials",
+    "source": "gStatDefenseDL",
+    "title": "Defense Upgrade",
+    "triangles": 142
+  },
+  "StatMagic": {
+    "approximations": [
+      "Generated interpretation of the green native Magic Jar; native ROM geometry unavailable."
+    ],
+    "camera": {
+      "azimuth": 0,
+      "elevation": 0,
+      "roll": 0
+    },
+    "dependencies": {
+      "tools/nei_icons/SOURCE/magic_jar_generated.png": "226ffef498f51417aaf80998463375a282d08c217a6e3a43f5e89fa76925db9e",
+      "tools/nei_icons/SOURCE/magic_jar_prompt.txt": "1f7883e67b62c1edba124cdcfb9aff1d0cf9f1fced0ba2ebca5d85c2fdaebf2d",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "image_gen; preserved authored RGBA source, downsampled from 1280px",
+    "source": "magic_jar_generated",
+    "title": "Magic Upgrade",
+    "triangles": null
+  },
+  "StatPower": {
+    "approximations": [],
+    "camera": {
+      "azimuth": -80,
+      "elevation": 8,
+      "roll": 0
+    },
+    "dependencies": {
+      "mm/assets/custom/objects/gameplay_keep/gEffUnknown10Tex": "fbbfbdd05ec65f84de2da84bfc17f7da8d9a7e0f06a53ddbb5ad35096fafbe29",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL": "2a7b022f6593cff40ed518a2cc3a147d23627a9df0745faf2b0a7ff2f0d4cbfa",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_tri_0": "5c7a76f0c09c86328aa5ffee69cc64da8e662af9506fa059050648a1b2a3cc3f",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_tri_1": "437edfb3163de51bcd5193b7b0a535acb381d9328110df3fbe3300df58918172",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_tri_2": "beb1e1b36ff3a8719967a19378030d1cdff8be00b8128b39ca5226c35c682c1b",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_tri_3": "8b79d8ff1c7ea3fb41f468135a6b55be1969da23be319e65693aeb570d5a2da8",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_vtx_0": "5bcf3e756e98a0faf7ab8c408f3faf6a84cbf757bfde10ecdadb033daa674527",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_vtx_1": "2aaf647ee3ce1644887d32521826a80b705c9e7d07c2d1e455ed17ca94dde46c",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_vtx_2": "06c2e3dbf09fbe27b4ab63aae5e519207e484b1dff065f0e10dbbf634100ce1d",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatPowerDL_layer_Opaque_vtx_3": "06e3b4efc068c0544da29db678fc9a0cd59b82fb289389a74208e314b7f1af75",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPowerDL_Main_Body_Piece_layerOpaque": "e66a444bca8f0aec88ae43e71ab49409c5ee5cc03c5981245db62d605f240249",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPowerDL_Pearl_layerOpaque": "df8e452bce26b8c5a2413148031144d7c1b4b1a0b27ec4ed2dbb01a627854133",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPowerDL_Small_Body_Piece_layerOpaque": "486e307929b346acd46239b11024a2fef5dcce05a9069a5aa762414a07dcf3f1",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatPowerDL_String_layerOpaque": "2c1a98084143d57bb0d1cae890961c45cb2f2d46c57f7ac78e5e0214920954fa",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native XML display-list triangles and primitive/environment materials",
+    "source": "gStatPowerDL",
+    "title": "Power Upgrade",
+    "triangles": 154
+  },
+  "StatSpeed": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 25,
+      "elevation": 12,
+      "roll": 0
+    },
+    "dependencies": {
+      "mm/assets/custom/objects/gameplay_keep/gEffUnknown10Tex": "fbbfbdd05ec65f84de2da84bfc17f7da8d9a7e0f06a53ddbb5ad35096fafbe29",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatSpeedDL": "c84ea6b584015139261fb174c491f831581cf069f920ce3ef4d0bfe2942580c5",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatSpeedDL_layer_Opaque_tri_0": "0a4d11b572058241f391dd37e63edeb5f417a2a76a093ed4731e69222aa12c45",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatSpeedDL_layer_Opaque_tri_1": "b30ff84f129c90f84d3608d70952e7cc6f66bef71eb9f0813744e67464d05ef0",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatSpeedDL_layer_Opaque_vtx_0": "8297c207d129607f65bb23e2f4c4d76142e5cb6edfc7c44fe8bb264a9b1d39ef",
+      "soh/assets/custom/objects/object_stat_upgrade/gStatSpeedDL_layer_Opaque_vtx_1": "d809c3534cce0c40349dfaccadbd73b6aa14ad6c57d0b469ed2c072be5f757bc",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatSpeedDL_Boot_DG_layerOpaque": "42911a6c107bb575b3656f5b1ea890472b4f938df96ba492fbd6696caea95c6b",
+      "soh/assets/custom/objects/object_stat_upgrade/mat_gStatSpeedDL_Boot_LG_layerOpaque": "de0acb51c2e77c0f67708958cd92fda1f0d368d06a6b6a502f0c16fe45fa7bb6",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native XML display-list triangles and primitive/environment materials",
+    "source": "gStatSpeedDL",
+    "title": "Speed Upgrade",
+    "triangles": 84
+  },
+  "StormRod": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 18,
+      "elevation": 8,
+      "roll": -27
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/storm_rod/storm_rod.glb": "66011a9b41c67fe3ab0fc1ae3d4d8eb7165848befdcd858c10eb641872949c68",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "storm_rod",
+    "title": "Storm Rod",
+    "triangles": 1464
+  },
+  "TornadoRod": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 18,
+      "elevation": 8,
+      "roll": -27
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/tornado_rod/tornado_rod.glb": "1f54fa0f93d79ad54654999247d3059129edad0f97ceb470f1eb37be0a49d30b",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "tornado_rod",
+    "title": "Tornado Rod",
+    "triangles": 2144
+  },
+  "WaterRod": {
+    "approximations": [],
+    "camera": {
+      "azimuth": 18,
+      "elevation": 8,
+      "roll": -27
+    },
+    "dependencies": {
+      "tools/nei_gi/CHECKPOINTS/water_rod/water_rod.glb": "2052b461073a15dc508ea46d3e56baff0642d7c19f06593d566aaab38d0d2f37",
+      "tools/nei_icons/SOURCE/render_driver_20261004.py": "77d354f7878381448e0938459204dee464ece5041aef4790754da1d8b126fa80",
+      "tools/nei_icons/render.py": "afdd89b78da881911cfbe06424d9f8136e097c9a1248e077363c3b6e14d4d476"
+    },
+    "method": "native GI checkpoint GLB triangles and materials",
+    "source": "water_rod",
+    "title": "Water Rod",
+    "triangles": 2200
+  }
+}

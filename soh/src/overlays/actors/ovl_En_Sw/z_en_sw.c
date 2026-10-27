@@ -2,8 +2,17 @@
 #include "objects/object_st/object_st.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "mods/transformation_masks/mm_mask_wear.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
+
+Actor* EnSw_SpawnFromSoil(Actor* soil, PlayState* play, s32 playChime) {
+    // Native soil births use zero rotZ. Carry the quiet intent on this spawn so
+    // deferred init and unrelated actors in pre-init callbacks cannot steal it.
+    return Actor_Spawn(&play->actorCtx, play, ACTOR_EN_SW, soil->world.pos.x, soil->world.pos.y, soil->world.pos.z, 0,
+                       soil->shape.rot.y, playChime ? 0 : ENSW_SOIL_QUIET_ROT_Z, (soil->params | 0x8000));
+}
 
 void EnSw_Init(Actor* thisx, PlayState* play);
 void EnSw_Destroy(Actor* thisx, PlayState* play);
@@ -220,6 +229,12 @@ void EnSw_Init(Actor* thisx, PlayState* play) {
     s32 phi_v0;
     Vec3f sp4C = { 0.0f, 0.0f, 0.0f };
     s32 pad;
+    s32 quietSoilSpawn = (thisx->params & 0x8000) && (thisx->home.rot.z == ENSW_SOIL_QUIET_ROT_Z);
+
+    if (quietSoilSpawn) {
+        // Actor_Init has copied the birth rotation into all four carriers.
+        thisx->home.rot.z = thisx->world.rot.z = thisx->shape.rot.z = thisx->focus.rot.z = 0;
+    }
 
     if (thisx->params & 0x8000) {
         phi_v0 = (((thisx->params - 0x8000) & 0xE000) >> 0xD) + 1;
@@ -267,9 +282,9 @@ void EnSw_Init(Actor* thisx, PlayState* play) {
         func_80B0C0CC(this, play, 1);
     }
 
-    if (((thisx->params & 0xE000) >> 0xD) >= 3) {
-        Audio_PlaySoundGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    if (((thisx->params & 0xE000) >> 0xD) >= 3 && !quietSoilSpawn) {
+        Audio_PlaySfxGeneral(NA_SE_SY_CORRECT_CHIME, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 
     switch ((thisx->params & 0xE000) >> 0xD) {
@@ -313,8 +328,6 @@ void EnSw_Destroy(Actor* thisx, PlayState* play) {
     EnSw* this = (EnSw*)thisx;
 
     Collider_DestroyJntSph(play, &this->collider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 s32 func_80B0C9F0(EnSw* this, PlayState* play) {
@@ -555,9 +568,7 @@ void func_80B0D590(EnSw* this, PlayState* play) {
             this->collider.elements[0].info.ocElemFlags = 1;
         }
 
-        Math_ApproachF(&this->actor.scale.x,
-                       !IS_DAY || CVarGetInteger(CVAR_ENHANCEMENT("NightGSAlwaysSpawn"), 0) ? 0.02f : 0.0f, 0.2f,
-                       0.01f);
+        Math_ApproachF(&this->actor.scale.x, !IS_DAY || MmMaskWear_ShouldForceNightGS() ? 0.02f : 0.0f, 0.2f, 0.01f);
         Actor_SetScale(&this->actor, this->actor.scale.x);
     }
 
@@ -621,8 +632,8 @@ void func_80B0D878(EnSw* this, PlayState* play) {
     this->actor.shape.rot = this->actor.world.rot;
 
     if ((this->unk_394 == 0) && (this->unk_392 == 0)) {
-        Audio_PlaySoundGeneral(NA_SE_SY_KINSTA_MARK_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_SY_KINSTA_MARK_APPEAR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         x = (this->unk_364.x * 10.0f);
         y = (this->unk_364.y * 10.0f);
         z = (this->unk_364.z * 10.0f);

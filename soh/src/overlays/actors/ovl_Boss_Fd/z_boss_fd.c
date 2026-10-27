@@ -16,6 +16,7 @@
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "mods/transformation_masks/boss_super_damage.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -396,9 +397,8 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
                     this->fogMode = 1;
                 }
                 if (this->timers[0] < 50) {
-                    Audio_PlaySoundGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     this->camData.yMod = Math_CosS(this->work[BFD_MOVE_TIMER] * 0x8000) * this->camData.shake;
                     Math_ApproachF(&this->camData.shake, 2.0f, 1.0f, 0.8 * 0.01f);
                 }
@@ -418,8 +418,8 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
             case BFD_CS_LOOK_GROUND:
                 this->camData.yMod = Math_CosS(this->work[BFD_MOVE_TIMER] * 0x8000) * this->camData.shake;
                 Math_ApproachF(&this->camData.shake, 2.0f, 1.0f, 0.8 * 0.01f);
-                Audio_PlaySoundGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 if (this->timers[0] == 0) {
                     this->introState = BFD_CS_COLLAPSE;
                     this->camData.nextEye.x = player2->actor.world.pos.x + 100.0f + 300.0f;
@@ -439,8 +439,8 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
                 this->camData.accel = 0.005f;
                 this->camData.yMod = Math_CosS(this->work[BFD_MOVE_TIMER] * 0x8000) * this->camData.shake;
                 Math_ApproachF(&this->camData.shake, 2.0f, 1.0f, 0.8 * 0.01f);
-                Audio_PlaySoundGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 if (this->timers[0] == 100) {
                     this->platformSignal = VBSIMA_COLLAPSE;
                 }
@@ -476,9 +476,8 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
                 osSyncPrintf("WAY_SPD Y = %f\n", this->camData.atVel.y);
                 osSyncPrintf("WAY_SPD Z = %f\n", this->camData.atVel.z);
                 if ((this->timers[3] > 190) && !Flags_GetEventChkInf(EVENTCHKINF_BEGAN_VOLVAGIA_BATTLE)) {
-                    Audio_PlaySoundGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 if (this->timers[3] == 190) {
                     this->camData.atMaxVel.x = this->camData.atMaxVel.y = this->camData.atMaxVel.z = 0.05f;
@@ -684,9 +683,8 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
                 if (this->actor.bgCheckFlags & 0x10) {
                     this->fwork[BFD_CEILING_BOUNCE] = -18384.0f;
                     this->timers[1] = 10;
-                    Audio_PlaySoundGeneral(NA_SE_EV_EXPLOSION, &this->actor.projectedPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_EV_EXPLOSION, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                     Actor_RequestQuakeWithSpeed(play, 3, 0xA, 0x7530);
                     this->work[BFD_ROCK_TIMER] = 300;
                 }
@@ -785,9 +783,8 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
 
                 sp150 = 1;
                 if (this->work[BFD_MOVE_TIMER] & 0x1C) {
-                    Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_BURN - SFX_FLAG, &this->actor.projectedPos, 4,
-                                           &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                           &gSfxDefaultReverb);
+                    Audio_PlaySfxGeneral(NA_SE_EN_VALVAISA_BURN - SFX_FLAG, &this->actor.projectedPos, 4,
+                                         &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
                 }
                 for (i1 = 0; i1 < sp150; i1++) {
                     if (sp150) { // Needed for matching
@@ -859,9 +856,9 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
                         this->work[BFD_CEILING_TARGET]++;
                         this->timers[1] = 60;
                         this->work[BFD_CAM_SHAKE_TIMER] = 20;
-                        Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_LAND2, &this->actor.projectedPos, 4,
-                                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
-                                               &gSfxDefaultReverb);
+                        Audio_PlaySfxGeneral(NA_SE_EN_VALVAISA_LAND2, &this->actor.projectedPos, 4,
+                                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale,
+                                             &gSfxDefaultReverb);
                         Player_SetCsActionWithHaltedActors(play, &this->actor, 5);
                         for (i1 = 0; i1 < 15; i1++) {
                             Vec3f sp144 = { 0.0f, 0.0f, 0.0f };
@@ -902,8 +899,8 @@ void BossFd_Fly(BossFd* this, PlayState* play) {
                 Vec3f sp114 = { 0.0f, 0.0f, 0.0f };
                 Vec3f sp108 = { 0.0f, 0.03f, 0.0f };
 
-                Audio_PlaySoundGeneral(NA_SE_EN_GOMA_LAST - SFX_FLAG, &this->actor.projectedPos, 4,
-                                       &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                Audio_PlaySfxGeneral(NA_SE_EN_GOMA_LAST - SFX_FLAG, &this->actor.projectedPos, 4,
+                                     &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
 
                 sp120.x = Rand_CenteredFloat(40.0f) + this->actor.world.pos.x;
                 sp120.y = (Rand_CenteredFloat(10.0f) + this->actor.world.pos.y) - 10.0f;
@@ -1142,8 +1139,8 @@ void BossFd_Effects(BossFd* this, PlayState* play) {
 
     if (this->work[BFD_ROAR_TIMER] != 0) {
         if (this->work[BFD_ROAR_TIMER] == 37) {
-            Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_ROAR, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Audio_PlaySfxGeneral(NA_SE_EN_VALVAISA_ROAR, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                                 &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
         jawAngle = 6000.0f;
         jawSpeed = 1300.0f;
@@ -1163,8 +1160,8 @@ void BossFd_Effects(BossFd* this, PlayState* play) {
         Vec3f spawnPos1;
         s32 pad;
 
-        Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_APPEAR - SFX_FLAG, &this->actor.projectedPos, 4,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EN_VALVAISA_APPEAR - SFX_FLAG, &this->actor.projectedPos, 4,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         if (this->work[BFD_SPLASH_TIMER] != 0) {
             this->work[BFD_SPLASH_TIMER]--;
             if ((this->actor.colChkInfo.health == 0) ||
@@ -1241,8 +1238,8 @@ void BossFd_Effects(BossFd* this, PlayState* play) {
         this->fogMode = 2;
         spawnSpeed2.z = 30.0f;
 
-        Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_FIRE - SFX_FLAG, &sFireAudioVec, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EN_VALVAISA_FIRE - SFX_FLAG, &sFireAudioVec, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         spawnPos2 = this->headPos;
 
         spawnAngleY = (this->actor.world.rot.y / (f32)0x8000) * M_PI;
@@ -1292,6 +1289,42 @@ void BossFd_CollisionCheck(BossFd* this, PlayState* play) {
     ColliderJntSphElement* headCollider = &this->collider.elements[0];
     ColliderInfo* hurtbox;
 
+    // FD / Pika Gigantamax: full damage to the flying head and CAN kill it in the air
+    // (vanilla clamps health to a min of 2, forcing you to finish it in the hole phase
+    // — user wants it killable while flying). Triggered by an accepted AC hit on the
+    // head (Pika electric / FD beam land on the wide 0xFFCDFFFE bumper) OR the geometric
+    // FD-sword-blade / touch reach detector (lets FD reach the high serpent even when
+    // not at full health, where the ranged beam isn't available). Gated on IsFormActive
+    // so normal play / the boomerang regression is untouched. Mash to death.
+    if (BossSuperDamage_IsFormActive(play) &&
+        ((headCollider->info.bumperFlags & BUMP_HIT) ||
+         BossSuperDamage_FormAttackReaches(play, &this->headPos, BossSuperDamage_FormAttackRange(play) + 60.0f))) {
+        headCollider->info.bumperFlags &= ~BUMP_HIT;
+        if ((s8)this->actor.colChkInfo.health <= 0) {
+            return; // already dying — ignore further hits while the death plays out
+        }
+        BossSuperDamage_StartElectricSparks(&this->actor, 90);
+        this->actor.colChkInfo.health -= BossSuperDamage_FormDamage(play);
+        if ((s8)this->actor.colChkInfo.health <= 0) {
+            this->actor.colChkInfo.health = 0;
+            // Route the air kill through Boss_Fd2's death sequence so the FULL death
+            // cutscene plays and ALL defeat triggers fire (subcamera, blue warp, room
+            // clear, finishing blow). Boss_Fd2 owns the death subcamera — killing
+            // Boss_Fd directly (forcing BOSSFD_DEATH_START) burns the body but never
+            // creates the camera, so no cutscene. Park Boss_Fd in Wait so it receives
+            // the FD2_SIGNAL_DEATH handoff Boss_Fd2 sends mid-sequence (→ emerge → body
+            // burn). Looks odd (serpent vanishes, dies at a hole) but fires everything —
+            // user's explicit choice.
+            this->actionFunc = BossFd_Wait;
+            this->handoffSignal = FD2_SIGNAL_AIRKILL;
+        }
+        this->work[BFD_DAMAGE_FLASH_TIMER] = 10;
+        this->work[BFD_INVINC_TIMER] = 12; // short cooldown so mashing lands fast
+        Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_DAMAGE1, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        return;
+    }
+
     if (headCollider->info.bumperFlags & BUMP_HIT) {
         headCollider->info.bumperFlags &= ~BUMP_HIT;
         hurtbox = headCollider->info.acHitInfo;
@@ -1304,8 +1337,8 @@ void BossFd_CollisionCheck(BossFd* this, PlayState* play) {
         }
         this->work[BFD_DAMAGE_FLASH_TIMER] = 10;
         this->work[BFD_INVINC_TIMER] = 20;
-        Audio_PlaySoundGeneral(NA_SE_EN_VALVAISA_DAMAGE1, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EN_VALVAISA_DAMAGE1, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 }
 
@@ -1666,6 +1699,9 @@ void BossFd_Draw(Actor* thisx, PlayState* play) {
     osSyncPrintf("FD DRAW END\n");
     BossFd_DrawEffects(this->effects, play);
     osSyncPrintf("FD DRAW END2\n");
+
+    // Skijer's NEI: FD/Pika electric glow
+    BossSuperDamage_DrawGlowFromSpheres(&this->actor, play, &this->collider, 19, 1.5f);
 }
 
 s32 BossFd_OverrideRightArmDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* thisx) {

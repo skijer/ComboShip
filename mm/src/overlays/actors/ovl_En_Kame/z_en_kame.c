@@ -5,6 +5,7 @@
  */
 
 #include "z_en_kame.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_HOOKSHOT_PULLS_PLAYER)
@@ -762,7 +763,7 @@ void EnKame_UpdateDamage(EnKame* this, PlayState* play) {
 
         Actor_SetDropFlag(&this->actor, &this->collider.elem);
         if ((this->drawDmgEffType == ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) &&
-            (this->collider.elem.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            (DinFireSword_OriginalDamageFlags(play, this->collider.elem.acHitElem) & 0xDB0B3)) {
             return;
         }
 

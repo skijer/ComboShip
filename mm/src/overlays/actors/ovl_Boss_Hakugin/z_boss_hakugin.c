@@ -1,3 +1,4 @@
+#include "din_fire_sword.h"
 /*
  * File: z_boss_hakugin.c
  * Overlay: ovl_Boss_Hakugin
@@ -1627,9 +1628,8 @@ void BossHakugin_FrozenBeforeFight(BossHakugin* this, PlayState* play) {
         DECR(this->timer);
     }
 
-    if (GameInteractor_Should(VB_GOHT_UNFREEZE,
-                              (this->iceCollider.base.acFlags & AC_HIT) &&
-                                  (this->iceCollider.elem.acHitElem->atDmgInfo.dmgFlags == DMG_FIRE_ARROW))) {
+    if (GameInteractor_Should(VB_GOHT_UNFREEZE, (this->iceCollider.base.acFlags & AC_HIT) &&
+                                                    (DinFireSword_IsFireHit(play, this->iceCollider.elem.acHitElem)))) {
         this->iceCollider.base.atFlags &= ~AT_HIT;
         this->iceCollider.base.acFlags &= ~AC_HIT;
         this->iceCollider.base.ocFlags1 &= ~OC1_HIT;
@@ -2680,7 +2680,7 @@ s32 BossHakugin_UpdateDamage(BossHakugin* this, PlayState* play) {
         // DMG_DEKU_NUT | DMG_DEKU_STICK | DMG_ZORA_BOOMERANG | DMG_NORMAL_ARROW | DMG_HOOKSHOT | DMG_ICE_ARROW
         // | DMG_LIGHT_ARROW | DMG_DEKU_SPIN | DMG_DEKU_BUBBLE | DMG_DEKU_LAUNCH | DMG_ZORA_BARRIER
         if ((this->drawDmgEffType == ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) &&
-            (this->bodyCollider.elements[i].base.acHitElem->atDmgInfo.dmgFlags & 0x000DB0B3)) {
+            (DinFireSword_OriginalDamageFlags(play, this->bodyCollider.elements[i].base.acHitElem) & 0x000DB0B3)) {
             return false;
         }
 

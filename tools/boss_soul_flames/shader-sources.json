@@ -1,0 +1,14 @@
+[
+  {
+    "path": "source-shaders/opengl.glsl",
+    "sha256": "c5022db74200ec332d0d3ff344c853b547d2bf7fc352906b2b0c8ee01a7d31e3"
+  },
+  {
+    "path": "source-shaders/directx.hlsl",
+    "sha256": "32c416888ab1ba050d419f722329394c8f36736e820377e7e0c586bee7b99daf"
+  },
+  {
+    "path": "source-shaders/metal.metal",
+    "sha256": "7dea65b5e554ef0c417215e570ef46a2a578e29f8687d8bc5923c0d3a1e3320c"
+  }
+]

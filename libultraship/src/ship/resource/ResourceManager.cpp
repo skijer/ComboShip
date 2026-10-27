@@ -8,6 +8,7 @@
 #include "ship/utils/Utils.h"
 #include "ship/config/ConsoleVariable.h"
 #include "ship/Context.h"
+#include "ship/diagnostics/PerformanceTrace.h"
 
 namespace Ship {
 
@@ -68,6 +69,27 @@ void ResourceManager::Init(const std::vector<std::string>& archivePaths,
 
 ResourceManager::~ResourceManager() {
     SPDLOG_INFO("destruct ResourceManager");
+    // Jobs capture this. Drain them while the cache, mutex and archive fields
+    // are still alive; member destruction would destroy the mutex first.
+    if (mThreadPool) {
+        mThreadPool->wait();
+        mThreadPool.reset();
+    }
+}
+
+std::shared_ptr<ResourceManager> ResourceManager::CreateResourceView(const std::shared_ptr<Archive>& archive) {
+    if (!archive || !mResourceLoader || !mArchiveManager || !mThreadPool)
+        return nullptr;
+    auto view = std::make_shared<ResourceManager>();
+    view->mResourceLoader = mResourceLoader;
+    view->mArchiveManager = mArchiveManager;
+    // A shared pool would outlive the view while queued tasks still capture
+    // its `this`. An owned worker joins before the view's cache is destroyed.
+    view->mThreadPool = std::make_shared<BS::thread_pool>(1);
+    view->mDefaultCacheOwner = mDefaultCacheOwner;
+    view->mDefaultCacheArchive = archive;
+    view->mAltAssetsEnabled = false;
+    return view;
 }
 
 bool ResourceManager::IsLoaded() {
@@ -75,7 +97,7 @@ bool ResourceManager::IsLoaded() {
 }
 
 std::shared_ptr<File> ResourceManager::LoadFileProcess(const std::string& filePath) {
-    auto file = mArchiveManager->LoadFile(filePath);
+    auto file = mDefaultCacheArchive ? mDefaultCacheArchive->LoadFile(filePath) : mArchiveManager->LoadFile(filePath);
     if (file != nullptr) {
         SPDLOG_TRACE("Loaded File {} on ResourceManager", filePath);
     } else {
@@ -103,7 +125,7 @@ std::shared_ptr<IResource> ResourceManager::LoadResourceProcess(const ResourceId
     // Check for and remove the OTR signature
     if (OtrSignatureCheck(identifier.Path.c_str())) {
         const auto newFilePath = identifier.Path.substr(7);
-        return LoadResourceProcess({ newFilePath, identifier.Owner, identifier.Parent }, false, initData);
+        return LoadResourceProcess({ newFilePath, identifier.Owner, identifier.Parent }, loadExact, initData);
     }
 
     // Cache the starts_with check to avoid repeated string comparisons
@@ -126,7 +148,7 @@ std::shared_ptr<IResource> ResourceManager::LoadResourceProcess(const ResourceId
     // While waiting in the queue, another thread could have loaded the resource.
     // In a last attempt to avoid doing work that will be discarded, let's check if the cached version exists.
     auto cacheLine = CheckCache(identifier, loadExact);
-    auto cachedResource = GetCachedResource(cacheLine);
+    auto cachedResource = GetCachedResource(std::move(cacheLine));
     if (cachedResource != nullptr) {
         return cachedResource;
     }
@@ -152,19 +174,45 @@ std::shared_ptr<IResource> ResourceManager::LoadResourceProcess(const ResourceId
     // Get the file from the OTR. It may be null when the resource exists only as a `.meta`
     // alias (no real file at this path); fall through so the loader can resolve the alias,
     // but only when a `.meta` for this path actually exists.
-    auto file = LoadFileProcess(identifier.Path);
-    if (file == nullptr && !mArchiveManager->HasFile(identifier.Path + ".meta")) {
+    PerformanceTrace::Scope coldTrace("resource.cold_load", identifier.Path, reinterpret_cast<uintptr_t>(this),
+                                      identifier.Owner);
+    coldTrace.Detail("exception_or_incomplete");
+    auto file = [&]() {
+        PerformanceTrace::Scope stage("resource.archive_read", identifier.Path, reinterpret_cast<uintptr_t>(this),
+                                      identifier.Owner);
+        stage.Detail("exception_or_incomplete");
+        auto result = LoadFileProcess(identifier);
+        stage.Detail(result ? "file" : "missing_or_meta_alias");
+        return result;
+    }();
+    const bool hasMeta = identifier.Parent ? identifier.Parent->HasFile(identifier.Path + ".meta")
+                                           : mArchiveManager->HasFile(identifier.Path + ".meta");
+    if (file == nullptr && !hasMeta) {
         SPDLOG_TRACE("Failed to load resource file at path {}", identifier.Path);
         mResourceCache[identifier] = ResourceLoadError::NotFound;
+        coldTrace.Detail("not_found");
+        PerformanceTrace::Count("resource.errors");
         return nullptr;
     }
 
     // Transform the raw data into a resource
-    auto resource = GetResourceLoader()->LoadResource(identifier.Path, file, initData);
+    auto resource = [&]() {
+        PerformanceTrace::Scope stage("resource.deserialize_import", identifier.Path, reinterpret_cast<uintptr_t>(this),
+                                      identifier.Owner);
+        stage.Detail("exception_or_incomplete");
+        auto result = GetResourceLoader()->LoadResource(identifier.Path, file, initData, identifier.Parent);
+        stage.Detail(result ? "success" : "failure");
+        return result;
+    }();
 
     // Another thread could have loaded the resource while we were processing, so we want to check before setting to
     // the cache.
     cachedResource = GetCachedResource(identifier, true);
+    if (cachedResource != nullptr)
+        PerformanceTrace::Count("resource.duplicate_loads");
+    coldTrace.Detail(cachedResource ? "duplicate_discarded" : resource ? "success" : "import_failure");
+    if (!resource)
+        PerformanceTrace::Count("resource.errors");
 
     {
         const std::lock_guard<std::mutex> lock(mMutex);
@@ -214,8 +262,15 @@ ResourceManager::LoadResourceAsync(const ResourceIdentifier& identifier, bool lo
         return promise->get_future().share();
     }
 
+    const auto traceContext = PerformanceTrace::CaptureContext();
+    const auto queuedAt = traceContext.enabled ? PerformanceTrace::Now() : 0;
     return mThreadPool->submit_task(
-        [this, identifier, loadExact, initData]() -> std::shared_ptr<IResource> {
+        [this, identifier, loadExact, initData, traceContext, queuedAt]() -> std::shared_ptr<IResource> {
+            PerformanceTrace::ContextScope traceBinding(traceContext);
+            if (traceContext.enabled) {
+                PerformanceTrace::Record("resource.queue_delay", identifier.Path, queuedAt, PerformanceTrace::Now(),
+                                         reinterpret_cast<uintptr_t>(this), identifier.Owner);
+            }
             return LoadResourceProcess(identifier, loadExact, initData);
         },
         priority);
@@ -229,7 +284,19 @@ ResourceManager::LoadResourceAsync(const std::string& filePath, bool loadExact, 
 
 std::shared_ptr<IResource> ResourceManager::LoadResource(const ResourceIdentifier& identifier, bool loadExact,
                                                          std::shared_ptr<ResourceInitData> initData) {
+    // Match LoadResourceAsync's signature handling before consulting the same cache.
+    if (OtrSignatureCheck(identifier.Path.c_str())) {
+        return LoadResource({ identifier.Path.substr(7), identifier.Owner, identifier.Parent }, loadExact);
+    }
+    // A synchronous cache hit does not need an allocated promise/future pair.
+    if (auto cachedResource = GetCachedResource(identifier, loadExact)) {
+        return cachedResource;
+    }
+    PerformanceTrace::Scope waitTrace("resource.wait", identifier.Path, reinterpret_cast<uintptr_t>(this),
+                                      identifier.Owner, 2000000);
+    waitTrace.Detail("exception_or_incomplete");
     auto resource = LoadResourceAsync(identifier, loadExact, BS::pr::highest, initData).get();
+    waitTrace.Detail(resource ? "success" : "failure");
     if (resource == nullptr) {
         SPDLOG_TRACE("Failed to load resource file at path {}", identifier.Path);
     }
@@ -258,9 +325,12 @@ ResourceManager::CheckCache(const ResourceIdentifier& identifier, bool loadExact
         const auto altPath = IResource::gAltAssetPrefix + identifier.Path;
         auto altCacheResult = CheckCache({ altPath, identifier.Owner, identifier.Parent }, loadExact);
 
-        // If the type held at this cache index is a resource, then we return it.
-        // Else we attempt to load standard definition assets.
-        if (std::holds_alternative<std::shared_ptr<IResource>>(altCacheResult)) {
+        // A cold Alt entry is unresolved, not an absent override. Scene teardown
+        // unloads alt/* while native cache entries can survive. Let the loader
+        // probe Alt before a retained native resource can satisfy this request.
+        // Warm Alt hits and known Alt failures keep their existing fast paths.
+        if (std::holds_alternative<std::shared_ptr<IResource>>(altCacheResult) ||
+            std::get<ResourceLoadError>(altCacheResult) == ResourceLoadError::NotCached) {
             return altCacheResult;
         }
     }
@@ -295,23 +365,29 @@ ResourceManager::GetCachedResource(std::variant<ResourceLoadError, std::shared_p
     // Gets the cached resource based on a cache line std::variant from the cache map.
     if (std::holds_alternative<std::shared_ptr<IResource>>(cacheLine)) {
         try {
-            auto resource = std::get<std::shared_ptr<IResource>>(cacheLine);
+            auto& resource = std::get<std::shared_ptr<IResource>>(cacheLine);
 
             if (resource.use_count() <= 0) {
                 return nullptr;
             }
 
+            PerformanceTrace::Count("resource.dirty_checks");
             if (resource->IsDirty()) {
+                PerformanceTrace::Count("resource.dirty_misses");
+                PerformanceTrace::Count("resource.cache_misses");
                 return nullptr;
             }
 
-            return resource;
+            PerformanceTrace::Count("resource.cache_hits");
+            // cacheLine owns this reference; transfer it without another atomic retain/release.
+            return std::move(resource);
         } catch (std::bad_variant_access const& e) {
             // This should never happen. The holds_alternative check above should prevent it.
             SPDLOG_ERROR("Unexpected bad_variant_access in GetCachedResource: {}", e.what());
         }
     }
 
+    PerformanceTrace::Count("resource.cache_misses");
     return nullptr;
 }
 
@@ -332,8 +408,10 @@ ResourceManager::LoadResourcesProcess(const ResourceFilter& filter) {
 
 std::shared_future<std::shared_ptr<std::vector<std::shared_ptr<IResource>>>>
 ResourceManager::LoadResourcesAsync(const ResourceFilter& filter, BS::priority_t priority) {
+    const auto traceContext = PerformanceTrace::CaptureContext();
     return mThreadPool->submit_task(
-        [this, filter]() -> std::shared_ptr<std::vector<std::shared_ptr<IResource>>> {
+        [this, filter, traceContext]() -> std::shared_ptr<std::vector<std::shared_ptr<IResource>>> {
+            PerformanceTrace::ContextScope traceBinding(traceContext);
             return LoadResourcesProcess(filter);
         },
         priority);

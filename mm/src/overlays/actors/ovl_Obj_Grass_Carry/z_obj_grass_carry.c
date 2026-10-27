@@ -9,6 +9,7 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "overlays/actors/ovl_Obj_Grass/z_obj_grass.h"
 #include "GameInteractor/GameInteractor.h"
+#include "2s2h/Enhancements/Audio/MMWeather.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED | ACTOR_FLAG_THROW_ONLY)
 
@@ -361,5 +362,30 @@ void ObjGrassCarry_Update(Actor* thisx, PlayState* play) {
 }
 
 void ObjGrassCarry_Draw(Actor* this, PlayState* play) {
+    s32 season = (play->sceneId == SCENE_24KEMONOMITI || play->sceneId == SCENE_26SARUNOMORI)
+                     ? MMWeather_SeasonForPlay(play)
+                     : -1;
+    s32 spring = season == SEASON_SPRING;
+    s32 frost = season == SEASON_WINTER;
+    s32 seasonal = spring || season == SEASON_AUTUMN || frost;
+    OPEN_DISPS(play->state.gfxCtx);
+    if (seasonal) {
+        gDPSetGrayscaleColor(POLY_OPA_DISP++,
+                             spring  ? 246
+                             : frost ? 220
+                                     : 242,
+                             spring  ? 193
+                             : frost ? 236
+                                     : 104,
+                             spring  ? 217
+                             : frost ? 245
+                                     : 70,
+                             255);
+        gSPGrayscale(POLY_OPA_DISP++, spring || frost ? 3 : 2);
+    }
     Gfx_DrawDListOpa(play, gKusaBushType1DL);
+    if (seasonal) {
+        gSPGrayscale(POLY_OPA_DISP++, false);
+    }
+    CLOSE_DISPS(play->state.gfxCtx);
 }

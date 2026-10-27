@@ -1,0 +1,4 @@
+PASS oot scenario=oot_native forest=oot stock=0: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot scenario=oot_native forest=oot stock=1: native Open -> destination -> actual spawn -> stay -> static-collision return -> re-entry (3 cycles)
+PASS oot bundled structural failures: every structural path blocks; duplicate marker and pause protected; base owner absent
+BOUNDARY: bundled structural routes only; base owner and keeper are absent, full forest readiness fails closed; no gameplay proof

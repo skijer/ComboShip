@@ -1,36 +1,202 @@
-name: Build Artifacts (Windows)
+name: Build Artifacts
 
-# Nightly / PR build: runs the reusable build pipeline (build.yml) on PRs and on every develop push,
-# producing the runnable ComboShip Release ZIP as a downloadable artifact (pr-artifacts.yml posts
-# nightly.link links). develop pushes additionally produce the comborando validator, which
-# validate-seed.yml pulls from the latest successful develop run. Releases are cut separately from
-# v* tags — see release.yml.
+# Preserve this filename/name: validate-seed.yml consumes successful develop runs.
+# Preflight releases builds and regression groups in one independent matrix.
+# The stable `gate` job verifies every required result before the run is green.
 
 on:
   pull_request:
-    paths: &code_paths
-      - 'libultraship/**'
-      - 'soh/**'
-      - 'mm/**'
-      - 'combo/**'
-      - 'CMakeLists.txt'
-      - 'CMake/**'
-      - 'OTRExporter/**'
-      - 'ZAPDTR/**'
-      # A build input (CMakeLists.txt reads it for the version/save gate), and it keeps the gate from
-      # skipping an upstream-merge PR whose diff is only the pin bump + merge log.
-      - 'upstream-pins.json'
-      - '.github/workflows/build.yml'
-      - '.github/workflows/build-artifacts.yml'
   push:
     branches: [develop]
-    paths: *code_paths
+    paths-ignore:
+      - 'docs/**/*.md'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - 'CHANGELOG.md'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Preserve develop builds so validators and shared compiler caches can finish.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
+  preflight:
+    name: Fast source checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      code: ${{ steps.route.outputs.code }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Classify changed paths
+        id: route
+        run: python3 -B scripts/ci/route_changes.py
+
+      - name: Scan for conflict markers
+        shell: bash
+        run: |
+          set -uo pipefail
+          # {7,} not {7}: rename/path conflicts emit 8-char markers ("<<<<<<<< HEAD:path") — the exact
+          # form of the mm-asset splices that slipped past this gate in #50 and 2026-07-13.
+          pattern='^(<{7,}|>{7,}|\|{7,})( |$)'
+          hits=$(git grep -nE "$pattern" -- . ':(exclude).github/workflows/build-artifacts.yml' || true)
+
+          if [ -z "$hits" ]; then
+            echo "✅ No unresolved conflict markers." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          count=$(printf '%s\n' "$hits" | wc -l | tr -d ' ')
+          {
+            echo "## ⛔ Unresolved merge-conflict markers ($count)"
+            echo ""
+            echo "This PR has committed conflict markers and **must not be merged** until they are resolved."
+            echo "GitHub's \"ready to merge\" / \"no conflicts\" is misleading here — the markers are plain text"
+            echo "inside the files, not a git-level conflict. Resolve them on the source branch, then this"
+            echo "check goes green."
+            echo ""
+            echo '```'
+            printf '%s\n' "$hits"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          while IFS=: read -r file line _; do
+            [ -n "$file" ] && echo "::error file=${file},line=${line}::Unresolved merge-conflict marker — resolve before merging"
+          done <<< "$hits"
+
+          echo "::error::Found $count conflict-marker line(s). See annotations and the job summary."
+          exit 1
+
+      # main = release track: only the bot's release PRs may move main's upstream pins.
+
+      - name: Only release PRs change main's upstream pins
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          # HEAD is the PR merge commit, so HEAD^1 is main's tip. A fork can name any branch, so require in-repo.
+          if ! git diff --quiet HEAD^1 HEAD -- upstream-pins.json \
+             && { [[ "$HEAD_REF" != bot/upstream-release-* ]] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; }; then
+            echo "::error file=upstream-pins.json::Only in-repo bot/upstream-release-* PRs may change upstream-pins.json on main (see docs/UPSTREAM_MERGES.md)"
+            exit 1
+          fi
+
+      - name: Prepare exact shipped spin resources
+        run: python3 -B scripts/assets/prepare_spin_styles.py
+
+      - name: Prepare exact cumulative source assets
+        run: |
+          python3 -B scripts/assets/prepare_cumulative_assets.py
+          python3 -B scripts/assets/prepare_temple_sages.py
+          python3 -B scripts/assets/prepare_lake_tunnel_sand.py
+
+      - name: Check custom asset trees for new path collisions
+        run: python3 scripts/check-asset-collisions.py
+
+      - name: Install pinned preflight tools
+        timeout-minutes: 3
+        run: |
+          python3 -m venv "$RUNNER_TEMP/combo-gate-python"
+          "$RUNNER_TEMP/combo-gate-python/bin/python3" -m pip install --only-binary=:all: --timeout 20 --retries 2 -r scripts/ci/preflight-requirements.txt
+          ln -s clang-format "$RUNNER_TEMP/combo-gate-python/bin/clang-format-14"
+          "$RUNNER_TEMP/combo-gate-python/bin/clang-format-14" --version
+          echo "$RUNNER_TEMP/combo-gate-python/bin" >> "$GITHUB_PATH"
+
+      - name: Verify CI failure handling
+        run: python3 -B -m unittest discover -s tests/ci -v
+
+      - name: Fast generated sword UI asset check
+        run: python3 -B scripts/assets/build_sword_element_ui.py --check
+
+      - name: Verify shipped spin styles
+        run: |
+          python3 -B tests/spin_style/test_bundled_assets.py
+          python3 -B scripts/assets/build_spin_style_resources.py --check
+          python3 -B scripts/diagnostics/run_spin_style_tests.py --policy --resources
+
+      - name: Verify native location titles
+        run: |
+          python3 -B tests/location_titles/test_native_assets.py
+          python3 -B tests/location_titles/run_tests.py
+
+      - name: clang-format (clang-format-14)
+        run: |
+          ./run-clang-format.sh
+          git diff --exit-code
+
+  checks:
+    name: ${{ matrix.label }}
+    needs: preflight
+    if: needs.preflight.outputs.code == 'true'
+    strategy:
+      # Finish every required check so one fixture failure cannot hide another.
+      fail-fast: false
+      matrix:
+        include:
+          - check: windows
+            label: Build Windows
+          - check: linux
+            label: Build Linux
+          - check: world
+            label: Test forest, shops and Mirror
+          - check: entrances
+            label: Test entrances and returns
+          - check: items
+            label: Test items and rewards
+          - check: equipment
+            label: Test equipment and actors
+          - check: systems
+            label: Test audio, saves and weather
+          - check: render
+            label: Test rendering and assets
+    uses: ./.github/workflows/ci-check.yml
     with:
-      # Only develop's validator artifact is ever consumed (validate-seed.yml fetches the latest
-      # successful develop run), so PRs skip building and uploading it.
+      check: ${{ matrix.check }}
       validator: ${{ github.ref == 'refs/heads/develop' }}
+
+  gate:
+    name: Final required-check status
+    if: ${{ always() }}
+    needs: [preflight, checks]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: scripts/ci/check_required_jobs.py
+          sparse-checkout-cone-mode: false
+      - name: Locate earlier failures
+        id: failures
+        if: needs.preflight.result != 'success' || needs.checks.result == 'failure' || needs.checks.result == 'cancelled'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+              filter: 'latest',
+              per_page: 100,
+            });
+            const failed = jobs.filter(job => ['failure', 'cancelled'].includes(job.conclusion));
+            core.setOutput('jobs', JSON.stringify(failed.map(job => ({
+              name: job.name, conclusion: job.conclusion, html_url: job.html_url,
+              completed_at: job.completed_at,
+              steps: (job.steps || []).filter(step => step.conclusion === 'failure').map(step => ({
+                name: step.name, conclusion: step.conclusion,
+              })),
+            }))));
+      - name: Require every expected check
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          WORKFLOW_JOBS_JSON: ${{ steps.failures.outputs.jobs }}
+        run: python3 -B scripts/ci/check_required_jobs.py

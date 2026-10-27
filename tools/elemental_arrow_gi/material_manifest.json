@@ -1,0 +1,36 @@
+{
+  "source_sha256": "5fb1e5d6889cfaa3a2f5d1e2cf9eb190eddbd3333e5cae99f5c07c8c244da7ad",
+  "entries": {
+    "fire": {
+      "source": "alt/custom/medallion_magic/spells/fire/s1Tex",
+      "target": "objects/nei_elemental_arrow_gi/fire",
+      "pixels": [
+        512,
+        512
+      ],
+      "payload_sha256": "81f3bb180913fec365cbc25b5d7928324af6e83028a58de7352d0351223c5f64",
+      "resource_sha256": "a43100fc2bab6a8935fff938f8a115e77794b920c71325e7bcab4cfb6ecb5287"
+    },
+    "ice": {
+      "source": "alt/custom/medallion_magic/arrows/water/s2Tex",
+      "target": "objects/nei_elemental_arrow_gi/ice",
+      "pixels": [
+        512,
+        1024
+      ],
+      "payload_sha256": "7dd699d5ac57ca48db51291a42d2e2fc2074ad9112d6534e7d1e16cb9dcf2fe2",
+      "resource_sha256": "5fb6f3e832f6fd371bc4cf4f276c5babfa187ecedd5cf9e83a0cc3642e1f8cbd"
+    },
+    "light": {
+      "source": "alt/overlays/ovl_Arrow_Light/s1Tex",
+      "target": "objects/nei_elemental_arrow_gi/light",
+      "pixels": [
+        512,
+        1024
+      ],
+      "payload_sha256": "b73037553d05bba5bc0ce7b65cb06034261a57b7099611a69023861c818de90e",
+      "resource_sha256": "61cb1ef81fb4d738901fe468a311ec78b6e51bfcf28598a3160b64f751a800c0"
+    }
+  },
+  "pack_sha256": "9a25084e256dfdf909c3f1732215dc08b48af95fff85c829b78bcddfd9967f58"
+}

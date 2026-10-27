@@ -9,6 +9,9 @@
 
 #define FLAGS ACTOR_FLAG_DRAW_CULLING_DISABLED
 
+// season_scene.cpp supplies an actor-local offset without changing progression flags.
+extern f32 SeasonScene_WaterLevelOffset(void);
+
 void BgSpot01Idomizu_Init(Actor* thisx, PlayState* play);
 void BgSpot01Idomizu_Destroy(Actor* thisx, PlayState* play);
 void BgSpot01Idomizu_Update(Actor* thisx, PlayState* play);
@@ -42,6 +45,8 @@ void BgSpot01Idomizu_Init(Actor* thisx, PlayState* play) {
     } else {
         this->waterHeight = 52.0f;
     }
+    this->seasonOffset = SeasonScene_WaterLevelOffset();
+    this->waterHeight += this->seasonOffset;
     this->actionFunc = BgSpot01Idomizu_UpdateWaterLevel;
     this->actor.world.pos.y = this->waterHeight;
 }
@@ -50,13 +55,21 @@ void BgSpot01Idomizu_Destroy(Actor* thisx, PlayState* play) {
 }
 
 void BgSpot01Idomizu_UpdateWaterLevel(BgSpot01Idomizu* this, PlayState* play) {
+    f32 seasonOffset = SeasonScene_WaterLevelOffset();
+    f32 delta = seasonOffset - this->seasonOffset;
+
+    // The rod changes season just before reloading. Keep this last outgoing
+    // update aligned too, so only genuine puzzle drainage makes a drain sound.
+    this->actor.world.pos.y += delta;
+    this->waterHeight += delta;
+    this->seasonOffset = seasonOffset;
     if (Flags_GetEventChkInf(EVENTCHKINF_DRAINED_WELL_IN_KAKARIKO)) {
-        this->waterHeight = -550.0f;
+        this->waterHeight = -550.0f + this->seasonOffset;
     }
     play->colCtx.colHeader->waterBoxes[0].ySurface = this->actor.world.pos.y;
     if (this->waterHeight < this->actor.world.pos.y) {
-        Audio_PlaySoundGeneral(NA_SE_EV_WATER_LEVEL_DOWN - SFX_FLAG, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+        Audio_PlaySfxGeneral(NA_SE_EV_WATER_LEVEL_DOWN - SFX_FLAG, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                             &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
     Math_ApproachF(&this->actor.world.pos.y, this->waterHeight, 1.0f, 2.0f);
 }

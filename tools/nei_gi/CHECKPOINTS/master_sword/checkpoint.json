@@ -1,0 +1,76 @@
+{
+  "resource_count": 6,
+  "vertex_records": 2112,
+  "vertex_loads": 72,
+  "slug": "master_sword",
+  "name": "Master Sword",
+  "entry": "objects/nei_gi_redesign/master_sword/gi_dl",
+  "draw_scale": 1,
+  "matrix_scale": 0.0412445068359375,
+  "triangles": 704,
+  "bounds_author": [
+    [
+      -16.4375,
+      -33.125,
+      -6.0
+    ],
+    [
+      16.4375,
+      106.375,
+      6.0
+    ]
+  ],
+  "markers": {
+    "guard_baseline_y": 0,
+    "preview_front_angle": 16,
+    "preview_back_angle": 164,
+    "source": "supplied Twilight Princess MasterSword.obj",
+    "texture_upscale": 4,
+    "blade_length_factor": 1,
+    "held_grip_y": -18.75,
+    "held_tip_y": 106.375,
+    "visual_review_candidate": true,
+    "runtime_tested": false,
+    "supersedes_tp_planar_environment_card": true,
+    "blade_depth_factor": 1.5,
+    "planar_fittings_depth_factor": 1.2,
+    "depth_parts": [
+      {
+        "part": "TP blade",
+        "factor": 1.5
+      },
+      {
+        "part": "TP winged hilt and grip",
+        "factor": 1.2
+      },
+      {
+        "part": "Four Sword sheen over TP blade",
+        "factor": 1.5
+      }
+    ],
+    "imported_approved_model": false
+  },
+  "notes": [
+    "Original TP blade and hilt geometry with original UV atlas bindings; 4x Lanczos upscale with conservative sharpening.",
+    "TP zero-thickness environment card is replaced by a Four-Sword-style normal-generated reflection decal over the opaque blade.",
+    "Original TP violet hilt, grip detail, gold jewel and engraved steel blade retained.",
+    "Offline candidate only; gameplay and user acceptance remain pending.",
+    "Rotation depth pass: blade and attached relief 1.5x; planar fittings 1.2x; rounded grips retained. Face-on X/Y silhouette, UVs and materials retained."
+  ],
+  "runtime_tested": false,
+  "source_provenance": {
+    "bundle": "TP_Sword_GI_POC2_20261009",
+    "baseline_commit": "c0181856968dd6f3869be0d1aa240743091fd6a8",
+    "authoring_recipe": "tools/tp_sword_gi/build.py",
+    "resource_sha256": {
+      "four_sword_sheen_tex": "e587740b8fdf5516484bab7804d83092b8712c87bddf682cf65f92f4a047b08d",
+      "gi_dl": "66ce8e1bd09ca7212d88af416ff12dc094879a57adb035e7abdfb37309581e41",
+      "mesh_opa_vtx": "ce89895bb75f26aab33178d64d045cbdaccec181aba1e2569705c77876580336",
+      "scale_mtx": "bba652b1cf8f43eb8f04a6fdc3fa639db60eab659614e7fcbef2bbac0943a4ad",
+      "tp_blade_tex": "4742fd3ce78a39d79fca0dff6b22c86a1acd026fa2bf1f1a5959750e6dfca859",
+      "tp_hilt_tex": "a7f9ffc92ba8c6cd1acb675c017ba69cd54e1eb367df0609a4ad1ca655ed3aa8"
+    },
+    "glb_sha256": "33392f56d7bd5060623e5630b05ae1165c6e90609521713e731a50c5045b99d4",
+    "acceptance": "pending user visual review and configuration-specific runtime test"
+  }
+}

@@ -1,5 +1,6 @@
 #pragma once
 #include <ship/resource/Resource.h>
+#include <deque>
 
 namespace SOH {
 enum class TextureAnimationParamsType {
@@ -100,6 +101,8 @@ class TextureAnimation : public Ship::Resource<AnimatedMaterial> {
     size_t GetPointerSize();
 
     std::vector<AnimatedMaterial> anims;
-    std::vector<std::string> textureCycleTextures;
+    // AnimatedMatTexCycleParams keeps c_str() pointers into these strings.
+    // Appending later cycles must preserve earlier strings, including SSO.
+    std::deque<std::string> textureCycleTextures;
 };
 } // namespace SOH

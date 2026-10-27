@@ -1,5 +1,4 @@
-#ifndef SOHMENU_H
-#define SOHMENU_H
+#pragma once
 
 #include "Menu.h"
 #include <fast/backends/gfx_rendering_api.h>
@@ -30,6 +29,10 @@ void UpdateMenuTricks();
 void UpdateMenuLocations();
 void MarkRandomizerMenusDirty();
 
+// The Sheikah Sensor rune's five wish slots. Drawn from both the NEI and the Randomizer menus, so
+// it lives on its own instead of being written twice. Skijer's NEI
+void DrawSensorDesirePicker();
+
 class SohMenu : public Ship::Menu {
   public:
     SohMenu(const std::string& consoleVariable, const std::string& name);
@@ -41,6 +44,8 @@ class SohMenu : public Ship::Menu {
 
     void AddSidebarEntry(std::string sectionName, std::string sidbarName, uint32_t columnCount);
     WidgetInfo& AddWidget(WidgetPath& pathInfo, std::string widgetName, WidgetType widgetType);
+    WidgetInfo& AddWidgetAfter(WidgetPath& pathInfo, const char* anchorCvar, std::string widgetName,
+                               WidgetType widgetType);
     void AddMenuElements();
     void AddMenuSettings();
     void AddMenuEnhancements();
@@ -69,5 +74,3 @@ class SohMenu : public Ship::Menu {
     ComboMenuExport::State<WidgetInfo> mComboExport;
 };
 } // namespace SohGui
-
-#endif // SOHMENU_H

@@ -1,0 +1,99 @@
+{
+  "baseline": "13901c677d0084e0305eec4672c0557f4434aea7",
+  "uploadedInputs": [
+    {
+      "name": "01-MM-All-Equipment-Progressive-20261007(1).json",
+      "sha256": "f32ad2e1eed138cd93ec2aa641257b2b4ace1fb8129140ce9416b89350f347f9"
+    },
+    {
+      "name": "ComboShip-MM-Dungeon-Bottle-GI-Checkpoint-20261006(1).zip",
+      "sha256": "f08606e94f8a827d956508eb90ea23dec9f51cdb51a5b7f4ef957a6da80632a9"
+    },
+    {
+      "name": "ComboShip-MM-Sand-Storm-Behavior-POC-20261007(1).zip",
+      "sha256": "5b8a3e937d7fc1e70ec8401bf4b1ef1e3b4f6f67d789f4bf428b4226c015f74e"
+    },
+    {
+      "name": "ComboShip-Magic-Cape-Texture-Fix-20261006(1).zip",
+      "sha256": "70940fe2246dc060a870383469987562ad4ccc8fa2842cdbf525b200c342cfc1"
+    },
+    {
+      "name": "ComboShip-Magic-Cape-Visibility-QoL-20261007(1).zip",
+      "sha256": "b0378964e5acf91a058176e01b67d4cf5c933911e6d8644004dba31b9b75a28d"
+    },
+    {
+      "name": "ComboShip-Sword-Autumn-Bridge-20261007(1).zip",
+      "sha256": "dede7ad317db6287b377fdd74353f4cd3e6c823100c732bce7afb77934192875"
+    },
+    {
+      "name": "ComboShip-Tunic-GI-Recovery-20261007(1).zip",
+      "sha256": "0487a9fad9e7978c92b26d46760f4fc166b8f640e0e14f78f3fd1749a397fd20"
+    },
+    {
+      "name": "ComboShip_Final_Polish_POC4_20261007(1).zip",
+      "sha256": "19d014f4bd57ce428184057d75ef83fe60a4bcc277dd7660ed421e06b448ea0f"
+    },
+    {
+      "name": "ComboShip_Key_Dialogue_Bridge_20261007(1).zip",
+      "sha256": "6fcbf7470846052589b6f4fdd500508b38f04325e838396e3d3ba8a5fa6c0cb9"
+    },
+    {
+      "name": "ComboShip_Map_Junk_Song_Key_Merge_Patch_20261007(2).zip",
+      "sha256": "ae5501147828fc305422cafe9a2b2770d21f1b0cdb1b4155c967f21f709938ac"
+    },
+    {
+      "name": "ComboShip_Shadow_Crystal_GI_POC1_20261007(1).zip",
+      "sha256": "d9ae006280c86ead6ec30d7d968646c8790233fea8b38e1bacc47a1ad57831d8"
+    },
+    {
+      "name": "Elemental_Arrow_GI_POC1_Recovery(1).zip",
+      "sha256": "e0d4c3bb68fa2c8dcee0b495921f68f88a5cb18668d47787fd030a6ec62a6196"
+    }
+  ],
+  "appliedPatches": [
+    {
+      "inputPath": "ComboShip_Final_Polish_POC4_20261007/patches/source.patch",
+      "sha256": "59f9bc1e7405e901ced393b5bc65733765be896b098a62b014f04fe906eccb40"
+    },
+    {
+      "inputPath": "ComboShip-Sword-Autumn-Bridge-20261007/ComboShip-Sword-Autumn-Bridge-20261007/sword/candidate.patch",
+      "sha256": "c329b0313aa64666bd5c055f79aacab83361a3666f4a88013f8eba266e416196"
+    },
+    {
+      "inputPath": "ComboShip-Sword-Autumn-Bridge-20261007/ComboShip-Sword-Autumn-Bridge-20261007/autumn/candidate.patch",
+      "sha256": "295ff1b3535f650ae84db9ba49199ffd5ad1ed27c1c0f0189c04289f5131f667"
+    },
+    {
+      "inputPath": "ComboShip-Tunic-Ikana-GI-Recovery-20261007/candidate.patch",
+      "sha256": "5331ae449cc4739054b8b3db15cabbd55608dc0fcf0c4ef5d2d6fa48a2db3217"
+    },
+    {
+      "inputPath": "ComboShip_Key_Dialogue_Bridge_20261007/combined.patch",
+      "sha256": "fb3981f5a4dd9c662861d5d4d5983262d09c8335e9ddc8a07d893511db6a4dce"
+    },
+    {
+      "inputPath": "ComboShip-Magic-Cape-Visibility-QoL-20261007/magic-cape-choice.patch",
+      "sha256": "6797190447f5825b44c8ea61648648820c53137067f79f0956a599aaba6c9035"
+    },
+    {
+      "inputPath": "ComboShip-MM-Sand-Storm-Behavior-POC-20261007/candidate.patch",
+      "sha256": "cf422bdc0b78e250c438a1653372f75a89107ade1d7916f9f7a75b984d0fdcef"
+    },
+    {
+      "inputPath": "ComboShip_Shadow_Crystal_GI_POC1_20261007/Shadow_Crystal_Native_GI_6e0895d4.patch",
+      "sha256": "adb4d7a0da0dc85bbc7809bc50964db8e68918c1fbdc453b9b4f24b51ef0ab2c"
+    },
+    {
+      "inputPath": "Elemental_Arrow_GI_POC1_Recovery/candidate.patch",
+      "sha256": "74d9324352d375fe29e6dfb17bb87fc4011c94df8ebafe2f8461d222f1e354d3"
+    }
+  ],
+  "alreadyPresent": [
+    "Oct 6 cape metadata-preserving texture fix",
+    "Oct 6 MM dungeon, bottle, soul and Tingle native imports"
+  ],
+  "supersededInputs": [
+    "Older tunic-only recovery: included by the newer tunic/Ikana superset",
+    "Morning map/junk/song/key source patch: included by the final 34-key dialogue bridge"
+  ]
+}

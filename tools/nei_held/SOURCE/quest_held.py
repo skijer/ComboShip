@@ -1,0 +1,194 @@
+"""Quest equipment fitted to native grip axes; keep legacy override entrypoints.
+
+Build: python tools/nei_held/SOURCE/quest_held.py --install
+The meshes are GI source triangles without GI tilt or spin. Compatibility aliases
+keep higher-priority resource packs authoritative at their established paths.
+"""
+import argparse
+import importlib.util
+from pathlib import Path
+import shutil
+import sys
+import xml.etree.ElementTree as ET
+import numpy as np
+
+ROOT=Path(__file__).resolve().parents[1]
+REPO=ROOT.parents[1]
+sys.path.insert(0,str(REPO/'tools/nei_gi/SOURCE'))
+import quest_revamp as source
+import meshkit
+import preview
+from meshkit import Q,rotation,unit
+
+
+def fitted(m,draw_scale):
+    m.prefix='objects/nei_held_redesign/'+m.slug+'/'
+    m.entry=m.prefix+'gi_dl'
+    # Geometry already has native units. Resource matrix exactly undoes Q.
+    m.native_scale=1/Q
+    m.draw_scale=draw_scale
+    m.effective_scale=draw_scale
+    m.markers={}
+    return m
+
+
+def axial_fit(m,author_grip,native_grip,low,high):
+    pts=np.concatenate([p['p'] for p in m.parts])
+    lower=(native_grip-low)/(author_grip-pts[:,1].min())
+    upper=(high-native_grip)/(pts[:,1].max()-author_grip)
+    for p in m.parts:
+        scale=np.where(p['p'][:,1]<author_grip,lower,upper)
+        p['p'][:,1]=np.rint((native_grip+(p['p'][:,1]-author_grip)*scale)*Q)/Q
+        p['n'][:,1]/=scale
+        p['n']=unit(p['n'])
+    return lower,upper
+
+
+def wand(slug):
+    m=fitted(source.wand(slug),.12)
+    m.transform(rotation('z',14))
+    # Legacy leather material (part2) spans y=-124..33, center=-45.5.
+    # Legacy complete mesh spans x=+-36,y=+-175,z=+-23. Shaft is +Y.
+    lower,upper=axial_fit(m,-13,-45.5,-175,175)
+    pts=np.concatenate([p['p'] for p in m.parts])
+    m.transform(scale=[36/np.abs(pts[:,0]).max(),1,23/np.abs(pts[:,2]).max()])
+    m.markers=dict(grip_native=[0,-45.5,0],shaft_axis_native=[0,1,0],
+                   tip_native=[0,175,0],native_bounds=[[-36,-175,-23],[36,175,23]],
+                   axial_scale_about_grip=[lower,upper])
+    m.notes=['GI Z -14-degree display tilt removed; no GI spin/shimmer.',
+             'Exact native +Y axis, legacy leather grip center -45.5 and 350-unit axial envelope.',
+             'Small piecewise axial fit about grip retains both pommel and crown endpoints.',
+             'OoT calibrated parent pose is unchanged; MM uses its measured right-palm socket.',
+             'All used source materials are opaque; no synthetic translucent shell.']
+    return m
+
+
+def slate():
+    m=fitted(source.slate('sheikah_slate'),.1)
+    # Legacy wrapped top grip vertices y42..48, midpoint45; full y+-48,
+    # x+-28,z+-5. New author's wrapped handle axis is x at y44.
+    lower,upper=axial_fit(m,44,45,-48,48)
+    pts=np.concatenate([p['p'] for p in m.parts])
+    m.transform(scale=[28/np.abs(pts[:,0]).max(),1,5/np.abs(pts[:,2]).max()])
+    m.markers=dict(grip_native=[0,45,0],grip_axis_native=[1,0,0],
+                   native_bounds=[[-28,-48,-5],[28,48,5]],
+                   axial_scale_about_grip=[lower,upper])
+    m.notes=['Same sculpted GI Slate; exact legacy handle center y45 and 96-unit native envelope.',
+             'OoT bone pose and MM forearm/hand pose remain their separately calibrated values.',
+             'Rune pickups are abilities of this same tablet, not additional held objects.']
+    return m
+
+
+BUILDERS={slug:(lambda slug=slug:wand(slug)) for slug in source.WANDS}
+BUILDERS['sheikah_slate']=slate
+LEGACY={
+    'sand_rod':'gNeiSandRod','tornado_rod':'gNeiTornadoRod','water_rod':'gNeiWaterRod',
+    'meteor_rod':'gNeiMeteorRod','storm_rod':'gNeiStormRod','shadow_scepter':'gNeiShadowScepter',
+    'sheikah_slate':'gNeiSheikahSlate',
+}
+
+
+def legacy_folder(slug):
+    return 'objects/object_nei_'+('' if slug=='sheikah_slate' else 'wand_')+slug+'/'
+
+
+def dependencies(assets,path,seen=None):
+    seen=set() if seen is None else seen
+    if path in seen:return seen
+    seen.add(path)
+    file=assets/path
+    if not file.exists():
+        assert list(file.parent.glob(file.name+'.*.png')), path
+        return seen
+    if file.read_bytes()[:1] != b'<':return seen
+    root=ET.parse(file).getroot()
+    for node in root.iter():
+        child=node.get('Path')
+        if child:dependencies(assets,child,seen)
+    return seen
+
+
+def install_aliases(assets,slug):
+    folder=legacy_folder(slug);base=LEGACY[slug]
+    for suffix in ['DL']+([] if slug=='sheikah_slate' else ['XluDL']):
+        path=assets/folder/(base+suffix)
+        backup=assets/folder/(base+'Legacy'+suffix)
+        if not backup.exists():shutil.copyfile(path,backup)
+        entry='objects/nei_held_redesign/'+slug+'/gi_dl'
+        body=f'  <CallDisplayList Path="{entry}"/>\n' if suffix=='DL' else ''
+        path.write_text('<DisplayList Version="0">\n'+body+'  <EndDisplayList/>\n</DisplayList>\n')
+
+
+def header(assets):
+    lines=['/* Generated by tools/nei_held/SOURCE/quest_held.py; complete dependency gates. */',
+           '#ifndef QUEST_HELD_RESOURCES_INC','#define QUEST_HELD_RESOURCES_INC',
+           'static u8 QuestHeld_Complete(const char* const* resources) {',
+           '    for (; *resources; ++resources) {',
+           '        if (!NeiHeld_HasResources(*resources, NULL)) return 0;',
+           '    }','    return 1;','}',
+           'typedef struct { const char* opa; const char* xlu; const char* fallbackOpa; const char* fallbackXlu;',
+           '    const char* const* required; const char* const* fallbackRequired;',
+           '    const char* const* fallbackOpaRequired; const char* const* fallbackXluRequired; } QuestHeldModel;',
+           'static u8 QuestHeld_UseOriginal(const QuestHeldModel* model) {',
+           '    // A legacy resource-pack override owns its dependencies; missing',
+           '    // built-in mesh parts must never divert it onto the native fallback.',
+           '    return (QUEST_HELD_IS_MOD(model->opa) && NeiHeld_HasResources(model->opa, model->xlu)) ||',
+           '           QuestHeld_Complete(model->required);',
+           '}',
+           'static void QuestHeld_Select(const QuestHeldModel* model, const char** opa, const char** xlu) {',
+           '    const u8 modOpa = QUEST_HELD_IS_MOD(model->opa);',
+           '    const u8 modXlu = model->xlu && QUEST_HELD_IS_MOD(model->xlu);',
+           '    *opa = *xlu = NULL;',
+           '    if (!modOpa && !modXlu) {',
+           '        if (QuestHeld_Complete(model->required)) { *opa = model->opa; *xlu = model->xlu; }',
+           '        else if (QuestHeld_Complete(model->fallbackRequired)) {',
+           '            *opa = model->fallbackOpa; *xlu = model->fallbackXlu;',
+           '        }',
+           '        return;',
+           '    }',
+           '    // Preserve each mod-owned pass. Its unmodified counterpart uses a',
+           '    // pristine Legacy graph, never an alias to missing new mesh resources.',
+           '    *opa = modOpa && NeiHeld_HasResources(model->opa, NULL) ? model->opa :',
+           '        QuestHeld_Complete(model->fallbackOpaRequired) ? model->fallbackOpa : NULL;',
+           '    if (model->xlu) {',
+           '        *xlu = modXlu && NeiHeld_HasResources(model->xlu, NULL) ? model->xlu :',
+           '            QuestHeld_Complete(model->fallbackXluRequired) ? model->fallbackXlu : NULL;',
+           '    }',
+           '}']
+    for slug,base in LEGACY.items():
+        folder=legacy_folder(slug)
+        opa=folder+base+'DL';xlu=None if slug=='sheikah_slate' else folder+base+'XluDL'
+        fallback=folder+base+'LegacyDL';fallback_xlu=None if xlu is None else folder+base+'LegacyXluDL'
+        for name,paths in [('Required',[opa]+([] if xlu is None else [xlu])),
+                           ('FallbackRequired',[fallback]+([] if fallback_xlu is None else [fallback_xlu])),
+                           ('FallbackOpaRequired',[fallback]),
+                           ('FallbackXluRequired',[] if fallback_xlu is None else [fallback_xlu])]:
+            all_paths=set()
+            for path in paths:all_paths|=dependencies(assets,path)
+            lines.append(f'static const char* const sQuest_{slug}_{name}[] = {{')
+            lines += ['    "__OTR__'+p+'",' for p in sorted(all_paths)]
+            lines.append('    NULL,\n};')
+        def c(path):return 'NULL' if path is None else '"__OTR__'+path+'"'
+        lines.append(f'static const QuestHeldModel sQuest_{slug} = {{ {c(opa)}, {c(xlu)}, {c(fallback)}, {c(fallback_xlu)}, sQuest_{slug}_Required, sQuest_{slug}_FallbackRequired, sQuest_{slug}_FallbackOpaRequired, sQuest_{slug}_FallbackXluRequired }};')
+    lines.append('#endif\n')
+    return '\n'.join(lines)
+
+
+def build(install=False):
+    meshkit.ROOT=preview.ROOT=ROOT
+    for slug,builder in BUILDERS.items():
+        m=builder();stats=meshkit.export_resources(m);preview.checkpoint(m,stats)
+        if install:
+            for game in ['soh','mm']:
+                assets=REPO/game/'assets/custom'
+                shutil.copytree(ROOT/'RESOURCES'/m.prefix,assets/m.prefix,dirs_exist_ok=True)
+                if slug in LEGACY:install_aliases(assets,slug)
+    if install:
+        data=header(REPO/'soh/assets/custom')
+        for game in ['soh','mm']:
+            (REPO/game/'mods/items/objects/quest_held_resources.inc').write_text(data)
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--install',action='store_true')
+    build(parser.parse_args().install)

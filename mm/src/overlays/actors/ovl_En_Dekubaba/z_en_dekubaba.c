@@ -5,6 +5,7 @@
  */
 
 #include "z_en_dekubaba.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 #include "overlays/effects/ovl_Effect_Ss_Hahen/z_eff_ss_hahen.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
@@ -1083,7 +1084,7 @@ void EnDekubaba_UpdateDamage(EnDekubaba* this, PlayState* play) {
 
             if ((i != ARRAY_COUNT(this->colliderElements)) &&
                 ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-                 !(jntSphElem->base.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3))) {
+                 !(DinFireSword_OriginalDamageFlags(play, jntSphElem->base.acHitElem) & 0xDB0B3))) {
                 EnDekubaba_SpawnIceEffects(this, play);
                 newHealth = this->actor.colChkInfo.health - this->actor.colChkInfo.damage;
 

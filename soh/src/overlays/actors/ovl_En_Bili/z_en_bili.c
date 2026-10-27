@@ -5,9 +5,9 @@
  */
 
 #include "z_en_bili.h"
+#include "din_fire_sword.h"
 #include "objects/object_bl/object_bl.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
 
 #define FLAGS \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_IGNORE_QUAKE | ACTOR_FLAG_CAN_ATTACH_TO_ARROW)
@@ -139,8 +139,6 @@ void EnBili_Destroy(Actor* thisx, PlayState* play) {
     EnBili* this = (EnBili*)thisx;
 
     Collider_DestroyCylinder(play, &this->collider);
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 // Setup Action Functions
@@ -593,7 +591,7 @@ void EnBili_UpdateDamage(EnBili* this, PlayState* play) {
                 EnBili_SetupBurnt(this);
             }
 
-            if (this->collider.info.acHitInfo->toucher.dmgFlags & 0x1F820) { // DMG_ARROW
+            if (DinFireSword_OriginalDamageFlags(play, this->collider.info.acHitInfo) & 0x1F820) { // DMG_ARROW
                 this->actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
             }
         }

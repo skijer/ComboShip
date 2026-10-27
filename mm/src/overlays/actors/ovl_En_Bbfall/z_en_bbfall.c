@@ -5,6 +5,7 @@
  */
 
 #include "z_en_bbfall.h"
+#include "din_fire_sword.h"
 #include "overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 
@@ -524,7 +525,7 @@ void EnBbfall_UpdateDamage(EnBbfall* this, PlayState* play) {
         this->collider.base.atFlags &= ~(AT_HIT | AT_BOUNCED);
         this->collider.base.atFlags &= ~AT_ON;
         if ((this->drawDmgEffType != ACTOR_DRAW_DMGEFF_FROZEN_NO_SFX) ||
-            !(this->collider.elements[0].base.acHitElem->atDmgInfo.dmgFlags & 0xDB0B3)) {
+            !(DinFireSword_OriginalDamageFlags(play, this->collider.elements[0].base.acHitElem) & 0xDB0B3)) {
             Actor_SetDropFlagJntSph(&this->actor, &this->collider);
             this->flameOpacity = 0;
             this->flameScaleY = 0.0f;

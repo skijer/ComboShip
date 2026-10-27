@@ -1,0 +1,910 @@
+{
+  "baseline": "613802447",
+  "status": "implemented; native object/branch verification in runner; runtime appearance and audio require game acceptance",
+  "inventory_scope": "Native actor profiles categorized ENEMY or BOSS. Hostile MISC actors also use generic collision observers. This inventory is not a runtime proof of each actor.",
+  "inventory": {
+    "soh": {
+      "profile_count": 79,
+      "profiles": [
+        {
+          "actor_id": "ACTOR_BOSS_DODONGO",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Dodongo/z_boss_dodongo.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_FD",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Fd/z_boss_fd.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_FD2",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Fd2/z_boss_fd2.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_GANON",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Ganon/z_boss_ganon.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_GANON2",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Ganon2/z_boss_ganon2.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_GANONDROF",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Ganondrof/z_boss_ganondrof.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_GOMA",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Goma/z_boss_goma.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_MO",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Mo/z_boss_mo.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_SST",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Sst/z_boss_sst.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_TW",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Tw/z_boss_tw.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_VA",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Boss_Va/z_boss_va.c"
+        },
+        {
+          "actor_id": "ACTOR_DEMO_GEFF",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_Demo_Geff/z_demo_geff.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_AM",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Am/z_en_am.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ANUBICE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Anubice/z_en_anubice.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ANUBICE_FIRE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Anubice_Fire/z_en_anubice_fire.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ATTACK_NIW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Attack_Niw/z_en_attack_niw.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Ba/z_en_ba.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Bb/z_en_bb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BDFIRE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Bdfire/z_en_bdfire.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BIGOKUTA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Bigokuta/z_en_bigokuta.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BILI",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Bili/z_en_bili.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BROB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Brob/z_en_brob.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BUBBLE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Bubble/z_en_bubble.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Bw/z_en_bw.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BX",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Bx/z_en_bx.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_CLEAR_TAG",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Clear_Tag/z_en_clear_tag.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_CROW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Crow/z_en_crow.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DEKUBABA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Dekubaba/z_en_dekubaba.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DEKUNUTS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Dekunuts/z_en_dekunuts.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DH",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Dh/z_en_dh.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DHA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Dha/z_en_dha.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DODOJR",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Dodojr/z_en_dodojr.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DODONGO",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Dodongo/z_en_dodongo.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_EIYER",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Eiyer/z_en_eiyer.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ENCOUNT2",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Encount2/z_en_encount2.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Fd/z_en_fd.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FD_FIRE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Fd_Fire/z_en_fd_fire.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FHG_FIRE",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Fhg_Fire/z_en_fhg_fire.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FIREFLY",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Firefly/z_en_firefly.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FIRE_ROCK",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Fire_Rock/z_en_fire_rock.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FLOORMAS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Floormas/z_en_floormas.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Fw/z_en_fw.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FZ",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Fz/z_en_fz.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_GANON_MANT",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Ganon_Mant/z_en_ganon_mant.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_GANON_ORGAN",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Ganon_Organ/z_en_ganon_organ.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_GELDB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_GeldB/z_en_geldb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_GOMA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Goma/z_en_goma.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_HINTNUTS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Hintnuts/z_en_hintnuts.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_IK",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Ik/z_en_ik.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_KAREBABA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Karebaba/z_en_karebaba.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_MB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Mb/z_en_mb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_NY",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Ny/z_en_ny.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_OKUTA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Okuta/z_en_okuta.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PEEHAT",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Peehat/z_en_peehat.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_POH",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Poh/z_en_poh.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PO_FIELD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Po_Field/z_en_po_field.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PO_SISTERS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Po_Sisters/z_en_po_sisters.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Rd/z_en_rd.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RR",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Rr/z_en_rr.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Sb/z_en_sb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SDA",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Sda/z_en_sda.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SHOPNUTS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Shopnuts/z_en_shopnuts.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SKB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Skb/z_en_skb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SKJ",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Skj/z_en_skj.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SKJNEEDLE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Skjneedle/z_en_skjneedle.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ST",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_St/z_en_st.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TEST",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Test/z_en_test.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TITE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Tite/z_en_tite.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TORCH2",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Torch2/z_en_torch2.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TP",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Tp/z_en_tp.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_VALI",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Vali/z_en_vali.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_VB_BALL",
+          "category": "ACTORCAT_BOSS",
+          "file": "soh/src/overlays/actors/ovl_En_Vb_Ball/z_en_vb_ball.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_VM",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Vm/z_en_vm.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WALLMAS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Wallmas/z_en_wallmas.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WEIYER",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Weiyer/z_en_weiyer.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WF",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Wf/z_en_wf.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_YUKABYUN",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Yukabyun/z_en_yukabyun.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ZF",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_En_Zf/z_en_zf.c"
+        },
+        {
+          "actor_id": "ACTOR_OBJ_ROOMTIMER",
+          "category": "ACTORCAT_ENEMY",
+          "file": "soh/src/overlays/actors/ovl_Obj_Roomtimer/z_obj_roomtimer.c"
+        }
+      ]
+    },
+    "mm": {
+      "profile_count": 91,
+      "profiles": [
+        {
+          "actor_id": "ACTOR_BOSS_01",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Boss_01/z_boss_01.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_02",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Boss_02/z_boss_02.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_03",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Boss_03/z_boss_03.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_04",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Boss_04/z_boss_04.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_05",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_Boss_05/z_boss_05.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_06",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Boss_06/z_boss_06.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_07",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Boss_07/z_boss_07.c"
+        },
+        {
+          "actor_id": "ACTOR_BOSS_HAKUGIN",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Boss_Hakugin/z_boss_hakugin.c"
+        },
+        {
+          "actor_id": "ACTOR_DEMO_SHD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_Demo_Shd/z_demo_shd.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_AM",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Am/z_en_am.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ATTACK_NIW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Attack_Niw/z_en_attack_niw.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BAGUO",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Baguo/z_en_baguo.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BAT",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Bat/z_en_bat.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Bb/z_en_bb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BBFALL",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Bbfall/z_en_bbfall.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BEE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Bee/z_en_bee.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BIGOKUTA",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Bigokuta/z_en_bigokuta.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BIGPAMET",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Bigpamet/z_en_bigpamet.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BIGPO",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Bigpo/z_en_bigpo.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BIGSLIME",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Bigslime/z_en_bigslime.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BU",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Bu/z_en_bu.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_BUBBLE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Bubble/z_en_bubble.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_CROW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Crow/z_en_crow.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DEATH",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Death/z_en_death.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DEKUBABA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Dekubaba/z_en_dekubaba.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DEKUNUTS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Dekunuts/z_en_dekunuts.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DG",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Dg/z_en_dg.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DINOFOS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Dinofos/z_en_dinofos.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DODONGO",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Dodongo/z_en_dodongo.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_DRAGON",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Dragon/z_en_dragon.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_EGOL",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Egol/z_en_egol.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ENCOUNT3",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Encount3/z_en_encount3.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FAMOS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Famos/z_en_famos.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FIREFLY",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Firefly/z_en_firefly.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FIREFLY2",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Firefly2/z_en_firefly2.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FIRE_ROCK",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Fire_Rock/z_en_fire_rock.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FLOORMAS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Floormas/z_en_floormas.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_FZ",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Fz/z_en_fz.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_GRASSHOPPER",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Grasshopper/z_en_grasshopper.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_IK",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Ik/z_en_ik.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_JSO",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Jso/z_en_jso.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_JSO2",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Jso2/z_en_jso2.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_KAIZOKU",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Kaizoku/z_en_kaizoku.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_KAME",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Kame/z_en_kame.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_KAREBABA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Karebaba/z_en_karebaba.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_KNIGHT",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Knight/z_en_knight.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_MINIDEATH",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Minideath/z_en_minideath.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_MINISLIME",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Minislime/z_en_minislime.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_MKK",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Mkk/z_en_mkk.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_NEO_REEBA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Neo_Reeba/z_en_neo_reeba.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_OKUTA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Okuta/z_en_okuta.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PAMETFROG",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Pametfrog/z_en_pametfrog.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PEEHAT",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Peehat/z_en_peehat.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_POH",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Poh/z_en_poh.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PO_SISTERS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Po_Sisters/z_en_po_sisters.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PP",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Pp/z_en_pp.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PR",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Pr/z_en_pr.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PR2",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Pr2/z_en_pr2.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_PRZ",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Prz/z_en_prz.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RAILGIBUD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Railgibud/z_en_railgibud.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RAIL_SKB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Rail_Skb/z_en_rail_skb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RAT",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Rat/z_en_rat.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Rd/z_en_rd.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RR",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Rr/z_en_rr.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_RUPPECROW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Ruppecrow/z_en_ruppecrow.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Sb/z_en_sb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SDA",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Sda/z_en_sda.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SKB",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Skb/z_en_skb.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SLIME",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Slime/z_en_slime.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SNOWMAN",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Snowman/z_en_snowman.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_ST",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_St/z_en_st.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SYATEKI_CROW",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Syateki_Crow/z_en_syateki_crow.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SYATEKI_DEKUNUTS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Syateki_Dekunuts/z_en_syateki_dekunuts.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SYATEKI_OKUTA",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Syateki_Okuta/z_en_syateki_okuta.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_SYATEKI_WF",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Syateki_Wf/z_en_syateki_wf.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TALK_GIBUD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Talk_Gibud/z_en_talk_gibud.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TANRON1",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Tanron1/z_en_tanron1.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TANRON2",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Tanron2/z_en_tanron2.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TANRON3",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Tanron3/z_en_tanron3.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TANRON5",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Tanron5/z_en_tanron5.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TANRON6",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Tanron6/z_en_tanron6.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_THIEFBIRD",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Thiefbird/z_en_thiefbird.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_TITE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Tite/z_en_tite.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_VM",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Vm/z_en_vm.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WALLMAS",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Wallmas/z_en_wallmas.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WATER_EFFECT",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_En_Water_Effect/z_en_water_effect.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WDHAND",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Wdhand/z_en_wdhand.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WIZ",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Wiz/z_en_wiz.c"
+        },
+        {
+          "actor_id": "ACTOR_EN_WIZ_FIRE",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_En_Wiz_Fire/z_en_wiz_fire.c"
+        },
+        {
+          "actor_id": "ACTOR_ITEM_B_HEART",
+          "category": "ACTORCAT_BOSS",
+          "file": "mm/src/overlays/actors/ovl_Item_B_Heart/z_item_b_heart.c"
+        },
+        {
+          "actor_id": "ACTOR_OBJ_ROOMTIMER",
+          "category": "ACTORCAT_ENEMY",
+          "file": "mm/src/overlays/actors/ovl_Obj_Roomtimer/z_obj_roomtimer.c"
+        }
+      ]
+    }
+  },
+  "generic_route": "Exact owned player melee element -> accepted numeric collision -> same actor consumption update -> lethal health/Actor_ApplyDamage/Actor_Kill/Enemy_StartFinishingBlow -> copied collision-volume presentation. Ordinary/foreign mixed damage is conservative and never inherits an earlier elemental hit.",
+  "native_response_policy": "Existing audited native burn/freeze/light draw responses suppress only duplicate finish effects; actor IDs do not gate generic fallback.",
+  "confirmed_adapters": {
+    "soh": {
+      "ACTOR_EN_BUBBLE": "Primary lethal AC branch after nonlethal bounce rejection; OC-only player pop excluded.",
+      "ACTOR_BOSS_DODONGO": "Custom health <=0 immediately after native sword damage; next-update native death remains unchanged.",
+      "ACTOR_BOSS_VA": "Bari child accepted KillBari entry, before its native 30-frame death timer.",
+      "ACTOR_EN_FD_FIRE": "Native AC extinguish branch, including admitted adult spin/jump with zero numeric damage; slash mask rejection unchanged."
+    },
+    "mm": {
+      "ACTOR_EN_BUBBLE": "Primary lethal AC branch; OC-only pop excluded.",
+      "ACTOR_EN_RAT": "Accepted non-stun/non-hook AC explosion branch; revive policy remains native.",
+      "ACTOR_EN_TANRON3": "Accepted AC deathTimer==0 branch; Gyorg fry death path unchanged.",
+      "ACTOR_EN_MINIDEATH": "Each accepted destroyed bat uses its own hitter/position/part index; foreign hit and parent-wide scripted death do not confer elemental credit.",
+      "ACTOR_BOSS_07": "Majora Mask native signed <=0 branch, including u8 overkill; phase timers unchanged.",
+      "ACTOR_EN_BAGUO": "Nejiron native KILL response; forced off-ground/water explosions excluded.",
+      "ACTOR_EN_INVADEPOH": "Only native Alien_Update accepted AC branch bypasses generic category eligibility; other actor variants never call this observer."
+    }
+  },
+  "other_actor_specific_observation": {
+    "soh": [
+      "ACTOR_BOSS_GANON/ACTOR_BOSS_GANON2 signed health observation preserves native final-stage clamp to1.",
+      "ACTOR_EN_PEEHAT larvae params>0 bypass native adult fire renderer and receive fallback."
+    ]
+  },
+  "preserved_invariants": [
+    "No damage/multiplier changes in finish system",
+    "No actor update/draw replacement or delay",
+    "Native drop and cut flags restored through existing OriginalDamageFlags",
+    "No new magic cost",
+    "Soul veto precedes native accepted AC death path",
+    "No stored Actor or Collider pointers in finished presentation",
+    "No gameplay RNG consumed by drawing"
+  ],
+  "limits": [
+    "Fallback copies collision-volume anchors at fatal entry. It does not follow a moving death skeleton or impose gameplay frozen state.",
+    "Instant native removal may erase the actor model immediately; copied effect continues without delaying progression.",
+    "32 extra points per frame rotate across presentations, with actual XLU/OPA arena guards and checked matrix allocation; dense mass kills may show fewer anchors.",
+    "32 finish audio requests per gameplay frame rotate independently across presentations, including repeated draws and pause/resume. Dense mass kills share native channels; unrefreshed light loops stop safely.",
+    "2048 hit records and 2048 copied effects per host bound memory; native engine SFX channel contention remains authoritative.",
+    "OoT light uses the MM strict graph when available, otherwise its native orb graph with MM colors. MM light-loop audio requires the existing MM sound bridge/archive.",
+    "External/custom actors whose kills occur outside these native collision/lifecycle routes require separate runtime evidence or an explicit adapter."
+  ]
+}

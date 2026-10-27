@@ -6,6 +6,8 @@
 
 #include "z_bg_spot07_taki.h"
 #include "objects/object_spot07_object/object_spot07_object.h"
+#include "mods/extended_inventory.h" // Skijer's NEI: Seasons_* — Winter freezes it, Summer thaws it
+#include "soh/Enhancements/Graphics/ZorasDomain.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
@@ -14,7 +16,7 @@ void BgSpot07Taki_Destroy(Actor* thisx, PlayState* play);
 void BgSpot07Taki_Update(Actor* thisx, PlayState* play);
 void BgSpot07Taki_Draw(Actor* thisx, PlayState* play);
 
-void BgSpot07Taki_DoNothing(BgSpot07Taki* this, PlayState* play);
+void BgSpot07Taki_UpdateFrozenState(BgSpot07Taki* this, PlayState* play);
 
 const ActorInit Bg_Spot07_Taki_InitVars = {
     ACTOR_BG_SPOT07_TAKI,
@@ -33,31 +35,83 @@ static InitChainEntry sInitChain[] = {
     ICHAIN_VEC3F_DIV1000(scale, 100, ICHAIN_STOP),
 };
 
+typedef enum {
+    /* 0 */ ZD_ICE_VANILLA, // frozen only as adult
+    /* 1 */ ZD_ICE_ALWAYS,  // frozen regardless of age
+    /* 2 */ ZD_ICE_NEVER,   // waterfall regardless of age
+} ZorasDomainIceOverride;
+
+// Overrides the LINK_IS_ADULT check that decides between the ice block (adult)
+// and the running waterfall (child). Update applies collision and rendering as
+// one state, including when the immersion checkbox changes while in the room.
+//
+// Always Thawed outranks seasons; otherwise retain the Rod and legacy console
+// override precedence. This actor already owns both native water/ice models.
+// Skijer's NEI
+static s32 BgSpot07Taki_IsFrozen(PlayState* play) {
+    if (ZorasDomain_IsAlwaysThawed(play)) {
+        return false;
+    }
+    if (Seasons_SeasonCount() != 0) {
+        uint8_t season = Seasons_GetSeason();
+
+        if (season == SEASON_WINTER) {
+            return true;
+        }
+        if (season == SEASON_SUMMER) {
+            return false;
+        }
+    }
+
+    switch (CVarGetInteger(CVAR_ENHANCEMENT("ZorasDomainIce"), ZD_ICE_VANILLA)) {
+        case ZD_ICE_ALWAYS:
+            return true;
+        case ZD_ICE_NEVER:
+            return false;
+        default:
+            return LINK_IS_ADULT;
+    }
+}
+
 void BgSpot07Taki_Init(Actor* thisx, PlayState* play) {
     BgSpot07Taki* this = (BgSpot07Taki*)thisx;
     s32 pad;
-    CollisionHeader* colHeader = NULL;
 
     DynaPolyActor_Init(&this->dyna, DPM_PLAYER);
     Actor_ProcessInitChain(&this->dyna.actor, sInitChain);
-    if (LINK_IS_ADULT) {
-        if (this->dyna.actor.params == 0) {
-            CollisionHeader_GetVirtual(&object_spot07_object_Col_002590, &colHeader);
-        } else {
-            CollisionHeader_GetVirtual(&object_spot07_object_Col_0038FC, &colHeader);
-        }
-        this->dyna.bgId = DynaPoly_SetBgActor(play, &play->colCtx.dyna, &this->dyna.actor, colHeader);
-    }
-    this->actionFunc = BgSpot07Taki_DoNothing;
+    this->isFrozen = -1;
+    this->actionFunc = BgSpot07Taki_UpdateFrozenState;
+    this->actionFunc(this, play);
 }
 
 void BgSpot07Taki_Destroy(Actor* thisx, PlayState* play) {
     BgSpot07Taki* this = (BgSpot07Taki*)thisx;
 
-    DynaPoly_DeleteBgActor(play, &play->colCtx.dyna, this->dyna.bgId);
+    if (this->dyna.bgId >= 0 && this->dyna.bgId < BG_ACTOR_MAX) {
+        DynaPoly_DeleteBgActor(play, &play->colCtx.dyna, this->dyna.bgId);
+    }
 }
 
-void BgSpot07Taki_DoNothing(BgSpot07Taki* this, PlayState* play) {
+void BgSpot07Taki_UpdateFrozenState(BgSpot07Taki* this, PlayState* play) {
+    s32 isFrozen = BgSpot07Taki_IsFrozen(play);
+    CollisionHeader* colHeader = NULL;
+
+    if (isFrozen == this->isFrozen) {
+        return;
+    }
+    if (this->dyna.bgId >= 0 && this->dyna.bgId < BG_ACTOR_MAX) {
+        DynaPoly_DeleteBgActor(play, &play->colCtx.dyna, this->dyna.bgId);
+    }
+    this->dyna.bgId = BGACTOR_NEG_ONE;
+    if (isFrozen) {
+        if (this->dyna.actor.params == 0) {
+            CollisionHeader_GetVirtual((void*)object_spot07_object_Col_002590, &colHeader);
+        } else {
+            CollisionHeader_GetVirtual((void*)object_spot07_object_Col_0038FC, &colHeader);
+        }
+        this->dyna.bgId = DynaPoly_SetBgActor(play, &play->colCtx.dyna, &this->dyna.actor, colHeader);
+    }
+    this->isFrozen = isFrozen;
 }
 
 void BgSpot07Taki_Update(Actor* thisx, PlayState* play) {
@@ -69,10 +123,11 @@ void BgSpot07Taki_Update(Actor* thisx, PlayState* play) {
 void BgSpot07Taki_Draw(Actor* thisx, PlayState* play) {
     BgSpot07Taki* this = (BgSpot07Taki*)thisx;
     u32 frames;
+    s32 isFrozen = this->isFrozen;
 
     OPEN_DISPS(play->state.gfxCtx);
     frames = play->gameplayFrames;
-    if (LINK_IS_ADULT) {
+    if (isFrozen) {
         Gfx_SetupDL_25Opa(play->state.gfxCtx);
         gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
         if (this->dyna.actor.params == 0) {
@@ -89,7 +144,7 @@ void BgSpot07Taki_Draw(Actor* thisx, PlayState* play) {
                Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, ((frames * -1) & 0x7F), ((frames * 1) & 0x7F), 32, 32, 1,
                                   ((frames * 1) & 0x7F), ((frames * 1) & 0x7F), 32, 32, -1, 1, 1, 1));
 
-    if (!LINK_IS_ADULT) {
+    if (!isFrozen) {
         gDPSetEnvColor(POLY_XLU_DISP++, 255, 255, 255, 128);
         if (this->dyna.actor.params == 0) {
             gSPSegment(POLY_XLU_DISP++, 0x09,

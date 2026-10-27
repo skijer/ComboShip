@@ -1,0 +1,10 @@
+newmtl material-0138A9AD
+Kd 1 1 1
+d 1
+illum 2
+map_Kd dn_queen_e00_0.png
+newmtl material-02FDF718
+Kd 1 1 1
+d 1
+illum 2
+map_Kd dn_queen_00_800.png

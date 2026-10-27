@@ -1,0 +1,38 @@
+{
+  "resource_count": 7,
+  "vertex_records": 1460,
+  "vertex_loads": 54,
+  "slug": "four_sword_hilt",
+  "name": "Four Sword / gameplay four_sword_hilt",
+  "entry": "objects/nei_held_redesign/four_sword_hilt/gi_dl",
+  "draw_scale": 1.0,
+  "matrix_scale": 2.05859375,
+  "triangles": 1254,
+  "bounds_author": [
+    [
+      -15.1875,
+      -8.875,
+      -6.0625
+    ],
+    [
+      23.875,
+      29.125,
+      1.5625
+    ]
+  ],
+  "markers": {
+    "axis_native": [
+      1,
+      0,
+      0
+    ],
+    "legacy_blade_x": [
+      719,
+      3389
+    ]
+  },
+  "notes": [
+    "Complete approved sword split into native blade/hilt DLs. Native hand, sheath, clone and age transforms retain priority and placement."
+  ],
+  "runtime_tested": false
+}

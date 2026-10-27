@@ -1,0 +1,11 @@
+<DisplayList Version="0">
+	<PipeSync />
+	<SetPrimColor M="0" L="0" R="255" G="255" B="255" A="255" />
+	<CallDisplayList Path="objects/object_gi_gerudo_warrior/bone010_gLinkAdultHeadLimb_mesh_layer_Opaque" />
+	<CallDisplayList Path="objects/object_gi_gerudo_warrior/bone011_gLinkAdultHatLimb_mesh_layer_Opaque" />
+	<PipeSync />
+	<ClearGeometryMode G_TEXTURE_GEN="1" G_TEXTURE_GEN_LINEAR="1" />
+	<Texture S="65535" T="65535" Level="0" Tile="0" On="0" />
+	<SetEnvColor R="255" G="255" B="255" A="255" />
+	<EndDisplayList />
+</DisplayList>

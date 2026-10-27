@@ -650,6 +650,12 @@ ResourceFactoryXMLDisplayListV0::ReadResource(std::shared_ptr<Ship::File> file,
             uint32_t lrt = child->IntAttribute("Lrt");
 
             g = gsDPSetTileSize(t, uls, ult, lrs, lrt);
+        } else if (childName == "ScrollTexture") {
+            uint32_t tile = child->UnsignedAttribute("Tile");
+            int speedX = child->IntAttribute("SpeedX");
+            int speedY = child->IntAttribute("SpeedY");
+
+            g = gsSPScrollTexture(tile, speedX, speedY);
         } else if (childName == "SetOtherMode") {
             std::string cmdStr = child->Attribute("Cmd");
             int sft = child->IntAttribute("Sft");
@@ -1172,7 +1178,15 @@ ResourceFactoryXMLDisplayListV0::ReadResource(std::shared_ptr<Ship::File> file,
             g = gsDPSetRenderMode(renderModes[rawMode1], renderModes[rawMode2]);
         } else if (childName == "PushShader") {
             const char* shader = child->Attribute("Shader", nullptr);
-            GsSPPushShader(dl->Instructions, shader);
+            if (shader == nullptr) {
+                printf("DisplayListXML: PushShader is missing its Shader attribute\n");
+            } else {
+                char* shaderCopy = (char*)malloc(strlen(shader) + 1);
+                dl->Strings.push_back(shaderCopy);
+                strcpy(shaderCopy, shader);
+
+                GsSPPushShader(dl->Instructions, shaderCopy);
+            }
         } else if (childName == "PopShader") {
             GsSPPopShader(dl->Instructions);
         } else {

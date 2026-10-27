@@ -5,10 +5,10 @@
  */
 
 #include "z_en_po_field.h"
+#include "din_fire_sword.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "objects/object_po_field/object_po_field.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/savestate_serialize.h"
 
 #include <string.h>
@@ -199,8 +199,6 @@ void EnPoField_Destroy(Actor* thisx, PlayState* play) {
         Collider_DestroyCylinder(play, &this->flameCollider);
         Collider_DestroyCylinder(play, &this->collider);
     }
-
-    ResourceMgr_UnregisterSkeleton(&this->skelAnime);
 }
 
 void EnPoField_SetupWaitForSpawn(EnPoField* this, PlayState* play) {
@@ -281,7 +279,7 @@ void EnPoField_SetupFlee(EnPoField* this) {
 
 void EnPoField_SetupDamage(EnPoField* this) {
     Animation_MorphToPlayOnce(&this->skelAnime, &gPoeFieldDamagedAnim, -6.0f);
-    if (this->collider.info.acHitInfo->toucher.dmgFlags & 0x1F824) {
+    if (DinFireSword_OriginalDamageFlags(gPlayState, this->collider.info.acHitInfo) & 0x1F824) {
         this->actor.world.rot.y = this->collider.base.ac->world.rot.y;
     } else {
         this->actor.world.rot.y = Actor_WorldYawTowardActor(&this->actor, this->collider.base.ac) + 0x8000;

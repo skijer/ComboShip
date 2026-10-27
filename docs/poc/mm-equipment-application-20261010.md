@@ -1,0 +1,28 @@
+# MM equipment application regression POC — 2026-10-10
+
+Baseline: `d371fb26284b6b6e7d05ef0888fb90e09ca9fc3d` (PR41).
+Branch: `poc/equipment-apply-regression-20261010`.
+This is an isolated source candidate. No push, merge, deployment or runtime acceptance is claimed.
+
+## Findings and resulting behavior
+
+1. MM retained the old dummy Byrna application: selecting it changed the extended slot but did not put its item on B, and its item ID resolved to action NONE. Byrna now carries its own ID on B and uses the existing one-hand sword action and blue cane hand model. Removal clears B through the existing setter. The former recovery perks remain with Great Fairy's Sword; no Kinsect or new combat ability is added.
+2. Trident and Four Sword share Kokiri's item action. The native use path treated a change between them as reuse of the existing action, retaining the previous held ID. Four's held selector then declined the Trident ID before its getter could run. Accepted switches involving extended swords now refresh their identity through the existing native transition/initialization path. Native action/input rejection gates remain in place.
+3. MM's C/D item dispatcher never called its existing extended-equipment toggle function. Assigned tunics resolved to NONE and went through ordinary item stowing instead. C/D presses now call the toggle entry point; Byrna C-selection sets the B carrier and B swings it. An owned C-assigned piece opts in through `ExtEquip_Equip` when the old cheat setting is off, as A-selection already did. Unowned assignments cannot enable or mutate the loadout. Custom tool handlers run first and used to cancel on that raw equipment press: the complete Gust Jar handler reproduced a cleared held-jar state despite the native ID surviving. A narrow wrapper now temporarily reserves only the native-priority owned/permitted extended C/D edge through the custom update and restores it for native dispatch. Disabled slots, ownership, age, Pikachu, Trident shield compatibility, unrelated cancellation and C-Up retain their policies. Raw slot filtering prevents premature callbacks for unrelated song/tool items; only the reserved edge is restored, preserving other consumed input.
+4. Trident's policy explicitly auto-selected owned Divine or Ikana shields. It now preserves an already-selected compatible Divine/Ikana/native Mirror and clears an incompatible shield. Ownership alone does not select another shield. Clearing a genuine native Hero retains its earned ownership record. Page reentry does not change that loadout.
+
+The parent task separately fixes the pause doll's missing translucent-stream framebuffer isolation, which produced the oversized Divine Shield in the supplied screenshot. This delta leaves that renderer untouched.
+
+## Verification
+
+- The new real native button/use cases fail on the preserved baseline: same-action B switches retain the wrong held ID; C equipment presses never reach the toggle; a tunic press stows the held Gust Jar before native dispatch. They pass after the fix, also under ASan/UBSan. `tests/mm_nei/run_use_tests.py --source-ref d371fb26 <case>` runs the control without changing HEAD.
+- The extended ownership/setter/toggle fixture failed with 11 expected failures against the baseline; the candidate passes all checks under ASan/UBSan. It retains actual `NeiSaveData` and native item constants, production acquisition/setter/pause draw/cursor/application functions and sync ownership publishers. New checks cover all sword B carriers, tunic opt-in/removal, unowned assignments, explicit Trident shields, starter ownership and page reentry.
+- All 21 MM native use functional cases plus the lifecycle integration pass normally and under ASan/UBSan. Ownership passes all 426 checks under ASan/UBSan. MM action and hand selection, both-host equipment/held selectors and the dedicated Four Sword GI/held body/Din/graph/native/adult/late-hook tests pass. MM equipment pause names/selectors pass under sanitizers. Season rod native lifecycle and Wand modes (including 2224 OoT/MM Sand parity observations) pass; the Wand fixture declares the new equipment boundary and asserts that its unrelated item flow never calls it.
+- The complete MM `z_player.c` owning unit, including the changed equipment/action/Byrna unity sources, passes actual-header syntax under GNU C17, the standard selected by `mm/CMakeLists.txt`. Existing compatibility/header/asset-pointer warnings remain. A preliminary C23 attempt used the wrong standard and encountered existing unspecified-prototype compatibility declarations.
+- Clang-format 14 and `git diff --check` pass for the changed native source.
+- Independent review reproduced the custom-tool cancellation and verified the corrected wrapper, raw-slot filtering and permanent full-handler control.
+- A duplicate broad gate reached the early GI suites, then stopped because `cmake` was absent from that process's PATH. The parent task owns the final combined canonical gate with the supplied diagnostic toolchain PATH; no complete broad-gate result is inferred from this partial run.
+
+## Runtime boundaries
+
+The actual installed archive stack, controller inputs, GPU output and save/world transitions have not been executed here. The same-action Four Sword identity gap is reproduced; another configuration-specific visibility cause remains possible. The existing authored graph, native/mod fallback and independent Alt ownership paths are unchanged. Check Four/Trident/Byrna B switches, C/D tunic activation, explicit Trident shield choice and pause reentry in the rebuilt application before accepting this POC.

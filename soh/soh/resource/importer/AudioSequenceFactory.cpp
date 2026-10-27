@@ -1,17 +1,18 @@
-#include "soh/resource/importer/AudioSequenceFactory.h"
-#include "soh/resource/importer/AudioSoundFontFactory.h"
-#include "soh/resource/type/AudioSequence.h"
-#include "spdlog/spdlog.h"
+#include <type_traits>
+#include <spdlog/spdlog.h>
+
 #include <ship/resource/ResourceManager.h>
 #include <tinyxml2.h>
-
 #include <ship/Context.h>
 #include <ship/resource/archive/Archive.h>
 #ifdef COMBO_BUILD
 #include <ship/resource/CrossRMRegistry.h>
 #endif
 #include <ship/utils/binarytools/BinaryWriter.h>
-#include <type_traits>
+
+#include "soh/resource/importer/AudioSequenceFactory.h"
+#include "soh/resource/importer/AudioSoundFontFactory.h"
+#include "soh/resource/type/AudioSequence.h"
 
 namespace SOH {
 std::shared_ptr<Ship::IResource>
@@ -33,8 +34,13 @@ ResourceFactoryBinaryAudioSequenceV2::ReadResource(std::shared_ptr<Ship::File> f
     audioSequence->sequence.seqNumber = reader->ReadUByte();
     audioSequence->sequence.medium = reader->ReadUByte();
     audioSequence->sequence.cachePolicy = reader->ReadUByte();
+    audioSequence->sequence.resolvedFont = -1; // set only for resolved streamed seqs in AudioLoad_Init
 
     audioSequence->sequence.numFonts = reader->ReadUInt32();
+    if (audioSequence->sequence.numFonts < 0 || audioSequence->sequence.numFonts > 16) {
+        SPDLOG_ERROR("Sequence '{}' has an invalid font count", initData->Path);
+        return nullptr;
+    }
     for (int32_t i = 0; i < 16; i++) {
         audioSequence->sequence.fonts[i] = 0;
     }
@@ -204,8 +210,8 @@ static void WriteMonoSingleSeq(Ship::BinaryWriter* writer, uint16_t delay, uint8
     writer->Seek(channelStart, Ship::SeekOffsetType::Start);
 
     // Channel header
-    layerPlaceholderOff = static_cast<uint16_t>(writer->GetBaseAddress());
     WriteNoshort(writer);
+    layerPlaceholderOff = static_cast<uint16_t>(writer->GetBaseAddress());
     WriteLdlayer(writer, 0, 0);
     WritePan(writer, 64);
     WriteVolCHeader(writer, 127); // Max volume
@@ -328,6 +334,7 @@ ResourceFactoryXMLAudioSequenceV0::ReadResource(std::shared_ptr<Ship::File> file
         ResourceFactoryXMLSoundFontV0::CachePolicyToInt(child->Attribute("CachePolicy"), initData->Path.c_str());
     sequence->sequence.seqDataSize = child->IntAttribute("Size");
     sequence->sequence.seqNumber = child->IntAttribute("Index");
+    sequence->sequence.resolvedFont = -1; // set only for resolved streamed seqs in AudioLoad_Init
     bool streamed = child->BoolAttribute("Streamed");
 
     memset(sequence->sequence.fonts, 0, sizeof(sequence->sequence.fonts));
@@ -335,6 +342,10 @@ ResourceFactoryXMLAudioSequenceV0::ReadResource(std::shared_ptr<Ship::File> file
     tinyxml2::XMLElement* fontsElement = child->FirstChildElement();
     tinyxml2::XMLElement* fontElement = fontsElement->FirstChildElement();
     while (fontElement != nullptr) {
+        if (i >= 16) {
+            SPDLOG_ERROR("Sequence '{}' has more than 16 font operands", initData->Path);
+            return nullptr;
+        }
         sequence->sequence.fonts[i] = fontElement->IntAttribute("FontIdx");
         fontElement = fontElement->NextSiblingElement();
         i++;

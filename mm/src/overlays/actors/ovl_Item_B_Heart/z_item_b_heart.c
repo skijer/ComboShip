@@ -106,12 +106,12 @@ void ItemBHeart_Draw(Actor* thisx, PlayState* play) {
         Gfx_SetupDL25_Xlu(play->state.gfxCtx);
         MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx);
         gSPDisplayList(POLY_XLU_DISP++, &gGiHeartBorderDL);
-        gSPDisplayList(POLY_XLU_DISP++, &gGiHeartContainerDL);
+        POLY_XLU_DISP = GetItem_DrawDListWithCosmetics(POLY_XLU_DISP, gGiHeartContainerDL, GID_HEART_CONTAINER);
     } else {
         Gfx_SetupDL25_Opa(play->state.gfxCtx);
         MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx);
         gSPDisplayList(POLY_OPA_DISP++, &gGiHeartBorderDL);
-        gSPDisplayList(POLY_OPA_DISP++, &gGiHeartContainerDL);
+        POLY_OPA_DISP = GetItem_DrawDListWithCosmetics(POLY_OPA_DISP, gGiHeartContainerDL, GID_HEART_CONTAINER);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);

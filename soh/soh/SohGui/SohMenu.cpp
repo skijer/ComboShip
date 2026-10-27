@@ -1,7 +1,8 @@
-#include "SohMenu.h"
 #include <libultraship/bridge/consolevariablebridge.h>
 #include <ship/Context.h>
-#include <ship/utils/StringHelper.h>
+#include <cstring>
+
+#include "SohMenu.h"
 #include "soh/OTRGlobals.h" // ComboShip: EvalDisabledByIndex foreground guard mirrors Menu::DrawElement
 
 extern "C" {
@@ -29,7 +30,7 @@ WidgetInfo& SohMenu::AddWidget(WidgetPath& pathInfo, std::string widgetName, Wid
     std::unordered_map<std::string, SidebarEntry>& sidebar = menuEntries.at(pathInfo.sectionName).sidebars;
     uint8_t column = pathInfo.column;
     if (sidebar.contains(pathInfo.sidebarName)) {
-        while (sidebar.at(pathInfo.sidebarName).columnWidgets.size() < column + 1) {
+        while (sidebar.at(pathInfo.sidebarName).columnWidgets.size() < static_cast<size_t>(column) + 1) {
             sidebar.at(pathInfo.sidebarName).columnWidgets.push_back({});
         }
     }
@@ -78,6 +79,24 @@ WidgetInfo& SohMenu::AddWidget(WidgetPath& pathInfo, std::string widgetName, Wid
             widget.options = std::make_shared<WidgetOptions>();
     }
     return widget;
+}
+
+// Registration-time insertion, before Combo's menu export caches widget indices.
+// Reuse AddWidget's native options and keep every existing widget/callback intact.
+WidgetInfo& SohMenu::AddWidgetAfter(WidgetPath& pathInfo, const char* anchorCvar, std::string widgetName,
+                                    WidgetType widgetType) {
+    AddWidget(pathInfo, widgetName, widgetType);
+    auto& widgets =
+        menuEntries.at(pathInfo.sectionName).sidebars.at(pathInfo.sidebarName).columnWidgets.at(pathInfo.column);
+    const auto last = widgets.end() - 1;
+    const auto anchor = std::find_if(widgets.begin(), last, [anchorCvar](const WidgetInfo& widget) {
+        return anchorCvar && widget.cVar && std::strcmp(widget.cVar, anchorCvar) == 0;
+    });
+    if (anchor == last)
+        return widgets.back();
+    const auto insertion = anchor + 1;
+    std::rotate(insertion, last, widgets.end());
+    return *insertion;
 }
 
 SohMenu::SohMenu(const std::string& consoleVariable, const std::string& name)
@@ -423,9 +442,11 @@ int32_t SohMenu::DrawWidgetByIndex(int32_t i, int32_t width) {
     // SoH's Combobox does comboMap.at(value), which THROWS (and would unwind across the C-ABI
     // boundary and crash) if the CVar value isn't a current option key. comboui's search/flat render
     // skips the section update funcs that normally keep it in range — skip drawing when out of range.
+    // Use the same default as CVarCombobox: equipment slots default to -1 (inherit),
+    // and treating an unset slot as pack 0 hides it when that pack lacks the item.
     if (w->type == WIDGET_CVAR_COMBOBOX && w->cVar && w->cVar[0]) {
         auto opts = std::static_pointer_cast<UIWidgets::ComboboxOptions>(w->options);
-        if (!opts || opts->comboMap.find(CVarGetInteger(w->cVar, 0)) == opts->comboMap.end()) {
+        if (!opts || opts->comboMap.find(CVarGetInteger(w->cVar, opts->defaultIndex)) == opts->comboMap.end()) {
             return 0;
         }
     }
@@ -434,7 +455,7 @@ int32_t SohMenu::DrawWidgetByIndex(int32_t i, int32_t width) {
     bool hasCvar = (w->cVar && w->cVar[0]);
     int32_t beforeI = hasCvar ? CVarGetInteger(w->cVar, 0) : 0;
     float beforeF = hasCvar ? CVarGetFloat(w->cVar, 0.0f) : 0.0f;
-    MenuDrawItem(*w, (uint32_t)(width > 0 ? width : 90), GetMenuThemeColor());
+    MenuDrawItem(*w, GetMenuThemeColor());
     if (!hasCvar) {
         return 0;
     }

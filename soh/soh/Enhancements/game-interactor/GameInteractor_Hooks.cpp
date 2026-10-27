@@ -1,4 +1,10 @@
 #include "GameInteractor_Hooks.h"
+#include "soh/Enhancements/debugger/FrameTimingProbe.h"
+
+#ifdef COMBO_BUILD
+extern "C" void Combo_SOH_BeforeNativeLoadGame(void);
+extern "C" void Combo_SOH_AfterNativeLoadGame(void);
+#endif
 
 // MARK: - Gameplay
 
@@ -11,7 +17,13 @@ void GameInteractor_ExecuteOnZTitleUpdate(void* gameState) {
 }
 
 void GameInteractor_ExecuteOnLoadGame(int32_t fileNum) {
+#ifdef COMBO_BUILD
+    Combo_SOH_BeforeNativeLoadGame();
+#endif
     GameInteractor::Instance->ExecuteHooks<GameInteractor::OnLoadGame>(fileNum);
+#ifdef COMBO_BUILD
+    Combo_SOH_AfterNativeLoadGame();
+#endif
 }
 
 void GameInteractor_ExecuteOnExitGame(int32_t fileNum) {
@@ -26,6 +38,7 @@ void GameInteractor_ExecuteOnGameStateMainStart() {
 }
 
 void GameInteractor_ExecuteOnGameFrameUpdate() {
+    FrameTiming::Scope timing(FRAME_TIMING_FRAME_HOOKS);
     GameInteractor::Instance->ExecuteHooks<GameInteractor::OnGameFrameUpdate>();
 }
 
@@ -114,8 +127,16 @@ void GameInteractor_ExecuteOnOcarinaSongAction() {
     GameInteractor::Instance->ExecuteHooks<GameInteractor::OnOcarinaSongAction>();
 }
 
+void GameInteractor_ExecuteOnWarpSongLeave() {
+    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnWarpSongLeave>();
+}
+
 void GameInteractor_ExecuteOnOcarinaNote(uint8_t note, float modulator, int8_t bend) {
     GameInteractor::Instance->ExecuteHooks<GameInteractor::OnOcarinaNote>(note, modulator, bend);
+}
+
+void GameInteractor_ExecuteOnOcarinaPlaybackNote(uint8_t note, float modulator) {
+    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnOcarinaPlaybackNote>(note, modulator);
 }
 
 void GameInteractor_ExecuteOnShopSlotChangeHooks(uint8_t cursorIndex, int16_t price) {
@@ -170,6 +191,16 @@ void GameInteractor_ExecuteOnActorKill(void* actor) {
     GameInteractor::Instance->ExecuteHooksForID<GameInteractor::OnActorKill>(((Actor*)actor)->id, actor);
     GameInteractor::Instance->ExecuteHooksForPtr<GameInteractor::OnActorKill>((uintptr_t)actor, actor);
     GameInteractor::Instance->ExecuteHooksForFilter<GameInteractor::OnActorKill>(actor);
+}
+
+bool GameInteractor_ShouldActorDestroy(void* actor) {
+    bool result = true;
+    GameInteractor::Instance->ExecuteHooks<GameInteractor::ShouldActorDestroy>(actor, &result);
+    GameInteractor::Instance->ExecuteHooksForID<GameInteractor::ShouldActorDestroy>(((Actor*)actor)->id, actor,
+                                                                                    &result);
+    GameInteractor::Instance->ExecuteHooksForPtr<GameInteractor::ShouldActorDestroy>((uintptr_t)actor, actor, &result);
+    GameInteractor::Instance->ExecuteHooksForFilter<GameInteractor::ShouldActorDestroy>(actor, &result);
+    return result;
 }
 
 void GameInteractor_ExecuteOnActorDestroy(void* actor) {

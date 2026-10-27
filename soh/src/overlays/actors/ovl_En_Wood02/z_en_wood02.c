@@ -7,6 +7,9 @@
 #include "z_en_wood02.h"
 #include "objects/object_wood02/object_wood02.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/Graphics/SeasonFoliageActor.h"
+#include "mods/transformation_masks/mm_mask_wear.h"
+#include <libultraship/bridge/consolevariablebridge.h>
 
 #define FLAGS 0
 
@@ -183,7 +186,7 @@ void EnWood02_Init(Actor* thisx, PlayState* play2) {
     // as the night scene, For the always spawn GS enhancement we apply the needed
     // params to have the GS drop when bonking
     if ((this->actor.params & 0xFF) == WOOD_TREE_CONICAL_MEDIUM && IS_DAY && play->sceneNum == SCENE_KAKARIKO_VILLAGE &&
-        CVarGetInteger(CVAR_ENHANCEMENT("NightGSAlwaysSpawn"), 0)) {
+        MmMaskWear_ShouldForceNightGS()) {
         this->actor.params = 0x2001;
         this->actor.home.rot.z = 0x71;
     }
@@ -471,11 +474,17 @@ void EnWood02_Draw(Actor* thisx, PlayState* play) {
         Gfx_DrawDListOpa(play, D_80B3BF54[this->drawType & 0xF]);
         gDPSetEnvColor(POLY_XLU_DISP++, red, green, blue, 0);
         gSPMatrix(POLY_XLU_DISP++, MATRIX_NEWMTX(gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        s32 seasonal = SeasonFoliage_ActorBegin(&POLY_XLU_DISP, play, true);
         gSPDisplayList(POLY_XLU_DISP++, D_80B3BF70[this->drawType & 0xF]);
+        SeasonFoliage_ActorEnd(&POLY_XLU_DISP, seasonal);
     } else {
         Gfx_SetupDL_25Xlu(gfxCtx);
         gSPMatrix(POLY_XLU_DISP++, MATRIX_NEWMTX(gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        s32 seasonal = (this->drawType & 0xF) == WOOD_DRAW_BUSH_GREEN
+                           ? SeasonFoliage_ActorBegin(&POLY_XLU_DISP, play, false)
+                           : false;
         gSPDisplayList(POLY_XLU_DISP++, D_80B3BF54[this->drawType & 0xF]);
+        SeasonFoliage_ActorEnd(&POLY_XLU_DISP, seasonal);
     }
 
     CLOSE_DISPS(gfxCtx);

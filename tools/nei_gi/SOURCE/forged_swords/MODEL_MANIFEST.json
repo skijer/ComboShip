@@ -1,0 +1,138 @@
+{
+  "master_sword": {
+    "name": "Master Sword",
+    "resource_entry": "objects/nei_gi_redesign/master_sword/gi_dl",
+    "triangle_count": 3114,
+    "author_quantization": 16,
+    "resource_scale": 0.0412445068359375,
+    "draw_scale": 1.0,
+    "glb_sha256": "7d20618f8415e483246da693ce58a579c1ad6653c99edf679ca58d3421172e9a",
+    "export": {
+      "resource_count": 12,
+      "vertex_records": 3641,
+      "vertex_loads": 138
+    },
+    "notes": [
+      "Canonical Master silhouette rebuilt with cutting bevels, fuller, layered wing guard, gemstone setting, grip wrap and Triforce.",
+      "Reflection bands use the game-supported G_TEXTURE_GEN material, not an image overlay.",
+      "Steel blade, blue-violet metal hilt and leather grip, golden central gem."
+    ],
+    "runtime_tested": false
+  },
+  "true_master_sword": {
+    "name": "True Master Sword",
+    "resource_entry": "objects/nei_gi_redesign/true_master_sword/gi_dl",
+    "triangle_count": 3114,
+    "author_quantization": 16,
+    "resource_scale": 0.0412445068359375,
+    "draw_scale": 1.0,
+    "glb_sha256": "f428c0ecb2f57f02ee2bedc19a4e855d98f413db766eea4e1036057ef8277847",
+    "export": {
+      "resource_count": 11,
+      "vertex_records": 3641,
+      "vertex_loads": 138
+    },
+    "notes": [
+      "Canonical Master silhouette rebuilt with cutting bevels, fuller, layered wing guard, gemstone setting, grip wrap and Triforce.",
+      "Reflection bands use the game-supported G_TEXTURE_GEN material, not an image overlay.",
+      "Level-four pigments: blade #E0A800, white hilt/grip #F8F8F8, gem #4870D0."
+    ],
+    "runtime_tested": false
+  },
+  "gilded_sword": {
+    "name": "Gilded Sword",
+    "resource_entry": "objects/nei_gi_redesign/gilded_sword/gi_dl",
+    "triangle_count": 2646,
+    "author_quantization": 16,
+    "resource_scale": 0.0412445068359375,
+    "draw_scale": 1.0,
+    "glb_sha256": "19fc7da974f592bc2b04cc9b38ab34947dac10b046a3795603649c6e6079a1c6",
+    "export": {
+      "resource_count": 10,
+      "vertex_records": 4926,
+      "vertex_loads": 211
+    },
+    "notes": [
+      "Native Gilded identity retained: forked violet guard, red grip, silver pommel and three gold blade diamonds.",
+      "Three physical tempered-gold inlays sit in recessed blade pockets and have independent reflection materials."
+    ],
+    "runtime_tested": false
+  },
+  "great_fairy_sword": {
+    "name": "Great Fairy Sword",
+    "resource_entry": "objects/nei_gi_redesign/great_fairy_sword/gi_dl",
+    "triangle_count": 4014,
+    "author_quantization": 16,
+    "resource_scale": 0.0412445068359375,
+    "draw_scale": 1.0,
+    "glb_sha256": "de9f1d992bb5c453807241ec6593ad68a5c4cf21c3ac8195c55fcdd6472c997d",
+    "export": {
+      "resource_count": 11,
+      "vertex_records": 4796,
+      "vertex_loads": 213
+    },
+    "notes": [
+      "Rebuilt rose-metal blade, lilac lily fittings, emerald field and sculpted leaves/floral ornament.",
+      "All blade, handle and ornament surfaces are opaque; no enlarged low-resolution black/green motif is used.",
+      "Art interpretation pending user review; shimmer code and colors remain untouched."
+    ],
+    "runtime_tested": false
+  },
+  "kokiri_sword": {
+    "name": "Kokiri Sword (OoT)",
+    "resource_entry": "objects/nei_gi_redesign/kokiri_sword/gi_dl",
+    "triangle_count": 1538,
+    "author_quantization": 16,
+    "resource_scale": 0.0412445068359375,
+    "draw_scale": 1.0,
+    "glb_sha256": "a86974807df75b3f35c0eb83d88b3fae95bc50086d0ba3e7da6fe32cdec5e7be",
+    "export": {
+      "resource_count": 10,
+      "vertex_records": 2069,
+      "vertex_loads": 85
+    },
+    "notes": [
+      "OoT Kokiri identity: short steel blade, solid brown guard, red jewel, leather grip and flared wooden pommel.",
+      "Clean walnut guard without added wire ornament; mirrored bevel faces point outward and the blade tang extends through its central mount."
+    ],
+    "runtime_tested": false
+  },
+  "mm_kokiri_sword": {
+    "name": "Kokiri Sword (MM)",
+    "resource_entry": "objects/nei_gi_redesign/mm_kokiri_sword/gi_dl",
+    "triangle_count": 2144,
+    "author_quantization": 16,
+    "resource_scale": 0.0412445068359375,
+    "draw_scale": 1.0,
+    "glb_sha256": "b30ca60f9ba459334d225072722a210f747664ec8970489304cf94357412911f",
+    "export": {
+      "resource_count": 10,
+      "vertex_records": 2052,
+      "vertex_loads": 84
+    },
+    "notes": [
+      "MM Kokiri identity: broad clipped steel blade, rounded brass bar guard with two recessed fasteners, pale wrapped grip and violet pommel.",
+      "Rebuilt beveled steel, machined guard rims and grip fittings; continuous blade tang passes into the guard and upper grip."
+    ],
+    "runtime_tested": false
+  },
+  "four_sword": {
+    "name": "Four Sword",
+    "resource_entry": "objects/nei_gi_redesign/four_sword/gi_dl",
+    "triangle_count": 8660,
+    "author_quantization": 16,
+    "resource_scale": 0.0412445068359375,
+    "draw_scale": 1.0,
+    "glb_sha256": "23d165c71c6a1b4119bdf6115f538cb05a96c2534b43b239702550e8e464e527",
+    "export": {
+      "resource_count": 11,
+      "vertex_records": 12068,
+      "vertex_loads": 432
+    },
+    "notes": [
+      "Four Sword follows the user-supplied reference: curved gold guard with three integral recessed bands, round red ruby, ivory cloth grip and circular blue/gold Triforce pommel.",
+      "No dangling cloth tails. Blade tang and forked collar join continuously; reflective steel and gold are real exported materials."
+    ],
+    "runtime_tested": false
+  }
+}
