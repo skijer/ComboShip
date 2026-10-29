@@ -24,17 +24,22 @@ enum GameIndex { Oot, Mm, GameCount };
 
 std::array<std::unique_ptr<GameModule>, GameCount> sGames;
 
+enum class StartingGame { Oot, Mm, Random };
+
 struct Options {
     std::string ootDirectory;
     std::string mmDirectory;
     uint32_t seed = 1;
     std::string outputPath;
     std::string settingsPath;
+    ComboRando::CwGoal goal;
+    StartingGame start = StartingGame::Oot;
 };
 
 struct Fill {
     ComboRando::CombinedFillResult result;
     uint32_t masterSeed;
+    bool mmStart;
     std::string ootDump;
     std::string mmDump;
 };
@@ -90,6 +95,40 @@ template <GameIndex Game> struct Oracle {
     }
 };
 
+// "required:total" pieces across both games; total defaults to required.
+bool ParseTriforceHunt(const std::string& value, ComboRando::CwGoal& goal) {
+    const size_t colon = value.find(':');
+    const int required = std::atoi(value.substr(0, colon).c_str());
+    const int total = colon == std::string::npos ? required : std::atoi(value.substr(colon + 1).c_str());
+    if (required < 1 || total < required || total > ComboRando::kMaxComboTriforcePieces) {
+        return false;
+    }
+    goal = { .hunt = true, .required = required, .total = total };
+    return true;
+}
+
+bool ParseStartingGame(const std::string& value, StartingGame& start) {
+    if (value == "oot" || value == "OOT") {
+        start = StartingGame::Oot;
+    } else if (value == "mm" || value == "MM") {
+        start = StartingGame::Mm;
+    } else if (value == "random") {
+        start = StartingGame::Random;
+    } else {
+        return false;
+    }
+    return true;
+}
+
+// FNV-1a over ComboShip's derivation string, so a Random start resolves the same way in both generators.
+bool RollsMmStart(uint32_t masterSeed) {
+    uint32_t hash = 2166136261u;
+    for (unsigned char c : "startingGame:" + std::to_string(masterSeed)) {
+        hash = (hash ^ c) * 16777619u;
+    }
+    return (hash & 1u) != 0;
+}
+
 bool ParseOptions(int argc, char* argv[], Options& options) {
     for (int i = 1; i + 1 < argc; i += 2) {
         const std::string flag = argv[i];
@@ -104,6 +143,14 @@ bool ParseOptions(int argc, char* argv[], Options& options) {
             options.outputPath = value;
         } else if (flag == "--settings") {
             options.settingsPath = value;
+        } else if (flag == "--triforce") {
+            if (!ParseTriforceHunt(value, options.goal)) {
+                return false;
+            }
+        } else if (flag == "--start") {
+            if (!ParseStartingGame(value, options.start)) {
+                return false;
+            }
         } else {
             return false;
         }
@@ -124,7 +171,8 @@ bool AttachGames(const Options& options) {
 }
 
 // Each game block of a spoiler carries that game's settings snapshot, so another spoiler can seed this one.
-bool RestoreSettingsFrom(const std::string& spoilerPath) {
+// Its goal and starting game come along, unless the command line names its own.
+bool RestoreSettingsFrom(const std::string& spoilerPath, Options& options, bool commandLineGoal) {
     const nlohmann::json spoiler = nlohmann::json::parse(std::ifstream(spoilerPath), nullptr, false);
     if (!spoiler.is_object()) {
         std::cerr << "[fleet-seedgen] could not read settings from " << spoilerPath << "\n";
@@ -134,18 +182,49 @@ bool RestoreSettingsFrom(const std::string& spoilerPath) {
         const nlohmann::json block = spoiler.value(kGameKeys[game], nlohmann::json::object());
         sGames[game]->Request("RestoreSettings", block.dump());
     }
+    const nlohmann::json goal = spoiler.value("goal", nlohmann::json::object());
+    if (!commandLineGoal && goal.value("type", std::string()) == "triforceHunt") {
+        options.goal = { .hunt = true,
+                         .required = goal.value("requiredPieces", 0),
+                         .total = goal.value("totalPieces", -1) };
+    }
+    if (!commandLineGoal) {
+        ParseStartingGame(spoiler.value("startingGame", std::string("OOT")), options.start);
+    }
     return true;
 }
 
+void SendComboGoal(const ComboRando::CwGoal& goal, bool mmStart) {
+    const std::string startingGame = mmStart ? "MM" : "OOT";
+    const int pieces[GameCount] = { ComboRando::CwOotPieces(goal.total), ComboRando::CwMmPieces(goal.total) };
+    for (int game = 0; game < GameCount; game++) {
+        const nlohmann::json request = { { "hunt", goal.hunt },
+                                         { "required", goal.required },
+                                         { "pieces", pieces[game] },
+                                         { "startingGame", startingGame } };
+        sGames[game]->Request("SetComboGoal", request.dump());
+    }
+}
+
 // One whole fill: both games roll their own pools from masterSeed, then the combined fill places the rest.
-Fill FillOnce(uint32_t masterSeed) {
+Fill FillOnce(uint32_t masterSeed, const ComboRando::CwGoal& goal, bool mmStart) {
     const std::string seed = nlohmann::json{ { "seed", masterSeed } }.dump();
     for (const auto& game : sGames) {
         game->Request("SetSeed", seed);
     }
+    SendComboGoal(goal, mmStart);
     Fill fill = { .masterSeed = masterSeed,
+                  .mmStart = mmStart,
                   .ootDump = Oracle<Oot>::DumpStaticData(),
                   .mmDump = Oracle<Mm>::DumpStaticData() };
+    if (fill.ootDump.empty() || fill.mmDump.empty()) {
+        fill.result.error = "a game could not prepare its seed (see its log)";
+        return fill;
+    }
+    if (goal.hunt && ComboRando::CountPoolTriforcePieces(fill.ootDump, fill.mmDump) < goal.required) {
+        fill.result.error = "the combined pool holds fewer Triforce pieces than the hunt requires";
+        return fill;
+    }
     const std::string forcedOot = sGames[Oot]->Request("GetForcedPlacements");
     const ComboRando::OracleFns ootOracle = { .Reset = Oracle<Oot>::Reset,
                                               .SetOwnedItems = Oracle<Oot>::SetOwnedItems,
@@ -156,20 +235,29 @@ Fill FillOnce(uint32_t masterSeed) {
                                              .SetOwnedItems = Oracle<Mm>::SetOwnedItems,
                                              .GetReachableChecks = Oracle<Mm>::GetReachableChecks,
                                              .PlaceItem = Oracle<Mm>::PlaceItem };
-    fill.result = ComboRando::CrossWorldCombinedFill(fill.ootDump, fill.mmDump, masterSeed, ootOracle, mmOracle,
-                                                     nullptr, forcedOot, ComboRando::OotAccessFromDump(fill.ootDump));
+    fill.result = ComboRando::CrossWorldCombinedFill(
+        fill.ootDump, fill.mmDump, masterSeed, ootOracle, mmOracle, nullptr, forcedOot,
+        ComboRando::OotAccessFromDump(fill.ootDump), goal, mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT);
     return fill;
 }
 
+nlohmann::json GoalJson(const ComboRando::CwGoal& goal) {
+    if (!goal.hunt) {
+        return { { "type", "bosses" } };
+    }
+    return { { "type", "triforceHunt" }, { "requiredPieces", goal.required }, { "totalPieces", goal.total } };
+}
+
 // ComboShip's consolidated layout: per game its settings snapshot, placements and the prices the seed rolled.
-nlohmann::json BuildSpoiler(const Fill& fill, uint32_t seed) {
+// OoT's entrance layout moves to the top-level "entrances" block, where ComboShip's validator reads it.
+nlohmann::json BuildSpoiler(const Fill& fill, uint32_t seed, const ComboRando::CwGoal& goal) {
     const nlohmann::json placements = nlohmann::json::parse(fill.result.spoilerJson);
     const std::string dumps[GameCount] = { fill.ootDump, fill.mmDump };
     nlohmann::json spoiler = { { "fileType", "ComboShipRandomizer" },
                                { "seed", seed },
                                { "masterSeed", fill.masterSeed },
-                               { "goal", { { "type", "bosses" } } },
-                               { "startingGame", "OOT" },
+                               { "goal", GoalJson(goal) },
+                               { "startingGame", fill.mmStart ? "MM" : "OOT" },
                                { "foreign", placements.value("foreign", nlohmann::json::array()) } };
     for (int game = 0; game < GameCount; game++) {
         nlohmann::json block = nlohmann::json::parse(sGames[game]->Request("DumpSettings"), nullptr, false);
@@ -180,16 +268,28 @@ nlohmann::json BuildSpoiler(const Fill& fill, uint32_t seed) {
         block["prices"] = nlohmann::json::parse(dumps[game]).value("prices", nlohmann::json::object());
         spoiler[kGameKeys[game]] = std::move(block);
     }
+    spoiler["entrances"] = { { "oot", spoiler["oot"].value("entrances", nlohmann::json::array()) } };
+    spoiler["oot"].erase("entrances");
     return spoiler;
+}
+
+// A Random start falls back to OoT on the last attempt, as ComboShip's generator does.
+bool ResolvesMmStart(StartingGame start, uint32_t masterSeed, int attempt) {
+    if (start == StartingGame::Random) {
+        return attempt + 1 < ComboRando::kFillAttempts && RollsMmStart(masterSeed);
+    }
+    return start == StartingGame::Mm;
 }
 
 int GenerateSeed(int argc, char* argv[]) {
     Options options;
     if (!ParseOptions(argc, argv, options)) {
-        std::cerr << "usage: fleet-seedgen --oot <Ship folder> --mm <2Ship folder> [--seed N] [--out spoiler.json] "
-                     "[--settings spoiler.json]\n";
+        std::cerr << "usage: fleet-seedgen --oot <Ship folder> --mm <2Ship folder> [--seed N] [--out spoiler.json]\n"
+                     "                     [--settings spoiler.json] [--triforce required[:total]]\n"
+                     "                     [--start oot|mm|random]\n";
         return 2;
     }
+    const bool commandLineGoal = options.goal.hunt || options.start != StartingGame::Oot;
 
     Ship::Context* context = Ship::Context::CreateUninitializedInstance("Fleet", "fleet", "fleetship.json");
     context->InitLogging();
@@ -198,14 +298,15 @@ int GenerateSeed(int argc, char* argv[]) {
     if (!AttachGames(options)) {
         return 2;
     }
-    if (!options.settingsPath.empty() && !RestoreSettingsFrom(options.settingsPath)) {
+    if (!options.settingsPath.empty() && !RestoreSettingsFrom(options.settingsPath, options, commandLineGoal)) {
         return 2;
     }
 
     // Same re-derived seeds as ComboShip's generator, so a seed number names the same layout in both.
     Fill fill = {};
     for (int attempt = 0; attempt < ComboRando::kFillAttempts && !fill.result.success; attempt++) {
-        fill = FillOnce(options.seed + attempt * 0x9E3779B9u);
+        const uint32_t masterSeed = options.seed + attempt * 0x9E3779B9u;
+        fill = FillOnce(masterSeed, options.goal, ResolvesMmStart(options.start, masterSeed, attempt));
     }
     if (!fill.result.success) {
         sGames[Mm]->Request("Finish");
@@ -213,7 +314,7 @@ int GenerateSeed(int argc, char* argv[]) {
         return 1;
     }
     // Finish drops the seed's restored lists, so the settings snapshot is taken first.
-    const nlohmann::json spoiler = BuildSpoiler(fill, options.seed);
+    const nlohmann::json spoiler = BuildSpoiler(fill, options.seed, options.goal);
     sGames[Mm]->Request("Finish");
     std::cout << "[fleet-seedgen] seed " << options.seed << " PASS: " << spoiler["oot"]["placements"].size()
               << " OoT and " << spoiler["mm"]["placements"].size() << " MM placements, "

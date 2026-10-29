@@ -34,16 +34,19 @@ The proposal is one appended field, `char* (*RandoRequest)(const char* op, const
 `fleet-seedgen` generates one combined seed from the installed builds, with no window:
 
 ```sh
-fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --seed 12345 --out spoiler.json [--settings other.json]
+fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --seed 12345 --out spoiler.json
+              [--settings other.json] [--triforce required[:total]] [--start oot|mm|random]
 ```
 
 It needs the games' `fleet-rando` branches (contract 1.1). Fleet builds its own `libultraship.dll` from the submodule, with the options both games use, and each game binds to it.
 
-The spoiler follows ComboShip's consolidated layout: per game its settings snapshot, placements and prices, plus the cross-game `foreign` list. `--settings` takes the settings and OoT tricks from another spoiler instead of each game's own config; nothing is written back to the games' config files.
+The spoiler follows ComboShip's consolidated layout: per game its settings snapshot, placements and prices, the goal, the starting game, OoT's entrance layout and Master Quest dungeons, plus the cross-game `foreign` list. `--settings` takes the settings, tricks, goal and starting game from another spoiler instead of each game's own config; nothing is written back to the games' config files. A Random start resolves exactly as ComboShip's does.
 
-Already served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, the headless init, and the settings dump and restore.
+Served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, the headless init, settings dump and restore, the combined goal (bosses or a Triforce Hunt split across both pools), the MM start, and OoT's own entrance shuffle. Both games name checks and items by unique readable names.
 
-Not served yet: spoiler prices for replay, OoT entrance shuffle, cross-dungeon entrances, shared item tiers, hints and the goal options. MM item names are still the raw `RI_*` tokens.
+Not served yet: spoiler prices for replay, cross-dungeon entrances, shared item tiers and hints.
+
+See [docs/pr2-triage.md](docs/pr2-triage.md) for what else PR #2 brings and where each part goes.
 
 ## Next
 
