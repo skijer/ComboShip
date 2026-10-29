@@ -1,0 +1,4 @@
+[submodule "libultraship"]
+	path = libultraship
+	url = https://github.com/skijer/libultraship.git
+	branch = unbound-fleet

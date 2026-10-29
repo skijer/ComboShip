@@ -29,8 +29,21 @@ The headless driver resolves 56 game exports by name. Under Fleet these become c
 
 The proposal is one appended field, `char* (*RandoRequest)(const char* op, const char* json)`, keyed by the export names above. That keeps the contract small and lets the game side grow without bumping its version.
 
+## fleet-seedgen
+
+`fleet-seedgen` generates one combined seed from the installed builds, with no window:
+
+```sh
+fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --seed 12345 --out spoiler.json
+```
+
+It needs the games' `fleet-rando` branches (contract 1.1). Fleet builds its own `libultraship.dll` from the submodule, with the options both games use, and each game binds to it.
+
+Already served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, and the headless init.
+
+Not served yet: the settings and tricks requests, OoT entrance shuffle, cross-dungeon entrances, shared item tiers, hints and the goal options. Item and check names on the MM side are still the raw `RI_*` tokens.
+
 ## Next
 
-1. Add `RandoRequest` to the contract and implement it in the Unbound hosts.
-2. Port `ComboRandoHeadless.cpp` from `LoadLibrary` and named exports to `Fleet_GetGameApi`.
-3. Build the Fleet host itself: window, game selection, scene switches, saves and the item mapper.
+1. The remaining `RandoRequest` services, in the order above.
+2. The Fleet host itself: window, game selection, scene switches, saves and the item mapper.
