@@ -29,7 +29,17 @@ struct Options {
     std::string mmDirectory;
     uint32_t seed = 1;
     std::string outputPath;
+    std::string settingsPath;
 };
+
+struct Fill {
+    ComboRando::CombinedFillResult result;
+    uint32_t masterSeed;
+    std::string ootDump;
+    std::string mmDump;
+};
+
+const char* const kGameKeys[GameCount] = { "oot", "mm" };
 
 void LogFromGame(const char* game, FleetLogLevel level, const char* message) {
     std::cerr << "[" << game << "] " << message << "\n";
@@ -92,6 +102,8 @@ bool ParseOptions(int argc, char* argv[], Options& options) {
             options.seed = static_cast<uint32_t>(std::strtoul(value.c_str(), nullptr, 10));
         } else if (flag == "--out") {
             options.outputPath = value;
+        } else if (flag == "--settings") {
+            options.settingsPath = value;
         } else {
             return false;
         }
@@ -111,14 +123,29 @@ bool AttachGames(const Options& options) {
     return true;
 }
 
+// Each game block of a spoiler carries that game's settings snapshot, so another spoiler can seed this one.
+bool RestoreSettingsFrom(const std::string& spoilerPath) {
+    const nlohmann::json spoiler = nlohmann::json::parse(std::ifstream(spoilerPath), nullptr, false);
+    if (!spoiler.is_object()) {
+        std::cerr << "[fleet-seedgen] could not read settings from " << spoilerPath << "\n";
+        return false;
+    }
+    for (int game = 0; game < GameCount; game++) {
+        const nlohmann::json block = spoiler.value(kGameKeys[game], nlohmann::json::object());
+        sGames[game]->Request("RestoreSettings", block.dump());
+    }
+    return true;
+}
+
 // One whole fill: both games roll their own pools from masterSeed, then the combined fill places the rest.
-ComboRando::CombinedFillResult FillOnce(uint32_t masterSeed) {
+Fill FillOnce(uint32_t masterSeed) {
     const std::string seed = nlohmann::json{ { "seed", masterSeed } }.dump();
     for (const auto& game : sGames) {
         game->Request("SetSeed", seed);
     }
-    const std::string ootDump = Oracle<Oot>::DumpStaticData();
-    const std::string mmDump = Oracle<Mm>::DumpStaticData();
+    Fill fill = { .masterSeed = masterSeed,
+                  .ootDump = Oracle<Oot>::DumpStaticData(),
+                  .mmDump = Oracle<Mm>::DumpStaticData() };
     const std::string forcedOot = sGames[Oot]->Request("GetForcedPlacements");
     const ComboRando::OracleFns ootOracle = { .Reset = Oracle<Oot>::Reset,
                                               .SetOwnedItems = Oracle<Oot>::SetOwnedItems,
@@ -129,14 +156,38 @@ ComboRando::CombinedFillResult FillOnce(uint32_t masterSeed) {
                                              .SetOwnedItems = Oracle<Mm>::SetOwnedItems,
                                              .GetReachableChecks = Oracle<Mm>::GetReachableChecks,
                                              .PlaceItem = Oracle<Mm>::PlaceItem };
-    return ComboRando::CrossWorldCombinedFill(ootDump, mmDump, masterSeed, ootOracle, mmOracle, nullptr, forcedOot,
-                                              ComboRando::OotAccessFromDump(ootDump));
+    fill.result = ComboRando::CrossWorldCombinedFill(fill.ootDump, fill.mmDump, masterSeed, ootOracle, mmOracle,
+                                                     nullptr, forcedOot, ComboRando::OotAccessFromDump(fill.ootDump));
+    return fill;
+}
+
+// ComboShip's consolidated layout: per game its settings snapshot, placements and the prices the seed rolled.
+nlohmann::json BuildSpoiler(const Fill& fill, uint32_t seed) {
+    const nlohmann::json placements = nlohmann::json::parse(fill.result.spoilerJson);
+    const std::string dumps[GameCount] = { fill.ootDump, fill.mmDump };
+    nlohmann::json spoiler = { { "fileType", "ComboShipRandomizer" },
+                               { "seed", seed },
+                               { "masterSeed", fill.masterSeed },
+                               { "goal", { { "type", "bosses" } } },
+                               { "startingGame", "OOT" },
+                               { "foreign", placements.value("foreign", nlohmann::json::array()) } };
+    for (int game = 0; game < GameCount; game++) {
+        nlohmann::json block = nlohmann::json::parse(sGames[game]->Request("DumpSettings"), nullptr, false);
+        if (!block.is_object()) {
+            block = nlohmann::json::object();
+        }
+        block["placements"] = placements.value(kGameKeys[game], nlohmann::json::object());
+        block["prices"] = nlohmann::json::parse(dumps[game]).value("prices", nlohmann::json::object());
+        spoiler[kGameKeys[game]] = std::move(block);
+    }
+    return spoiler;
 }
 
 int GenerateSeed(int argc, char* argv[]) {
     Options options;
     if (!ParseOptions(argc, argv, options)) {
-        std::cerr << "usage: fleet-seedgen --oot <Ship folder> --mm <2Ship folder> [--seed N] [--out spoiler.json]\n";
+        std::cerr << "usage: fleet-seedgen --oot <Ship folder> --mm <2Ship folder> [--seed N] [--out spoiler.json] "
+                     "[--settings spoiler.json]\n";
         return 2;
     }
 
@@ -147,23 +198,26 @@ int GenerateSeed(int argc, char* argv[]) {
     if (!AttachGames(options)) {
         return 2;
     }
+    if (!options.settingsPath.empty() && !RestoreSettingsFrom(options.settingsPath)) {
+        return 2;
+    }
 
     // Same re-derived seeds as ComboShip's generator, so a seed number names the same layout in both.
-    ComboRando::CombinedFillResult result = {};
-    for (int attempt = 0; attempt < ComboRando::kFillAttempts && !result.success; attempt++) {
-        result = FillOnce(options.seed + attempt * 0x9E3779B9u);
+    Fill fill = {};
+    for (int attempt = 0; attempt < ComboRando::kFillAttempts && !fill.result.success; attempt++) {
+        fill = FillOnce(options.seed + attempt * 0x9E3779B9u);
     }
-    sGames[Mm]->Request("Finish");
-
-    if (!result.success) {
-        std::cerr << "[fleet-seedgen] seed " << options.seed << " failed: " << result.error << "\n";
+    if (!fill.result.success) {
+        sGames[Mm]->Request("Finish");
+        std::cerr << "[fleet-seedgen] seed " << options.seed << " failed: " << fill.result.error << "\n";
         return 1;
     }
-    const nlohmann::json spoiler = nlohmann::json::parse(result.spoilerJson);
-    std::cout << "[fleet-seedgen] seed " << options.seed << " PASS: "
-              << spoiler.value("oot", nlohmann::json::object()).size() << " OoT and "
-              << spoiler.value("mm", nlohmann::json::object()).size() << " MM placements, "
-              << spoiler.value("foreign", nlohmann::json::array()).size() << " across games\n";
+    // Finish drops the seed's restored lists, so the settings snapshot is taken first.
+    const nlohmann::json spoiler = BuildSpoiler(fill, options.seed);
+    sGames[Mm]->Request("Finish");
+    std::cout << "[fleet-seedgen] seed " << options.seed << " PASS: " << spoiler["oot"]["placements"].size()
+              << " OoT and " << spoiler["mm"]["placements"].size() << " MM placements, "
+              << spoiler["foreign"].size() << " across games\n";
     if (!options.outputPath.empty()) {
         std::ofstream(options.outputPath) << spoiler.dump(2);
     }

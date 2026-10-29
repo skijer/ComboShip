@@ -34,14 +34,16 @@ The proposal is one appended field, `char* (*RandoRequest)(const char* op, const
 `fleet-seedgen` generates one combined seed from the installed builds, with no window:
 
 ```sh
-fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --seed 12345 --out spoiler.json
+fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --seed 12345 --out spoiler.json [--settings other.json]
 ```
 
 It needs the games' `fleet-rando` branches (contract 1.1). Fleet builds its own `libultraship.dll` from the submodule, with the options both games use, and each game binds to it.
 
-Already served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, and the headless init.
+The spoiler follows ComboShip's consolidated layout: per game its settings snapshot, placements and prices, plus the cross-game `foreign` list. `--settings` takes the settings and OoT tricks from another spoiler instead of each game's own config; nothing is written back to the games' config files.
 
-Not served yet: the settings and tricks requests, OoT entrance shuffle, cross-dungeon entrances, shared item tiers, hints and the goal options. MM item names are still the raw `RI_*` tokens.
+Already served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, the headless init, and the settings dump and restore.
+
+Not served yet: spoiler prices for replay, OoT entrance shuffle, cross-dungeon entrances, shared item tiers, hints and the goal options. MM item names are still the raw `RI_*` tokens.
 
 ## Next
 
