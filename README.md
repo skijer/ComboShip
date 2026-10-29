@@ -41,7 +41,7 @@ It needs the games' `fleet-rando` branches (contract 1.1). Fleet builds its own 
 
 Already served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, and the headless init.
 
-Not served yet: the settings and tricks requests, OoT entrance shuffle, cross-dungeon entrances, shared item tiers, hints and the goal options. Item and check names on the MM side are still the raw `RI_*` tokens.
+Not served yet: the settings and tricks requests, OoT entrance shuffle, cross-dungeon entrances, shared item tiers, hints and the goal options. MM item names are still the raw `RI_*` tokens.
 
 ## Next
 
