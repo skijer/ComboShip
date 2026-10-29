@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 
 #include <nlohmann/json.hpp>
@@ -34,6 +35,7 @@ struct Options {
     std::string settingsPath;
     ComboRando::CwGoal goal;
     StartingGame start = StartingGame::Oot;
+    uint32_t sharedMask = 0;
 };
 
 struct Fill {
@@ -129,6 +131,22 @@ bool RollsMmStart(uint32_t masterSeed) {
     return (hash & 1u) != 0;
 }
 
+// "all", or the family keys of combo/rando/SharedItems.h separated by commas.
+bool ParseSharedItems(const std::string& value, uint32_t& mask) {
+    if (value == "all") {
+        mask = ComboRando::SharedMaskAll();
+        return true;
+    }
+    nlohmann::json keys = nlohmann::json::array();
+    std::stringstream names(value);
+    std::string name;
+    while (std::getline(names, name, ',')) {
+        keys.push_back(name);
+    }
+    mask = ComboRando::SharedMaskFromKeys(keys);
+    return mask != 0;
+}
+
 bool ParseOptions(int argc, char* argv[], Options& options) {
     for (int i = 1; i + 1 < argc; i += 2) {
         const std::string flag = argv[i];
@@ -149,6 +167,10 @@ bool ParseOptions(int argc, char* argv[], Options& options) {
             }
         } else if (flag == "--start") {
             if (!ParseStartingGame(value, options.start)) {
+                return false;
+            }
+        } else if (flag == "--shared") {
+            if (!ParseSharedItems(value, options.sharedMask)) {
                 return false;
             }
         } else {
@@ -191,28 +213,35 @@ bool RestoreSettingsFrom(const std::string& spoilerPath, Options& options, bool 
     if (!commandLineGoal) {
         ParseStartingGame(spoiler.value("startingGame", std::string("OOT")), options.start);
     }
+    if (options.sharedMask == 0) {
+        options.sharedMask = ComboRando::SharedMaskFromKeys(spoiler.value("sharedItems", nlohmann::json::array()));
+    }
     return true;
 }
 
-void SendComboGoal(const ComboRando::CwGoal& goal, bool mmStart) {
+void SendComboOptions(const Options& options, bool mmStart) {
     const std::string startingGame = mmStart ? "MM" : "OOT";
+    const ComboRando::CwGoal& goal = options.goal;
     const int pieces[GameCount] = { ComboRando::CwOotPieces(goal.total), ComboRando::CwMmPieces(goal.total) };
+    const bool sharedWallets = (options.sharedMask & (1u << ComboRando::SF_WALLET)) != 0;
     for (int game = 0; game < GameCount; game++) {
         const nlohmann::json request = { { "hunt", goal.hunt },
                                          { "required", goal.required },
                                          { "pieces", pieces[game] },
-                                         { "startingGame", startingGame } };
-        sGames[game]->Request("SetComboGoal", request.dump());
+                                         { "startingGame", startingGame },
+                                         { "sharedWallets", sharedWallets } };
+        sGames[game]->Request("SetComboOptions", request.dump());
     }
 }
 
 // One whole fill: both games roll their own pools from masterSeed, then the combined fill places the rest.
-Fill FillOnce(uint32_t masterSeed, const ComboRando::CwGoal& goal, bool mmStart) {
+Fill FillOnce(uint32_t masterSeed, const Options& options, bool mmStart) {
     const std::string seed = nlohmann::json{ { "seed", masterSeed } }.dump();
     for (const auto& game : sGames) {
         game->Request("SetSeed", seed);
     }
-    SendComboGoal(goal, mmStart);
+    SendComboOptions(options, mmStart);
+    const ComboRando::CwGoal& goal = options.goal;
     Fill fill = { .masterSeed = masterSeed,
                   .mmStart = mmStart,
                   .ootDump = Oracle<Oot>::DumpStaticData(),
@@ -237,7 +266,8 @@ Fill FillOnce(uint32_t masterSeed, const ComboRando::CwGoal& goal, bool mmStart)
                                              .PlaceItem = Oracle<Mm>::PlaceItem };
     fill.result = ComboRando::CrossWorldCombinedFill(
         fill.ootDump, fill.mmDump, masterSeed, ootOracle, mmOracle, nullptr, forcedOot,
-        ComboRando::OotAccessFromDump(fill.ootDump), goal, mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT);
+        ComboRando::OotAccessFromDump(fill.ootDump), goal, mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT, "",
+        options.sharedMask);
     return fill;
 }
 
@@ -258,6 +288,7 @@ nlohmann::json BuildSpoiler(const Fill& fill, uint32_t seed, const ComboRando::C
                                { "masterSeed", fill.masterSeed },
                                { "goal", GoalJson(goal) },
                                { "startingGame", fill.mmStart ? "MM" : "OOT" },
+                               { "sharedItems", placements.value("sharedItems", nlohmann::json::array()) },
                                { "foreign", placements.value("foreign", nlohmann::json::array()) } };
     for (int game = 0; game < GameCount; game++) {
         nlohmann::json block = nlohmann::json::parse(sGames[game]->Request("DumpSettings"), nullptr, false);
@@ -286,7 +317,7 @@ int GenerateSeed(int argc, char* argv[]) {
     if (!ParseOptions(argc, argv, options)) {
         std::cerr << "usage: fleet-seedgen --oot <Ship folder> --mm <2Ship folder> [--seed N] [--out spoiler.json]\n"
                      "                     [--settings spoiler.json] [--triforce required[:total]]\n"
-                     "                     [--start oot|mm|random]\n";
+                     "                     [--start oot|mm|random] [--shared all|bows,wallets,...]\n";
         return 2;
     }
     const bool commandLineGoal = options.goal.hunt || options.start != StartingGame::Oot;
@@ -306,7 +337,7 @@ int GenerateSeed(int argc, char* argv[]) {
     Fill fill = {};
     for (int attempt = 0; attempt < ComboRando::kFillAttempts && !fill.result.success; attempt++) {
         const uint32_t masterSeed = options.seed + attempt * 0x9E3779B9u;
-        fill = FillOnce(masterSeed, options.goal, ResolvesMmStart(options.start, masterSeed, attempt));
+        fill = FillOnce(masterSeed, options, ResolvesMmStart(options.start, masterSeed, attempt));
     }
     if (!fill.result.success) {
         sGames[Mm]->Request("Finish");
