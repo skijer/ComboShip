@@ -1,0 +1,722 @@
+// combo/rando/CrossForeign.h
+// ComboShip: cross-world foreign-item lookup — shared by soh.dll, 2ship.dll, ComboShip.exe.
+// The consolidated combo spoiler's "foreign" array records which checks (in each game) hold an item
+// belonging to the OTHER game. At pickup the check's own game places a sentinel; the pickup code
+// consults this array for the real foreign item + destination game, then delivers it immediately.
+// The spoiler is pushed once per save-load into an in-memory blob (Combo_SetForeignJson, driven by
+// SOH_/MM_LoadComboRando) — no runtime file read; it lives baked in the slot's .combosav container.
+//
+// "foreign" array element:
+//   { "checkGame":"oot|mm", "checkName":"<friendly check name>", "itemGame":"oot|mm",
+//     "itemName":"<friendly item name>", "displayName":"<human name + (MM)/(OOT)>",
+//     optional: "advancement"/"trap" (only when true), "category" (native item category, drives CMC),
+//     optional trap disguise: "fakeItemName", "fakeDisplayName", "fakeTrickName" }
+//
+// Note: checkName/itemName are the friendly combo-spoiler names (bare, no suffix) — the home game
+// resolves itemName to grant it, so both must match that game's friendly name maps exactly.
+#pragma once
+
+#include <algorithm>
+#include <limits>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <cstdint>
+#include <cstring>
+#include <iterator>
+#include <nlohmann/json.hpp>
+
+#include "SharedItems.h"
+
+namespace ComboRando {
+
+// Game identity used across the cross-world rando layer (soh.dll, 2ship.dll, ComboShip.exe).
+enum GameId : uint8_t { GAME_OOT = 0, GAME_MM = 1 };
+
+// ComboShip merged-save IO callbacks: launcher-provided, pushed into each DLL at boot via
+// SOH_SetComboSaveIO / MM_SetComboSaveIO. game: 0=OOT,1=MM (GameId); fileNum 0-based (MM maps its
+// 1-based mmFileNum via fileNum = mmFileNum - 1). Read returns the section JSON ("" if absent).
+typedef const char* (*FnComboReadSave)(int game, int fileNum);
+typedef void (*FnComboWriteSave)(int game, int fileNum, const char* json);
+
+// Sentinel item names written into each game's own APPLY payload (not the persisted spoiler) for a
+// foreign check; each game resolves its own sentinel to the RG_/RI_COMBO_FOREIGN item.
+inline constexpr const char* kForeignSentinelNameOOT = "Combo Foreign Item"; // OOT English name
+inline constexpr const char* kForeignSentinelNameMM = "RI_COMBO_FOREIGN";    // MM RI_ spoilerName
+
+// Rebuild one game's apply payload from a consolidated seed: stored placements name foreign items
+// for real, so the sentinel goes back at every foreign check (MM's apply THROWS on a real one).
+inline nlohmann::json ApplyPayloadFromConsolidated(const nlohmann::json& consolidated, GameId game) {
+    const char* gameKey = (game == GAME_OOT) ? "oot" : "mm";
+    const char* sentinel = (game == GAME_OOT) ? kForeignSentinelNameOOT : kForeignSentinelNameMM;
+    nlohmann::json apply =
+        consolidated.value(gameKey, nlohmann::json::object()).value("placements", nlohmann::json::object());
+    for (const auto& fm : consolidated.value("foreign", nlohmann::json::array())) {
+        std::string checkName = fm.value("checkName", "");
+        if (!checkName.empty() && fm.value("checkGame", "") == gameKey) {
+            apply[checkName] = sentinel;
+        }
+    }
+    // OOT's curated ice-trap disguise set rides along as a reserved key (absent on old spoilers, where
+    // the apply falls back to deriving one).
+    if (game == GAME_OOT) {
+        const nlohmann::json oot = consolidated.value("oot", nlohmann::json::object());
+        if (oot.contains("iceTrapModels")) {
+            apply["__iceTrapModels"] = oot["iceTrapModels"];
+        }
+    }
+    return apply;
+}
+
+struct ForeignItem {
+    GameId itemGame;          // the game the item belongs to / must be delivered to
+    std::string itemName;     // friendly item name in itemGame (bare; resolved by that game's map)
+    std::string displayName;  // human string for the "sent"/"received" text
+    bool advancement = false; // progression in its home game -> drives the held-up pickup animation
+    bool trap = false;        // a trap in its home game -> fires on the FINDER, never cross-delivered
+    // Native item category name (junk/lesser/health/bossKey/smallKey/token/major/mask/strayFairy).
+    // Empty = absent (old seed or plando); consumers fall back to advancement.
+    std::string category;
+    // Trap disguise (empty = none). The name/model shown until the check is collected; the GRANT
+    // always uses itemName. fakeItemName lives in itemGame's namespace (feeds the draw producers).
+    std::string fakeItemName;
+    std::string fakeDisplayName; // disguise human name (suffixed like displayName)
+    std::string fakeTrickName;   // typo'd disguise name for shop/merchant/hint text
+    // Shared Items (OoTMM-style): itemName is an effective shared family's OOT name — no suffix, no
+    // "(OOT)"/"(MM)" tag on any surface. Absent (old seed) -> false -> tagged exactly as before.
+    bool shared = false;
+    bool HasDisguise() const {
+        return !fakeItemName.empty();
+    }
+};
+
+inline std::string GameIdToKey(GameId g) {
+    return g == GAME_OOT ? "oot" : "mm";
+}
+inline GameId KeyToGameId(const std::string& s) {
+    return s == "mm" ? GAME_MM : GAME_OOT;
+}
+
+inline std::filesystem::path ConsolidatedDir() {
+    return std::filesystem::path("Randomizer");
+}
+
+// Per-seed spoiler named from the 5 hash-icon indexes, like SoH's own (spoiler_log.cpp). The newest
+// is remembered in CVAR_GENERAL("ComboSpoiler"); see docs/deviations/rando.md.
+inline std::filesystem::path ComboSpoilerPath(const nlohmann::json& fileHash, const char* stem = "Combo") {
+    std::string name = stem;
+    for (const auto& idx : fileHash) {
+        char pair[8];
+        snprintf(pair, sizeof(pair), "-%02d", idx.get<int>());
+        name += pair;
+    }
+    return ConsolidatedDir() / (name + ".json");
+}
+
+// The consolidated combo spoiler, pushed once per save-load by SOH_/MM_LoadComboRando. The three
+// loaders below parse it in place of the retired per-slot file. C++17 inline var: one per DLL.
+inline std::string g_comboForeignJson;
+
+// Store the pushed spoiler blob (called by each DLL's LoadComboRando export). Null clears it.
+inline void Combo_SetForeignJson(const char* json) {
+    g_comboForeignJson = json ? json : "";
+}
+
+// Drop a trailing " (OOT)"/" (MM)" tag so re-tagging an already-tagged name (plandomizer round-trip)
+// can't double it.
+inline std::string StripGameSuffix(std::string s) {
+    for (const char* suf : { " (OOT)", " (MM)" }) {
+        const size_t n = std::strlen(suf);
+        if (s.size() > n && s.compare(s.size() - n, n, suf) == 0) {
+            s.resize(s.size() - n);
+            break;
+        }
+    }
+    return s;
+}
+
+// Mirror MM's trap-name trick: double one letter of the disguise's name so it reads as a near-miss.
+inline std::string MakeTrickName(const std::string& name, uint32_t r) {
+    if (name.empty())
+        return name;
+    std::string out = name;
+    const size_t i = r % out.size();
+    out.insert(i, 1, out[i]);
+    return out;
+}
+
+// Ice Trap Names "Misspelled (Vowel)": swap one vowel for a different one, case kept (soh text.cpp).
+inline std::string MakeVowelSwapName(const std::string& name, uint32_t r) {
+    static constexpr char vowels[] = { 'a', 'e', 'i', 'o', 'u' };
+    std::vector<size_t> at;
+    for (size_t i = 0; i < name.size(); ++i) {
+        if (std::strchr("aeiouAEIOU", name[i]) != nullptr)
+            at.push_back(i);
+    }
+    if (at.empty())
+        return name;
+    std::string out = name;
+    const size_t pos = at[r % at.size()];
+    const bool upper = out[pos] >= 'A' && out[pos] <= 'Z';
+    const char old = upper ? out[pos] + ('a' - 'A') : out[pos];
+    uint32_t idx = (r / static_cast<uint32_t>(at.size())) % 4;
+    idx += vowels[idx] >= old; // skip the old vowel
+    out[pos] = upper ? vowels[idx] - ('a' - 'A') : vowels[idx];
+    return out;
+}
+
+// Ice Trap Names "Misspelled (Duplicate)": double one ASCII letter, never a space or apostrophe.
+inline std::string MakeDuplicateLetterName(const std::string& name, uint32_t r) {
+    std::vector<size_t> at;
+    for (size_t i = 0; i < name.size(); ++i) {
+        const char c = name[i];
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+            at.push_back(i);
+    }
+    if (at.empty())
+        return name;
+    std::string out = name;
+    const size_t pos = at[r % at.size()];
+    out.insert(pos + 1, 1, out[pos]);
+    return out;
+}
+
+// One game's item-table metadata from its dump's "items" array, keyed by the friendly grant name.
+struct ForeignItemMeta {
+    std::string displayName;
+    bool advancement = false;
+    bool trap = false;
+    std::vector<std::string> trickNames; // curated near-miss names for this item (may be empty)
+};
+
+inline std::unordered_map<std::string, ForeignItemMeta> ParseItemMeta(const std::string& dump) {
+    std::unordered_map<std::string, ForeignItemMeta> m;
+    try {
+        auto d = nlohmann::json::parse(dump);
+        for (const auto& it : d.value("items", nlohmann::json::array())) {
+            std::string n = it.value("name", "");
+            if (n.empty())
+                continue;
+            ForeignItemMeta meta;
+            meta.displayName = it.value("displayName", n);
+            meta.advancement = it.value("advancement", false);
+            meta.trap = it.value("trap", false);
+            meta.trickNames = it.value("trickNames", std::vector<std::string>{});
+            m.emplace(std::move(n), std::move(meta));
+        }
+    } catch (...) {}
+    return m;
+}
+
+// OOT's curated ice-trap disguise names from its dump ("iceTrapModels"). `present` = a usable (non-empty)
+// list; a stale dump (no field) or a failed prep (empty field) both fall back to the caller's own filter.
+inline std::set<std::string> ParseIceTrapModels(const std::string& dump, bool& present) {
+    std::set<std::string> out;
+    try {
+        auto d = nlohmann::json::parse(dump);
+        auto it = d.find("iceTrapModels");
+        if (it != d.end() && it->is_array()) {
+            for (const auto& n : *it) {
+                if (n.is_string())
+                    out.insert(n.get<std::string>());
+            }
+        }
+    } catch (...) {}
+    present = !out.empty();
+    return out;
+}
+
+// Give every foreign TRAP a disguise: a plausible progression item OF THE TRAP'S OWN GAME that this
+// seed actually placed (mirrors OOT's possibleIceTrapModels), plus a typo'd name for shop/hint text.
+// Deterministic: a dedicated LCG stream off masterSeed, sorted candidate sets, array order.
+// ootPlacements/mmPlacements are the fill's raw check->item maps (real names, pre-sentinel).
+inline void AssignTrapDisguises(nlohmann::json& foreignArr, const nlohmann::json& ootPlacements,
+                                const nlohmann::json& mmPlacements, const std::string& sohDump,
+                                const std::string& mmDump, uint32_t masterSeed) {
+    const auto ootMeta = ParseItemMeta(sohDump), mmMeta = ParseItemMeta(mmDump);
+    if (ootMeta.empty() && mmMeta.empty())
+        return;
+    // OOT candidates follow SoH's curated disguise list (issue #131: never a Triforce piece). The list
+    // holds representative names (Empty Bottle, ...) that no concrete placement matches, so those drop
+    // out of foreign candidacy too — a strict subset of native semantics, intended.
+    bool curatedPresent = false;
+    const std::set<std::string> curated = ParseIceTrapModels(sohDump, curatedPresent);
+    // OOT's Ice Trap Names option names every foreign trap, MM-origin ones too (MM has no option).
+    int trapNames = 1; // Similar, for dumps that predate the field
+    try {
+        trapNames =
+            nlohmann::json::parse(sohDump).value("accessibility", nlohmann::json::object()).value("iceTrapNames", 1);
+    } catch (...) {}
+    std::set<std::string> ootCand, mmCand;
+    auto scan = [&](const nlohmann::json& pl) {
+        if (!pl.is_object())
+            return;
+        for (auto it = pl.begin(); it != pl.end(); ++it) {
+            if (!it.value().is_string())
+                continue;
+            const std::string n = it.value().get<std::string>();
+            const bool ootOk = curatedPresent ? curated.count(n) != 0 : (n != "Triforce" && n != "Triforce Piece");
+            auto o = ootMeta.find(n);
+            if (ootOk && o != ootMeta.end() && o->second.advancement && !o->second.trap)
+                ootCand.insert(n);
+            auto m = mmMeta.find(n);
+            if (m != mmMeta.end() && m->second.advancement && !m->second.trap)
+                mmCand.insert(n);
+        }
+    };
+    scan(ootPlacements);
+    scan(mmPlacements);
+
+    uint64_t s = static_cast<uint64_t>(masterSeed) ^ 0x7A9F3C1D5E2B4867ULL;
+    auto next = [&s]() {
+        s = s * 6364136223846793005ULL + 1442695040888963407ULL;
+        return static_cast<uint32_t>(s >> 33);
+    };
+    for (auto& fm : foreignArr) {
+        const std::string itemGame = fm.value("itemGame", "");
+        if (itemGame != "oot" && itemGame != "mm")
+            continue;
+        const auto& meta = (itemGame == "mm") ? mmMeta : ootMeta;
+        auto mit = meta.find(fm.value("itemName", ""));
+        if (mit == meta.end() || !mit->second.trap)
+            continue;
+        fm["trap"] = true; // before the no-candidate bail: an undisguised trap is still a trap
+        const auto& cand = (itemGame == "mm") ? mmCand : ootCand;
+        if (cand.empty())
+            continue; // no plausible model this seed -> stays undisguised rather than lying badly
+        auto cit = cand.begin();
+        std::advance(cit, next() % cand.size());
+        const std::string& fake = *cit;
+        auto fmeta = meta.find(fake);
+        const std::string dn =
+            (fmeta != meta.end() && !fmeta->second.displayName.empty()) ? fmeta->second.displayName : fake;
+        fm["fakeItemName"] = fake;
+        fm["fakeDisplayName"] = dn;
+        // Exactly one draw per disguised trap whatever the option, so names never shift other output.
+        const uint32_t r = next();
+        const std::vector<std::string>* tn = (fmeta != meta.end()) ? &fmeta->second.trickNames : nullptr;
+        switch (trapNames) {
+            case 0: // Identical
+                fm["fakeTrickName"] = dn;
+                break;
+            case 2: // Misspelled (Vowel)
+                fm["fakeTrickName"] = MakeVowelSwapName(dn, r);
+                break;
+            case 3: // Misspelled (Duplicate)
+                fm["fakeTrickName"] = MakeDuplicateLetterName(dn, r);
+                break;
+            case 4: // Revealed: the trap's own name; the model stays the disguise
+                fm["fakeTrickName"] =
+                    mit->second.displayName.empty() ? fm.value("itemName", "") : mit->second.displayName;
+                break;
+            default: // Similar: the owning game's curated near-miss name, else letter-doubling
+                fm["fakeTrickName"] = (tn != nullptr && !tn->empty()) ? (*tn)[r % tn->size()] : MakeTrickName(dn, r);
+                break;
+        }
+    }
+}
+
+// " (MM)" / " (OOT)" — the one source for the home-game tag foreign names carry.
+inline const char* GameSuffix(GameId g) {
+    return g == GAME_MM ? " (MM)" : " (OOT)";
+}
+
+// Text shown for a foreign check: the latched/live resolved tier (tagged), or the spoiler displayName.
+inline std::string ShownForeignName(const ForeignItem& fi, const char* resolved) {
+    if (resolved != nullptr && resolved[0] != '\0') {
+        // Shared Items: once shared, the home-game qualifier is meaningless (decision 3).
+        return fi.shared ? std::string(resolved) : std::string(resolved) + GameSuffix(fi.itemGame);
+    }
+    return fi.displayName;
+}
+
+// A shared item exists once across both games: obtaining either half grants the other at runtime
+// (NEI's FleetSharedItems), so the fill keeps one copy and credits both logics when it is reached.
+struct CwSharedPair {
+    std::string ootName;
+    std::string mmName;
+};
+
+// Both native families and NEI pairs identify grant keys, never merely a colliding display name.
+inline bool IsSharedItem(GameId game, const std::string& name, uint32_t mask, const std::vector<CwSharedPair>& pairs) {
+    for (const auto& p : pairs)
+        if (name == (game == GAME_OOT ? p.ootName : p.mmName))
+            return true;
+    for (int i = 0; i < SF_COUNT; ++i) {
+        const auto& def = SharedFamilyByIndex(i);
+        if ((mask & (1u << i)) &&
+            ((game == GAME_OOT && name == def.ootName) || (game == GAME_MM && def.mmHasItem && name == def.mmName)))
+            return true;
+    }
+    return false;
+}
+
+// Tag a spoiler "foreign" array's displayNames with their home-game suffix for the consolidated file.
+// Every display surface (shops, hints, trackers, toasts) reads displayName, so tag once here.
+// advancement/trap/category are emitted only when meaningful; every loader defaults them.
+inline nlohmann::json BuildForeignArray(const nlohmann::json& foreignArray, uint32_t sharedMask = 0,
+                                        const std::vector<CwSharedPair>& sharedPairs = {}) {
+    nlohmann::json out = nlohmann::json::array();
+    for (const auto& fm : foreignArray) {
+        std::string checkGame = fm.value("checkGame", "");
+        std::string checkName = fm.value("checkName", "");
+        if (checkGame.empty() || checkName.empty())
+            continue;
+        std::string itemGame = fm.value("itemGame", "");
+        std::string itemName = fm.value("itemName", "");
+        // Junk keeps the tag too: "10 Arrows" that turn out to be MM's grant no OOT ammo, and the
+        // suffix is the only thing that tells the player why.
+        const bool shared = IsSharedItem(KeyToGameId(itemGame), itemName, sharedMask, sharedPairs);
+        const bool tagged = !shared && (itemGame == "mm" || itemGame == "oot");
+        const char* suffix = GameSuffix(KeyToGameId(itemGame));
+        auto tag = [&](std::string s) {
+            s = StripGameSuffix(std::move(s));
+            if (!s.empty() && tagged)
+                s += suffix;
+            return s;
+        };
+        std::string displayName = tag(fm.value("displayName", itemName));
+        nlohmann::json entry = { { "checkGame", checkGame },
+                                 { "checkName", checkName },
+                                 { "itemGame", itemGame },
+                                 { "itemName", itemName },
+                                 { "displayName", displayName } };
+        if (shared)
+            entry["shared"] = true;
+        if (fm.value("advancement", false))
+            entry["advancement"] = true;
+        if (fm.value("trap", false))
+            entry["trap"] = true;
+        // Native item category: drives the container-matches-contents look at a foreign check.
+        std::string category = fm.value("category", "");
+        if (!category.empty())
+            entry["category"] = category;
+        // Trap disguise: fakeItemName stays bare (it's a grant-namespace key); the shown names get tagged.
+        std::string fakeItemName = fm.value("fakeItemName", "");
+        if (!fakeItemName.empty()) {
+            entry["fakeItemName"] = fakeItemName;
+            entry["fakeDisplayName"] = tag(fm.value("fakeDisplayName", fakeItemName));
+            entry["fakeTrickName"] = tag(fm.value("fakeTrickName", fm.value("fakeDisplayName", fakeItemName)));
+        }
+        out.push_back(std::move(entry));
+    }
+    return out;
+}
+
+// SOH_DumpSharedItemPairs speaks the FC table's RI_* tokens while MM's dump names its items with
+// GetItemDisplayName, so joining them needs the dump's own token->name map. Without it every pair
+// misses silently. A pair whose mm side is already a friendly name passes through unchanged.
+inline std::vector<CwSharedPair> ResolveSharedPairs(const std::string& sharedPairsJson, const std::string& mmDumpJson) {
+    std::vector<CwSharedPair> pairs;
+    if (sharedPairsJson.empty()) {
+        return pairs;
+    }
+    std::unordered_map<std::string, std::string> tokenToName;
+    try {
+        auto d = nlohmann::json::parse(mmDumpJson);
+        for (const auto& it : d.value("items", nlohmann::json::array())) {
+            std::string token = it.value("token", std::string{});
+            std::string name = it.value("name", std::string{});
+            if (!token.empty() && !name.empty()) {
+                tokenToName.emplace(std::move(token), std::move(name));
+            }
+        }
+    } catch (...) {}
+    if (tokenToName.empty()) {
+        std::cerr << "[ComboShip] shared items: MM dump carries no item tokens; RI_*-keyed pairs cannot "
+                     "match - rebuild 2ship.dll\n";
+    }
+    try {
+        std::set<std::pair<std::string, std::string>> seen;
+        for (const auto& p : nlohmann::json::parse(sharedPairsJson)) {
+            std::string oot = p.value("oot", "");
+            std::string mm = p.value("mm", "");
+            if (oot.empty() || mm.empty()) {
+                continue;
+            }
+            auto named = tokenToName.find(mm);
+            if (named != tokenToName.end())
+                mm = named->second;
+            else if (mm.rfind("RI_", 0) == 0) {
+                std::cerr << "[ComboShip] shared items: unresolved MM token '" << mm << "', pair skipped\n";
+                continue;
+            }
+            if (seen.emplace(oot, mm).second)
+                pairs.push_back({ std::move(oot), std::move(mm) });
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "[ComboShip] shared items: pairs parse error, sharing off: " << e.what() << "\n";
+        pairs.clear();
+    }
+    return pairs;
+}
+
+// Names that mean the SAME item in both games, so nothing downstream may present them as two items.
+inline std::set<std::string> SharedPairNames(const std::vector<CwSharedPair>& pairs) {
+    std::set<std::string> names;
+    for (const auto& p : pairs) {
+        names.insert(p.ootName);
+        names.insert(p.mmName);
+    }
+    return names;
+}
+
+// One exemption set for UI generation, headless output and plando serialization.
+inline std::set<std::string> SharedUntaggedNames(uint32_t mask, const std::vector<CwSharedPair>& pairs) {
+    auto names = SharedUntaggedNames(mask);
+    auto nei = SharedPairNames(pairs);
+    names.insert(nei.begin(), nei.end());
+    return names;
+}
+
+struct CwSharedName {
+    GameId game;
+    std::string name;
+};
+struct CwSharedGroup {
+    std::vector<CwSharedName> names;
+    bool nei = false; // NEI progressive chains can exceed the native families' tier caps.
+    size_t mmTierCap = std::numeric_limits<size_t>::max();
+    bool nativeFamily = false;
+};
+
+// A native mask and its NEI imported representation can meet at the SAME MM item. Join those
+// edges before trimming or crediting; walking edges separately would count that pickup twice.
+inline std::vector<CwSharedGroup> BuildSharedItemGroups(const std::vector<CwSharedPair>& pairs, uint32_t mask) {
+    std::vector<CwSharedGroup> groups;
+    auto connect = [&](const std::string& oot, const std::string& mm, bool nei, size_t cap) {
+        size_t oi = groups.size(), mi = groups.size();
+        for (size_t i = 0; i < groups.size(); ++i)
+            for (const auto& n : groups[i].names) {
+                if (n.game == GAME_OOT && n.name == oot)
+                    oi = i;
+                if (n.game == GAME_MM && n.name == mm)
+                    mi = i;
+            }
+        const size_t missing = groups.size();
+        if (oi == missing && mi == missing) {
+            groups.push_back({ { { GAME_OOT, oot }, { GAME_MM, mm } }, nei, cap, !nei });
+            return;
+        }
+        size_t at = oi != missing ? oi : mi;
+        if (oi == missing)
+            groups[at].names.push_back({ GAME_OOT, oot });
+        if (mi == missing)
+            groups[at].names.push_back({ GAME_MM, mm });
+        if (oi != missing && mi != missing && oi != mi) {
+            groups[oi].names.insert(groups[oi].names.end(), groups[mi].names.begin(), groups[mi].names.end());
+            groups[oi].nei = groups[oi].nei || groups[mi].nei;
+            groups[oi].nativeFamily = groups[oi].nativeFamily || groups[mi].nativeFamily;
+            groups[oi].mmTierCap = std::max(groups[oi].mmTierCap, groups[mi].mmTierCap);
+            groups.erase(groups.begin() + mi);
+            at = oi - (mi < oi ? 1 : 0);
+        }
+        groups[at].nei = groups[at].nei || nei;
+        groups[at].nativeFamily = groups[at].nativeFamily || !nei;
+        groups[at].mmTierCap = std::max(groups[at].mmTierCap, cap);
+    };
+    for (const auto& p : pairs)
+        connect(p.ootName, p.mmName, true, std::numeric_limits<size_t>::max());
+    for (int i = 0; i < SF_COUNT; ++i) {
+        const auto& def = SharedFamilyByIndex(i);
+        if (!(mask & (1u << i)) || !def.mmHasItem)
+            continue;
+        connect(def.ootName, def.mmName, false, static_cast<size_t>(def.mmTierCap));
+        // Prefer the native OOT representation for an enabled family when deduplicating aliases.
+        for (auto& group : groups) {
+            auto n = std::find_if(group.names.begin(), group.names.end(),
+                                  [&](const CwSharedName& n) { return n.game == GAME_OOT && n.name == def.ootName; });
+            if (n != group.names.end())
+                std::rotate(group.names.begin(), n, n + 1);
+        }
+    }
+    return groups;
+}
+
+// Inputs contain only actual pickups. Rebuild the oracle views on every query; mirrored aliases
+// must never flow back into the pickup vectors or progressive tiers inflate on the next sphere.
+inline void SharedOwnedViews(const std::vector<CwSharedGroup>& groups, const std::vector<std::string>& ootOwned,
+                             const std::vector<std::string>& mmOwned, std::vector<std::string>& ootSeen,
+                             std::vector<std::string>& mmSeen) {
+    ootSeen = ootOwned;
+    mmSeen = mmOwned;
+    if (groups.empty())
+        return;
+    std::unordered_map<std::string, size_t> counts[2];
+    for (const auto& n : ootOwned)
+        ++counts[GAME_OOT][n];
+    for (const auto& n : mmOwned)
+        ++counts[GAME_MM][n];
+    for (const auto& group : groups) {
+        size_t copies = 0;
+        for (const auto& n : group.names) {
+            copies += counts[n.game][n.name];
+        }
+        for (const auto& n : group.names) {
+            auto& seen = n.game == GAME_OOT ? ootSeen : mmSeen;
+            const size_t native = counts[n.game][n.name];
+            const size_t target = n.game == GAME_MM && !group.nei ? std::min(copies, group.mmTierCap) : copies;
+            if (target > native)
+                seen.insert(seen.end(), target - native, n.name);
+        }
+    }
+}
+
+// Suffix cross-game ITEM-name collisions in the consolidated placements so a name like "Mirror Shield"
+// (in both games) reads unambiguously in the file / plandomizer. Only NATIVE placements are suffixed
+// (item's game == check's game), with that game's "(OOT)"/"(MM)" tag; each game strips its own suffix
+// on apply. Foreign checks are skipped (their real cross-game item is carried by the foreign[] array,
+// whose displayName already carries the tag). Check names are never suffixed: they live in per-game
+// objects (oot/mm) and a game DLL can't reproduce a cross-game-aware suffix at runtime.
+// sharedNames are exempt: a shared pair is ONE item, and tagging it would advertise two.
+inline void SuffixCrossGameItems(nlohmann::json& ootPlacements, nlohmann::json& mmPlacements,
+                                 const nlohmann::json& foreignArray, const std::string& sohDump,
+                                 const std::string& mmDump, const std::set<std::string>& sharedNames = {}) {
+    auto itemNames = [](const std::string& dump) {
+        std::set<std::string> s;
+        try {
+            auto d = nlohmann::json::parse(dump);
+            for (auto& it : d.value("pool", nlohmann::json::array()))
+                if (auto n = it.value("name", std::string{}); !n.empty())
+                    s.insert(std::move(n));
+            for (auto& it : d.value("items", nlohmann::json::array()))
+                if (auto n = it.value("name", std::string{}); !n.empty())
+                    s.insert(std::move(n));
+            for (auto& f : d.value("fixed", nlohmann::json::array()))
+                if (auto n = f.value("item", std::string{}); !n.empty())
+                    s.insert(std::move(n));
+        } catch (...) {}
+        return s;
+    };
+    std::set<std::string> ootSet = itemNames(sohDump), mmSet = itemNames(mmDump), shared;
+    for (const auto& n : ootSet)
+        if (mmSet.count(n) && !sharedNames.count(n))
+            shared.insert(n);
+    if (shared.empty())
+        return;
+    std::set<std::string> ootForeign, mmForeign;
+    for (const auto& fm : foreignArray) {
+        std::string cg = fm.value("checkGame", ""), cn = fm.value("checkName", "");
+        if (cn.empty())
+            continue;
+        (cg == "oot" ? ootForeign : mmForeign).insert(cn);
+    }
+    auto process = [&](nlohmann::json& pl, const std::set<std::string>& foreign, const char* suf) {
+        for (auto it = pl.begin(); it != pl.end(); ++it) {
+            if (!it.value().is_string() || foreign.count(it.key()))
+                continue;
+            std::string v = it.value().get<std::string>();
+            if (shared.count(v))
+                it.value() = v + suf;
+        }
+    };
+    process(ootPlacements, ootForeign, " (OOT)");
+    process(mmPlacements, mmForeign, " (MM)");
+}
+
+// Load one game's foreign-check section from the pushed spoiler blob, keyed by check name.
+// Returns empty on missing/corrupt data (never throws across the channel). slot is unused now that
+// the source is the in-memory blob (kept for call-site compatibility).
+inline std::unordered_map<std::string, ForeignItem> LoadForeignForGame(int slot, GameId checkGame) {
+    (void)slot;
+    std::unordered_map<std::string, ForeignItem> map;
+    if (g_comboForeignJson.empty())
+        return map;
+    try {
+        nlohmann::json j = nlohmann::json::parse(g_comboForeignJson);
+        const std::string key = GameIdToKey(checkGame);
+        for (const auto& fm : j.value("foreign", nlohmann::json::array())) {
+            if (fm.value("checkGame", "") != key)
+                continue;
+            ForeignItem fi;
+            fi.itemGame = KeyToGameId(fm.value("itemGame", ""));
+            fi.itemName = fm.value("itemName", "");
+            fi.displayName = fm.value("displayName", fi.itemName);
+            fi.advancement = fm.value("advancement", false);
+            // Absent in pre-trap-flag saves -> false -> the item cross-delivers as before.
+            fi.trap = fm.value("trap", false);
+            // Absent in pre-Shared-Items saves -> false -> tagged exactly as before.
+            fi.shared = fm.value("shared", false);
+            // Absent in pre-category saves -> empty -> consumers fall back to advancement.
+            fi.category = fm.value("category", "");
+            // Absent in pre-disguise saves -> empty -> every consumer falls back to the true name.
+            fi.fakeItemName = fm.value("fakeItemName", "");
+            fi.fakeDisplayName = fm.value("fakeDisplayName", "");
+            fi.fakeTrickName = fm.value("fakeTrickName", "");
+            map.emplace(fm.value("checkName", ""), std::move(fi));
+        }
+    } catch (...) { /* corrupt -> treat as empty */
+    }
+    return map;
+}
+
+// A foreign check's location, keyed the other way round (by itemName) for a game that wants to know
+// where ITS OWN item ended up when placed at a check in the other game (family-B: MM item -> OOT check).
+struct ForeignPlacement {
+    GameId checkGame;
+    std::string checkName;
+    std::string displayName;
+    bool advancement = false;
+};
+
+// Load itemGame's cross-placed items, keyed by itemName (the item's own namespace). Used when a
+// display routine's local check scan fails and it needs to know which OTHER game's check holds it.
+inline std::unordered_map<std::string, ForeignPlacement> LoadForeignByItem(int slot, GameId itemGame) {
+    (void)slot;
+    std::unordered_map<std::string, ForeignPlacement> map;
+    if (g_comboForeignJson.empty())
+        return map;
+    try {
+        nlohmann::json j = nlohmann::json::parse(g_comboForeignJson);
+        const std::string key = GameIdToKey(itemGame);
+        for (const auto& fm : j.value("foreign", nlohmann::json::array())) {
+            if (fm.value("itemGame", "") != key)
+                continue;
+            ForeignPlacement fp;
+            fp.checkGame = KeyToGameId(fm.value("checkGame", ""));
+            fp.checkName = fm.value("checkName", "");
+            fp.displayName = fm.value("displayName", fp.checkName);
+            fp.advancement = fm.value("advancement", false);
+            map.emplace(fm.value("itemName", ""), std::move(fp));
+        }
+    } catch (...) { /* corrupt -> treat as empty */
+    }
+    return map;
+}
+
+// Phase 4: MM's cross-game hint consumption. Mirrors the "hints.mm" object CrossHints.h::Generate
+// writes (gossipPool for gossip-stone draws, itemLocations for family-B GetItemLocationHintName).
+struct HintGossipEntry {
+    uint32_t weight = 1;
+    std::string text;
+};
+struct MmHints {
+    std::vector<HintGossipEntry> gossipPool;
+    std::unordered_map<std::string, std::string> itemLocations; // itemName -> "in <area> (OOT)"
+};
+
+// Load the hints.mm object from the pushed spoiler blob. Empty (never throws) on missing/corrupt
+// data. slot unused (source is the in-memory blob; kept for call-site compatibility).
+inline MmHints LoadHintsMM(int slot) {
+    (void)slot;
+    MmHints out;
+    if (g_comboForeignJson.empty())
+        return out;
+    try {
+        nlohmann::json j = nlohmann::json::parse(g_comboForeignJson);
+        auto mm = j.value("hints", nlohmann::json::object()).value("mm", nlohmann::json::object());
+        for (auto& g : mm.value("gossipPool", nlohmann::json::array()))
+            out.gossipPool.push_back({ g.value("weight", 1u), g.value("text", "") });
+        const auto itemLocs = mm.value("itemLocations", nlohmann::json::object());
+        for (auto& [k, v] : itemLocs.items())
+            out.itemLocations.emplace(k, v.get<std::string>());
+    } catch (...) { /* corrupt -> treat as empty */
+    }
+    return out;
+}
+
+} // namespace ComboRando
