@@ -18,12 +18,13 @@ The engine under `combo/rando/` is already here, unchanged. What is left is the 
 | IDs | Feature | State |
 | --- | --- | --- |
 | — | Oracle, seed dump, Link's Pocket, settings dump and restore (WU148) | Done |
-| — | Goal: bosses or combined Triforce Hunt; starting game OoT or MM | Pending |
-| — | OoT entrance shuffle, dump and replay of its layout | Pending |
-| WU057–WU058 | Vanilla/MQ dungeon layouts and exact replay | Pending |
-| IT109–IT126 | Shared item families (bows, bags, magic, wallets, hookshot, arrows, lens, songs, masks) | Pending: generation, then runtime tier sync in the host |
-| WU043–WU053 | Cross-dungeon, boss, interior, grotto and shop entrances across games | Pending: catalogue, exits and runtime warps |
-| WU147 | Cross-game hints | Pending |
+| — | Goal: bosses or combined Triforce Hunt; starting game OoT or MM | Done |
+| — | OoT entrance shuffle and its recorded layout | Done |
+| WU057–WU058 | Master Quest dungeons recorded per seed | Done; mixed vanilla/MQ asset setup is the host's |
+| IT109–IT126 | Shared item families (bows, bags, magic, wallets, hookshot, arrows, lens, songs, masks) | Generation done; runtime tier sync in the host |
+| WU043–WU052 | Cross-game dungeon, interior, shop and grotto entrances | Generation and replay done; boss arenas and runtime warps pending |
+| WU147 | Cross-game hints | Done |
+| — | Saved prices and `--playthrough` validation | Done |
 | IT127–IT130 | Cross-world grant correctness (dormant banking, wallet safety, MM no-effect grants, deterministic foreign junk) | Host runtime |
 | WU054–WU056, CO016 | Combo/OoT/MM launcher modes, solo save namespaces, two-game save container | Host runtime |
 | WU121–WU124 | Config import, settings sync, Time Splits and trackers | Host UI |

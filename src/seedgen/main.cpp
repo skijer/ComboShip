@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -15,6 +16,8 @@
 
 #include "GameModule.h"
 #include "rando/ComboPlaythrough.h"
+#include "rando/CrossDungeonCoordinator.h"
+#include "rando/CrossDungeonGeneration.h"
 #include "rando/CrossForeign.h"
 #include "rando/CrossHints.h"
 #include "rando/CrossWorldRando.h"
@@ -41,6 +44,8 @@ struct Options {
     StartingGame start = StartingGame::Oot;
     uint32_t sharedMask = 0;
     std::string dumpDirectory;
+    std::optional<ComboRando::CrossDungeon::PoolOptions> crossPools;
+    std::string playthroughPath;
 };
 
 struct Fill {
@@ -51,6 +56,10 @@ struct Fill {
     std::string mmDump;
     std::string ootHintDump;
     ComboRando::RequirednessResult requiredness;
+    nlohmann::json crossDungeonSeed;
+    // Routed through the cross-game entrances once those are laid out.
+    ComboRando::OracleFns ootOracle;
+    ComboRando::OracleFns mmOracle;
 };
 
 const char* const kGameKeys[GameCount] = { "oot", "mm" };
@@ -104,6 +113,60 @@ template <GameIndex Game> struct Oracle {
     }
 };
 
+// The cross-dungeon coordinator also takes plain function pointers; an empty reply is a refusal.
+template <GameIndex Game> struct CrossHost {
+    static const char* Reply(const std::string& op, const std::string& json) {
+        static std::string reply;
+        reply = sGames[Game]->Request(op, json);
+        return reply.empty() ? nullptr : reply.c_str();
+    }
+
+    static const char* DumpCatalogue() {
+        return Reply("DumpCrossDungeonCatalogue", "{}");
+    }
+
+    static const char* DumpCatalogueForOptions(const char* options) {
+        return Reply("DumpCrossDungeonCatalogue", options);
+    }
+
+    static const char* DumpSeedCatalogue(const char* spoiler) {
+        return Reply("DumpCrossDungeonCatalogueForSeed", spoiler);
+    }
+
+    static int SetSeed(const char* seed) {
+        return Reply("SetCrossDungeonSeed", seed) != nullptr ? 1 : 0;
+    }
+
+    static void SetAccess(const char* access) {
+        Reply("SetCrossDungeonAccess", access);
+    }
+
+    static const char* GetExits() {
+        return Reply("GetCrossDungeonExits", "{}");
+    }
+
+    static int CanEnterArrival(int32_t entrance) {
+        const char* reply = Reply("CanEnterCrossEntrance", nlohmann::json{ { "entrance", entrance } }.dump());
+        return reply != nullptr && nlohmann::json::parse(reply).value("allowed", false) ? 1 : 0;
+    }
+
+    static ComboRando::CrossDungeon::HostFns Fns() {
+        ComboRando::CrossDungeon::HostFns fns;
+        fns.DumpCatalogue = DumpCatalogue;
+        fns.SetSeed = SetSeed;
+        fns.SetAccess = SetAccess;
+        fns.GetExits = GetExits;
+        fns.DumpSeedCatalogue = DumpSeedCatalogue;
+        fns.DumpCatalogueForOptions = DumpCatalogueForOptions;
+        if (Game == Mm) {
+            fns.CanEnterArrival = CanEnterArrival;
+        }
+        return fns;
+    }
+};
+
+ComboRando::CrossDungeon::Coordinator sCrossDungeons;
+
 // "required:total" pieces across both games; total defaults to required.
 bool ParseTriforceHunt(const std::string& value, ComboRando::CwGoal& goal) {
     const size_t colon = value.find(':');
@@ -154,6 +217,22 @@ bool ParseSharedItems(const std::string& value, uint32_t& mask) {
     return mask != 0;
 }
 
+// The cross-game entrance pools to shuffle, e.g. "dungeons,interiors,grottos".
+bool ParseCrossPools(const std::string& value, std::optional<ComboRando::CrossDungeon::PoolOptions>& pools) {
+    const nlohmann::json known = ComboRando::CrossDungeon::OptionsJson({});
+    nlohmann::json flags = { { "dungeons", false } };
+    std::stringstream names(value);
+    std::string name;
+    while (std::getline(names, name, ',')) {
+        if (!known.contains(name)) {
+            return false;
+        }
+        flags[name] = true;
+    }
+    pools = ComboRando::CrossDungeon::ParseOptions(flags);
+    return pools->Any();
+}
+
 bool ParseOptions(int argc, char* argv[], Options& options) {
     for (int i = 1; i + 1 < argc; i += 2) {
         const std::string flag = argv[i];
@@ -176,6 +255,12 @@ bool ParseOptions(int argc, char* argv[], Options& options) {
             if (!ParseStartingGame(value, options.start)) {
                 return false;
             }
+        } else if (flag == "--cross") {
+            if (!ParseCrossPools(value, options.crossPools)) {
+                return false;
+            }
+        } else if (flag == "--playthrough") {
+            options.playthroughPath = value;
         } else if (flag == "--dumps") {
             options.dumpDirectory = value;
         } else if (flag == "--shared") {
@@ -198,6 +283,7 @@ bool AttachGames(const Options& options) {
     for (const auto& game : sGames) {
         game->Request("InitRandoHeadless");
     }
+    sCrossDungeons.hosts = { CrossHost<Oot>::Fns(), CrossHost<Mm>::Fns() };
     return true;
 }
 
@@ -224,6 +310,10 @@ bool RestoreSettingsFrom(const std::string& spoilerPath, Options& options, bool 
     }
     if (options.sharedMask == 0) {
         options.sharedMask = ComboRando::SharedMaskFromKeys(spoiler.value("sharedItems", nlohmann::json::array()));
+    }
+    const nlohmann::json crossSeed = ComboRando::CrossDungeon::Coordinator::SeedOf(spoiler);
+    if (!options.crossPools && ComboRando::CrossDungeon::Coordinator::Enabled(crossSeed)) {
+        options.crossPools = ComboRando::CrossDungeon::OptionsFromSeed(crossSeed);
     }
     return true;
 }
@@ -291,9 +381,27 @@ ComboRando::RequirednessResult FindRequiredItems(const Fill& fill, const Options
     } else if (noLogic) {
         goal = ComboRando::MmOnlyMajoraGoal;
     }
-    return ComboRando::PareDownPlaythrough(fill.result.spoilerJson, kOotOracle, kMmOracle, nullptr, fill.ootDump,
-                                           fill.mmDump, ootAreas, mmAreas, goal, !noLogic, fill.mmStart, nullptr,
-                                           options.sharedMask);
+    return ComboRando::PareDownPlaythrough(fill.result.spoilerJson, fill.ootOracle, fill.mmOracle, nullptr,
+                                           fill.ootDump, fill.mmDump, ootAreas, mmAreas, goal, !noLogic, fill.mmStart,
+                                           nullptr, options.sharedMask);
+}
+
+// The shared entrance pools across both games, structurally validated against both oracles, which it leaves
+// routed through the chosen layout.
+bool LayOutCrossEntrances(Fill& fill, const Options& options) {
+    const bool enabled = options.crossPools.has_value();
+    if (enabled) {
+        sCrossDungeons.SetOptions(*options.crossPools);
+    }
+    try {
+        fill.crossDungeonSeed =
+            ComboRando::CrossDungeon::GenerateValidatedSeed(sCrossDungeons, enabled, fill.masterSeed, fill.ootDump,
+                                                            fill.mmDump, fill.ootOracle, fill.mmOracle, fill.mmStart);
+    } catch (const std::exception& e) {
+        fill.result.error = e.what();
+        return false;
+    }
+    return true;
 }
 
 // One whole fill: both games roll their own pools from masterSeed, then the combined fill places the rest.
@@ -307,7 +415,9 @@ Fill FillOnce(uint32_t masterSeed, const Options& options, bool mmStart) {
     Fill fill = { .masterSeed = masterSeed,
                   .mmStart = mmStart,
                   .ootDump = Oracle<Oot>::DumpStaticData(),
-                  .mmDump = Oracle<Mm>::DumpStaticData() };
+                  .mmDump = Oracle<Mm>::DumpStaticData(),
+                  .ootOracle = kOotOracle,
+                  .mmOracle = kMmOracle };
     if (fill.ootDump.empty() || fill.mmDump.empty()) {
         fill.result.error = "a game could not prepare its seed (see its log)";
         return fill;
@@ -317,9 +427,12 @@ Fill FillOnce(uint32_t masterSeed, const Options& options, bool mmStart) {
         return fill;
     }
     const std::string forcedOot = sGames[Oot]->Request("GetForcedPlacements");
+    if (!LayOutCrossEntrances(fill, options)) {
+        return fill;
+    }
     const ComboRando::OotAccess ootAccess = ComboRando::OotAccessFromDump(fill.ootDump);
-    fill.result = ComboRando::CrossWorldCombinedFill(fill.ootDump, fill.mmDump, masterSeed, kOotOracle, kMmOracle,
-                                                     nullptr, forcedOot, ootAccess, goal,
+    fill.result = ComboRando::CrossWorldCombinedFill(fill.ootDump, fill.mmDump, masterSeed, fill.ootOracle,
+                                                     fill.mmOracle, nullptr, forcedOot, ootAccess, goal,
                                                      mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT, "",
                                                      options.sharedMask);
     if (fill.result.success) {
@@ -376,9 +489,71 @@ nlohmann::json BuildSpoiler(const Fill& fill, uint32_t seed, const ComboRando::C
         block["prices"] = nlohmann::json::parse(dumps[game]).value("prices", nlohmann::json::object());
         spoiler[kGameKeys[game]] = std::move(block);
     }
+    if (ComboRando::CrossDungeon::Coordinator::Enabled(fill.crossDungeonSeed)) {
+        spoiler["crossDungeonEntrances"] = fill.crossDungeonSeed;
+    }
     spoiler["entrances"] = { { "oot", spoiler["oot"].value("entrances", nlohmann::json::array()) } };
     spoiler["oot"].erase("entrances");
     return spoiler;
+}
+
+// The placements a playthrough walks: the spoiler's own plus every confined one the dumps fix in place, since a
+// saved file lists only shuffled checks while logic still gates on the others (vanilla shops, unshuffled remains).
+nlohmann::json PlaythroughPlacements(const nlohmann::json& spoiler, const std::string dumps[GameCount]) {
+    nlohmann::json flat = { { "foreign", spoiler.value("foreign", nlohmann::json::array()) } };
+    for (int game = 0; game < GameCount; game++) {
+        nlohmann::json placements =
+            spoiler.value(kGameKeys[game], nlohmann::json::object()).value("placements", nlohmann::json::object());
+        const nlohmann::json fixed = nlohmann::json::parse(dumps[game]).value("fixed", nlohmann::json::array());
+        for (const nlohmann::json& entry : fixed) {
+            const std::string check = entry.value("check", "");
+            if (!check.empty() && !placements.contains(check)) {
+                placements[check] = entry.value("item", "");
+            }
+        }
+        flat[kGameKeys[game]] = std::move(placements);
+    }
+    return flat;
+}
+
+// Rebuilds both games' logic for a finished spoiler, with its own prices and cross layout, and walks it.
+int ValidateSpoiler(Options& options) {
+    const nlohmann::json spoiler = nlohmann::json::parse(std::ifstream(options.playthroughPath), nullptr, false);
+    if (!spoiler.is_object() || !RestoreSettingsFrom(options.playthroughPath, options, false)) {
+        std::cerr << "[fleet-seedgen] could not read " << options.playthroughPath << "\n";
+        return 2;
+    }
+    const uint32_t masterSeed = spoiler.value("masterSeed", 0u);
+    const bool mmStart = spoiler.value("startingGame", std::string("OOT")) == "MM";
+    const std::string seed = nlohmann::json{ { "seed", masterSeed } }.dump();
+    for (const auto& game : sGames) {
+        game->Request("SetSeed", seed);
+    }
+    SendComboOptions(options, mmStart);
+    const std::string dumps[GameCount] = { Oracle<Oot>::DumpStaticData(), Oracle<Mm>::DumpStaticData() };
+    for (int game = 0; game < GameCount; game++) {
+        const nlohmann::json prices =
+            spoiler.value(kGameKeys[game], nlohmann::json::object()).value("prices", nlohmann::json::object());
+        sGames[game]->Request("SetCheckPrices", prices.dump());
+    }
+    ComboRando::OracleFns ootOracle = kOotOracle;
+    ComboRando::OracleFns mmOracle = kMmOracle;
+    const nlohmann::json crossSeed = ComboRando::CrossDungeon::Coordinator::SeedOf(spoiler);
+    if (options.crossPools) {
+        sCrossDungeons.SetOptions(*options.crossPools);
+    }
+    ComboRando::CrossDungeon::ValidateSavedStructure(sCrossDungeons, crossSeed, dumps[Oot], dumps[Mm], ootOracle,
+                                                     mmOracle, mmStart);
+
+    const bool portalGated = ComboRando::OotAccessFromDump(dumps[Oot]) != ComboRando::OotAccess::NO_LOGIC;
+    const ComboRando::PlaythroughResult result = ComboRando::RunPlaythrough(
+        PlaythroughPlacements(spoiler, dumps).dump(), ootOracle, mmOracle, std::to_string(masterSeed), nullptr,
+        nullptr, dumps[Oot], dumps[Mm], portalGated, false, options.goal, mmStart, options.sharedMask);
+    sGames[Mm]->Request("Finish");
+    std::cout << "[fleet-seedgen] " << options.playthroughPath << (result.beatable ? " BEATABLE" : " NOT BEATABLE")
+              << ": OoT " << result.reachableOot << " reachable / " << result.unreachableOot << " not, MM "
+              << result.reachableMm << " / " << result.unreachableMm << "\n";
+    return result.beatable ? 0 : 1;
 }
 
 // A Random start falls back to OoT on the last attempt, as ComboShip's generator does.
@@ -395,7 +570,9 @@ int GenerateSeed(int argc, char* argv[]) {
         std::cerr << "usage: fleet-seedgen --oot <Ship folder> --mm <2Ship folder> [--seed N] [--out spoiler.json]\n"
                      "                     [--settings spoiler.json] [--triforce required[:total]]\n"
                      "                     [--start oot|mm|random] [--shared all|bows,wallets,...]\n"
-                     "                     [--dumps <folder>]\n";
+                     "                     [--cross dungeons,expanded,interiors,shops,doorInteriors,grottos]\n"
+                     "                     [--dumps <folder>]\n"
+                     "       fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --playthrough spoiler.json\n";
         return 2;
     }
     const bool commandLineGoal = options.goal.hunt || options.start != StartingGame::Oot;
@@ -406,6 +583,9 @@ int GenerateSeed(int argc, char* argv[]) {
     context->InitConsoleVariables();
     if (!AttachGames(options)) {
         return 2;
+    }
+    if (!options.playthroughPath.empty()) {
+        return ValidateSpoiler(options);
     }
     if (!options.settingsPath.empty() && !RestoreSettingsFrom(options.settingsPath, options, commandLineGoal)) {
         return 2;

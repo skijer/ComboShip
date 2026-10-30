@@ -36,19 +36,22 @@ The proposal is one appended field, `char* (*RandoRequest)(const char* op, const
 ```sh
 fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --seed 12345 --out spoiler.json
               [--settings other.json] [--triforce required[:total]] [--start oot|mm|random]
+              [--shared all|bows,wallets,...] [--cross dungeons,expanded,interiors,shops,doorInteriors,grottos]
+              [--dumps <folder>]
+fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --playthrough spoiler.json
 ```
 
-It needs the games' `fleet-rando` branches (contract 1.1). Fleet builds its own `libultraship.dll` from the submodule, with the options both games use, and each game binds to it.
+It needs the games' `fleet-rando` branches (contract 1.1). Fleet builds its own `libultraship.dll` from the submodule, with the options both games use, and each game binds to it. The cross-dungeon seed formats both games read live in that submodule too, under `include/fleet/rando/`.
 
-The spoiler follows ComboShip's consolidated layout: per game its settings snapshot, placements and prices, the goal, the starting game, OoT's entrance layout and Master Quest dungeons, plus the cross-game `foreign` list. `--settings` takes the settings, tricks, goal and starting game from another spoiler instead of each game's own config; nothing is written back to the games' config files. A Random start resolves exactly as ComboShip's does.
+The spoiler follows ComboShip's consolidated layout: per game its settings snapshot, placements and prices, the goal, the starting game, shared items, OoT's entrance layout and Master Quest dungeons, the cross-game entrance layout, the hints, plus the cross-game `foreign` list. `--settings` takes the settings, tricks, goal, starting game, shared items and cross pools from another spoiler instead of each game's own config; nothing is written back to the games' config files. A Random start resolves exactly as ComboShip's does. `--playthrough` rebuilds both games' logic for a finished spoiler, with its own prices and cross layout, and reports whether it is beatable. `--dumps` writes what each game handed the engine.
 
-Served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, the headless init, settings dump and restore, the combined goal (bosses or a Triforce Hunt split across both pools), the MM start, and OoT's own entrance shuffle. Both games name checks and items by unique readable names.
+Served by the games: the oracle, the seed dump with everything each game confines to itself, Link's Pocket, the headless init, settings dump and restore, the combined goal (bosses or a Triforce Hunt split across both pools), the MM start, shared item families, OoT's own entrance shuffle, the cross-game dungeon, interior, shop and grotto pools, hint data and saved prices. Both games name checks and items by unique readable names.
 
-Not served yet: spoiler prices for replay, cross-dungeon entrances, shared item tiers and hints.
+Not served yet: cross-game boss arenas, and everything that happens while playing (the host).
 
 See [docs/pr2-triage.md](docs/pr2-triage.md) for what else PR #2 brings and where each part goes.
 
 ## Next
 
-1. The remaining `RandoRequest` services, in the order above.
-2. The Fleet host itself: window, game selection, scene switches, saves and the item mapper.
+1. Cross-game boss arenas: boss clears must reach both games' logic through one dispatch point.
+2. The Fleet host itself: window, game selection, scene switches and cross-game warps, saves, the item mapper and shared item tiers at run time.
