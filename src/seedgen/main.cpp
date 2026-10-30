@@ -68,10 +68,10 @@ void LogFromGame(const char* game, FleetLogLevel level, const char* message) {
     std::cerr << "[" << game << "] " << message << "\n";
 }
 
-const FleetHostApi sHost = { .structSize = sizeof(FleetHostApi),
-                             .major = FLEET_GAME_API_MAJOR,
-                             .minor = FLEET_GAME_API_MINOR,
-                             .Log = LogFromGame };
+// The seed generator offers the games only its log; they run no frames here.
+void* HostFunction(const char* name) {
+    return std::string(name) == "Log" ? reinterpret_cast<void*>(LogFromGame) : nullptr;
+}
 
 // The combined fill takes plain function pointers, so each game gets its own set of entry points.
 template <GameIndex Game> struct Oracle {
@@ -81,25 +81,25 @@ template <GameIndex Game> struct Oracle {
 
     static void Reset() {
         Ship::GameScope scope(Module().Name());
-        Module().Api().RandoReset();
+        Module().Functions().RandoReset();
     }
 
     static void SetOwnedItems(const char* itemsJson) {
         Ship::GameScope scope(Module().Name());
-        Module().Api().RandoSetOwnedItems(itemsJson);
+        Module().Functions().RandoSetOwnedItems(itemsJson);
     }
 
     // The fill reads the result before the next query, so one buffer per game is enough.
     static const char* GetReachableChecks() {
         static std::string reachable;
         Ship::GameScope scope(Module().Name());
-        reachable = Module().TakeString(Module().Api().RandoGetReachableChecks());
+        reachable = Module().TakeString(Module().Functions().RandoGetReachableChecks());
         return reachable.c_str();
     }
 
     static void PlaceItem(const char* check, const char* item) {
         Ship::GameScope scope(Module().Name());
-        Module().Api().RandoPlaceItem(check, item);
+        Module().Functions().RandoPlaceItem(check, item);
     }
 
     static uint8_t GetPortalOpen() {
@@ -109,7 +109,7 @@ template <GameIndex Game> struct Oracle {
 
     static std::string DumpStaticData() {
         Ship::GameScope scope(Module().Name());
-        return Module().TakeString(Module().Api().DumpRandoStaticData());
+        return Module().TakeString(Module().Functions().DumpRandoStaticData());
     }
 };
 
@@ -275,8 +275,8 @@ bool ParseOptions(int argc, char* argv[], Options& options) {
 }
 
 bool AttachGames(const Options& options) {
-    sGames[Oot] = GameModule::Load(options.ootDirectory, "soh", sHost);
-    sGames[Mm] = GameModule::Load(options.mmDirectory, "2ship", sHost);
+    sGames[Oot] = GameModule::Load(options.ootDirectory, "soh", HostFunction);
+    sGames[Mm] = GameModule::Load(options.mmDirectory, "2ship", HostFunction);
     if (sGames[Oot] == nullptr || sGames[Mm] == nullptr) {
         return false;
     }

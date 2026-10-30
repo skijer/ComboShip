@@ -100,9 +100,12 @@ void Activate(GameIndex target) {
     HostedGame& game = sGames[target];
     sActive = target;
     if (game.fiber == nullptr) {
-        game.fiber = std::make_unique<GameFiber>([&game] { game.module->Api().Run(&game.arrival); });
+        game.fiber = std::make_unique<GameFiber>([&game] { game.module->Functions().Run(&game.arrival); });
     } else {
         Ship::GameRegistry::SetActive(game.module->Name());
+        if (game.module->Functions().Arrive != nullptr) {
+            game.module->Functions().Arrive(&game.arrival);
+        }
     }
     game.fiber->SwitchTo();
 }
@@ -135,12 +138,19 @@ void FrameEnd(const char* game) {
     Ship::GameRegistry::SetActive(game);
 }
 
-const FleetHostApi sHost = { .structSize = sizeof(FleetHostApi),
-                             .major = FLEET_GAME_API_MAJOR,
-                             .minor = FLEET_GAME_API_MINOR,
-                             .Log = LogFromGame,
-                             .RequestSwitch = RequestSwitch,
-                             .FrameEnd = FrameEnd };
+void* HostFunction(const char* name) {
+    const std::string service = name;
+    if (service == "Log") {
+        return reinterpret_cast<void*>(LogFromGame);
+    }
+    if (service == "RequestSwitch") {
+        return reinterpret_cast<void*>(RequestSwitch);
+    }
+    if (service == "FrameEnd") {
+        return reinterpret_cast<void*>(FrameEnd);
+    }
+    return nullptr;
+}
 
 // A double-clicked fleet.exe finds the games through fleet.json beside it; relative paths start there.
 void LoadInstallFile(Options& options) {
@@ -193,7 +203,7 @@ bool AttachGames(const Options& options) {
         { { options.ootDirectory, "soh" }, { options.mmDirectory, "2ship" } }
     };
     for (int game = 0; game < GameCount; game++) {
-        sGames[game].module = GameModule::Load(installs[game].first, installs[game].second, sHost);
+        sGames[game].module = GameModule::Load(installs[game].first, installs[game].second, HostFunction);
         if (sGames[game].module == nullptr && sAttachProblems.empty()) {
             sAttachProblems.push_back(std::string(installs[game].second) + " could not be loaded from " +
                                       installs[game].first + ".");

@@ -18,16 +18,14 @@ cmake -S . -B build && cmake --build build && ctest --test-dir build
 
 ## What the engine needs from each game
 
-The headless driver resolves 56 game exports by name. Under Fleet these become calls on `FleetGameApi`:
+ComboShip's headless driver resolves 56 game exports by name. Under Fleet every service is a function looked up by name too: Fleet asks a game through its single export `Fleet_GetFunction`, and a game asks Fleet through the lookup it receives in `Attach`. A name that is not there is a service not offered; there is no contract version.
 
-| Group | Exports today | Under Fleet |
+| Group | ComboShip exports | Under Fleet |
 | --- | --- | --- |
-| Logic oracle | `Combo_*_Rando_Reset`, `SetOwnedItems`, `GetReachableChecks`, `PlaceItem`, `Restore`; `Combo_SOH_Rando_GetPortalOpen` | The `Rando*` fields already in the contract. |
-| Static data | `*_DumpRandoStaticData`, `SOH_DumpRandoHintData`, `SOH_DumpSharedItemPairs`, `SOH_GetForcedPlacements` | `DumpRandoStaticData` plus a generic request call. |
-| Settings | `*_DumpRandoSettings`, `*_RestoreRandoSettings`, `*_InitRandoHeadless`, `SOH_PrepRandoContext`, `SOH_Read*CVars`, `*_SetCombo*`, `*_SetCheckPrices`, the tricks calls, `SOH_NormalizeComboGraceFromMM` | Generic request call. |
-| Dungeons and entrances | `*_DumpCrossDungeonCatalogue`, `*_GetCrossDungeonExits`, `*_SetCrossDungeon*`, `MM_CanEnterCrossEntrance`, `SOH_ShuffleEntrancesForCombo`, `SOH_ApplyEntranceOverridesForCombo`, `SOH_DumpEntranceOverrides`, the dungeon-layout calls | Generic request call; `ResolveExit` at run time. |
-
-The proposal is one appended field, `char* (*RandoRequest)(const char* op, const char* json)`, keyed by the export names above. That keeps the contract small and lets the game side grow without bumping its version.
+| Logic oracle | `Combo_*_Rando_Reset`, `SetOwnedItems`, `GetReachableChecks`, `PlaceItem`, `Restore`; `Combo_SOH_Rando_GetPortalOpen` | `RandoReset`, `RandoSetOwnedItems`, `RandoGetReachableChecks`, `RandoPlaceItem`; the portal through `RandoRequest`. |
+| Static data | `*_DumpRandoStaticData`, `SOH_DumpRandoHintData`, `SOH_DumpSharedItemPairs`, `SOH_GetForcedPlacements` | `DumpRandoStaticData`, and `RandoRequest` for the rest. |
+| Settings | `*_DumpRandoSettings`, `*_RestoreRandoSettings`, `*_InitRandoHeadless`, `SOH_PrepRandoContext`, `SOH_Read*CVars`, `*_SetCombo*`, `*_SetCheckPrices`, the tricks calls | `RandoRequest`, one op per service. |
+| Dungeons and entrances | `*_DumpCrossDungeonCatalogue`, `*_GetCrossDungeonExits`, `*_SetCrossDungeon*`, `MM_CanEnterCrossEntrance`, `SOH_ShuffleEntrancesForCombo`, the entrance and dungeon-layout calls | `RandoRequest`; switching games through `RequestSwitch` and `Arrive`. |
 
 ## fleet-seedgen
 
@@ -41,7 +39,7 @@ fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --seed 12345 --out spoiler
 fleet-seedgen --oot <Ship folder> --mm <2Ship folder> --playthrough spoiler.json
 ```
 
-It needs the games' `fleet-rando` branches (contract 1.1). Fleet builds its own `libultraship.dll` from the submodule, with the options both games use, and each game binds to it. The cross-dungeon seed formats both games read live in that submodule too, under `include/fleet/rando/`.
+It needs the games' `fleet-rando` branches. Fleet builds its own `libultraship.dll` from the submodule, with the options both games use, and each game binds to it. The cross-dungeon seed formats both games read live in that submodule too, under `include/fleet/rando/`.
 
 The spoiler follows ComboShip's consolidated layout: per game its settings snapshot, placements and prices, the goal, the starting game, shared items, OoT's entrance layout and Master Quest dungeons, the cross-game entrance layout, the hints, plus the cross-game `foreign` list. `--settings` takes the settings, tricks, goal, starting game, shared items and cross pools from another spoiler instead of each game's own config; nothing is written back to the games' config files. A Random start resolves exactly as ComboShip's does. `--playthrough` rebuilds both games' logic for a finished spoiler, with its own prices and cross layout, and reports whether it is beatable. `--dumps` writes what each game handed the engine.
 
