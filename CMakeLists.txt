@@ -23,9 +23,11 @@ if(NOT nlohmann_json_FOUND)
     FetchContent_MakeAvailable(nlohmann_json)
 endif()
 
-# The combined randomizer engine: game-agnostic headers that talk to each game through JSON.
+# The combined randomizer engine: game-agnostic headers that talk to each game through JSON. The seed formats
+# both games also read live with the Fleet contract in libultraship.
 add_library(fleet-rando INTERFACE)
-target_include_directories(fleet-rando INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/combo)
+target_include_directories(fleet-rando INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/combo
+                                                 ${CMAKE_CURRENT_SOURCE_DIR}/libultraship/include/fleet/rando)
 target_link_libraries(fleet-rando INTERFACE nlohmann_json::nlohmann_json)
 if(MSVC)
     target_compile_options(fleet-rando INTERFACE /bigobj /utf-8)

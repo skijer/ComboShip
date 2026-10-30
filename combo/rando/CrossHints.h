@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <cstdint>
 #include <iostream>
 #include <optional>
@@ -467,7 +468,10 @@ inline nlohmann::json Generate(uint32_t masterSeed, const std::string& sohDumpJs
             if (totalStones == 0)
                 break;
             std::string name = trialName.get<std::string>();
-            Tri msg = EnglishOnly("The " + name + " is required to reach Ganon's Castle.");
+            // Ship's trial names carry their own article ("the Light Trial").
+            std::string sentence = name + " is required to reach Ganon's Castle.";
+            sentence[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(sentence[0])));
+            Tri msg = EnglishOnly(sentence);
             for (uint8_t copy = 0; copy < preset.trialCopies && totalStones > 0; ++copy, --totalStones) {
                 ootHints.push_back({ { "checkName", "__TRIAL__" + name + std::to_string(copy) },
                                      { "type", "trial" },

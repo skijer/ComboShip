@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -13,6 +14,9 @@
 #include <ship/GameRegistry.h>
 
 #include "GameModule.h"
+#include "rando/ComboPlaythrough.h"
+#include "rando/CrossForeign.h"
+#include "rando/CrossHints.h"
 #include "rando/CrossWorldRando.h"
 
 #ifdef _WIN32
@@ -36,6 +40,7 @@ struct Options {
     ComboRando::CwGoal goal;
     StartingGame start = StartingGame::Oot;
     uint32_t sharedMask = 0;
+    std::string dumpDirectory;
 };
 
 struct Fill {
@@ -44,6 +49,8 @@ struct Fill {
     bool mmStart;
     std::string ootDump;
     std::string mmDump;
+    std::string ootHintDump;
+    ComboRando::RequirednessResult requiredness;
 };
 
 const char* const kGameKeys[GameCount] = { "oot", "mm" };
@@ -169,6 +176,8 @@ bool ParseOptions(int argc, char* argv[], Options& options) {
             if (!ParseStartingGame(value, options.start)) {
                 return false;
             }
+        } else if (flag == "--dumps") {
+            options.dumpDirectory = value;
         } else if (flag == "--shared") {
             if (!ParseSharedItems(value, options.sharedMask)) {
                 return false;
@@ -234,6 +243,59 @@ void SendComboOptions(const Options& options, bool mmStart) {
     }
 }
 
+const ComboRando::OracleFns kOotOracle = { .Reset = Oracle<Oot>::Reset,
+                                           .SetOwnedItems = Oracle<Oot>::SetOwnedItems,
+                                           .GetReachableChecks = Oracle<Oot>::GetReachableChecks,
+                                           .PlaceItem = Oracle<Oot>::PlaceItem,
+                                           .GetPortalOpen = Oracle<Oot>::GetPortalOpen };
+const ComboRando::OracleFns kMmOracle = { .Reset = Oracle<Mm>::Reset,
+                                          .SetOwnedItems = Oracle<Mm>::SetOwnedItems,
+                                          .GetReachableChecks = Oracle<Mm>::GetReachableChecks,
+                                          .PlaceItem = Oracle<Mm>::PlaceItem };
+
+// What each game handed the engine, for inspecting a seed by hand.
+void WriteDumps(const Fill& fill, const std::string& directory) {
+    if (directory.empty()) {
+        return;
+    }
+    std::filesystem::create_directories(directory);
+    std::ofstream(std::filesystem::path(directory) / "oot.json") << fill.ootDump;
+    std::ofstream(std::filesystem::path(directory) / "mm.json") << fill.mmDump;
+    std::ofstream(std::filesystem::path(directory) / "oot-hints.json") << fill.ootHintDump;
+    std::ofstream(std::filesystem::path(directory) / "fill.json") << fill.result.spoilerJson;
+}
+
+// Which placements the goal truly needs, for Way of the Hero and Foolish hints. Runs while the games still
+// hold this attempt's seed. Without logic only MM's half is checked, since OoT may be unbeatable by design.
+ComboRando::RequirednessResult FindRequiredItems(const Fill& fill, const Options& options, bool noLogic) {
+    if (options.goal.hunt && noLogic) {
+        return {};
+    }
+    if (!ComboRando::NeedsRequirednessPareDown(fill.ootHintDump, fill.mmDump)) {
+        return {};
+    }
+    std::unordered_map<std::string, std::string> ootAreas;
+    const nlohmann::json ootHints = nlohmann::json::parse(fill.ootHintDump, nullptr, false);
+    for (const nlohmann::json& check : ootHints.value("checks", nlohmann::json::array())) {
+        ootAreas.emplace(check.value("name", ""), check.value("area", ""));
+    }
+    std::unordered_map<std::string, std::string> mmAreas;
+    const nlohmann::json mmLocationHints =
+        nlohmann::json::parse(fill.mmDump).value("locationHints", nlohmann::json::object());
+    for (const auto& [check, area] : mmLocationHints.items()) {
+        mmAreas.emplace(check, area.get<std::string>());
+    }
+    ComboRando::GoalPredicate goal = ComboRando::DefaultGanonMajoraGoal;
+    if (options.goal.hunt) {
+        goal = ComboRando::MakeTriforceHuntGoal(options.goal.required);
+    } else if (noLogic) {
+        goal = ComboRando::MmOnlyMajoraGoal;
+    }
+    return ComboRando::PareDownPlaythrough(fill.result.spoilerJson, kOotOracle, kMmOracle, nullptr, fill.ootDump,
+                                           fill.mmDump, ootAreas, mmAreas, goal, !noLogic, fill.mmStart, nullptr,
+                                           options.sharedMask);
+}
+
 // One whole fill: both games roll their own pools from masterSeed, then the combined fill places the rest.
 Fill FillOnce(uint32_t masterSeed, const Options& options, bool mmStart) {
     const std::string seed = nlohmann::json{ { "seed", masterSeed } }.dump();
@@ -255,19 +317,16 @@ Fill FillOnce(uint32_t masterSeed, const Options& options, bool mmStart) {
         return fill;
     }
     const std::string forcedOot = sGames[Oot]->Request("GetForcedPlacements");
-    const ComboRando::OracleFns ootOracle = { .Reset = Oracle<Oot>::Reset,
-                                              .SetOwnedItems = Oracle<Oot>::SetOwnedItems,
-                                              .GetReachableChecks = Oracle<Oot>::GetReachableChecks,
-                                              .PlaceItem = Oracle<Oot>::PlaceItem,
-                                              .GetPortalOpen = Oracle<Oot>::GetPortalOpen };
-    const ComboRando::OracleFns mmOracle = { .Reset = Oracle<Mm>::Reset,
-                                             .SetOwnedItems = Oracle<Mm>::SetOwnedItems,
-                                             .GetReachableChecks = Oracle<Mm>::GetReachableChecks,
-                                             .PlaceItem = Oracle<Mm>::PlaceItem };
-    fill.result = ComboRando::CrossWorldCombinedFill(
-        fill.ootDump, fill.mmDump, masterSeed, ootOracle, mmOracle, nullptr, forcedOot,
-        ComboRando::OotAccessFromDump(fill.ootDump), goal, mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT, "",
-        options.sharedMask);
+    const ComboRando::OotAccess ootAccess = ComboRando::OotAccessFromDump(fill.ootDump);
+    fill.result = ComboRando::CrossWorldCombinedFill(fill.ootDump, fill.mmDump, masterSeed, kOotOracle, kMmOracle,
+                                                     nullptr, forcedOot, ootAccess, goal,
+                                                     mmStart ? ComboRando::GAME_MM : ComboRando::GAME_OOT, "",
+                                                     options.sharedMask);
+    if (fill.result.success) {
+        fill.ootHintDump = sGames[Oot]->Request("DumpHintData");
+        WriteDumps(fill, options.dumpDirectory);
+        fill.requiredness = FindRequiredItems(fill, options, ootAccess == ComboRando::OotAccess::NO_LOGIC);
+    }
     return fill;
 }
 
@@ -279,23 +338,41 @@ nlohmann::json GoalJson(const ComboRando::CwGoal& goal) {
 }
 
 // ComboShip's consolidated layout: per game its settings snapshot, placements and the prices the seed rolled.
-// OoT's entrance layout moves to the top-level "entrances" block, where ComboShip's validator reads it.
+// Item names both games use get a game tag, cross-game traps get their disguises, and the hints are composed
+// over both games. OoT's entrance layout moves to the top-level "entrances" block, where ComboShip's validator
+// reads it.
 nlohmann::json BuildSpoiler(const Fill& fill, uint32_t seed, const ComboRando::CwGoal& goal) {
-    const nlohmann::json placements = nlohmann::json::parse(fill.result.spoilerJson);
-    const std::string dumps[GameCount] = { fill.ootDump, fill.mmDump };
+    const nlohmann::json fillSpoiler = nlohmann::json::parse(fill.result.spoilerJson);
+    const nlohmann::json sharedItems = fillSpoiler.value("sharedItems", nlohmann::json::array());
+    const uint32_t sharedMask = ComboRando::SharedMaskFromKeys(sharedItems);
+    nlohmann::json placements[GameCount] = { fillSpoiler.value("oot", nlohmann::json::object()),
+                                              fillSpoiler.value("mm", nlohmann::json::object()) };
+    const nlohmann::json rawForeign = fillSpoiler.value("foreign", nlohmann::json::array());
+    ComboRando::SuffixCrossGameItems(placements[Oot], placements[Mm], rawForeign, fill.ootDump, fill.mmDump,
+                                     ComboRando::SharedUntaggedNames(sharedMask));
+    nlohmann::json disguised = rawForeign;
+    ComboRando::AssignTrapDisguises(disguised, fillSpoiler.value("oot", nlohmann::json::object()),
+                                    fillSpoiler.value("mm", nlohmann::json::object()), fill.ootDump, fill.mmDump,
+                                    fill.masterSeed);
+    const nlohmann::json foreign = ComboRando::BuildForeignArray(disguised, sharedMask);
+
     nlohmann::json spoiler = { { "fileType", "ComboShipRandomizer" },
                                { "seed", seed },
                                { "masterSeed", fill.masterSeed },
                                { "goal", GoalJson(goal) },
                                { "startingGame", fill.mmStart ? "MM" : "OOT" },
-                               { "sharedItems", placements.value("sharedItems", nlohmann::json::array()) },
-                               { "foreign", placements.value("foreign", nlohmann::json::array()) } };
+                               { "sharedItems", sharedItems },
+                               { "foreign", foreign },
+                               { "hints", ComboRando::Generate(fill.masterSeed, fill.ootDump, fill.ootHintDump,
+                                                               fill.mmDump, foreign, fill.result.spoilerJson,
+                                                               fill.requiredness) } };
+    const std::string dumps[GameCount] = { fill.ootDump, fill.mmDump };
     for (int game = 0; game < GameCount; game++) {
         nlohmann::json block = nlohmann::json::parse(sGames[game]->Request("DumpSettings"), nullptr, false);
         if (!block.is_object()) {
             block = nlohmann::json::object();
         }
-        block["placements"] = placements.value(kGameKeys[game], nlohmann::json::object());
+        block["placements"] = std::move(placements[game]);
         block["prices"] = nlohmann::json::parse(dumps[game]).value("prices", nlohmann::json::object());
         spoiler[kGameKeys[game]] = std::move(block);
     }
@@ -317,7 +394,8 @@ int GenerateSeed(int argc, char* argv[]) {
     if (!ParseOptions(argc, argv, options)) {
         std::cerr << "usage: fleet-seedgen --oot <Ship folder> --mm <2Ship folder> [--seed N] [--out spoiler.json]\n"
                      "                     [--settings spoiler.json] [--triforce required[:total]]\n"
-                     "                     [--start oot|mm|random] [--shared all|bows,wallets,...]\n";
+                     "                     [--start oot|mm|random] [--shared all|bows,wallets,...]\n"
+                     "                     [--dumps <folder>]\n";
         return 2;
     }
     const bool commandLineGoal = options.goal.hunt || options.start != StartingGame::Oot;
@@ -359,7 +437,12 @@ int GenerateSeed(int argc, char* argv[]) {
 } // namespace
 
 int main(int argc, char* argv[]) {
-    const int status = GenerateSeed(argc, argv);
+    int status = 1;
+    try {
+        status = GenerateSeed(argc, argv);
+    } catch (const std::exception& e) {
+        std::cerr << "[fleet-seedgen] generation aborted: " << e.what() << "\n";
+    }
     std::cout.flush();
     std::cerr.flush();
     // The games have no headless shutdown yet: a normal exit would run their static destructors after
