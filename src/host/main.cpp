@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -12,6 +13,7 @@
 
 #include <SDL2/SDL.h>
 #include <fast/Fast3dWindow.h>
+#include <nlohmann/json.hpp>
 #include <ship/Context.h>
 #include <ship/GameRegistry.h>
 #include <libultraship/controller/controldeck/ControlDeck.h>
@@ -140,7 +142,26 @@ const FleetHostApi sHost = { .structSize = sizeof(FleetHostApi),
                              .RequestSwitch = RequestSwitch,
                              .FrameEnd = FrameEnd };
 
+// A double-clicked fleet.exe finds the games through fleet.json beside it; relative paths start there.
+void LoadInstallFile(Options& options) {
+    char* basePath = SDL_GetBasePath();
+    const std::filesystem::path folder = basePath != nullptr ? basePath : ".";
+    SDL_free(basePath);
+    std::ifstream file(folder / "fleet.json");
+    const nlohmann::json config = nlohmann::json::parse(file, nullptr, false);
+    if (!config.is_object()) {
+        return;
+    }
+    for (auto [key, directory] : { std::pair{ "oot", &options.ootDirectory }, std::pair{ "mm", &options.mmDirectory } }) {
+        const std::string path = config.value(key, "");
+        if (!path.empty()) {
+            *directory = (folder / path).lexically_normal().string();
+        }
+    }
+}
+
 bool ParseOptions(int argc, char* argv[], Options& options) {
+    LoadInstallFile(options);
     for (int i = 1; i + 1 < argc; i += 2) {
         const std::string flag = argv[i];
         const std::string value = argv[i + 1];
@@ -223,7 +244,12 @@ void RegisterCommands() {
 int RunFleet(int argc, char* argv[]) {
     Options options;
     if (!ParseOptions(argc, argv, options)) {
-        std::cerr << "usage: fleet --oot <Ship folder> --mm <2Ship folder> [--start oot|mm] [--smoke frames]\n";
+        const char* usage = "Fleet needs your Ship of Harkinian and 2 Ship 2 Harkinian folders.\n\n"
+                            "Set them in fleet.json next to fleet.exe:\n"
+                            "{ \"oot\": \"../Ship\", \"mm\": \"../2Ship\" }\n\n"
+                            "or pass --oot <folder> --mm <folder> [--start oot|mm] [--smoke frames].";
+        std::cerr << usage << "\n";
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fleet", usage, nullptr);
         return 2;
     }
     sSmokeFrames = options.smokeFrames;
